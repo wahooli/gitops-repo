@@ -13,18 +13,18 @@ locals {
 	full_clone              = true
 	nameserver              = "10.0.0.1 10.0.1.1"
 	searchdomain            = "absolutist.it"
-	clone                   = "debian-11-cloudinit"
-	default_image_password  = "ansible"
-	default_image_username  = "ansible"
+	clone                   = var.clone_from
+	default_image_password  = var.default_user
+	default_image_username  = var.default_user_password
     bios                    = "ovmf"
-    qemu_os                 = "l26"
-    # has qemu-guest-agent
-    agent                   = 1
+    qemu_os                 = "l26" # for some reason this always defaults to other, whatever the value is
+    agent                   = 1 # has qemu-guest-agent
     os_type                 = "cloud-init"
     scsihw                  = "virtio-scsi-single"
     tablet                  = false
     onboot                  = true
     disk_type               = "virtio"
+    sshkeys                 = var.ssh_public_keys
 }
 
 resource "proxmox_vm_qemu" "pve-qemu-bulk" {
@@ -60,7 +60,7 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
     desc            = each.value.desc
     ipconfig0       = "ip=${each.value.net_cidr},gw=${each.value.net_gw}"
     ipconfig1       = "ip=${each.value.storage_cidr}"
-    sshkeys         = var.ssh_public_keys
+    sshkeys         = local.sshkeys
     # define_connection_info = true
     # default_ipv4_address = element(split("/", each.value.net_cidr), 0)
     # ssh_host = element(split("/", each.value.net_cidr), 0)

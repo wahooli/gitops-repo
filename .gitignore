@@ -36,3 +36,9 @@ override.tf.json
 *.retry
 .DS_Store
 terraform-plugin-proxmox.log
+
+# dynamically generated inventories
+ansible/inventory/*.yml
+
+# private keys
+pk/*

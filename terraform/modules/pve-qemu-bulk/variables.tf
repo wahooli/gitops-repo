@@ -23,3 +23,21 @@ variable "ssh_public_keys" {
     description = "Temp SSH public key that will be added to the container"
     type = string
 }
+
+variable "default_user" {
+    description = "Default user to be created from cloud-init"
+    type = string
+	default = "devops"
+}
+
+variable "default_user_password" {
+    description = "Default password for user created from cloud-init"
+    type = string
+	default = "devops"
+}
+
+variable "clone_from" {
+    description = "Clone vm from this template"
+    type = string
+	default = "debian-11-cloudinit"
+}

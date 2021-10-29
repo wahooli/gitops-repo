@@ -24,14 +24,39 @@ provider "proxmox" {
   }
 }
 
+resource "tls_private_key" "bootstrap_private_key" {
+  algorithm = "ECDSA"
+  ecdsa_curve = "P384"
+}
+
+resource "local_file" "private-key" {
+  sensitive_content = tls_private_key.bootstrap_private_key.private_key_pem
+  filename = "${path.module}/../pk/private_key.pem"
+  file_permission = "0600"
+}
+
+
 module "kubernetes_masters" {
   source = "./modules/pve-qemu-bulk"
   vm-list = var.masters
-  ssh_public_keys = var.ssh_pubkey
+  ssh_public_keys = tls_private_key.bootstrap_private_key.public_key_openssh
 }
 
 module "kubernetes_workers" {
   source = "./modules/pve-qemu-bulk"
   vm-list = var.workers
-  ssh_public_keys = var.ssh_pubkey
+  ssh_public_keys = tls_private_key.bootstrap_private_key.public_key_openssh
+}
+
+module "ansible_inventory" {
+  source = "./modules/ansible-inventory"
+  ansible_inventory_filename = "k3s"
+  servers = {
+    master-nodes = [
+      for k,v in var.masters: element(split("/", v.net_cidr), 0)
+      ],
+    worker-nodes = [
+      for k,v in var.workers: element(split("/", v.net_cidr), 0)
+      ]
+  }
 }
