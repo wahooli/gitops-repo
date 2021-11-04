@@ -88,7 +88,7 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
         type        = local.disk_type
         storage     = each.value.disk_storage
         size        = each.value.disk_size
-        format      = "raw"
+        # format      = "raw"
         ssd         = local.disk_type != "virtio" ? 1 : 0
         discard     = "on"
     }

@@ -3,10 +3,10 @@ k3s_shared_secret:
 
 kubevip:
   interface: eth0
-  address: 10.3.1.1
+  address: 10.3.0.1
   bgp:
     node_as: 65537
-    peer_ip: 10.3.0.253
+    peer_ip: 10.0.0.253
     peer_as_number: 65536
 
 k3s_server:
@@ -16,11 +16,11 @@ k3s_server:
 
 calico:
   encapsulation: "None"
-  node_cidr: 10.3.0.0/24
-  metallb_addresses: 10.3.1.2-10.3.1.254 # can be also 10.3.1.0/24
+  node_cidr: 10.0.0.0/24
+  metallb_addresses: 10.3.0.2-10.3.0.254 # can be also 10.3.0.0/24
   bgp:
-    external_ips: 10.3.1.0/24
-    peer_ip: 10.3.0.253
+    external_ips: 10.3.0.0/24
+    peer_ip: 10.0.0.253
     peer_as_number: 65536
     node_as: 65537
 

@@ -52,10 +52,10 @@ module "ansible_inventory" {
   source = "./modules/ansible-inventory"
   ansible_inventory_filename = "k3s"
   servers = {
-    master-nodes = [
+    master_nodes = [
       for k,v in var.masters: element(split("/", v.net_cidr), 0)
       ],
-    worker-nodes = [
+    worker_nodes = [
       for k,v in var.workers: element(split("/", v.net_cidr), 0)
       ]
   }

@@ -1,7 +1,7 @@
 ---
 - hosts:
-  - master-nodes
-  - worker-nodes
+  - master_nodes
+  - worker_nodes
   become: true
   gather_facts: true
   any_errors_fatal: true
@@ -9,13 +9,22 @@
   - update_os
   - prepare
   - k3s/download
-- hosts: master-nodes
+  - k3s/pre-configure
+- hosts: master_nodes
   gather_facts: true
   become: true
   roles:
   - k3s/master
-- hosts: worker-nodes
+- hosts: worker_nodes
   gather_facts: true
   become: true
   roles:
   - k3s/worker
+- hosts:
+  - master_nodes
+  - worker_nodes
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  roles:
+  - k3s/install-cleanup

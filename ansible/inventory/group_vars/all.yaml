@@ -1,7 +1,7 @@
 ---
 
 k3s:
-  server_address: k3s-control.absolutist.it
+  server_address: k3s.absolutist.it
   version: v1.22.2+k3s2
   install_path: /usr/local/bin
   docker_proxy_address: http://dockerproxy.absolutist.it

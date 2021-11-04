@@ -1,21 +1,21 @@
 ---
 - hosts:
-  - master-nodes
-  - worker-nodes
+  - master_nodes
+  - worker_nodes
   become: true
   gather_facts: true
   any_errors_fatal: true
   roles:
   - k3s/download
 - hosts:
-  - master-nodes
+  - master_nodes
   become: true
   gather_facts: true
   any_errors_fatal: true
   roles:
   - k3s/master
 - hosts:
-  - worker-nodes
+  - worker_nodes
   become: true
   gather_facts: true
   any_errors_fatal: true

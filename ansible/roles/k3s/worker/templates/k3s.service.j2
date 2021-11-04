@@ -29,5 +29,5 @@ ExecStart=/usr/local/bin/k3s \
     agent \
  '--node-ip={{ansible_host}}' \
  '--server=https://{{k3s.server_address}}:6443' \
- '--token={{ hostvars[groups['master-nodes'][0]]['token'] }}' \
+ '--token={{ hostvars[groups['master_nodes'][0]]['token'] }}' \
  '--kubelet-arg=feature-gates=GracefulNodeShutdown=true' 

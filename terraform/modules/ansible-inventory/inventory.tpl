@@ -1,7 +1,9 @@
+all:
+  children:
 %{ for name, ips in servers ~}
-${name}:
-  hosts:
+    ${name}:
+      hosts:
 %{ for ip in ips ~}
-    ${ip}:
+        ${ip}:
 %{ endfor ~}
 %{ endfor ~}
