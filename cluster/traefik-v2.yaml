@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: traefik-v2
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  bootstrap: false
+  repo: https://helm.traefik.io/traefik
+  chart: traefik
+  targetNamespace: traefik-v2
+  valuesContent: |-
+    deployment:
+      terminationGracePeriodSeconds: 30
+    providers:
+      kubernetesCRD:
+        enabled: true
+        allowCrossNamespace: true
+    globalArguments:
+    - "--global.checknewversion"
+    service:
+      spec:
+        externalTrafficPolicy: Local

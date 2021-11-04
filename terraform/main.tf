@@ -60,3 +60,20 @@ module "ansible_inventory" {
       ]
   }
 }
+
+
+// Ansible post-provisioning configuration
+resource "null_resource" "configuration" {
+  depends_on = [
+    module.kubernetes_masters,
+    module.kubernetes_workers
+  ]
+
+  // Ansible playbook run - base config
+  provisioner "local-exec" {
+    command = "ansible-playbook -u devops -i ${path.module}/../ansible/inventory --private-key ${path.module}/../pk/private_key.pem ${path.module}/../ansible/k3s.yaml"
+    environment = {
+      ANSIBLE_CONFIG = "${path.module}/../ansible/ansible.cfg"
+    }
+  }
+}

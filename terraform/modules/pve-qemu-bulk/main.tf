@@ -98,4 +98,10 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
 			network
 		]
 	}
+
+    // Clear existing records (if exists) from known_hosts to prevent possible ssh connection issues
+    provisioner "local-exec" {
+        command = "ssh-keygen -f ~/.ssh/known_hosts -R ${element(split("/", each.value.net_cidr), 0)}"
+    }
+
 }

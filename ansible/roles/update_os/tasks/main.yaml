@@ -1,0 +1,13 @@
+---
+- name: Update and upgrade apt packages
+  become: true
+  register: apt_status
+  until: apt_status is success
+  delay: 6
+  retries: 10
+  apt:
+    update_cache: yes
+    upgrade: dist
+    cache_valid_time: 3600
+    autoclean: true
+    autoremove: true

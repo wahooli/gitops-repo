@@ -22,11 +22,6 @@ variable "proxmox_ignore_tls" {
   default     = "true"
 }
 
-variable "ssh_pubkey" {
-  type      = string
-  sensitive = true
-}
-
 variable "masters" {
 	type = map(object({
 		id = optional(number)
