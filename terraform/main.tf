@@ -15,7 +15,7 @@ provider "proxmox" {
   pm_api_token_id     = var.proxmox_api_token_id
   pm_api_token_secret = var.proxmox_api_token_secret
   pm_tls_insecure     = var.proxmox_ignore_tls
-  pm_parallel         = 4
+  pm_parallel         = 6
   pm_log_enable       = false
   pm_debug            = false
   pm_log_levels = {
@@ -24,23 +24,6 @@ provider "proxmox" {
   }
 }
 
-resource "tls_private_key" "bootstrap_private_key" {
-  algorithm = "ECDSA"
-  ecdsa_curve = "P384"
-}
-
-resource "local_file" "private-key" {
-  sensitive_content = tls_private_key.bootstrap_private_key.private_key_pem
-  filename = "${path.module}/../pk/private_key.pem"
-  file_permission = "0600"
-}
-
-
-module "kubernetes_masters" {
-  source = "./modules/pve-qemu-bulk"
-  vm-list = var.masters
-  ssh_public_keys = tls_private_key.bootstrap_private_key.public_key_openssh
-}
 
 module "kubernetes_workers" {
   source = "./modules/pve-qemu-bulk"
@@ -48,22 +31,8 @@ module "kubernetes_workers" {
   ssh_public_keys = tls_private_key.bootstrap_private_key.public_key_openssh
 }
 
-module "ansible_inventory" {
-  source = "./modules/ansible-inventory"
-  ansible_inventory_filename = "k3s"
-  servers = {
-    master_nodes = [
-      for k,v in var.masters: element(split("/", v.net_cidr), 0)
-      ],
-    worker_nodes = [
-      for k,v in var.workers: element(split("/", v.net_cidr), 0)
-      ]
-  }
-}
-
-
 // Ansible post-provisioning configuration
-resource "null_resource" "configuration" {
+resource "null_resource" "ansible" {
   depends_on = [
     module.kubernetes_masters,
     module.kubernetes_workers
@@ -71,9 +40,9 @@ resource "null_resource" "configuration" {
 
   // Ansible playbook run - base config
   provisioner "local-exec" {
-    command = "ansible-playbook -u devops -i ${path.module}/../ansible/inventory --private-key ${path.module}/../pk/private_key.pem ${path.module}/../ansible/k3s.yaml"
+    command = "ansible-playbook -u devops -i ${path.module}/../../ansible/inventory --private-key ${path.module}/../../pk/private_key.pem ${path.module}/../../ansible/k3s.yaml"
     environment = {
-      ANSIBLE_CONFIG = "${path.module}/../ansible/ansible.cfg"
+      ANSIBLE_CONFIG = "${path.module}/../../ansible/ansible.cfg"
     }
   }
 }

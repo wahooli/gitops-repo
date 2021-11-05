@@ -1,21 +1,21 @@
 terraform { 
-	required_providers {
-		proxmox = {
-			source = "telmate/proxmox"
-			version = ">=2.9.0"
-		}
-	}
-	required_version = ">= 1.0.0"
-	experiments = [module_variable_optional_attrs]
+    required_providers {
+        proxmox = {
+            source = "telmate/proxmox"
+            version = ">=2.9.0"
+        }
+    }
+    required_version = ">= 1.0.0"
+    experiments = [module_variable_optional_attrs]
 }
 
 locals {
-	full_clone              = true
-	nameserver              = "10.0.0.1 10.0.1.1"
-	searchdomain            = "absolutist.it"
-	clone                   = var.clone_from
-	default_image_password  = var.default_user
-	default_image_username  = var.default_user_password
+    full_clone              = true
+    nameserver              = "10.0.0.1 10.0.1.1"
+    searchdomain            = "absolutist.it"
+    clone                   = var.clone_from
+    default_image_password  = var.default_user
+    default_image_username  = var.default_user_password
     bios                    = "ovmf"
     qemu_os                 = "l26" # for some reason this always defaults to other, whatever the value is
     agent                   = 1 # has qemu-guest-agent
@@ -35,8 +35,8 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
     full_clone      = local.full_clone 
     bios            = local.bios
     qemu_os         = local.qemu_os # linux
-   	ciuser          = local.default_image_username
-	cipassword      = local.default_image_password
+    ciuser          = local.default_image_username
+    cipassword      = local.default_image_password
     searchdomain    = local.searchdomain
     nameserver      = local.nameserver
     os_type         = local.os_type
@@ -88,20 +88,23 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
         type        = local.disk_type
         storage     = each.value.disk_storage
         size        = each.value.disk_size
-        # format      = "raw"
+        format      = "raw"
         ssd         = local.disk_type != "virtio" ? 1 : 0
         discard     = "on"
     }
     
     lifecycle {
-		ignore_changes = [
-			network
-		]
-	}
+        ignore_changes = [
+            network,
+            disk.0.format
+        ]
+    }
 
     // Clear existing records (if exists) from known_hosts to prevent possible ssh connection issues
     provisioner "local-exec" {
         command = "ssh-keygen -f ~/.ssh/known_hosts -R ${element(split("/", each.value.net_cidr), 0)}"
     }
-
+    provisioner "local-exec" {
+        command = "ssh-keyscan -H ${element(split("/", each.value.net_cidr), 0)} >> ~/.ssh/known_hosts "
+    }
 }

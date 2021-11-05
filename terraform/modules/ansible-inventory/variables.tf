@@ -5,6 +5,6 @@ variable "servers" {
 }
 
 variable "ansible_inventory_filename" {
-    type = string
-    description = "Filename for Ansible inventory file."
+  type = string
+  description = "Filename for Ansible inventory file."
 }
