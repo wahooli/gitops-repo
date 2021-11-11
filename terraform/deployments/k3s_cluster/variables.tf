@@ -3,9 +3,3 @@ variable "remote_user" {
     type = string
     default = "debian"
 }
-
-variable "kubeconfig" {
-    description = "Kubeconfig"
-    type = string
-    default = file("${path.module}/outputs/kubeconfig")
-}

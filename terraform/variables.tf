@@ -22,8 +22,14 @@ variable "proxmox_ignore_tls" {
     default     = "true"
 }
 
-variable "kubeconfig" {
-    description = "Kubeconfig file path"
+variable "github_owner" {
     type        = string
-    default     = "${path.module}/outputs/kubeconfig"
+    description = "github owner"
+    default     = "wahooli"
+}
+
+variable "github_token" {
+    type        = string
+    description = "github token"
+    sensitive   = true
 }

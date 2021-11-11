@@ -34,8 +34,7 @@ variable "target_path" {
     default     = "cluster"
 }
 
-variable "kubeconfig" {
-    type        = string
-    description = "Kubeconfig file path"
-    default     = "${path.module}/../../outputs/kubeconfig"
-}
+# variable "kubeconfig" {
+#     type        = string
+#     description = "Kubeconfig file path"
+# }

@@ -4,6 +4,14 @@ terraform {
             source  = "telmate/proxmox"
             version = ">= 2.9.0"
         }
+        kubectl = {
+            source  = "gavinbunney/kubectl"
+            version = ">= 1.13.1"
+        }
+        flux = {
+            source  = "fluxcd/flux"
+            version = ">= 0.7.1"
+        }
     }
     required_version = ">= 1.0.0"
     experiments = [module_variable_optional_attrs]
@@ -24,6 +32,18 @@ provider "proxmox" {
     }
 }
 
+provider "flux" {}
+
+provider "kubectl" {}
+
+provider "kubernetes" {
+    config_path = "${path.module}/outputs/kubeconfig"
+}
+
+provider "github" {
+    owner = var.github_owner
+    token = var.github_token
+}
 
 module "k3s_cluster" {
     source = "./deployments/k3s_cluster"
@@ -34,4 +54,6 @@ module "flux" {
     depends_on = [
         module.k3s_cluster
     ]
+    github_token = var.github_token
+    github_owner = var.github_owner
 }

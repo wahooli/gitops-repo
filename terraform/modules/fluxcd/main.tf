@@ -10,11 +10,11 @@ terraform {
         }
         kubectl = {
             source  = "gavinbunney/kubectl"
-            version = ">= 1.10.0"
+            version = ">= 1.13.1"
         }
         flux = {
             source  = "fluxcd/flux"
-            version = ">= 0.0.13"
+            version = ">= 0.7.1"
         }
         tls = {
             source  = "hashicorp/tls"
@@ -22,19 +22,6 @@ terraform {
         }
     }
     required_version = ">= 1.0.0"
-}
-
-provider "flux" {}
-
-provider "kubectl" {}
-
-provider "kubernetes" {
-    config_path = var.kubeconfig
-}
-
-provider "github" {
-    owner = var.github_owner
-    token = var.github_token
 }
 
 # SSH
