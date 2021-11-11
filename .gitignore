@@ -39,6 +39,6 @@ terraform-plugin-proxmox.log
 
 # dynamically generated inventories
 ansible/inventory/*.yml
-
+terraform/outputs/*
 # private keys
 pk/*

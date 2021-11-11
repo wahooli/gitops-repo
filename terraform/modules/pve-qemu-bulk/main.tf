@@ -14,8 +14,8 @@ locals {
     nameserver              = "10.0.0.1 10.0.1.1"
     searchdomain            = "absolutist.it"
     clone                   = var.clone_from
-    default_image_password  = var.default_user
-    default_image_username  = var.default_user_password
+    default_image_password  = var.default_user_password
+    default_image_username  = var.default_user
     bios                    = "ovmf"
     qemu_os                 = "l26" # for some reason this always defaults to other, whatever the value is
     agent                   = 1 # has qemu-guest-agent

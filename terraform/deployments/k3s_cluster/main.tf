@@ -88,10 +88,24 @@ resource "tls_private_key" "bootstrap_private_key" {
     ecdsa_curve = "P384"
 }
 
-resource "local_file" "private-key" {
+resource "local_file" "private_key" {
     sensitive_content = tls_private_key.bootstrap_private_key.private_key_pem
-    filename = "${path.module}/../../pk/k3s-pk.pem"
+    filename = "${path.module}/../../../pk/k3s-pk.pem"
     file_permission = "0600"
+}
+
+module "kubernetes_masters" {
+    source = "../../modules/pve-qemu-bulk"
+    vm-list = local.masters
+    ssh_public_keys = tls_private_key.bootstrap_private_key.public_key_openssh
+    default_user = var.remote_user
+}
+
+module "kubernetes_workers" {
+    source = "../../modules/pve-qemu-bulk"
+    vm-list = local.workers
+    ssh_public_keys = tls_private_key.bootstrap_private_key.public_key_openssh
+    default_user = var.remote_user
 }
 
 module "ansible_inventory" {
@@ -107,30 +121,25 @@ module "ansible_inventory" {
   }
 }
 
-module "kubernetes_masters" {
-    source = "../../modules/pve-qemu-bulk"
-    vm-list = local.masters
-    ssh_public_keys = tls_private_key.bootstrap_private_key.public_key_openssh
-}
-
-module "kubernetes_workers" {
-    source = "../../modules/pve-qemu-bulk"
-    vm-list = local.workers
-    ssh_public_keys = tls_private_key.bootstrap_private_key.public_key_openssh
-}
-
 // Ansible post-provisioning configuration
 resource "null_resource" "ansible" {
-  depends_on = [
-    module.kubernetes_masters,
-    module.kubernetes_workers
-  ]
-
-  // Ansible playbook run - base config
-  provisioner "local-exec" {
-    command = "ansible-playbook -u devops -i ${path.module}/../../ansible/inventory --private-key ${path.module}/../../pk/private_key.pem ${path.module}/../../ansible/k3s.yaml"
-    environment = {
-      ANSIBLE_CONFIG = "${path.module}/../../ansible/ansible.cfg"
+    depends_on = [
+        module.kubernetes_masters,
+        module.kubernetes_workers
+    ]
+    triggers = {
+        servers = module.ansible_inventory.server_count
     }
-  }
+
+    // Ansible playbook run - base config
+    provisioner "local-exec" {
+        command = "ansible-playbook -u ${var.remote_user} -i ${path.module}/../../../ansible/inventory --private-key ${path.module}/../../../pk/k3s-pk.pem ${path.module}/../../../ansible/k3s.yaml"
+        environment = {
+            ANSIBLE_CONFIG = "${path.module}/../../../ansible/ansible.cfg"
+        }
+    }
+
+    provisioner "local-exec" {
+        command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${local_file.private_key.filename} ${var.remote_user}@${module.kubernetes_masters.ip_addresses.0}:~/.kube/config ${path.module}/../../outputs/kubeconfig"
+    }
 }

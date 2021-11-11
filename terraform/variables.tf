@@ -22,44 +22,8 @@ variable "proxmox_ignore_tls" {
     default     = "true"
 }
 
-variable "masters" {
-    type = map(object({
-        id = optional(number)
-        target_node = string
-
-        cores = number
-        memory = number
-        desc = optional(string)
-        net_cidr = string
-        net_gw = optional(string)
-        net_bridge = optional(string)
-        net_vlan = optional(number)
-        storage_cidr = string
-        storage_bridge = string
-        storage_vlan = optional(number)
-        disk_size = string
-        disk_storage = string
-    }))
-    description = "Master nodes config"
-}
-
-variable "workers" {
-    type = map(object({
-        id = optional(number)
-        target_node = string
-
-        cores = number
-        memory = number
-        desc = optional(string)
-        net_cidr = string
-        net_gw = optional(string)
-        net_bridge = optional(string)
-        net_vlan = optional(number)
-        storage_cidr = string
-        storage_bridge = string
-        storage_vlan = optional(number)
-        disk_size = string
-        disk_storage = string
-    }))
-    description = "Master nodes config"
+variable "kubeconfig" {
+    description = "Kubeconfig file path"
+    type        = string
+    default     = "${path.module}/outputs/kubeconfig"
 }
