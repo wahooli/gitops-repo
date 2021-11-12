@@ -1,4 +1,5 @@
 locals {
+    kubectl_content = ""
     masters = {
         "k3s-master-01" = {
             id              = 600
@@ -143,3 +144,14 @@ resource "null_resource" "ansible" {
         command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${local_file.private_key.filename} ${var.remote_user}@${module.kubernetes_masters.ip_addresses.0}:~/.kube/config ${path.module}/../../outputs/kubeconfig"
     }
 }
+
+# resource "local_file" "kubeconfig" {
+#     lifecycle {
+#         ignore_changes = [
+#             content,
+#             file_permission,
+#             directory_permission
+#         ]
+#     }
+#     filename = "${path.module}/../../outputs/kubeconfig"
+# }

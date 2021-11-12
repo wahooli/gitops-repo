@@ -1,7 +1,7 @@
 variable "github_owner" {
     type        = string
     description = "github owner"
-    default     = "wahooli"
+    default     = "absolutistit"
 }
 
 variable "github_token" {

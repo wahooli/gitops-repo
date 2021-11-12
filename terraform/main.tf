@@ -12,6 +12,10 @@ terraform {
             source  = "fluxcd/flux"
             version = ">= 0.7.1"
         }
+        github = {
+            source = "integrations/github"
+            version = ">= 4.18.0"
+        }
     }
     required_version = ">= 1.0.0"
     experiments = [module_variable_optional_attrs]
@@ -34,10 +38,13 @@ provider "proxmox" {
 
 provider "flux" {}
 
-provider "kubectl" {}
+provider "kubectl" {
+    insecure = true
+}
 
 provider "kubernetes" {
     config_path = "${path.module}/outputs/kubeconfig"
+    insecure = true
 }
 
 provider "github" {
@@ -49,11 +56,12 @@ module "k3s_cluster" {
     source = "./deployments/k3s_cluster"
 }
 
-module "flux" {
+module "fluxcd" {
     source = "./modules/fluxcd"
-    depends_on = [
-        module.k3s_cluster
-    ]
+    # depends_on = [
+    #     module.k3s_cluster.kubeconfig
+    # ]
     github_token = var.github_token
     github_owner = var.github_owner
+    target_path = "${path.module}/../clusters/k3s-at-home"
 }
