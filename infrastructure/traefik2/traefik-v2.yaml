@@ -2,8 +2,10 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: traefik2
+  namespace: traefik-v2
 spec:
-  releaseName: traefik-v2-traefik-ingress-controller
+  releaseName: traefik
+  targetNamespace: traefik-v2
   chart:
     spec:
       chart: traefik
