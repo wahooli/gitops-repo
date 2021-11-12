@@ -13,13 +13,11 @@ spec:
         kind: HelmRepository
         name: traefik
         namespace: flux-system
-      version: "10.3.2"
+      version: ">=10.3.0"
   interval: 1h0m0s
   install:
     remediation:
       retries: 3
-  # Default values
-  # https://github.com/bitnami/charts/blob/master/bitnami/nginx-ingress-controller/values.yaml
   values:
     deployment:
       terminationGracePeriodSeconds: 30
