@@ -3,8 +3,7 @@ kind: HelmRelease
 metadata:
   name: traefik2
 spec:
-  releaseName: traefik
-  targetNamespace: traefik-v2
+  releaseName: traefik-v2-traefik-ingress-controller
   chart:
     spec:
       chart: traefik
