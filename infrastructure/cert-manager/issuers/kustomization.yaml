@@ -2,13 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 metadata:
   name: cert-manager-issuers
-spec:
-  dependsOn:
-    - name: cert-manager
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: cloudflare-issuer-secrets
 resources:
 - cluster-issuer-production.yaml
 - cluster-issuer-staging.yaml
