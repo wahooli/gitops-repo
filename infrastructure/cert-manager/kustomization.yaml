@@ -1,5 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+metadata:
+  name: cert-manager
 resources:
 - namespace.yaml
-- traefik-v2.yaml
+- helmrelease.yaml
+- issuers

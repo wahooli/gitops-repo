@@ -1,5 +1,6 @@
 locals {
-    kubectl_content = ""
+    proxmox_storage = "nvme-zfs"
+    deploy_key_title = "FluxCD"
     masters = {
         "k3s-master-01" = {
             id              = 600
@@ -12,7 +13,7 @@ locals {
             storage_bridge  = "vmbr140"
             target_node     = "pitfall"
             disk_size       = "50G"
-            disk_storage    = "nvme-mirror"
+            disk_storage    = local.proxmox_storage
         },
         "k3s-master-02" = {
             id              = 601
@@ -25,7 +26,7 @@ locals {
             storage_bridge  = "vmbr140"
             target_node     = "berzerk"
             disk_size       = "50G"
-            disk_storage    = "nvme-mirror"
+            disk_storage    = local.proxmox_storage
         },
         "k3s-master-03" = {
             id              = 602
@@ -38,7 +39,7 @@ locals {
             storage_bridge  = "vmbr140"
             target_node     = "solaris"
             disk_size       = "50G"
-            disk_storage    = "nvme-mirror"
+            disk_storage    = local.proxmox_storage
         }
     }
     workers = {
@@ -53,7 +54,7 @@ locals {
             storage_bridge  = "vmbr140"
             target_node     = "berzerk"
             disk_size       = "50G"
-            disk_storage    = "nvme-mirror"
+            disk_storage    = local.proxmox_storage
         },
         "k3s-worker-02" = {
             id              = 604
@@ -66,7 +67,7 @@ locals {
             storage_bridge  = "vmbr140"
             target_node     = "pitfall"
             disk_size       = "50G"
-            disk_storage    = "nvme-mirror"
+            disk_storage    = local.proxmox_storage
         },
         "k3s-worker-03" = {
             id              = 605
@@ -79,7 +80,7 @@ locals {
             storage_bridge  = "vmbr140"
             target_node     = "solaris"
             disk_size       = "50G"
-            disk_storage    = "nvme-mirror"
+            disk_storage    = local.proxmox_storage
         }
     }
 }
@@ -110,48 +111,74 @@ module "kubernetes_workers" {
 }
 
 module "ansible_inventory" {
-  source = "../../modules/ansible-inventory"
-  ansible_inventory_filename = "k3s"
-  servers = {
-    master_nodes = [
-      for k,v in local.masters: element(split("/", v.net_cidr), 0)
-      ],
-    worker_nodes = [
-      for k,v in local.workers: element(split("/", v.net_cidr), 0)
-      ]
-  }
+    source = "../../modules/ansible-inventory"
+    ansible_inventory_filename = "k3s"
+    servers = {
+        master_nodes = [
+            for k,v in local.masters: element(split("/", v.net_cidr), 0)
+        ],
+        worker_nodes = [
+            for k,v in local.workers: element(split("/", v.net_cidr), 0)
+        ]
+    }
 }
 
-// Ansible post-provisioning configuration
-resource "null_resource" "ansible" {
+module "ansible_playbook" {
+    source = "../../modules/ansible-provisioner"
     depends_on = [
+        module.ansible_inventory,
         module.kubernetes_masters,
         module.kubernetes_workers
     ]
+    user                = var.remote_user
+    config_path         = "${path.module}/../../../ansible/ansible.cfg"
+    inventory_path      = "${path.module}/../../../ansible/inventory"
+    playbook_path       = "${path.module}/../../../ansible/k3s.yaml"
+    private_key_path    = local_file.private_key.filename
     triggers = {
         servers = module.ansible_inventory.server_count
     }
-
-    // Ansible playbook run - base config
-    provisioner "local-exec" {
-        command = "ansible-playbook -u ${var.remote_user} -i ${path.module}/../../../ansible/inventory --private-key ${path.module}/../../../pk/k3s-pk.pem ${path.module}/../../../ansible/k3s.yaml"
-        environment = {
-            ANSIBLE_CONFIG = "${path.module}/../../../ansible/ansible.cfg"
-        }
-    }
-
-    provisioner "local-exec" {
-        command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${local_file.private_key.filename} ${var.remote_user}@${module.kubernetes_masters.ip_addresses.0}:~/.kube/config ${path.module}/../../outputs/kubeconfig"
-    }
 }
 
-# resource "local_file" "kubeconfig" {
-#     lifecycle {
-#         ignore_changes = [
-#             content,
-#             file_permission,
-#             directory_permission
-#         ]
-#     }
-#     filename = "${path.module}/../../outputs/kubeconfig"
-# }
+module "kubeconfig" {
+    source = "../../modules/remote-file-download"
+    depends_on = [
+        module.ansible_playbook,
+        module.kubernetes_masters
+    ]
+    user                = var.remote_user
+    host_addr           = module.kubernetes_masters.ip_addresses.0
+    remote_file         = "~/.kube/config"
+    local_path          = "${path.module}/../../outputs/kubeconfig"
+    private_key_path    = local_file.private_key.filename
+}
+
+provider "kubernetes" {
+    config_path = module.kubeconfig.filepath
+}
+
+provider "kubectl" {
+    config_path = module.kubeconfig.filepath
+}
+
+module "flux" {
+    source                  = "../../modules/fluxcd"
+    # depends_on              = [ module.kubeconfig ]
+    github_deploy_key_title = local.deploy_key_title
+    github_token            = var.github_token
+    github_owner            = var.github_owner
+    repository_name         = var.repository_name
+    branch                  = var.branch
+    target_path             = var.flux_path
+    flux_namespace          = var.flux_namespace
+    kubeconfig_path         = module.kubeconfig.filepath
+}
+
+module "sops_gpg" {
+    source                  = "../../modules/kube-sops-secret"
+    depends_on              = [ module.kubeconfig, module.flux ]
+    key_fp                  = var.key_fp
+    secret_name             = "sops-gpg"
+    namespace               = var.flux_namespace
+    kubeconfig_path         = module.kubeconfig.filepath
+}

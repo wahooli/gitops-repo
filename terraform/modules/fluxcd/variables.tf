@@ -1,7 +1,6 @@
 variable "github_owner" {
     type        = string
     description = "github owner"
-    default     = "absolutistit"
 }
 
 variable "github_token" {
@@ -13,13 +12,6 @@ variable "github_token" {
 variable "repository_name" {
     type        = string
     description = "github repository name"
-    default     = "homelab"
-}
-
-variable "repository_visibility" {
-    type        = string
-    description = "How visible is the github repo"
-    default     = "private"
 }
 
 variable "branch" {
@@ -31,10 +23,20 @@ variable "branch" {
 variable "target_path" {
     type        = string
     description = "flux sync target path"
-    default     = "cluster"
 }
 
-# variable "kubeconfig" {
-#     type        = string
-#     description = "Kubeconfig file path"
-# }
+variable "flux_namespace" {
+    type        = string
+    description = "the flux namespace"
+    default     = "flux-system"
+}
+
+variable "kubeconfig_path" {
+    type        = string
+    description = "Path to the kubeconfig file."
+}
+
+variable "github_deploy_key_title" {
+    type        = string
+    description = "Name of github deploy key"
+}

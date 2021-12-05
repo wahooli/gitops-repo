@@ -1,36 +1,19 @@
-terraform {
-    required_providers {
-        kubernetes = {
-            source  = "hashicorp/kubernetes"
-            version = ">= 2.0.2"
+resource "kubernetes_namespace" "flux_namespace" {
+    metadata {
+        annotations = {
+            name = var.flux_namespace
         }
-        kubectl = {
-            source  = "gavinbunney/kubectl"
-            version = ">= 1.13.1"
-        }
-        flux = {
-            source  = "fluxcd/flux"
-            version = ">= 0.7.1"
-        }
-        tls = {
-            source  = "hashicorp/tls"
-            version = "3.1.0"
-        }
+        name = var.flux_namespace
     }
-    required_version = ">= 1.0.0"
+
+    lifecycle {
+        ignore_changes = [
+            metadata["annotations"],
+            metadata["labels"]
+        ]
+    }
 }
 
-# SSH
-locals {
-    known_hosts = "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
-}
-
-resource "tls_private_key" "main" {
-    algorithm = "RSA"
-    rsa_bits  = 4096
-}
-
-# Flux
 data "flux_install" "main" {
     target_path = var.target_path
 }
@@ -39,19 +22,6 @@ data "flux_sync" "main" {
     target_path = var.target_path
     url         = "ssh://git@github.com/${var.github_owner}/${var.repository_name}.git"
     branch      = var.branch
-}
-
-# Kubernetes
-resource "kubernetes_namespace" "flux_system" {
-    metadata {
-        name = "flux-system"
-    }
-
-    lifecycle {
-        ignore_changes = [
-            metadata[0].labels,
-        ]
-    }
 }
 
 data "kubectl_file_documents" "install" {
@@ -76,68 +46,87 @@ locals {
 }
 
 resource "kubectl_manifest" "install" {
-    for_each   = { for v in local.install : lower(join("/", compact([v.data.apiVersion, v.data.kind, lookup(v.data.metadata, "namespace", ""), v.data.metadata.name]))) => v.content }
-    depends_on = [kubernetes_namespace.flux_system]
-    yaml_body  = each.value
+    depends_on  = [kubernetes_namespace.flux_namespace]
+    for_each    = { for v in local.install : lower(join("/", compact([v.data.apiVersion, v.data.kind, lookup(v.data.metadata, "namespace", ""), v.data.metadata.name]))) => v.content }
+    yaml_body   = each.value
 }
 
 resource "kubectl_manifest" "sync" {
-    for_each   = { for v in local.sync : lower(join("/", compact([v.data.apiVersion, v.data.kind, lookup(v.data.metadata, "namespace", ""), v.data.metadata.name]))) => v.content }
-    depends_on = [kubernetes_namespace.flux_system]
-    yaml_body  = each.value
+    depends_on  = [kubectl_manifest.install, kubernetes_namespace.flux_namespace]
+    for_each    = { for v in local.sync : lower(join("/", compact([v.data.apiVersion, v.data.kind, lookup(v.data.metadata, "namespace", ""), v.data.metadata.name]))) => v.content }
+    yaml_body   = each.value
+}
+
+locals {
+    known_hosts = "github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg="
+}
+
+resource "tls_private_key" "github_deploy_key" {
+    algorithm   = "RSA"
+    rsa_bits    = 4096
 }
 
 resource "kubernetes_secret" "main" {
     depends_on = [kubectl_manifest.install]
 
     metadata {
-        name      = data.flux_sync.main.secret
-        namespace = data.flux_sync.main.namespace
+        name            = data.flux_sync.main.secret
+        namespace       = data.flux_sync.main.namespace
     }
 
     data = {
-        identity       = tls_private_key.main.private_key_pem
-        "identity.pub" = tls_private_key.main.public_key_pem
-        known_hosts    = local.known_hosts
+        known_hosts     = local.known_hosts
+        identity        = tls_private_key.github_deploy_key.private_key_pem
+        "identity.pub"  = tls_private_key.github_deploy_key.public_key_openssh
+    }
+
+    lifecycle {
+        ignore_changes = [
+            metadata["annotations"],
+            metadata["labels"]
+        ]
     }
 }
 
-# GitHub
-resource "github_repository" "main" {
-    name       = var.repository_name
-    visibility = var.repository_visibility
-    auto_init  = true
+# Github
+provider "github" {
+    token           = var.github_token
+    owner           = var.github_owner
 }
 
-resource "github_branch_default" "main" {
-    repository = github_repository.main.name
-    branch     = var.branch
-}
-
-resource "github_repository_deploy_key" "main" {
-    title      = "staging-cluster"
-    repository = github_repository.main.name
-    key        = tls_private_key.main.public_key_openssh
-    read_only  = true
+# To make sure the repository exists and the correct permissions are set.
+data "github_repository" "main" {
+    full_name = "${var.github_owner}/${var.repository_name}"
 }
 
 resource "github_repository_file" "install" {
-    repository = github_repository.main.name
-    file       = data.flux_install.main.path
-    content    = data.flux_install.main.content
-    branch     = var.branch
+    repository          = data.github_repository.main.name
+    file                = data.flux_install.main.path
+    content             = data.flux_install.main.content
+    branch              = var.branch
+    overwrite_on_create = true
 }
 
 resource "github_repository_file" "sync" {
-    repository = github_repository.main.name
-    file       = data.flux_sync.main.path
-    content    = data.flux_sync.main.content
-    branch     = var.branch
+    repository          = var.repository_name
+    file                = data.flux_sync.main.path
+    content             = data.flux_sync.main.content
+    branch              = var.branch
+    overwrite_on_create = true
 }
 
 resource "github_repository_file" "kustomize" {
-    repository = github_repository.main.name
-    file       = data.flux_sync.main.kustomize_path
-    content    = data.flux_sync.main.kustomize_content
-    branch     = var.branch
+    repository          = var.repository_name
+    file                = data.flux_sync.main.kustomize_path
+    content             = data.flux_sync.main.kustomize_content
+    branch              = var.branch
+    overwrite_on_create = true
+}
+
+# For flux to fetch source
+resource "github_repository_deploy_key" "flux" {
+    title               = var.github_deploy_key_title
+    repository          = data.github_repository.main.name
+    key                 = tls_private_key.github_deploy_key.public_key_openssh
+    read_only           = true
 }

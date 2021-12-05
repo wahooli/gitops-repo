@@ -42,3 +42,5 @@ ansible/inventory/*.yml
 terraform/outputs/*
 # private keys
 pk/*
+unencrypted/*
+hidden_folder

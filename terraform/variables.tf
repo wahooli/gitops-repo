@@ -33,3 +33,9 @@ variable "github_token" {
     description = "github token"
     sensitive   = true
 }
+
+variable "key_fp" {
+    type        = string
+    description = "SOPS key fingerprint"
+    sensitive   = true
+}
