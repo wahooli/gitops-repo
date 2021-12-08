@@ -4,3 +4,4 @@ resources:
 - sources
 - cert-manager.yaml
 - cert-manager-issuers.yaml
+- longhorn.yaml

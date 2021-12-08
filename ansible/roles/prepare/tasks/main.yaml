@@ -5,6 +5,28 @@
     name: gnupg
     state: present
 
+# for longhorn
+- name: Ensure nfs-common installed
+  become: true
+  package:
+    name: nfs-common
+    state: present
+
+# for longhorn
+- name: Ensure open-iscsi installed
+  become: true
+  package:
+    name: open-iscsi
+    state: present
+
+# for longhorn
+- name: Start and enable iscsid
+  become: yes
+  systemd:
+    name: iscsid
+    state: started
+    enabled: yes
+
 - name: Ensure procps installed (sysctl)
   become: true
   package:

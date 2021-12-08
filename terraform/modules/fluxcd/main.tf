@@ -1,3 +1,21 @@
+resource "null_resource" "destroy_remove_finalizers" {
+    depends_on  = [kubectl_manifest.sync]
+    triggers = {
+        namespace   = var.flux_namespace
+        kubeconfig  = var.kubeconfig_path
+    }
+
+    provisioner "local-exec" {
+        command = "echo hello"
+    }
+
+    provisioner "local-exec" {
+        when       = destroy
+        command    = "kubectl --kubeconfig ${self.triggers.kubeconfig} patch customresourcedefinition helmcharts.source.toolkit.fluxcd.io helmreleases.helm.toolkit.fluxcd.io helmrepositories.source.toolkit.fluxcd.io kustomizations.kustomize.toolkit.fluxcd.io -p '{\"metadata\":{\"finalizers\":null}}'"
+        on_failure = continue
+    }
+}
+
 resource "kubernetes_namespace" "flux_namespace" {
     metadata {
         annotations = {

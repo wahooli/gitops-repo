@@ -12,6 +12,6 @@ resource "null_resource" "sops_gpg_secret" {
 
     provisioner "local-exec" {
         when       = destroy
-        command    = "kubectl --kubeconfig ${self.triggers.kubeconfig} delete secret ${self.triggers.secret_name}"
+        command    = "kubectl --kubeconfig ${self.triggers.kubeconfig} delete secret -n ${self.triggers.namespace} ${self.triggers.secret_name}"
     }
 }
