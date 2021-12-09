@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-longhorn-ingress
+  namespace: longhorn-system
+spec:
+  secretName: tls-longhorn-ingress
+  commonName: longhorn.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - longhorn.absolutist.it
+  - longhorn.wahoo.li

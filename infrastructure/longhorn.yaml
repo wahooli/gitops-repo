@@ -4,6 +4,9 @@ metadata:
   name: longhorn
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: traefik
+    - name: cert-manager
   interval: 5m
   path: "./infrastructure/longhorn"
   prune: true

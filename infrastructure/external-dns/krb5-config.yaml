@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-dns-krb5.conf
+  namespace: kube-system
+data:
+  krb5.conf: |
+    [logging]
+    default = FILE:/var/log/krb5libs.log
+    kdc = FILE:/var/log/krb5kdc.log
+    admin_server = FILE:/var/log/kadmind.log
+
+    [libdefaults]
+    dns_lookup_realm = false
+    ticket_lifetime = 24h
+    renew_lifetime = 7d
+    forwardable = true
+    rdns = false
+    pkinit_anchors = /etc/pki/tls/certs/ca-bundle.crt
+    default_ccache_name = KEYRING:persistent:%{uid}
+
+    default_realm = ABSOLUTIST.IT
+
+    [realms]
+    ABSOLUTIST.IT = {
+      kdc = klax.absolutist.it
+      admin_server = klax.absolutist.it
+    }
+
+    [domain_realm]
+    absolutist.it = ABSOLUTIST.IT
+    .absolutist.it = ABSOLUTIST.IT

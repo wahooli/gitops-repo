@@ -38,9 +38,9 @@ override.tf.json
 terraform-plugin-proxmox.log
 
 # dynamically generated inventories
-ansible/inventory/*.yml
-terraform/outputs/*
+provisioning/ansible/inventory/*.yml
+provisioning/terraform/outputs/*
 # private keys
-pk/*
+provisioning/pk/*
 unencrypted/*
 hidden_folder

@@ -5,3 +5,5 @@ resources:
 - cert-manager.yaml
 - cert-manager-issuers.yaml
 - longhorn.yaml
+- traefik.yaml
+- external-dns

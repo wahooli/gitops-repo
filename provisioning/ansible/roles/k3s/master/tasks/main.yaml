@@ -1,0 +1,246 @@
+---
+# - name: Remove manifest directory if exists
+- name: Generate shared secret
+  run_once: true
+  set_fact:
+    k3s_shared_secret: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=32') }}"
+
+- name: Create manifests directory
+  become: yes
+  file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+
+- name: Create k3s config directory
+  become: yes
+  file:
+    path: /etc/rancher/k3s/
+    state: directory
+
+- name: Copy registry config
+  template:
+    src: registries.yaml.j2
+    dest: /etc/rancher/k3s/registries.yaml
+    owner: root
+    group: root
+
+- name: Copy kube-vip rbac file
+  run_once: true
+  become: yes
+  template:
+    src: kube-vip/rbac.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/kube-vip.rbac.yaml
+    owner: root
+    group: root
+
+- name: Copy kube-vip daemonset file
+  run_once: true
+  become: yes
+  template:
+    src: kube-vip/daemonset.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/kube-vip.daemonset.yaml
+    owner: root
+    group: root
+
+- name: Copy calico bgp configuration
+  run_once: true
+  become: yes
+  template:
+    src: calico/bgpconfiguration.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/calico-bgpconfiguration.yaml
+    owner: root
+    group: root
+
+- name: Copy calico bgp peer config
+  run_once: true
+  become: yes
+  template:
+    src: calico/bgppeer.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/calico-bgppeer.yaml
+    owner: root
+    group: root
+
+- name: Copy calico installation config
+  run_once: true
+  become: yes
+  template:
+    src: calico/installation.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/calico-installation.yaml
+    owner: root
+    group: root
+
+- name: Copy metallb helm chart
+  run_once: true
+  become: yes
+  template:
+    src: helm/metallb-controller.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/helm-metallb.yaml
+    owner: root
+    group: root
+
+# - name: Copy metallb helm chart
+#   run_once: true
+#   become: yes
+#   template:
+#     src: helm/traefik-v2.yaml.j2
+#     dest: /var/lib/rancher/k3s/server/manifests/helm-traefik-v2.yaml
+#     owner: root
+#     group: root
+
+- name: Check if service file exists
+  stat: path={{ systemd_dir }}/k3s.service.env
+  register: serviceenvfile
+
+- name: Copy K3s service env file
+  become: yes
+  register: k3s_service_env
+  when: not serviceenvfile.stat.exists
+  template:
+    src: "systemd/k3s.service.env.j2"
+    dest: "{{ systemd_dir }}/k3s.service.env"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy K3s service file with --cluster-init
+  register: k3s_service_cluster_init
+  become: yes
+  run_once: true
+  template:
+    src: "systemd/k3s.cluster-init-service.j2"
+    dest: "{{ systemd_dir }}/k3s.service"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Check if service file exists
+  stat: path={{ systemd_dir }}/k3s.service
+  register: servicefile
+
+- name: Copy K3s service file
+  register: k3s_service
+  become: yes
+  when: not servicefile.stat.exists
+  template:
+    src: "systemd/k3s.service.j2"
+    dest: "{{ systemd_dir }}/k3s.service"
+    force: no
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable K3s service on all nodes, but don't start yet
+  register: k3s_service_enabled
+  become: yes
+  systemd:
+    name: k3s
+    daemon_reload: yes
+    enabled: yes
+
+- name: Run K3s service for first node
+  become: yes
+  run_once: true
+  systemd:
+    name: k3s
+    state: started
+    enabled: yes
+
+- name: Create calico operator manifest
+  become: yes
+  run_once: true
+  ignore_errors: yes
+  command: kubectl apply -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
+
+- name: Wait for node-token
+  run_once: true
+  wait_for:
+    path: /var/lib/rancher/k3s/server/node-token
+
+# - name: Wait for kube-vip to be created
+#   become: true
+#   run_once: true
+#   shell: "kubectl get po --namespace=kube-system -l name=kube-vip-ds --output=jsonpath='{.items[*].metadata.name}'"
+#   register: kube_vip_pod_created
+#   until: item in kube_vip_pod_created.stdout
+#   retries: 25
+#   delay: 10
+#   with_items:
+#     - kube-vip
+
+# - name: Wait kube-vip to start
+#   run_once: true
+#   become: true
+#   shell: "kubectl wait --namespace=kube-system --for=condition=Ready=true pods -l name=kube-vip-ds"
+#   register: ip_ready
+
+# - name: Wait kube-vip to start
+#   run_once: true
+#   become: true
+#   shell: "kubectl rollout status daemonset/kube-vip-ds -n kube-system"
+#   register: ip_ready
+
+- name: Run K3s service for other nodes
+  become: yes
+  throttle: 1
+  systemd:
+    name: k3s
+    state: started
+    enabled: yes
+
+- name: Register node-token file access mode
+  stat:
+    path: /var/lib/rancher/k3s/server
+  register: p
+
+- name: Change file access node-token
+  file:
+    path: /var/lib/rancher/k3s/server
+    mode: "g+rx,o+rx"
+
+- name: Read node-token from master
+  run_once: true
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: node_token
+
+- name: Store Master node-token
+  run_once: true
+  set_fact:
+    token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+
+- name: Restore node-token file access
+  file:
+    path: /var/lib/rancher/k3s/server
+    mode: "{{ p.stat.mode }}"
+
+- name: Create directory .kube
+  file:
+    path: ~{{ ansible_user }}/.kube
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: "u=rwx,g=rx,o="
+
+- name: Copy config file to user home directory
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: ~{{ ansible_user }}/.kube/config
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    mode: "u=rw,g=,o="
+
+- name: Replace https://localhost:6443 by https://{{ k3s.server_address }}:6443
+  command: >-
+    k3s kubectl config set-cluster default
+      --server=https://{{ k3s.server_address }}:6443
+      --kubeconfig ~{{ ansible_user }}/.kube/config
+  changed_when: true
+
+- name: Update bashrc, add KUBECONFIG line
+  lineinfile:
+    dest: ~{{ ansible_user }}/.bashrc
+    line: "export KUBECONFIG=~/.kube/config"
+    regexp: "^export\\s+KUBECONFIG.+$"
+    owner: "{{ ansible_user }}"
+    state: present
+    insertafter: EOF
+    create: True
