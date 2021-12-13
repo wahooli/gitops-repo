@@ -6,3 +6,4 @@ resources:
 - namespace.yaml
 - helmrelease.yaml
 - crds
+- volumesnapshotclass.yaml

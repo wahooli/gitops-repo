@@ -1,0 +1,21 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: external-snapshotter
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: https://github.com/kubernetes-csi/external-snapshotter
+  ref:
+    semver: ">=v4.2.1"
+  ignore: |
+    # exclude all
+    /*
+    # include deploy dir
+    !/deploy/kubernetes/snapshot-controller/
+    !/client/config/crd/
+    # exclude file extensions from deploy dir
+    /deploy/**/*.md
+    /deploy/**/*.txt
+    /client/**/*.md
+    /client/**/*.txt

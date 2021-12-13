@@ -7,6 +7,8 @@ spec:
   dependsOn:
     - name: traefik
     - name: cert-manager
+    - name: external-snapshotter-crd
+    - name: external-snapshotter-controller
   interval: 5m
   path: "./infrastructure/longhorn"
   prune: true

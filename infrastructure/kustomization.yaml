@@ -4,6 +4,7 @@ resources:
 - sources
 - cert-manager.yaml
 - cert-manager-issuers.yaml
+- csi-external-snapshotter
 - longhorn.yaml
 - traefik.yaml
 - external-dns
