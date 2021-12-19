@@ -62,18 +62,31 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
     memory          = each.value.memory
     desc            = each.value.desc
 
-    # ugly as hell, but it works lol
-    ipconfig0       = lookup(each.value.network, "0", null) == null ? "" : format("%s%s", 
-        "ip=${each.value.network["0"]["cidr"]}",
-        each.value.network["0"]["gw"] != null ? ",gw=${each.value.network["0"]["gw"]}" : "")
+    # less ugly than below but, still ugly.
+    ipconfig0       = each.value.network[0] == null ? "" : format("%s%s", "ip=${each.value.network[0].cidr}",
+        each.value.network[0].gw != null ? ",gw=${each.value.network[0].gw}" : "")
 
-    ipconfig1       = lookup(each.value.network, "1", null) == null ? "" : format("%s%s", 
-        "ip=${each.value.network["1"]["cidr"]}",
-        each.value.network["1"]["gw"] != null ? ",gw=${each.value.network["1"]["gw"]}" : "")
+    ipconfig1       = element(each.value.network, 1) != null ? "" : format("%s%s", "ip=${each.value.network[1].cidr}",
+        each.value.network[1].gw != null ? ",gw=${each.value.network[1].gw}" : "")
+
+    ipconfig2       = element(each.value.network, 2) != null ? "" : format("%s%s", "ip=${each.value.network[2].cidr}",
+         each.value.network[2].gw != null ? ",gw=${each.value.network[2].gw}" : "")
+
+    ipconfig3       = element(each.value.network, 3) != null ? "" : format("%s%s", "ip=${each.value.network[3].cidr}",
+        each.value.network[3].gw != null ? ",gw=${each.value.network[3].gw}" : "")
     
-    ipconfig2       = lookup(each.value.network, "2", null) == null ? "" : format("%s%s", 
-        "ip=${each.value.network["2"]["cidr"]}",
-        each.value.network["2"]["gw"] != null ? ",gw=${each.value.network["2"]["gw"]}" : "")
+    # ugly as hell, but it works lol
+    # ipconfig0       = lookup(each.value.network, "0", null) == null ? "" : format("%s%s", 
+    #     "ip=${each.value.network["0"]["cidr"]}",
+    #     each.value.network["0"]["gw"] != null ? ",gw=${each.value.network["0"]["gw"]}" : "")
+
+    # ipconfig1       = lookup(each.value.network, "1", null) == null ? "" : format("%s%s", 
+    #     "ip=${each.value.network["1"]["cidr"]}",
+    #     each.value.network["1"]["gw"] != null ? ",gw=${each.value.network["1"]["gw"]}" : "")
+    
+    # ipconfig2       = lookup(each.value.network, "2", null) == null ? "" : format("%s%s", 
+    #     "ip=${each.value.network["2"]["cidr"]}",
+    #     each.value.network["2"]["gw"] != null ? ",gw=${each.value.network["2"]["gw"]}" : "")
     
     sshkeys         = local.sshkeys
     # define_connection_info = true
@@ -91,7 +104,7 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
     }
 
     dynamic "network" {
-        for_each = each.value.network
+        for_each = toset(each.value.network)
         
         content {
             model   = local.network_model
@@ -101,7 +114,7 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
     }
 
     dynamic "disk" {
-        for_each = each.value.disk
+        for_each = toset(each.value.disk)
         
         content {
             type        = local.disk_type
@@ -122,11 +135,17 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
 
     // Clear existing records (if exists) from known_hosts to prevent possible ssh connection issues
     provisioner "local-exec" {
-        command = "ssh-keygen -f ~/.ssh/known_hosts -R ${element(split("/", lookup(each.value.network, "0", null).cidr), 0)}"
+        command = "ssh-keygen -f ~/.ssh/known_hosts -R ${element(split("/", each.value.network[0].cidr), 0)}"
     }
     provisioner "local-exec" {
-        command = "ssh-keyscan -H ${element(split("/", lookup(each.value.network, "0", null).cidr), 0)} >> ~/.ssh/known_hosts "
+        command = "ssh-keyscan -H ${element(split("/", each.value.network[0].cidr), 0)} >> ~/.ssh/known_hosts "
     }
+    # provisioner "local-exec" {
+    #     command = "ssh-keygen -f ~/.ssh/known_hosts -R ${element(split("/", lookup(each.value.network, "0", null).cidr), 0)}"
+    # }
+    # provisioner "local-exec" {
+    #     command = "ssh-keyscan -H ${element(split("/", lookup(each.value.network, "0", null).cidr), 0)} >> ~/.ssh/known_hosts "
+    # }
 
     # provisioner "local-exec" {
     #     command = "ssh-keygen -f ~/.ssh/known_hosts -R ${element(split("/", each.value.net_cidr), 0)}"

@@ -1,6 +1,6 @@
 ---
 
-- name: Wait until api kubernetes is reachable (bgp route propagation)
+- name: Wait until api kubernetes is reachable (bgp converge)
   delegate_to: 127.0.0.1
   become: false
   uri:

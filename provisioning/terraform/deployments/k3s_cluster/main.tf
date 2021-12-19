@@ -9,69 +9,57 @@ locals {
             cores           = 4
             memory          = 4096
             target_node     = "pitfall"
-            network = {
-                0 = {
+            network = [
+                {
                     cidr    = "10.0.0.2/24",
                     gw      = "10.0.0.253"
                     bridge  = "vmbr100"
-                },
-                1 = {
-                    cidr    = "10.2.0.200/25"
-                    bridge  = "vmbr140"
-                },
-            },
-            disk = {
-                0 = {
+                }
+            ],
+            disk = [
+                {
                     size    = "35G"
                     storage = local.os_disk_storage
                 }
-            }
+            ]
         },
         "k3s-master-02" = {
             id              = 601
             cores           = 4
             memory          = 4096
             target_node     = "berzerk"
-            network = {
-                0 = {
+            network = [
+                {
                     cidr    = "10.0.0.3/24",
                     gw      = "10.0.0.253"
                     bridge  = "vmbr100"
-                },
-                1 = {
-                    cidr    = "10.2.0.201/25"
-                    bridge  = "vmbr140"
-                },
-            },
-            disk = {
-                0 = {
+                }
+            ],
+            disk = [
+                {
                     size    = "35G"
                     storage = local.os_disk_storage
                 }
-            }
+            ]
         },
         "k3s-master-03" = {
             id              = 602
             cores           = 4
             memory          = 4096
             target_node     = "solaris"
-            network = {
-                0 = {
+            network = [
+                {
                     cidr    = "10.0.0.4/24",
                     gw      = "10.0.0.253"
                     bridge  = "vmbr100"
-                },
-                1 = {
-                    cidr    = "10.2.0.202/25"
-                    bridge  = "vmbr140"
-                },
-            }
-            disk = {
-                0 = {
+                }
+            ]
+            disk = [
+                {
                     size    = "35G"
                     storage = local.os_disk_storage
                 }
-            }
+            ]
         }
     }
     workers = {
@@ -80,69 +68,69 @@ locals {
             cores           = 8
             memory          = 16384
             target_node     = "berzerk"
-            network = {
-                0 = {
+            network = [
+                {
                     cidr    = "10.0.0.5/24",
                     gw      = "10.0.0.253"
                     bridge  = "vmbr100"
                 }
-            }
-            disk = {
-                0 = {
+            ]
+            disk = [
+                {
                     size    = "45G"
                     storage = local.os_disk_storage
                 },
-                1 = {
+                {
                     size    = "140G"
                     storage = local.proxmox_storage
                 }
-            }
+            ]
         },
         "k3s-worker-02" = {
             id              = 604
             cores           = 8
             memory          = 16384
             target_node     = "pitfall"
-            network = {
-                0 = {
+            network = [
+                {
                     cidr    = "10.0.0.6/24",
                     gw      = "10.0.0.253"
                     bridge  = "vmbr100"
                 }
-            }
-            disk = {
-                0 = {
+            ]
+            disk = [
+                {
                     size    = "45G"
                     storage = local.os_disk_storage
                 },
-                1 = {
+                {
                     size    = "140G"
                     storage = local.proxmox_storage
                 }
-            }
+            ]
         },
         "k3s-worker-03" = {
             id              = 605
             cores           = 8
             memory          = 16384
             target_node     = "solaris"
-            network = {
-                0 = {
+            network = [
+                {
                     cidr    = "10.0.0.7/24",
                     gw      = "10.0.0.253"
                     bridge  = "vmbr100"
                 }
-            }
-            disk = {
-                0 = {
+            ]
+            disk = [
+                {
                     size    = "45G"
                     storage = local.os_disk_storage
                 },
-                1 = {
+                {
                     size    = "140G"
                     storage = local.proxmox_storage
                 }
-            }
+            ]
         }
     }
 }

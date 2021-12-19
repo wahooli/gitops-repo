@@ -6,13 +6,13 @@ variable "vm-list" {
         cores = number
         memory = number
         desc = optional(string)
-        network = map(object({
+        network = list(object({
             cidr    = string
             vlan    = optional(number)
             bridge  = string
             gw      = optional(string)
         }))
-        disk = map(object({
+        disk = list(object({
             storage = string
             size    = string
         }))
