@@ -8,3 +8,4 @@ resources:
 - longhorn.yaml
 - traefik.yaml
 - external-dns
+- longhorn-data-restore.yaml

@@ -1,0 +1,20 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: longhorn-data-restore
+  namespace: flux-system
+spec:
+  interval: 5m
+  dependsOn:
+    - name: longhorn
+  path: "./infrastructure/longhorn-data-restore"
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+  - apiVersion: batch/v1
+    kind: Job
+    name: longhorn-data-restore
+    namespace: longhorn-system

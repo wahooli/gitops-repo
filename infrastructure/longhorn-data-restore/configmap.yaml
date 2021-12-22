@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: longhorn-data-restore-job-config
+  namespace: longhorn-system
+data:
+  config.json: |
+    {
+      "homebridge-data" : {
+        "createPV": false,
+        "createPVC": false
+      }
+    }

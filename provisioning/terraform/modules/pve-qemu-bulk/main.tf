@@ -114,8 +114,9 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
     }
 
     dynamic "disk" {
-        for_each = toset(each.value.disk)
-        
+        #for_each = toset(each.value.disk)
+        for_each = {for i, d in each.value.disk : i => d}
+
         content {
             type        = local.disk_type
             storage     = disk.value["storage"]
