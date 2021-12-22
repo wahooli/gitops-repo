@@ -1,0 +1,41 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: homebridge
+  namespace: flux-system
+spec:
+  releaseName: homebridge
+  targetNamespace: iot
+  chart:
+    spec:
+      chart: homebridge
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: ">=4.2.0"
+  interval: 1h0m0s
+  values:
+    hostNetwork: true
+    env:
+      TZ: Europe/Helsinki
+    persistence:
+      config:
+        enabled: true
+        type: pvc
+        mountpath: /homebridge
+        existingClaim: homebridge-data-pvc
+        retain: true
+    service:
+      main:
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            enabled: true
+            primary: true
+            port: 80
+            protocol: TCP
+            targetPort: 8581
+        annotations: 
+          external-dns.alpha.kubernetes.io/hostname: homebridge.absolutist.it.

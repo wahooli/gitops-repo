@@ -16,8 +16,12 @@ spec:
     kind: GitRepository
     name: flux-system
   healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: longhorn-ui
-      namespace: longhorn-system
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: longhorn-ui
+    namespace: longhorn-system
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    name: longhorn-manager
+    namespace: longhorn-system
   timeout: 5m

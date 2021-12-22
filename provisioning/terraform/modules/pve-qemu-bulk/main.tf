@@ -130,7 +130,8 @@ resource "proxmox_vm_qemu" "pve-qemu-bulk" {
     lifecycle {
         ignore_changes = [
             network,
-            disk.0.format
+            disk[0].format,
+            disk[1].format
         ]
     }
 

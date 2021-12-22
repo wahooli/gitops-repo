@@ -1,0 +1,27 @@
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: homebridge-data-pvc
+#   namespace: iot
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   volumeMode: Filesystem
+#   resources:
+#     requests:
+#       storage: 5Gi
+#   storageClassName: longhorn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homebridge-data-pvc
+  namespace: iot
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi # must match size from earlier
+  storageClassName: longhorn # must match name from earlier
+  volumeName: homebridge-data-pv # must reference Persistent Volume

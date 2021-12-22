@@ -43,7 +43,7 @@ resource "kubernetes_namespace" "flux_namespace" {
     lifecycle {
         ignore_changes = [
             metadata["annotations"],
-            metadata["labels"]
+            metadata[0].labels["*"]
         ]
     }
 }
@@ -122,6 +122,8 @@ resource "kubernetes_secret" "main" {
     depends_on = [kubectl_manifest.install]
 
     metadata {
+        annotations     = {}
+        labels          = {}
         name            = data.flux_sync.main.secret
         namespace       = data.flux_sync.main.namespace
     }
@@ -134,8 +136,8 @@ resource "kubernetes_secret" "main" {
 
     lifecycle {
         ignore_changes = [
-            metadata["annotations"],
-            metadata["labels"]
+            metadata[0].annotations,
+            metadata[0].labels
         ]
     }
 }
