@@ -5,6 +5,12 @@
     name: gnupg
     state: present
 
+- name: Ensure dnsutils installed
+  become: true
+  package:
+    name: dnsutils
+    state: present
+
 - name: Ensure parted installed
   become: true
   package:
@@ -63,6 +69,12 @@
     name: br_netfilter
     state: present
 
+- name: Add ip_conntrack module
+  become: yes
+  modprobe:
+    name: ip_conntrack
+    state: present
+
 - name: Disable swap for current session
   command: swapoff -a
   become: true
@@ -83,6 +95,15 @@
     sysctl_file: /etc/sysctl.d/99-kubernetes.conf
     state: present
     reload: no
+
+- name: Increase conntrack table count
+  become: yes
+  sysctl:
+    name: net.netfilter.nf_conntrack_max
+    value: 1000000
+    sysctl_file: /etc/sysctl.conf
+    state: present
+    reload: yes
 
 - name: Enable iptables bridge netfilter IPv4
   become: yes

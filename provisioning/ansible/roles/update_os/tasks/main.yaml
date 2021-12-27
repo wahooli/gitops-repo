@@ -4,7 +4,7 @@
   register: apt_status
   until: apt_status is success
   delay: 6
-  retries: 10
+  retries: 15
   apt:
     update_cache: yes
     upgrade: dist

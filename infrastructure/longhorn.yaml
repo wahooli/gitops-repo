@@ -24,4 +24,8 @@ spec:
     kind: DaemonSet
     name: longhorn-manager
     namespace: longhorn-system
-  timeout: 5m
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    name: longhorn-csi-plugin
+    namespace: longhorn-system
+  timeout: 10m

@@ -1,0 +1,15 @@
+{
+    "volumeHandle" : {
+        "size": 10500234,
+        "pvName": "volume",
+        "pvcName": "volumeclaim",
+        "pvcNamespace": "not-default",
+        "createPV": true,
+        "createPVC": true
+    },
+    "volume-Handle-2" : {
+        "size": 5050505,
+        "createPV": false,
+        "createPVC": false
+    }
+}

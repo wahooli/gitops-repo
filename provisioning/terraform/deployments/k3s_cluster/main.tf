@@ -12,7 +12,7 @@ locals {
             network = [
                 {
                     cidr    = "10.0.0.2/24",
-                    gw      = "10.0.0.253"
+                    gw      = "10.0.0.251"
                     bridge  = "vmbr100"
                 }
             ],
@@ -31,7 +31,7 @@ locals {
             network = [
                 {
                     cidr    = "10.0.0.3/24",
-                    gw      = "10.0.0.253"
+                    gw      = "10.0.0.251"
                     bridge  = "vmbr100"
                 }
             ],
@@ -50,7 +50,7 @@ locals {
             network = [
                 {
                     cidr    = "10.0.0.4/24",
-                    gw      = "10.0.0.253"
+                    gw      = "10.0.0.251"
                     bridge  = "vmbr100"
                 }
             ]
@@ -71,7 +71,7 @@ locals {
             network = [
                 {
                     cidr    = "10.0.0.5/24",
-                    gw      = "10.0.0.253"
+                    gw      = "10.0.0.251"
                     bridge  = "vmbr100"
                 }
             ]
@@ -94,7 +94,7 @@ locals {
             network = [
                 {
                     cidr    = "10.0.0.6/24",
-                    gw      = "10.0.0.253"
+                    gw      = "10.0.0.251"
                     bridge  = "vmbr100"
                 }
             ]
@@ -117,7 +117,7 @@ locals {
             network = [
                 {
                     cidr    = "10.0.0.7/24",
-                    gw      = "10.0.0.253"
+                    gw      = "10.0.0.251"
                     bridge  = "vmbr100"
                 }
             ]
@@ -232,21 +232,6 @@ module "flux" {
     kube_client_certificate     = module.kubeconfig.kubeconfig.client_certificate
     kube_client_key             = module.kubeconfig.kubeconfig.client_key
     kube_cluster_ca_certificate = module.kubeconfig.kubeconfig.cluster_ca_certificate
-}
-
-resource "null_resource" "worker_nodes_label" {
-    depends_on = [
-        module.kubeconfig
-    ]
-    for_each = local.workers
-    triggers = {
-        kubeconfig = module.kubeconfig.filepath
-    }
-
-    provisioner "local-exec" {
-        # when        = apply
-        command     = "kubectl --kubeconfig ${self.triggers.kubeconfig} label nodes ${each.key} node.longhorn.io/create-default-disk=true"
-    }
 }
 
 module "sops_gpg" {
