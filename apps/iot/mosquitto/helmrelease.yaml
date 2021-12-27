@@ -1,0 +1,32 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: mosquitto
+  namespace: flux-system
+spec:
+  releaseName: mosquitto
+  targetNamespace: iot
+  chart:
+    spec:
+      chart: mosquitto
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: ">=4.1.0"
+  interval: 1h0m0s
+  values:
+    persistence:
+      configinc:
+        enabled: true
+        existingClaim: mosquitto-data-pvc
+    auth:
+      enabled: true
+    env:
+      TZ: Europe/Helsinki
+    service:
+      main:
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        annotations: 
+          external-dns.alpha.kubernetes.io/hostname: mqtt.absolutist.it.

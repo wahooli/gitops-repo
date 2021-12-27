@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: homebridge-data-pv
+  name: mosquitto-data-pv
   namespace: iot
 spec:
   capacity:
-    storage: 5Gi 
+    storage: 256Mi 
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
@@ -15,7 +15,7 @@ spec:
     driver: driver.longhorn.io 
     fsType: ext4
     volumeAttributes:
-      numberOfReplicas: "3"
+      numberOfReplicas: "3" 
       staleReplicaTimeout: "30" 
-    volumeHandle: homebridge-data 
+    volumeHandle: mosquitto-data 
   storageClassName: longhorn 

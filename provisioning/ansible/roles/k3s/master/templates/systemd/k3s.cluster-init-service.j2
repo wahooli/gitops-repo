@@ -31,6 +31,7 @@ ExecStart=/usr/local/bin/k3s \
  '--tls-san={{ k3s.server_address }}' \
  '--cluster-cidr={{ k3s_server.cidr.cluster }}' \
  '--service-cidr={{ k3s_server.cidr.service }}' \
+ '--node-label=node.kubernetes.io/exclude-from-external-load-balancers=true' \
  '--node-ip={{ ansible_host }}' \
  '--disable=local-storage' \
  '--disable=traefik' \

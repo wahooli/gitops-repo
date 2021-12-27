@@ -78,15 +78,6 @@
     owner: root
     group: root
 
-# - name: Copy metallb helm chart
-#   run_once: true
-#   become: yes
-#   template:
-#     src: helm/traefik-v2.yaml.j2
-#     dest: /var/lib/rancher/k3s/server/manifests/helm-traefik-v2.yaml
-#     owner: root
-#     group: root
-
 - name: Check if service file exists
   stat: path={{ systemd_dir }}/k3s.service.env
   register: serviceenvfile
@@ -155,29 +146,6 @@
   run_once: true
   wait_for:
     path: /var/lib/rancher/k3s/server/node-token
-
-# - name: Wait for kube-vip to be created
-#   become: true
-#   run_once: true
-#   shell: "kubectl get po --namespace=kube-system -l name=kube-vip-ds --output=jsonpath='{.items[*].metadata.name}'"
-#   register: kube_vip_pod_created
-#   until: item in kube_vip_pod_created.stdout
-#   retries: 25
-#   delay: 10
-#   with_items:
-#     - kube-vip
-
-# - name: Wait kube-vip to start
-#   run_once: true
-#   become: true
-#   shell: "kubectl wait --namespace=kube-system --for=condition=Ready=true pods -l name=kube-vip-ds"
-#   register: ip_ready
-
-# - name: Wait kube-vip to start
-#   run_once: true
-#   become: true
-#   shell: "kubectl rollout status daemonset/kube-vip-ds -n kube-system"
-#   register: ip_ready
 
 - name: Run K3s service for other nodes
   become: yes

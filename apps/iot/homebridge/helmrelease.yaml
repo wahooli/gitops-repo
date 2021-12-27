@@ -17,6 +17,7 @@ spec:
   interval: 1h0m0s
   values:
     hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
     env:
       TZ: Europe/Helsinki
     persistence:
@@ -26,16 +27,11 @@ spec:
         mountpath: /homebridge
         existingClaim: homebridge-data-pvc
         retain: true
-    service:
+    ingress:
       main:
-        type: LoadBalancer
-        externalTrafficPolicy: Local
-        ports:
-          http:
-            enabled: true
-            primary: true
-            port: 80
-            protocol: TCP
-            targetPort: 8581
-        annotations: 
-          external-dns.alpha.kubernetes.io/hostname: homebridge.absolutist.it.
+        enabled: true
+        hosts: 
+        - host: homebridge.absolutist.it
+          paths:
+            - path: "/"
+              pathType: "Prefix"

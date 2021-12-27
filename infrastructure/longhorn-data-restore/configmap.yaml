@@ -9,5 +9,9 @@ data:
       "homebridge-data" : {
         "createPV": false,
         "createPVC": false
+      },
+      "mosquitto-data" : {
+        "createPV": false,
+        "createPVC": false
       }
     }

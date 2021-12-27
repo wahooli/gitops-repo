@@ -2,7 +2,8 @@
 apiVersion: crd.projectcalico.org/v1
 kind: BGPPeer
 metadata:
-  name: global
+  name: worker-peer
 spec:
+  nodeSelector: has(router-peer)
   peerIP: {{ calico.bgp.peer_ip }}
   asNumber: {{ calico.bgp.peer_as_number }}

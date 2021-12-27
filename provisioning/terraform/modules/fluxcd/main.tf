@@ -13,46 +13,20 @@ provider "kubectl" {
     config_path = var.kubeconfig_path
 }
 
-# provider "kubernetes" {
-#     config_paths            = [ var.kubeconfig_path ]
-#     # host                    = var.kube_host
-#     # current
-#     # client_certificate      = var.kube_client_certificate
-#     # client_key              = var.kube_client_key
-#     # # cluster_ca_certificate  = var.kube_cluster_ca_certificate
-#     # insecure                = true
-# }
-
-# provider "kubectl" {
-#     # # config_path = var.kubeconfig_path
-#     # host                    = var.kube_host
-#     # client_certificate      = var.kube_client_certificate
-#     # client_key              = var.kube_client_key
-#     # cluster_ca_certificate  = var.kube_cluster_ca_certificate
-# }
-
-# provider "flux" {}
-resource "kubernetes_namespace" "flux_namespace" {
-    metadata {
-        annotations = {
-            name = var.flux_namespace
-        }
-        name = var.flux_namespace
-    }
-
-    lifecycle {
-        ignore_changes = [
-            metadata["annotations"],
-            metadata[0].labels["*"]
-        ]
-    }
-}
-
-resource "null_resource" "destroy_remove_finalizers" {
-    depends_on  = [kubernetes_namespace.flux_namespace]
+resource "null_resource" "flux_namespace" {
     triggers = {
         namespace   = var.flux_namespace
         kubeconfig  = var.kubeconfig_path
+    }
+
+    provisioner "local-exec" {
+        when = create
+        command = "kubectl --kubeconfig ${self.triggers.kubeconfig} create namespace ${self.triggers.namespace}"
+    }
+
+    provisioner "local-exec" {
+        when       = destroy
+        command    = "kubectl --kubeconfig ${self.triggers.kubeconfig} delete namespace ${self.triggers.namespace} --cascade=true --wait=false"
     }
 
     provisioner "local-exec" {
@@ -98,13 +72,13 @@ locals {
 }
 
 resource "kubectl_manifest" "install" {
-    depends_on  = [kubernetes_namespace.flux_namespace]
+    depends_on  = [null_resource.flux_namespace]
     for_each    = { for v in local.install : lower(join("/", compact([v.data.apiVersion, v.data.kind, lookup(v.data.metadata, "namespace", ""), v.data.metadata.name]))) => v.content }
     yaml_body   = each.value
 }
 
 resource "kubectl_manifest" "sync" {
-    depends_on  = [kubectl_manifest.install, kubernetes_namespace.flux_namespace]
+    depends_on  = [kubectl_manifest.install, null_resource.flux_namespace]
     for_each    = { for v in local.sync : lower(join("/", compact([v.data.apiVersion, v.data.kind, lookup(v.data.metadata, "namespace", ""), v.data.metadata.name]))) => v.content }
     yaml_body   = each.value
 }

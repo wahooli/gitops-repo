@@ -3,3 +3,5 @@ kind: Kustomization
 resources:
 - configmap.yaml
 - job.yaml
+- backup-daily-job.yaml
+- backup-weekly-job.yaml
