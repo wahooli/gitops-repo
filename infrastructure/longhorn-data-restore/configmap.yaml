@@ -6,6 +6,10 @@ metadata:
 data:
   config.json: |
     {
+      "mariadb-data" : {
+        "createPV": false,
+        "createPVC": false
+      },
       "homebridge-data" : {
         "createPV": false,
         "createPVC": false

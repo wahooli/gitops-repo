@@ -6,3 +6,4 @@ resources:
 - traefik.yaml
 - external-dns.yaml
 - k8s-at-home.yaml
+- bitnami.yaml

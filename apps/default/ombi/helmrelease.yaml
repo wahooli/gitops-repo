@@ -1,0 +1,62 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ombi
+  namespace: flux-system
+spec:
+  releaseName: ombi
+  targetNamespace: default
+  chart:
+    spec:
+      chart: ombi
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: ">=11.1.0"
+  interval: 1h0m0s
+  values:
+    env:
+      TZ: Europe/Helsinki
+    persistence:
+      config:
+        enabled: true
+        type: secret
+        name: ombi-database-json
+        mountpath: /config/database.json
+        readOnly: false
+        # existingClaim: ombi-data-pvc
+        # retain: true
+    ingress:
+      insecure:
+        enabled: true
+        annotations: 
+          traefik.ingress.kubernetes.io/router.entrypoints: web
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-https-only@kubernetescrd
+        hosts: 
+        - host: ombi.absolutist.it
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        - host: ombi.wahoo.li
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+      main:
+        primary: true
+        annotations: 
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
+          traefik.ingress.kubernetes.io/router.tls: "true"
+        enabled: true
+        hosts: 
+        - host: ombi.absolutist.it
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        - host: ombi.wahoo.li
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        tls:
+          - secretName: tls-ombi-ingress

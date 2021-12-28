@@ -22,6 +22,7 @@ spec:
     serviceMonitor:
       enabled: false
     provider: rfc2136
+    logLevel: error
     extraVolumeMounts:
     - mountPath: /etc/krb5.conf
       name: kerberos-config-volume

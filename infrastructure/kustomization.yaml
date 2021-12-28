@@ -7,5 +7,6 @@ resources:
 - csi-external-snapshotter
 - longhorn.yaml
 - traefik.yaml
+- traefik-crd.yaml
 - external-dns
 - longhorn-data-restore.yaml
