@@ -1,14 +1,14 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: mariadb
+  name: redis
   namespace: flux-system
 spec:
-  releaseName: mariadb
-  targetNamespace: default
+  releaseName: redis
+  targetNamespace: db
   chart:
     spec:
-      chart: mariadb
+      chart: redis
       sourceRef:
         kind: HelmRepository
         name: bitnami
@@ -17,17 +17,24 @@ spec:
   interval: 1h0m0s
   values:
     image:
-      tag: 10.5.13-debian-10-r32
+      tag: 6.2.6-debian-10-r53
     architecture: standalone
     auth:
       replicationUser: replicator
       username: maria_adm
-      existingSecret: mariadb-password-secret
+      existingSecretPasswordKey: redis-password-secret
     diagnosticMode:
       enabled: false
     metrics:
-      enabled: false
-    primary:
+      enabled: true
+      serviceMonitor:
+        labels:
+          app: redis
+          release: kube-prometheus-stack
+        jobLabel: redis-metrics
+        enabled: true
+        namespace: db
+    master:
       persistence:
         enabled: true
-        existingClaim: mariadb-data-pvc
+        existingClaim: db-redis-pvc

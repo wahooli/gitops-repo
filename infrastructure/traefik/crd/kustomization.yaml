@@ -5,3 +5,4 @@ resources:
 - gzip-middleware.yaml
 - https-only.yaml
 - local-ip-only-middleware.yaml
+- metrics-service.yaml

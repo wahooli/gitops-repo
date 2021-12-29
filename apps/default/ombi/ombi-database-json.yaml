@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ombi-database-json
+  namespace: default
+stringData:
+  database.json: |
+    {
+      "OmbiDatabase": {
+          "Type": "MySQL",
+          "ConnectionString": "Server=mariadb.db.svc.cluster.local;Port=3306;Database=Ombi;User=ombi;Password=${ombi_database_password}"
+      },
+      "SettingsDatabase": {
+          "Type": "MySQL",
+          "ConnectionString": "Server=mariadb.db.svc.cluster.local;Port=3306;Database=Ombi;User=ombi;Password=${ombi_database_password}"
+      },
+      "ExternalDatabase": {
+          "Type": "MySQL",
+          "ConnectionString": "Server=mariadb.db.svc.cluster.local;Port=3306;Database=Ombi;User=ombi;Password=${ombi_database_password}"
+      }
+    }

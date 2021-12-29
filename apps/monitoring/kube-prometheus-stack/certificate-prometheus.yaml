@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-prometheus-ingress
+  namespace: monitoring
+spec:
+  secretName: tls-prometheus-ingress
+  commonName: prometheus.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - prometheus.absolutist.it
+  - prometheus.wahoo.li

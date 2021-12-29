@@ -21,7 +21,7 @@ spec:
     persistence:
       config:
         enabled: true
-        type: secret
+        type: configMap
         name: ombi-database-json
         mountpath: /config/database.json
         readOnly: false

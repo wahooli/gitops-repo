@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mariadb-data-pvc
-  namespace: default
+  name: db-redis-pvc
+  namespace: db
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 15Gi
+      storage: 8Gi
   storageClassName: longhorn
-  volumeName: mariadb-data-pv 
+  volumeName: db-redis-pv 

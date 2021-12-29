@@ -4,7 +4,7 @@ metadata:
   name: cert-manager
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 3m
   path: "./infrastructure/cert-manager"
   prune: true
   sourceRef:
@@ -15,3 +15,4 @@ spec:
       kind: Deployment
       name: cert-manager
       namespace: cert-manager
+  timeout: 10m

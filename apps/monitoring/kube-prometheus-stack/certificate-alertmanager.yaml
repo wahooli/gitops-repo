@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-alertmanager-ingress
+  namespace: monitoring
+spec:
+  secretName: tls-alertmanager-ingress
+  commonName: alertmanager.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - alertmanager.absolutist.it
+  - alertmanager.wahoo.li

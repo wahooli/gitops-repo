@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-grafana-ingress
+  namespace: monitoring
+spec:
+  secretName: tls-grafana-ingress
+  commonName: grafana.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - grafana.absolutist.it
+  - grafana.wahoo.li

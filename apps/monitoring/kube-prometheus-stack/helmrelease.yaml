@@ -1,0 +1,99 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: flux-system
+spec:
+  releaseName: kube-prometheus-stack
+  targetNamespace: monitoring
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      version: 25.2.0
+  interval: 5m
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    alertmanager:
+      enabled: true
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              storageClassName: longhorn
+              resources:
+                requests:
+                  storage: 10Gi
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        annotations: 
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
+          traefik.ingress.kubernetes.io/router.tls: "true"
+        paths:
+          - /
+        pathType: ImplementationSpecific
+        hosts:
+          - alertmanager.absolutist.it
+          - alertmanager.wahoo.li
+        tls:
+          - secretName: tls-alertmanager-ingress
+    grafana:
+      plugins: 
+        - grafana-piechart-panel
+        # - pmm-singlestat-panel
+      defaultDashboardsTimezone: Europe/Helsinki
+      sidecar:
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        annotations: 
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
+          traefik.ingress.kubernetes.io/router.tls: "true"
+        paths:
+          - /
+        pathType: ImplementationSpecific
+        hosts:
+          - grafana.absolutist.it
+          - grafana.wahoo.li
+        tls:
+          - secretName: tls-grafana-ingress
+    prometheus:
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        annotations: 
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
+          traefik.ingress.kubernetes.io/router.tls: "true"
+        paths:
+          - /
+        pathType: ImplementationSpecific
+        hosts:
+          - prometheus.absolutist.it
+          - prometheus.wahoo.li
+        tls:
+          - secretName: tls-prometheus-ingress
+      prometheusSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteMany"]
+              storageClassName: longhorn
+              resources:
+                requests:
+                  storage: 50Gi
+        podMonitorSelector: {}
+        serviceMonitorSelector: {}

@@ -1,16 +1,15 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
-  name: apps
+  name: monitoring-config
   namespace: flux-system
 spec:
   dependsOn:
-    - name: infrastructure
-    - name: monitoring
+    - name: kube-prometheus-stack
   interval: 10m0s
   prune: true
   validation: client
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./apps
+  path: ./apps/monitoring/monitoring-config

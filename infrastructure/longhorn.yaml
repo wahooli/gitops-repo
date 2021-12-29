@@ -9,7 +9,7 @@ spec:
     - name: cert-manager
     - name: external-snapshotter-crd
     - name: external-snapshotter-controller
-  interval: 5m
+  interval: 3m
   path: "./infrastructure/longhorn"
   prune: true
   sourceRef:
@@ -28,4 +28,4 @@ spec:
     kind: DaemonSet
     name: longhorn-csi-plugin
     namespace: longhorn-system
-  timeout: 10m
+  timeout: 20m

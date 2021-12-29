@@ -6,15 +6,23 @@ metadata:
 data:
   config.json: |
     {
-      "mariadb-data" : {
+      "db-mariadb": {
         "createPV": false,
         "createPVC": false
       },
-      "homebridge-data" : {
+      "db-postgresql": {
         "createPV": false,
         "createPVC": false
       },
-      "mosquitto-data" : {
+      "db-redis": {
+        "createPV": false,
+        "createPVC": false
+      },
+      "homebridge-data": {
+        "createPV": false,
+        "createPVC": false
+      },
+      "mosquitto-data": {
         "createPV": false,
         "createPVC": false
       }
