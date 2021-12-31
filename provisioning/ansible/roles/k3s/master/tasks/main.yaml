@@ -136,11 +136,29 @@
     state: started
     enabled: yes
 
-- name: Create calico operator manifest
+- name: Add Calico helm repo
   become: yes
+  command: helm repo add projectcalico https://docs.projectcalico.org/charts
+
+- name: Install Calico from helm chart
   run_once: true
-  ignore_errors: yes
-  command: kubectl apply -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
+  become: yes
+  block:
+    - name: Check calico chart is installed
+      command: helm status calico
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  rescue:
+    - name: Install calico
+      command: helm install calico projectcalico/tigera-operator --set installation.enabled=false,apiServer.enabled=true --version v3.21.2
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+# - name: Create calico operator manifest
+#   become: yes
+#   run_once: true
+#   ignore_errors: yes
+#   command: kubectl apply -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
 
 - name: Wait for node-token
   run_once: true

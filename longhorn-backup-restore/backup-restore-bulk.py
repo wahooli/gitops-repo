@@ -16,10 +16,13 @@ with open(os.getenv('CONFIG_PATH')) as json_file:
         if not existingVolume:
             createPV = True
             createPVC = True
+            groups = []
             if "createPV" in jsonData[volumeHandle]:
                 createPV = jsonData[volumeHandle]["createPV"]
             if "createPVC" in jsonData[volumeHandle]:
                 createPVC = jsonData[volumeHandle]["createPVC"]
+            if "groups" in jsonData[volumeHandle]:
+                groups = jsonData[volumeHandle]["groups"]
 
             print("Volume handle \"%s\" not found, restoring" % volumeHandle)
             bv = client.by_id_backupVolume(id=volumeHandle)
@@ -50,6 +53,10 @@ with open(os.getenv('CONFIG_PATH')) as json_file:
                                     fromBackup=url)
             volume = longhorn_common.wait_for_volume_detached(client, volumeHandle)
             print("Restored volume %s" % volumeHandle)
+            if groups:
+                for groupName in groups:
+                    volume.recurringJobAdd(name=groupName, isGroup=True)
+                    
             if createPV:
                 longhorn_common.create_pv_for_volume(client, volume, pvName)
                 print("Restored PersistentVolume %s" % pvName)

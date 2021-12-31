@@ -16,10 +16,17 @@ spec:
       version: ">=4.1.0"
   interval: 1h0m0s
   values:
+    dnsPolicy: ClusterFirstWithHostNet
     persistence:
       configinc:
         enabled: true
-        existingClaim: mosquitto-data-pvc
+        type: secret
+        name: mosquitto-configinc
+        mountpath: /mosquitto/configinc
+        readOnly: false
+      data:
+        enabled: true
+        existingClaim: iot-mosquitto-pvc
     auth:
       enabled: true
     env:

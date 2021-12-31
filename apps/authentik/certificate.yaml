@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-authentik-ingress
+  namespace: authentik
+spec:
+  secretName: tls-authentik-ingress
+  commonName: auth.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - auth.absolutist.it
+  - auth.wahoo.li

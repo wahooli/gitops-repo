@@ -8,22 +8,45 @@ data:
     {
       "db-mariadb": {
         "createPV": false,
-        "createPVC": false
+        "createPVC": false,
+        "groups": [
+          "hourly",
+          "daily",
+          "weekly"
+        ]
       },
       "db-postgresql": {
         "createPV": false,
-        "createPVC": false
+        "createPVC": false,
+        "groups": [
+          "hourly",
+          "daily",
+          "weekly"
+        ]
       },
       "db-redis": {
         "createPV": false,
-        "createPVC": false
+        "createPVC": false,
+        "groups": [
+          "hourly",
+          "daily",
+          "weekly"
+        ]
       },
-      "homebridge-data": {
+      "iot-homebridge": {
         "createPV": false,
-        "createPVC": false
+        "createPVC": false,
+        "groups": [
+          "daily",
+          "weekly"
+        ]
       },
-      "mosquitto-data": {
+      "iot-mosquitto": {
         "createPV": false,
-        "createPVC": false
+        "createPVC": false,
+        "groups": [
+          "daily",
+          "weekly"
+        ]
       }
     }

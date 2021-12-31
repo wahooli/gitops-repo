@@ -156,5 +156,5 @@ resource "github_repository_deploy_key" "flux" {
     title               = var.github_deploy_key_title
     repository          = data.github_repository.main.name
     key                 = tls_private_key.github_deploy_key.public_key_openssh
-    read_only           = true
+    read_only           = false # for auto-updating images
 }

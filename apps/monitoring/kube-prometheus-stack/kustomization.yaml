@@ -4,6 +4,4 @@ resources:
 - certificate-alertmanager.yaml
 - certificate-grafana.yaml
 - certificate-prometheus.yaml
-# - longhorn-volume.yaml
-# - pv.yaml
 - helmrelease.yaml

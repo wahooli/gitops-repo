@@ -190,19 +190,6 @@ module "ansible_playbook" {
     }
 }
 
-# module "kubeconfig" {
-#     source = "../../modules/remote-file-download"
-#     depends_on = [
-#         module.ansible_playbook,
-#         module.kubernetes_masters
-#     ]
-#     user                = var.remote_user
-#     host_addr           = module.kubernetes_masters.ip_addresses.0
-#     remote_file         = "~/.kube/config"
-#     local_path          = "${path.module}/../../outputs/kubeconfig"
-#     private_key_path    = local_file.private_key.filename
-# }
-
 module "kubeconfig" {
     source = "../../modules/kubeconfig"
     depends_on = [
@@ -214,6 +201,21 @@ module "kubeconfig" {
     remote_file         = "~/.kube/config"
     local_path          = "${path.module}/../../outputs/kubeconfig"
     private_key_path    = local_file.private_key.filename
+}
+
+resource "null_resource" "worker_nodes_label" {
+    depends_on = [
+        module.kubeconfig
+    ]
+    for_each = local.workers
+    triggers = {
+        kubeconfig = module.kubeconfig.filepath
+    }
+
+    provisioner "local-exec" {
+        # when        = apply
+        command     = "kubectl --kubeconfig ${self.triggers.kubeconfig} label nodes ${each.key} node-role.kubernetes.io/worker=worker"
+    }
 }
 
 module "flux" {

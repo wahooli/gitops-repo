@@ -16,6 +16,11 @@ spec:
   releaseName: cert-manager
   targetNamespace: cert-manager
   values:
+    tolerations:
+    - key: "node-role.kubernetes.io/master"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
     extraArgs: 
       - --dns01-recursive-nameservers-only
       - --dns01-recursive-nameservers=1.1.1.1:53,1.0.0.1:53

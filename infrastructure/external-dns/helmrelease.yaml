@@ -34,6 +34,11 @@ spec:
         defaultMode: 420
         name: external-dns-krb5.conf
       name: kerberos-config-volume
+    tolerations:
+    - key: "node-role.kubernetes.io/master"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
   valuesFrom:
   - kind: Secret
     name: external-dns-extra-args

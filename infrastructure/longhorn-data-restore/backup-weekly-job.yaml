@@ -7,6 +7,6 @@ spec:
   cron: "0 3 ? * SUN"
   task: backup
   groups:
-  - default
+  - weekly
   retain: 3
   concurrency: 2

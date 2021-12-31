@@ -8,3 +8,4 @@ resources:
 - k8s-at-home.yaml
 - bitnami.yaml
 - prometheus-community.yaml
+- goauthentik.yaml

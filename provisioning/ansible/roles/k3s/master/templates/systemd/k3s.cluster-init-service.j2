@@ -34,6 +34,7 @@ ExecStart=/usr/local/bin/k3s \
  '--node-label=node.kubernetes.io/exclude-from-external-load-balancers=true' \
  '--node-ip={{ ansible_host }}' \
  '--disable=local-storage' \
+ '--disable-network-policy' \
  '--disable=traefik' \
  '--disable=servicelb' \
  '--disable=metrics-server' \

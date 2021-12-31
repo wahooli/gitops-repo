@@ -22,3 +22,12 @@
     regexp: '.*{{ k3s.server_address }}$'
     line: "{{ k3s.server_address }} "
     state: absent
+
+- name: Wait for nodes to be ready
+  shell: "kubectl get nodes"
+  register: nodes
+  run_once: true
+  until:
+    - '" NotReady " not in nodes.stdout'
+  retries: 40
+  delay: 2

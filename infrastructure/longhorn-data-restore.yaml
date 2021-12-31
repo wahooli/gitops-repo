@@ -9,7 +9,6 @@ spec:
     - name: longhorn
   path: "./infrastructure/longhorn-data-restore"
   prune: true
-  wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system

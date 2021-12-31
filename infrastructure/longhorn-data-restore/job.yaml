@@ -4,6 +4,7 @@ metadata:
   name: longhorn-data-restore
   namespace: longhorn-system
 spec:
+  ttlSecondsAfterFinished: 0
   template:
     spec:
       containers:

@@ -32,6 +32,7 @@ ExecStart=/usr/local/bin/k3s \
  '--server=https://{{k3s.server_address}}:6443' \
  '--disable=local-storage' \
  '--disable=traefik' \
+ '--disable-network-policy' \
  '--disable=servicelb' \
  '--disable=metrics-server' \
  '--flannel-backend=none' \

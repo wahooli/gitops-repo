@@ -4,6 +4,11 @@ kind: Installation
 metadata:
   name: default
 spec:
+  controlPlaneTolerations:
+  - key: "node-role.kubernetes.io/master"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
   calicoNetwork:
     ipPools:
     - blockSize: 26

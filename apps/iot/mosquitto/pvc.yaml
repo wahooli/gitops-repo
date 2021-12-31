@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mosquitto-data-pvc
+  name: iot-mosquitto-pvc
   namespace: iot
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 256Mi # must match size from earlier
-  storageClassName: longhorn # must match name from earlier
-  volumeName: mosquitto-data-pv # must reference Persistent Volume
+      storage: 512Mi
+  storageClassName: longhorn
+  volumeName: iot-mosquitto-pv

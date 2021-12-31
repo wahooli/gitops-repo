@@ -5,6 +5,12 @@
     name: gnupg
     state: present
 
+- name: Ensure apt-transport-https installed
+  become: true
+  package:
+    name: apt-transport-https
+    state: present
+
 - name: Ensure dnsutils installed
   become: true
   package:
@@ -128,3 +134,21 @@
   template:
     src: containerd.conf.j2
     dest: /etc/modules-load.d/containerd.conf
+
+# for helm
+- name: Add an Apt signing key for helm
+  apt_key:
+    url: https://baltocdn.com/helm/signing.asc
+    state: present
+
+- name: Add source repository into sources list
+  apt_repository:
+    repo: deb https://baltocdn.com/helm/stable/debian/ all main
+    state: present
+    filename: helm-stable-debian
+
+- name: Ensure helm installed
+  become: true
+  package:
+    name: helm
+    state: present
