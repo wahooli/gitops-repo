@@ -24,3 +24,12 @@ spec:
       createDefaultDiskLabeledNodes: true
       defaultDataLocality: best-effort
       storageOverProvisioningPercentage: 150
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      host: longhorn.absolutist.it
+      tlsSecret: tls-longhorn-ingress
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-authentik-https-gzip@kubernetescrd
+        traefik.ingress.kubernetes.io/router.tls: "true"

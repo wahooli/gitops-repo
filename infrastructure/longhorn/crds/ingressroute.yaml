@@ -7,37 +7,11 @@ spec:
  entryPoints:
   - web
  routes:
-  - match: Host(`longhorn.absolutist.it`) || Host(`longhorn.wahoo.li`)
+  - match: Host(`longhorn.absolutist.it`)
     kind: Rule
     middlewares:
-    - name: local-ip-only
-      namespace: traefik
     - name: https-only
       namespace: traefik
     services:
      - name: longhorn-frontend
        port: 80
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
- name: longhorn-https
- namespace: longhorn-system
-spec:
- entryPoints:
-  - websecure
- routes:
-  - match: Host(`longhorn.absolutist.it`) || Host(`longhorn.wahoo.li`)
-    kind: Rule
-    middlewares:
-    - name: local-ip-only
-      namespace: traefik
-    - name: forwarded-proto-https
-      namespace: traefik
-    - name: gzip
-      namespace: traefik
-    services:
-     - name: longhorn-frontend
-       port: 80
- tls:
-  secretName: tls-longhorn-ingress

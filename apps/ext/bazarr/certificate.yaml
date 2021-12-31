@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-bazarr-ingress
+  namespace: ext
+spec:
+  secretName: tls-bazarr-ingress
+  commonName: bazarr.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - bazarr.absolutist.it
+  - bazarr.wahoo.li

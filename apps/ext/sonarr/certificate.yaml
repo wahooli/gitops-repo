@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-sonarr-ingress
+  namespace: ext
+spec:
+  secretName: tls-sonarr-ingress
+  commonName: sonarr.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - sonarr.absolutist.it
+  - sonarr.wahoo.li

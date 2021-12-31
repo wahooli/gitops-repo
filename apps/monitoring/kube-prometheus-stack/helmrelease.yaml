@@ -36,7 +36,7 @@ spec:
         ingressClassName: traefik
         annotations: 
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-authentik-https-gzip@kubernetescrd
           traefik.ingress.kubernetes.io/router.tls: "true"
         paths:
           - /
@@ -60,7 +60,7 @@ spec:
         ingressClassName: traefik
         annotations: 
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-authentik-https-gzip@kubernetescrd
           traefik.ingress.kubernetes.io/router.tls: "true"
         paths:
           - /
@@ -76,7 +76,7 @@ spec:
         ingressClassName: traefik
         annotations: 
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-authentik-https-gzip@kubernetescrd
           traefik.ingress.kubernetes.io/router.tls: "true"
         paths:
           - /

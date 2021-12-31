@@ -28,10 +28,35 @@ spec:
         existingClaim: iot-homebridge-pvc
         retain: true
     ingress:
+      insecure:
+        enabled: true
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: web
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-https-only@kubernetescrd
+        hosts:
+        - host: homebridge.absolutist.it
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        - host: homebridge.wahoo.li
+          paths:
+            - path: "/"
+              pathType: "Prefix"
       main:
         enabled: true
+        primary: true
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-authentik-https-gzip@kubernetescrd
+          traefik.ingress.kubernetes.io/router.tls: "true"
         hosts: 
         - host: homebridge.absolutist.it
           paths:
             - path: "/"
               pathType: "Prefix"
+        - host: homebridge.wahoo.li
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        tls:
+          - secretName: tls-homebridge-ingress

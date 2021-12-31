@@ -9,6 +9,7 @@ spec:
     trustForwardHeader: true
     tls:
       insecureSkipVerify: true
+      caOptional: true
     authResponseHeaders:
       - X-authentik-username
       - X-authentik-groups

@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: authentik-https-gzip
+  namespace: traefik
+spec:
+  chain:
+    middlewares:
+    - name: forwarded-proto-https
+      namespace: traefik
+    - name: gzip
+      namespace: traefik
+    - name: authentik
+      namespace: traefik

@@ -43,12 +43,12 @@ spec:
             - path: "/"
               pathType: "Prefix"
       main:
+        enabled: true
         primary: true
         annotations: 
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd,traefik-gzip@kubernetescrd
           traefik.ingress.kubernetes.io/router.tls: "true"
-        enabled: true
         hosts: 
         - host: ombi.absolutist.it
           paths:
