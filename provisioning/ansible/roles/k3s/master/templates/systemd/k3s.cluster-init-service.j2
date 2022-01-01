@@ -32,6 +32,7 @@ ExecStart=/usr/local/bin/k3s \
  '--cluster-cidr={{ k3s_server.cidr.cluster }}' \
  '--service-cidr={{ k3s_server.cidr.service }}' \
  '--node-label=node.kubernetes.io/exclude-from-external-load-balancers=true' \
+ '--node-taint=node-role.kubernetes.io/master=true:NoSchedule' \
  '--node-ip={{ ansible_host }}' \
  '--disable=local-storage' \
  '--disable-network-policy' \

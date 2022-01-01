@@ -1,0 +1,46 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ingress-nginx
+  namespace: flux-system
+spec:
+  releaseName: ingress-nginx
+  targetNamespace: ingress-nginx
+  chart:
+    spec:
+      chart: ingress-nginx
+      sourceRef:
+        kind: HelmRepository
+        name: ingress-nginx
+        namespace: flux-system
+      version: ">=4.0.13"
+  interval: 1h0m0s
+  install:
+    remediation:
+      retries: 3
+  values:
+    controller:
+      dnsPolicy: ClusterFirstWithHostNet
+      replicaCount: 3
+      ingressClassResource:
+        name: nginx
+        enabled: true
+        default: true
+      terminationGracePeriodSeconds: 300 # previously 30
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: ingress-nginx-internal
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: false
+        prometheusRule:
+          enabled: false
+      service:
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: nginx.absolutist.it.
+        externalTrafficPolicy: Local

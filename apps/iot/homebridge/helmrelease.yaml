@@ -28,27 +28,17 @@ spec:
         existingClaim: iot-homebridge-pvc
         retain: true
     ingress:
-      insecure:
-        enabled: true
-        annotations:
-          traefik.ingress.kubernetes.io/router.entrypoints: web
-          traefik.ingress.kubernetes.io/router.middlewares: traefik-https-only@kubernetescrd
-        hosts:
-        - host: homebridge.absolutist.it
-          paths:
-            - path: "/"
-              pathType: "Prefix"
-        - host: homebridge.wahoo.li
-          paths:
-            - path: "/"
-              pathType: "Prefix"
       main:
         enabled: true
         primary: true
+        ingressClassName: nginx
         annotations:
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: traefik-authentik-https-gzip@kubernetescrd
-          traefik.ingress.kubernetes.io/router.tls: "true"
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+          nginx.ingress.kubernetes.io/auth-url: http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/akprox/auth/nginx
+          nginx.ingress.kubernetes.io/auth-signin: https://auth.absolutist.it/akprox/start?rd=$scheme://$http_host$request_uri
+          nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+          nginx.ingress.kubernetes.io/auth-snippet: proxy_set_header X-Forwarded-Host $http_host;
+          nginx.ingress.kubernetes.io/auth-tls-verify-client: "off"
         hosts: 
         - host: homebridge.absolutist.it
           paths:

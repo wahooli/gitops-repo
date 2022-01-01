@@ -6,7 +6,6 @@ resources:
 - cert-manager-issuers.yaml
 - csi-external-snapshotter
 - longhorn.yaml
-- traefik.yaml
-- traefik-crd.yaml
+- ingress-nginx.yaml
 - external-dns
 - longhorn-data-restore.yaml

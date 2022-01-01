@@ -18,6 +18,12 @@ spec:
       enabled: false
       serviceAccount:
         create: false
+    controller:
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
     configInline:
       address-pools:
       - name: default

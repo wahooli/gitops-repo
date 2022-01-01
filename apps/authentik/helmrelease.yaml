@@ -44,11 +44,9 @@ spec:
         create: true
     ingress:
       enabled: true
-      ingressClassName: traefik
+      ingressClassName: nginx
       annotations: 
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.middlewares: traefik-forwarded-proto-https@kubernetescrd
-        traefik.ingress.kubernetes.io/router.tls: "true"
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       hosts: 
       - host: auth.absolutist.it
         paths:

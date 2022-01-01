@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: traefik
+    - name: cert-manager
   interval: 10m0s
   prune: true
   validation: client

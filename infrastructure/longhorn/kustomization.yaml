@@ -4,6 +4,6 @@ metadata:
   name: longhorn
 resources:
 - namespace.yaml
+- certificate.yaml
 - helmrelease.yaml
-- crds
 - volumesnapshotclass.yaml

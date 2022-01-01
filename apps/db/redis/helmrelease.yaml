@@ -21,7 +21,6 @@ spec:
     architecture: standalone
     auth:
       enabled: false
-      existingSecretPasswordKey: redis-password-secret
     diagnosticMode:
       enabled: false
     metrics:

@@ -5,8 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: traefik
-    - name: cert-manager
+    - name: cert-manager-issuers
     - name: external-snapshotter-crd
     - name: external-snapshotter-controller
   interval: 3m

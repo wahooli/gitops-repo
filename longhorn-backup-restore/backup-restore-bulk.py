@@ -26,7 +26,11 @@ with open(os.getenv('CONFIG_PATH')) as json_file:
 
             print("Volume handle \"%s\" not found, restoring" % volumeHandle)
             bv = client.by_id_backupVolume(id=volumeHandle)
-            lastBackup = bv.backupGet(name=bv.lastBackupName)
+            if bv.lastBackupName:
+                lastBackup = bv.backupGet(name=bv.lastBackupName)
+            else:
+                print("Empty backup name for volume \"%s\", there might be error elsewhere. Exiting" % volumeHandle)
+                exit(1)
             if "size" in jsonData[volumeHandle]:
                 volumeSize = jsonData[volumeHandle]["size"]
             else:

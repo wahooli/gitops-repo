@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
 - jetstack.yaml
 - longhorn.yaml
-- traefik.yaml
+- ingress-nginx.yaml
 - external-dns.yaml
 - k8s-at-home.yaml
 - bitnami.yaml

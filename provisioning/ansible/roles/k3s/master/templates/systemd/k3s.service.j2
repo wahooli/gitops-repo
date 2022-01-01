@@ -29,6 +29,7 @@ ExecStart=/usr/local/bin/k3s \
     server \
  '--node-ip={{ansible_host}}' \
  '--node-label=node.kubernetes.io/exclude-from-external-load-balancers=true' \
+ '--node-taint=node-role.kubernetes.io/master=true:NoSchedule' \
  '--server=https://{{k3s.server_address}}:6443' \
  '--disable=local-storage' \
  '--disable=traefik' \
