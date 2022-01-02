@@ -22,7 +22,7 @@ spec:
     domainFilters:
       - absolutist.it
     serviceMonitor:
-      enabled: false
+      enabled: false # will be added manually after prometheus install
     provider: rfc2136
     logLevel: error
     extraVolumeMounts:

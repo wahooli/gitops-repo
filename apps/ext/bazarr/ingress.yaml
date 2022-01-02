@@ -16,8 +16,10 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: bazarr
-          servicePort: 80
+          service:
+            name: bazarr
+            port:
+              number: 80
         pathType: ImplementationSpecific
   tls:
   - secretName: tls-bazarr-ingress

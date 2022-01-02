@@ -30,7 +30,7 @@ spec:
     metrics:
       enabled: false
       prometheusRule:
-        enabled: true
+        enabled: false
       serviceMonitor:
         additionalLabels:
           app: postgresql

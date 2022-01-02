@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-zigbee2mqtt-ingress
+  namespace: default
+spec:
+  secretName: tls-zigbee2mqtt-ingress
+  commonName: zigbee.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - zigbee.absolutist.it
+  - zigbee.wahoo.li

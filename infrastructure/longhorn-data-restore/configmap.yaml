@@ -41,6 +41,14 @@ data:
           "weekly"
         ]
       },
+      "iot-zigbee2mqtt": {
+        "createPV": false,
+        "createPVC": false,
+        "groups": [
+          "daily",
+          "weekly"
+        ]
+      },
       "iot-mosquitto": {
         "createPV": false,
         "createPVC": false,

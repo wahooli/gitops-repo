@@ -4,3 +4,7 @@ resources:
 - flux-system
 - longhorn-system
 - db
+- cert-manager
+- ingress-nginx
+- kube-system
+- authentik

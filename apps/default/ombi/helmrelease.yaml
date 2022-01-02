@@ -25,6 +25,7 @@ spec:
         name: ombi-database-json
         mountpath: /config/database.json
         readOnly: false
+    ingress:
       main:
         enabled: true
         primary: true

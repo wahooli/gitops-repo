@@ -26,7 +26,7 @@ spec:
     metrics:
       enabled: true
       serviceMonitor:
-        labels:
+        additionalLabels:
           app: redis
           release: kube-prometheus-stack
         jobLabel: redis-metrics
