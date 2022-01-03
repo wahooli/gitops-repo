@@ -1,0 +1,61 @@
+{
+    "version": 1,
+    "key": "input_select",
+    "data": {
+        "items": [
+            {
+                "options": [
+                    "Nightlight",
+                    "Relax",
+                    "Bright",
+                    "Cold"
+                ],
+                "name": "Bedroom scenes",
+                "id": "scene_switcher"
+            },
+            {
+                "name": "Kitchen scenes",
+                "options": [
+                    "Cold",
+                    "Bright",
+                    "Warm",
+                    "Nightlight"
+                ],
+                "id": "kitchen_scenes"
+            },
+            {
+                "name": "Kitchen motion sensor daytime scene",
+                "options": [
+                    "ON",
+                    "Cold",
+                    "Bright",
+                    "Warm",
+                    "Nightlight"
+                ],
+                "id": "kitchen_motionn_sensor_daytime_scene"
+            },
+            {
+                "name": "Kitchen motion sensor motion sensitivity",
+                "options": [
+                    "low",
+                    "medium",
+                    "high"
+                ],
+                "id": "kitchen_motion_sensor_motion_sensitivity"
+            },
+            {
+                "name": "Living room scenes",
+                "icon": "hass:television",
+                "options": [
+                    "Cold",
+                    "Bright",
+                    "Relax",
+                    "Dimmed",
+                    "Nightlight",
+                    "Movie time"
+                ],
+                "id": "living_room_scenes"
+            }
+        ]
+    }
+}

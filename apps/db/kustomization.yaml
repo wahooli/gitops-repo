@@ -5,3 +5,4 @@ resources:
 - mariadb.yaml
 - postgresql.yaml
 - redis.yaml
+- influxdb.yaml

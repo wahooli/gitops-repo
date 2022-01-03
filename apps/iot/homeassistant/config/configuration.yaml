@@ -1,0 +1,61 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+influxdb: !include influxdb.yaml
+
+homeassistant:
+  name: Home
+  unit_system: metric
+  time_zone: "Europe/Helsinki"
+  external_url: "https://ha.wahoo.li"
+  internal_url: "https://ha.absolutist.it"
+
+mqtt:
+  broker: mosquitto.iot.svc.cluster.local
+  port: 1883
+  username: homeassistant
+  password: !secret mosquitto_password
+
+recorder:
+  db_url: !secret psql_connection_string
+  auto_purge: true
+  purge_keep_days: 20
+  commit_interval: 0 # default 1
+  exclude:
+    entities:
+    - sensor.xiaomi_map
+
+http:
+  server_host: 0.0.0.0
+  base_url: https://ha.wahoo.li
+  ip_ban_enabled: true
+  login_attempts_threshold: 5
+  use_x_forwarded_for: true
+  trusted_proxies:
+  - 172.22.0.0/16
+  - 10.0.0.0/24
+  - 10.3.0.0/24
+
+wake_on_lan:
+webostv: !include webostv.yaml
+google_assistant: !include google_assistant.yaml
+
+netatmo:
+  client_id: !secret netatmo_client_id
+  client_secret: !secret netatmo_client_secret
+
+notify:
+  - platform: html5
+    name: ha.wahoo.li
+    vapid_pub_key: !secret notify_vapid_pub_key
+    vapid_prv_key: !secret notify_vapid_prv_key
+    vapid_email: !secret notify_vapid_email
+

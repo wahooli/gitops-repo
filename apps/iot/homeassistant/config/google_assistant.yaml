@@ -1,0 +1,40 @@
+project_id: arched-cabinet-139914
+service_account: !include google-service-account.json
+report_state: true
+exposed_domains:
+  - vacuum
+  - cover
+  - light
+  - switch
+  - scene
+  - fan
+entity_config:
+  input_boolean.zigbee_permit_join:
+    expose: false
+  input_select.bedroom_scenes:
+    expose: false
+    room: Bedroom
+    name: Scene select
+  input_select.living_room_scenes:
+    expose: false
+    room: Living Room
+    name: Scene select
+  input_select.kitchen_scenes:
+    expose: false
+    room: Kitchen
+    name: Scene select
+  sensor.sauna_sensor_temperature:
+    expose: true
+    name: Sauna temperature
+  sensor.bedroom_sensor_temperature:
+    expose: true
+    name: Bedroom temperature
+    room: Bedroom
+  input_boolean.leaving:
+    expose: true
+    name: Leaving home toggle
+  vacuum.johnny:
+    name: Johnny
+    room: Living Room
+  vacuum.mqtt_vacuum:
+    expose: false

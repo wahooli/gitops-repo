@@ -1,0 +1,75 @@
+{
+    "version": 1,
+    "key": "input_number",
+    "data": {
+        "items": [
+            {
+                "min": 0.0,
+                "max": 59.0,
+                "name": "Sleep timer minutes",
+                "unit_of_measurement": "m",
+                "mode": "slider",
+                "step": 5.0,
+                "id": "sleep_timer_minutes",
+                "icon": "hass:clock"
+            },
+            {
+                "min": 0.0,
+                "max": 6.0,
+                "name": "Sleep timer hours",
+                "unit_of_measurement": "h",
+                "mode": "slider",
+                "step": 1.0,
+                "id": "sleep_timer_hours",
+                "icon": "hass:clock"
+            },
+            {
+                "min": 0.0,
+                "max": 120.0,
+                "name": "Wakeup routine fade in minutes",
+                "icon": "hass:clock",
+                "step": 5.0,
+                "unit_of_measurement": "minutes",
+                "mode": "slider",
+                "id": "wakeup_routine_fade_in_minutes"
+            },
+            {
+                "min": 0.0,
+                "max": 600.0,
+                "name": "Kitchen motion lights turn off after",
+                "unit_of_measurement": "s",
+                "step": 5.0,
+                "icon": "mdi:clock",
+                "mode": "slider",
+                "id": "kitchen_motion_lights_turn_off_after"
+            },
+            {
+                "min": 0.0,
+                "max": 30.0,
+                "name": "Kitchen motion lights fadeout",
+                "unit_of_measurement": "s",
+                "step": 1.0,
+                "mode": "slider",
+                "id": "kitchen_mootion_lights_fadeout"
+            },
+            {
+                "min": 0.0,
+                "max": 30.0,
+                "name": "Kitchen motion lights fadeout",
+                "unit_of_measurement": "s",
+                "step": 1.0,
+                "mode": "slider",
+                "id": "kitchen_motion_lights_fadeout"
+            },
+            {
+                "min": 1.0,
+                "max": 5.0,
+                "name": "Vacuum repeats",
+                "icon": "mdi:repeat",
+                "step": 1.0,
+                "mode": "slider",
+                "id": "vacuum_repeats"
+            }
+        ]
+    }
+}

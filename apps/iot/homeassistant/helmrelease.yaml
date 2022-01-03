@@ -1,0 +1,102 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: flux-system
+spec:
+  releaseName: home-assistant
+  targetNamespace: iot
+  chart:
+    spec:
+      chart: home-assistant
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: ">=11.2.1"
+  interval: 5m
+  values:
+    initContainers:
+      copy-configuration: 
+        image: bash:5.1.12
+        imagePullPolicy: IfNotPresent
+        command: ['bash', '-c', 'find /src/ /src/.storage/ -type l ! -name "*..data" -maxdepth 1 | while read -r file; do install -D -m 664 $(readlink -f $file) /dest${file#/src}; done; find /dest -type f -maxdepth 1 -name "*.sh" -exec chmod +x {} \; ; echo copied'] # heccin oneliner
+        volumeMounts:
+        - name: config
+          mountPath: /dest
+        - name: configyaml
+          mountPath: /src
+        - name: configstorage
+          mountPath: /src/.storage
+    image:
+      repository: homeassistant/home-assistant
+      tag: 2021.6.3
+      pullPolicy: IfNotPresent
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
+    metrics:
+      enabled: true
+      serviceMonitor:
+        labels:
+          app: homeassistant
+          release: kube-prometheus-stack
+      prometheusRule:
+        enabled: false
+    env:
+      TZ: Europe/Helsinki
+    persistence:
+      config:
+        enabled: true
+        mountpath: /config
+        type: pvc
+        existingClaim: iot-homeassistant-pvc
+        retain: true
+      configyaml:
+        enabled: true
+        type: custom
+        volumeSpec:
+          configMap:
+            name: homeassistant-config
+      configstorage:
+        enabled: true
+        type: custom
+        volumeSpec:
+          configMap:
+            name: homeassistant-config-storage
+      ssh-keys:
+        enabled: true
+        type: secret
+        name: homeassistant-deploy-key
+        mountpath: /deploy_keys
+        readOnly: true
+      encrypted:
+        enabled: true
+        type: custom
+        volumeSpec:
+          secret:
+            secretName: homeassistant-secret
+        subPath:
+        - path: secrets.yaml
+          mountPath: /config/secrets.yaml
+          readOnly: true
+        - path: google-service-account.json
+          mountPath: /config/google-service-account.json
+          readOnly: true
+    ingress:
+      main:
+        enabled: true
+        primary: true
+        ingressClassName: nginx
+        annotations:
+          # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+        hosts: 
+        - host: ha.absolutist.it
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        - host: ha.wahoo.li
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        tls:
+          - secretName: tls-homeassistant-ingress

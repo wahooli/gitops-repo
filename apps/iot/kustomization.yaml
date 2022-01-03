@@ -5,4 +5,4 @@ resources:
 - mosquitto.yaml
 - zigbee2mqtt.yaml
 - homebridge
-# - homeassistant
+- homeassistant.yaml

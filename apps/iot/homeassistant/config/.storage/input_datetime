@@ -1,0 +1,21 @@
+{
+    "version": 1,
+    "key": "input_datetime",
+    "data": {
+        "items": [
+            {
+                "has_time": true,
+                "has_date": false,
+                "name": "Wakeup routine begin",
+                "id": "wakeup_routine_begin"
+            },
+            {
+                "has_time": true,
+                "has_date": false,
+                "name": "Kitchen nighttime start",
+                "icon": "mdi:weather-night",
+                "id": "kitchen_nighttime_start"
+            }
+        ]
+    }
+}

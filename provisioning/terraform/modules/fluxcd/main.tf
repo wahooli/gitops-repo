@@ -116,6 +116,42 @@ resource "kubernetes_secret" "main" {
     }
 }
 
+# maybe move this elsewhere, but lazy way to add deploykey to homeassistant
+resource "null_resource" "iot_namespace" {
+    triggers = {
+        namespace   = "iot"
+        kubeconfig  = var.kubeconfig_path
+    }
+
+    provisioner "local-exec" {
+        when = create
+        command = "kubectl --kubeconfig ${self.triggers.kubeconfig} create namespace ${self.triggers.namespace}"
+    }
+}
+
+resource "kubernetes_secret" "hass_deploy_key" {
+    depends_on = [null_resource.iot_namespace]
+
+    metadata {
+        annotations     = {}
+        labels          = {}
+        name            = "homeassistant-deploy-key"
+        namespace       = "iot"
+    }
+
+    data = {
+        id_rsa        = tls_private_key.github_deploy_key.private_key_pem
+        "id_rsa.pub"  = tls_private_key.github_deploy_key.public_key_openssh
+    }
+
+    lifecycle {
+        ignore_changes = [
+            metadata[0].annotations,
+            metadata[0].labels
+        ]
+    }
+}
+
 # To make sure the repository exists and the correct permissions are set.
 data "github_repository" "main" {
     full_name = "${var.github_owner}/${var.repository_name}"

@@ -1,0 +1,19 @@
+host: 192.168.253.15
+name: Living Room TV
+turn_on_action:
+  service: wake_on_lan.send_magic_packet
+  data:
+    mac: 38-8C-50-DA-EC-46
+customize:
+  sources:
+    - Live Tv
+    - YouTube
+    - Shield
+    - Netflix
+    - Playstation 4
+    - Nintendo Switch
+    - PC
+    - Plex
+    - Yle Areena
+    - Spotify Music - Listen free on LG TV
+    - Screen Share

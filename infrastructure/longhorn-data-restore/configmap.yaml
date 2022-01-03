@@ -33,7 +33,24 @@ data:
           "weekly"
         ]
       },
+      "db-influxdb": {
+        "createPV": false,
+        "createPVC": false,
+        "groups": [
+          "hourly",
+          "daily",
+          "weekly"
+        ]
+      },
       "iot-homebridge": {
+        "createPV": false,
+        "createPVC": false,
+        "groups": [
+          "daily",
+          "weekly"
+        ]
+      },
+      "iot-homeassistant": {
         "createPV": false,
         "createPVC": false,
         "groups": [

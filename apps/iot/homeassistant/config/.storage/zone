@@ -1,0 +1,17 @@
+{
+    "version": 1,
+    "key": "zone",
+    "data": {
+        "items": [
+            {
+                "name": "Work",
+                "icon": "mdi:office-building-marker-outline",
+                "latitude": 65.01300100203373,
+                "longitude": 25.475948452949527,
+                "passive": false,
+                "radius": 105.0,
+                "id": "work"
+            }
+        ]
+    }
+}

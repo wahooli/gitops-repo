@@ -1,0 +1,2112 @@
+- id: '1589327182393'
+  name: Bedroom Bright
+  entities:
+    light.bedroom_lights:
+      min_mireds: 153
+      max_mireds: 500
+      brightness: 253
+      color_temp: 259
+      hs_color:
+      - 40
+      - 43.529
+      rgb_color:
+      - 255
+      - 218
+      - 144
+      xy_color:
+      - 0.428
+      - 0.401
+      friendly_name: Bedroom lights
+      supported_features: 59
+      state: 'on'
+- id: '1598166626429'
+  name: Movie time
+  entities:
+    light.living_room_roof_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color_temp: 157
+      hs_color:
+      - 29.581
+      - 84.314
+      rgb_color:
+      - 255
+      - 145
+      - 39
+      xy_color:
+      - 0.58
+      - 0.387
+      color:
+        x: 0.581
+        y: 0.387
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 1
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a7a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 29636
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 92
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 1
+      supported_features: 63
+    light.living_room_roof_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color_temp: 157
+      hs_color:
+      - 29.581
+      - 84.314
+      rgb_color:
+      - 255
+      - 145
+      - 39
+      xy_color:
+      - 0.58
+      - 0.387
+      color:
+        x: 0.581
+        y: 0.387
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 2
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a6a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 58810
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 99
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 2
+      supported_features: 63
+    light.living_room_roof_3:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color_temp: 157
+      hs_color:
+      - 29.581
+      - 84.314
+      rgb_color:
+      - 255
+      - 145
+      - 39
+      xy_color:
+      - 0.58
+      - 0.387
+      color:
+        x: 0.581
+        y: 0.387
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 3
+        hardwareVersion: 1
+        ieeeAddr: '0x001788010416a568'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 34403
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 94
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 3
+      supported_features: 63
+    light.tv_right:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color_temp: 62
+      hs_color:
+      - 15.701
+      - 83.922
+      rgb_color:
+      - 255
+      - 96
+      - 40
+      xy_color:
+      - 0.636
+      - 0.337
+      color:
+        x: 0.639
+        y: 0.336
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Right
+        hardwareVersion: 1
+        ieeeAddr: '0x0017880106426595'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 26623
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 78
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Right
+      supported_features: 63
+    light.tv_background:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 18
+      color_temp: 417
+      hs_color:
+      - 14.758
+      - 97.255
+      rgb_color:
+      - 255
+      - 67
+      - 6
+      xy_color:
+      - 0.673
+      - 0.321
+      color:
+        x: 0.675
+        y: 0.32
+      device:
+        applicationVersion: 80
+        dateCode: ''
+        friendlyName: TV Background
+        hardwareVersion: 1
+        ieeeAddr: '0x588e81fffeede647'
+        manufacturerID: 4098
+        manufacturerName: _TZ3000_riwp3k79
+        model: HG06104A
+        networkAddress: 30389
+        powerSource: Mains (single phase)
+        stackVersion: 0
+        type: Router
+        zclVersion: 3
+      linkquality: 92
+      state: 'on'
+      friendly_name: TV Background
+      supported_features: 63
+      diyhue_room: Living room
+    light.tv_left:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color_temp: 62
+      hs_color:
+      - 15.701
+      - 83.922
+      rgb_color:
+      - 255
+      - 96
+      - 40
+      xy_color:
+      - 0.636
+      - 0.337
+      color:
+        x: 0.639
+        y: 0.336
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Left
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801064260e3'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 2615
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 105
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Left
+      supported_features: 63
+- id: '1611255096364'
+  name: Bedroom Nightlight
+  entities:
+    light.bedroom_lights:
+      min_mireds: 153
+      max_mireds: 500
+      brightness: 26
+      color_temp: 157
+      hs_color:
+      - 29.581
+      - 84.314
+      rgb_color:
+      - 255
+      - 145
+      - 39
+      xy_color:
+      - 0.58
+      - 0.387
+      friendly_name: Bedroom lights
+      supported_features: 59
+      state: 'on'
+- id: '1611256983282'
+  name: Relax Bedroom
+  entities:
+    light.bedroom_lights:
+      min_mireds: 153
+      max_mireds: 500
+      brightness: 175
+      color_temp: 381
+      hs_color:
+      - 36.81
+      - 63.922
+      rgb_color:
+      - 255
+      - 192
+      - 91
+      xy_color:
+      - 0.494
+      - 0.415
+      friendly_name: Bedroom lights
+      supported_features: 59
+      state: 'on'
+- id: '1611274892465'
+  name: Bedroom Cold
+  entities:
+    light.bedroom_lights:
+      min_mireds: 153
+      max_mireds: 500
+      brightness: 252
+      color_temp: 144
+      hs_color:
+      - 216.923
+      - 5.098
+      rgb_color:
+      - 242
+      - 247
+      - 255
+      xy_color:
+      - 0.312
+      - 0.321
+      friendly_name: Bedroom lights
+      supported_features: 59
+      state: 'on'
+- id: '1611323523321'
+  name: Kitchen Warm
+  entities:
+    light.kitchen_roof_light_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 177
+      color_temp: 454
+      color_temp_startup: 65535
+      device:
+        applicationVersion: 32
+        dateCode: '20200312'
+        friendlyName: Kitchen roof light 1
+        hardwareVersion: 1
+        ieeeAddr: '0x14b457fffe4411ee'
+        manufacturerID: 4476
+        manufacturerName: IKEA of Sweden
+        model: LED1733G7
+        networkAddress: 56783
+        powerSource: Mains (single phase)
+        softwareBuildID: 2.0.029
+        stackVersion: 98
+        type: Router
+        zclVersion: 2
+      linkquality: 63
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen roof light 1
+      supported_features: 47
+    light.kitchen_roof_light_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 177
+      color_temp: 454
+      color_temp_startup: 65535
+      device:
+        applicationVersion: 32
+        dateCode: '20200312'
+        friendlyName: Kitchen roof light 2
+        hardwareVersion: 1
+        ieeeAddr: '0x14b457fffe439a9a'
+        manufacturerID: 4476
+        manufacturerName: IKEA of Sweden
+        model: LED1733G7
+        networkAddress: 13070
+        powerSource: Mains (single phase)
+        softwareBuildID: 2.0.029
+        stackVersion: 98
+        type: Router
+        zclVersion: 2
+      linkquality: 92
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen roof light 2
+      supported_features: 47
+    light.kitchen_light:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 229
+      color_temp: 431
+      hs_color:
+      - 36.81
+      - 63.922
+      rgb_color:
+      - 255
+      - 192
+      - 91
+      xy_color:
+      - 0.494
+      - 0.415
+      color:
+        x: 0.49374523092787
+        y: 0.415134422282633
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Kitchen light
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801037f6610'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 51119
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 57
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen light
+      supported_features: 63
+- id: '1611323744138'
+  name: Kitchen Bright
+  entities:
+    light.kitchen_light:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 371
+      hs_color:
+      - 38.102
+      - 53.725
+      rgb_color:
+      - 255
+      - 205
+      - 118
+      xy_color:
+      - 0.46
+      - 0.409
+      color:
+        x: 0.460678421214773
+        y: 0.410781824719658
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Kitchen light
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801037f6610'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 51119
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 55
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen light
+      supported_features: 63
+    light.kitchen_roof_light_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 366
+      color_temp_startup: 65535
+      device:
+        applicationVersion: 32
+        dateCode: '20200312'
+        friendlyName: Kitchen roof light 1
+        hardwareVersion: 1
+        ieeeAddr: '0x14b457fffe4411ee'
+        manufacturerID: 4476
+        manufacturerName: IKEA of Sweden
+        model: LED1733G7
+        networkAddress: 56783
+        powerSource: Mains (single phase)
+        softwareBuildID: 2.0.029
+        stackVersion: 98
+        type: Router
+        zclVersion: 2
+      linkquality: 63
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen roof light 1
+      supported_features: 47
+    light.kitchen_roof_light_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 365
+      color_temp_startup: 65535
+      device:
+        applicationVersion: 32
+        dateCode: '20200312'
+        friendlyName: Kitchen roof light 2
+        hardwareVersion: 1
+        ieeeAddr: '0x14b457fffe439a9a'
+        manufacturerID: 4476
+        manufacturerName: IKEA of Sweden
+        model: LED1733G7
+        networkAddress: 13070
+        powerSource: Mains (single phase)
+        softwareBuildID: 2.0.029
+        stackVersion: 98
+        type: Router
+        zclVersion: 2
+      linkquality: 89
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen roof light 2
+      supported_features: 47
+- id: '1611323832039'
+  name: Kitchen Nightlight
+  entities:
+    light.kitchen_light:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 3
+      color_temp: 500
+      hs_color:
+      - 35.426
+      - 73.725
+      rgb_color:
+      - 255
+      - 178
+      - 67
+      xy_color:
+      - 0.525
+      - 0.413
+      color:
+        x: 0.526676280311873
+        y: 0.41329727450763
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Kitchen light
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801037f6610'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 51119
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 63
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen light
+      supported_features: 63
+    light.kitchen_roof_light_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 3
+      color_temp: 454
+      color:
+        x: 0.5052
+        y: 0.4152
+      color_temp_startup: 65535
+      device:
+        applicationVersion: 32
+        dateCode: '20200312'
+        friendlyName: Kitchen roof light 1
+        hardwareVersion: 1
+        ieeeAddr: '0x14b457fffe4411ee'
+        manufacturerID: 4476
+        manufacturerName: IKEA of Sweden
+        model: LED1733G7
+        networkAddress: 56783
+        powerSource: Mains (single phase)
+        softwareBuildID: 2.0.029
+        stackVersion: 98
+        type: Router
+        zclVersion: 2
+      linkquality: 60
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen roof light 1
+      supported_features: 47
+    light.kitchen_roof_light_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 3
+      color_temp: 454
+      color:
+        x: 0.5052
+        y: 0.4152
+      color_temp_startup: 65535
+      device:
+        applicationVersion: 32
+        dateCode: '20200312'
+        friendlyName: Kitchen roof light 2
+        hardwareVersion: 1
+        ieeeAddr: '0x14b457fffe439a9a'
+        manufacturerID: 4476
+        manufacturerName: IKEA of Sweden
+        model: LED1733G7
+        networkAddress: 13070
+        powerSource: Mains (single phase)
+        softwareBuildID: 2.0.029
+        stackVersion: 98
+        type: Router
+        zclVersion: 2
+      linkquality: 84
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen roof light 2
+      supported_features: 47
+- id: '1611324057172'
+  name: Kitchen Cold
+  entities:
+    light.kitchen_light:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 153
+      hs_color:
+      - 210
+      - 4.706
+      rgb_color:
+      - 242
+      - 248
+      - 255
+      xy_color:
+      - 0.312
+      - 0.322
+      color:
+        x: 0.313059507478705
+        y: 0.323172994053855
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Kitchen light
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801037f6610'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 51119
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 55
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen light
+      supported_features: 63
+    light.kitchen_roof_light_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 250
+      color_temp_startup: 65535
+      device:
+        applicationVersion: 32
+        dateCode: '20200312'
+        friendlyName: Kitchen roof light 1
+        hardwareVersion: 1
+        ieeeAddr: '0x14b457fffe4411ee'
+        manufacturerID: 4476
+        manufacturerName: IKEA of Sweden
+        model: LED1733G7
+        networkAddress: 56783
+        powerSource: Mains (single phase)
+        softwareBuildID: 2.0.029
+        stackVersion: 98
+        type: Router
+        zclVersion: 2
+      linkquality: 63
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen roof light 1
+      supported_features: 47
+    light.kitchen_roof_light_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 250
+      color_temp_startup: 65535
+      device:
+        applicationVersion: 32
+        dateCode: '20200312'
+        friendlyName: Kitchen roof light 2
+        hardwareVersion: 1
+        ieeeAddr: '0x14b457fffe439a9a'
+        manufacturerID: 4476
+        manufacturerName: IKEA of Sweden
+        model: LED1733G7
+        networkAddress: 13070
+        powerSource: Mains (single phase)
+        softwareBuildID: 2.0.029
+        stackVersion: 98
+        type: Router
+        zclVersion: 2
+      linkquality: 92
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Kitchen roof light 2
+      supported_features: 47
+- id: '1611795111899'
+  name: Living room bright
+  entities:
+    light.living_room_roof_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 253
+      color_temp: 261
+      hs_color:
+      - 37.778
+      - 52.941
+      rgb_color:
+      - 255
+      - 205
+      - 120
+      xy_color:
+      - 0.459
+      - 0.408
+      color:
+        x: 0.46
+        y: 0.408
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 1
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a7a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 29636
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 92
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 1
+      supported_features: 63
+    light.living_room_roof_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 253
+      color_temp: 261
+      hs_color:
+      - 37.778
+      - 52.941
+      rgb_color:
+      - 255
+      - 205
+      - 120
+      xy_color:
+      - 0.459
+      - 0.408
+      color:
+        x: 0.46
+        y: 0.408
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 2
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a6a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 58810
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 99
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 2
+      supported_features: 63
+    light.living_room_roof_3:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 253
+      color_temp: 261
+      hs_color:
+      - 37.778
+      - 52.941
+      rgb_color:
+      - 255
+      - 205
+      - 120
+      xy_color:
+      - 0.459
+      - 0.408
+      color:
+        x: 0.46
+        y: 0.408
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 3
+        hardwareVersion: 1
+        ieeeAddr: '0x001788010416a568'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 34403
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 94
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 3
+      supported_features: 63
+    light.tv_right:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color:
+        x: 0.639
+        y: 0.336
+      color_temp: 62
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Right
+        hardwareVersion: 1
+        ieeeAddr: '0x0017880106426595'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 26623
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 78
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Right
+      supported_features: 63
+    light.tv_background:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 1
+      color:
+        x: 0.675
+        y: 0.32
+      color_temp: 417
+      device:
+        applicationVersion: 80
+        dateCode: ''
+        friendlyName: TV Background
+        hardwareVersion: 1
+        ieeeAddr: '0x588e81fffeede647'
+        manufacturerID: 4098
+        manufacturerName: _TZ3000_riwp3k79
+        model: HG06104A
+        networkAddress: 30389
+        powerSource: Mains (single phase)
+        stackVersion: 0
+        type: Router
+        zclVersion: 3
+      linkquality: 92
+      state: 'off'
+      friendly_name: TV Background
+      supported_features: 63
+      diyhue_room: Living room
+    light.tv_left:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color:
+        x: 0.639
+        y: 0.336
+      color_temp: 62
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Left
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801064260e3'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 2615
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 105
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Left
+      supported_features: 63
+- id: '1611795216530'
+  name: Living room cold
+  entities:
+    light.living_room_roof_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 156
+      hs_color:
+      - 213.333
+      - 3.529
+      rgb_color:
+      - 246
+      - 250
+      - 255
+      xy_color:
+      - 0.315
+      - 0.324
+      color:
+        x: 0.314951744809611
+        y: 0.325010746064094
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 1
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a7a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 29636
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 89
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 1
+      supported_features: 63
+    light.living_room_roof_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 156
+      hs_color:
+      - 213.333
+      - 3.529
+      rgb_color:
+      - 246
+      - 250
+      - 255
+      xy_color:
+      - 0.315
+      - 0.324
+      color:
+        x: 0.314951744809611
+        y: 0.325010746064094
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 2
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a6a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 58810
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 99
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 2
+      supported_features: 63
+    light.living_room_roof_3:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color_temp: 156
+      hs_color:
+      - 213.333
+      - 3.529
+      rgb_color:
+      - 246
+      - 250
+      - 255
+      xy_color:
+      - 0.315
+      - 0.324
+      color:
+        x: 0.314951744809611
+        y: 0.325010746064094
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 3
+        hardwareVersion: 1
+        ieeeAddr: '0x001788010416a568'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 34403
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 94
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 3
+      supported_features: 63
+    light.tv_background:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 1
+      color:
+        x: 0.314951744809611
+        y: 0.325010746064094
+      color_temp: 156
+      device:
+        applicationVersion: 80
+        dateCode: ''
+        friendlyName: TV Background
+        hardwareVersion: 1
+        ieeeAddr: '0x588e81fffeede647'
+        manufacturerID: 4098
+        manufacturerName: _TZ3000_riwp3k79
+        model: HG06104A
+        networkAddress: 30389
+        powerSource: Mains (single phase)
+        stackVersion: 0
+        type: Router
+        zclVersion: 3
+      linkquality: 23
+      state: 'off'
+      friendly_name: TV Background
+      supported_features: 63
+      diyhue_room: Living room
+    light.tv_leftt:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color:
+        x: 0.314951744809611
+        y: 0.325010746064094
+      color_temp: 156
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Left
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801064260e3'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 2615
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 105
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Left
+      supported_features: 63
+    light.tv_right:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 254
+      color:
+        x: 0.314951744809611
+        y: 0.325010746064094
+      color_temp: 156
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Right
+        hardwareVersion: 1
+        ieeeAddr: '0x0017880106426595'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 26623
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 78
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Right
+      supported_features: 63
+- id: '1611795359186'
+  name: Living room nightlight
+  entities:
+    light.living_room_roof_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 2
+      color_temp: 335
+      hs_color:
+      - 35.161
+      - 72.941
+      rgb_color:
+      - 255
+      - 177
+      - 69
+      xy_color:
+      - 0.525
+      - 0.411
+      color:
+        x: 0.525
+        y: 0.413
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 1
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a7a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 29636
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 92
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 1
+      supported_features: 63
+    light.living_room_roof_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 2
+      color_temp: 335
+      hs_color:
+      - 35.161
+      - 72.941
+      rgb_color:
+      - 255
+      - 177
+      - 69
+      xy_color:
+      - 0.525
+      - 0.411
+      color:
+        x: 0.525
+        y: 0.413
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 2
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a6a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 58810
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 99
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 2
+      supported_features: 63
+    light.living_room_roof_3:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 2
+      color_temp: 335
+      hs_color:
+      - 35.161
+      - 72.941
+      rgb_color:
+      - 255
+      - 177
+      - 69
+      xy_color:
+      - 0.525
+      - 0.411
+      color:
+        x: 0.525
+        y: 0.413
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 3
+        hardwareVersion: 1
+        ieeeAddr: '0x001788010416a568'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 34403
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 94
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 3
+      supported_features: 63
+    light.tv_right:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color:
+        x: 0.636
+        y: 0.337
+      color_temp: 62
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Right
+        hardwareVersion: 1
+        ieeeAddr: '0x0017880106426595'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 26623
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 78
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Right
+      supported_features: 63
+    light.tv_background:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 18
+      color:
+        x: 0.673
+        y: 0.321
+      color_temp: 424
+      device:
+        applicationVersion: 80
+        dateCode: ''
+        friendlyName: TV Background
+        hardwareVersion: 1
+        ieeeAddr: '0x588e81fffeede647'
+        manufacturerID: 4098
+        manufacturerName: _TZ3000_riwp3k79
+        model: HG06104A
+        networkAddress: 30389
+        powerSource: Mains (single phase)
+        stackVersion: 0
+        type: Router
+        zclVersion: 3
+      linkquality: 92
+      state: 'off'
+      friendly_name: TV Background
+      supported_features: 63
+      diyhue_room: Living room
+    light.tv_left:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color:
+        x: 0.636
+        y: 0.337
+      color_temp: 62
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Left
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801064260e3'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 2615
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 105
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Left
+      supported_features: 63
+- id: '1611795474639'
+  name: Living room relax
+  entities:
+    light.living_room_roof_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 143
+      color_temp: 371
+      hs_color:
+      - 36
+      - 66.667
+      rgb_color:
+      - 255
+      - 186
+      - 84
+      xy_color:
+      - 0.505
+      - 0.413
+      color:
+        x: 0.504
+        y: 0.414
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 1
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a7a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 29636
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 92
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 1
+      supported_features: 63
+    light.living_room_roof_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 143
+      color_temp: 371
+      hs_color:
+      - 36
+      - 66.667
+      rgb_color:
+      - 255
+      - 186
+      - 84
+      xy_color:
+      - 0.505
+      - 0.413
+      color:
+        x: 0.504
+        y: 0.414
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 2
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a6a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 58810
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 99
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 2
+      supported_features: 63
+    light.living_room_roof_3:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 143
+      color_temp: 371
+      hs_color:
+      - 36
+      - 66.667
+      rgb_color:
+      - 255
+      - 186
+      - 84
+      xy_color:
+      - 0.505
+      - 0.413
+      color:
+        x: 0.504
+        y: 0.414
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 3
+        hardwareVersion: 1
+        ieeeAddr: '0x001788010416a568'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 34403
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 94
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 3
+      supported_features: 63
+    light.tv_right:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color:
+        x: 0.636
+        y: 0.337
+      color_temp: 62
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Right
+        hardwareVersion: 1
+        ieeeAddr: '0x0017880106426595'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 26623
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 78
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Right
+      supported_features: 63
+    light.tv_background:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 18
+      color:
+        x: 0.673
+        y: 0.321
+      color_temp: 424
+      device:
+        applicationVersion: 80
+        dateCode: ''
+        friendlyName: TV Background
+        hardwareVersion: 1
+        ieeeAddr: '0x588e81fffeede647'
+        manufacturerID: 4098
+        manufacturerName: _TZ3000_riwp3k79
+        model: HG06104A
+        networkAddress: 30389
+        powerSource: Mains (single phase)
+        stackVersion: 0
+        type: Router
+        zclVersion: 3
+      linkquality: 105
+      state: 'off'
+      friendly_name: TV Background
+      supported_features: 63
+      diyhue_room: Living room
+    light.tv_left:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color:
+        x: 0.636
+        y: 0.337
+      color_temp: 62
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Left
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801064260e3'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 2615
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 105
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Left
+      supported_features: 63
+- id: '1611795838194'
+  name: Living room dimmed
+  entities:
+    light.living_room_roof_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 74
+      color_temp: 371
+      hs_color:
+      - 36
+      - 66.667
+      rgb_color:
+      - 255
+      - 186
+      - 84
+      xy_color:
+      - 0.505
+      - 0.413
+      color:
+        x: 0.504
+        y: 0.414
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 1
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a7a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 29636
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 92
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 1
+      supported_features: 63
+    light.living_room_roof_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 74
+      color_temp: 371
+      hs_color:
+      - 36
+      - 66.667
+      rgb_color:
+      - 255
+      - 186
+      - 84
+      xy_color:
+      - 0.505
+      - 0.413
+      color:
+        x: 0.504
+        y: 0.414
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 2
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801043c8a6a'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 58810
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 99
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 2
+      supported_features: 63
+    light.living_room_roof_3:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 74
+      color_temp: 371
+      hs_color:
+      - 36
+      - 66.667
+      rgb_color:
+      - 255
+      - 186
+      - 84
+      xy_color:
+      - 0.505
+      - 0.413
+      color:
+        x: 0.504
+        y: 0.414
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: Living room roof 3
+        hardwareVersion: 1
+        ieeeAddr: '0x001788010416a568'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: 9290012573A
+        networkAddress: 34403
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 94
+      state: 'on'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: Living room roof 3
+      supported_features: 63
+    light.tv_right:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color:
+        x: 0.639
+        y: 0.336
+      color_temp: 62
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Right
+        hardwareVersion: 1
+        ieeeAddr: '0x0017880106426595'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 26623
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 78
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Right
+      supported_features: 63
+    light.tv_background:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 1
+      color:
+        x: 0.675
+        y: 0.32
+      color_temp: 417
+      device:
+        applicationVersion: 80
+        dateCode: ''
+        friendlyName: TV Background
+        hardwareVersion: 1
+        ieeeAddr: '0x588e81fffeede647'
+        manufacturerID: 4098
+        manufacturerName: _TZ3000_riwp3k79
+        model: HG06104A
+        networkAddress: 30389
+        powerSource: Mains (single phase)
+        stackVersion: 0
+        type: Router
+        zclVersion: 3
+      linkquality: 92
+      state: 'off'
+      friendly_name: TV Background
+      supported_features: 63
+      diyhue_room: Living room
+    light.tv_left:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      brightness: 38
+      color:
+        x: 0.639
+        y: 0.336
+      color_temp: 62
+      device:
+        applicationVersion: 2
+        dateCode: '20191218'
+        friendlyName: TV Left
+        hardwareVersion: 1
+        ieeeAddr: '0x00178801064260e3'
+        manufacturerID: 4107
+        manufacturerName: Philips
+        model: '915005733701'
+        networkAddress: 2615
+        powerSource: Mains (single phase)
+        softwareBuildID: 1.50.2_r30933
+        stackVersion: 1
+        type: Router
+        zclVersion: 1
+      linkquality: 105
+      state: 'off'
+      update:
+        state: idle
+      update_available: false
+      friendly_name: TV Left
+      supported_features: 63
