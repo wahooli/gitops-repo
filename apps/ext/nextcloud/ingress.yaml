@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextcloud
+  namespace: ext
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  rules:
+  - host: cloud.absolutist.it
+    http:
+      paths:
+      - backend:
+          service:
+            name: nextcloud
+            port:
+              number: 80
+        pathType: ImplementationSpecific
+  tls:
+  - secretName: tls-nextcloud-ingress

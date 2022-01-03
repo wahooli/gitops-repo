@@ -73,5 +73,13 @@ data:
           "daily",
           "weekly"
         ]
+      },
+      "default-tautulli": {
+        "createPV": false,
+        "createPVC": false,
+        "groups": [
+          "daily",
+          "weekly"
+        ]
       }
     }

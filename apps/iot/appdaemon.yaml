@@ -1,25 +1,23 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: homeassistant
+  name: appdaemon
   namespace: flux-system
 spec:
   interval: 5m
-  path: "./apps/iot/homeassistant"
+  path: "./apps/iot/appdaemon"
   prune: true
   dependsOn:
-    - name: mosquitto
-    - name: postgresql
-    - name: influxdb
+    - name: homeassistant
   sourceRef:
     kind: GitRepository
     name: flux-system
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: cluster-apps-secrets
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
-      name: home-assistant
+      name: appdaemon
       namespace: iot
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-gpg

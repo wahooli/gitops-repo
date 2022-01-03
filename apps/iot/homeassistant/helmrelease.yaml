@@ -79,8 +79,8 @@ spec:
         - path: secrets.yaml
           mountPath: /config/secrets.yaml
           readOnly: true
-        - path: google-service-account.json
-          mountPath: /config/google-service-account.json
+        - path: google-service-account.yaml
+          mountPath: /config/google-service-account.yaml
           readOnly: true
     ingress:
       main:
@@ -88,7 +88,7 @@ spec:
         primary: true
         ingressClassName: nginx
         annotations:
-          # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
         hosts: 
         - host: ha.absolutist.it
           paths:

@@ -6,3 +6,4 @@ resources:
 - zigbee2mqtt.yaml
 - homebridge
 - homeassistant.yaml
+- appdaemon.yaml

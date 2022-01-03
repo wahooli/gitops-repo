@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-appdaemon-ingress
+  namespace: default
+spec:
+  secretName: tls-appdaemon-ingress
+  commonName: appdaemon.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - appdaemon.absolutist.it
+  - ha-dash.absolutist.it
+  - appdaemon.wahoo.li
+  - ha-dash.wahoo.li

@@ -1,5 +1,5 @@
 project_id: arched-cabinet-139914
-service_account: !include google-service-account.json
+service_account: !include google-service-account.yaml
 report_state: true
 exposed_domains:
   - vacuum

@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-nextcloud-ingress
+  namespace: ext
+spec:
+  secretName: tls-nextcloud-ingress
+  commonName: nextcloud.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - cloud.absolutist.it
+  - cloud.wahoo.li

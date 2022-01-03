@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-ombi-ingress
+  namespace: default
+spec:
+  secretName: tls-ombi-ingress
+  commonName: ombi.absolutist.it
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+  - ombi.absolutist.it
+  - ombi.wahoo.li
