@@ -7,7 +7,7 @@ spec:
   secretName: tls-authentik-ingress
   commonName: auth.absolutist.it
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
   - auth.absolutist.it

@@ -7,7 +7,7 @@ spec:
   secretName: tls-radarr-ingress
   commonName: radarr.absolutist.it
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
   - radarr.absolutist.it

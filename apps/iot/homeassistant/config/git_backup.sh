@@ -35,6 +35,8 @@ if [ ! -d "${root_dir}" ]; then
 		exit 1
 	fi
 	cd ${root_dir}
+	git config user.name $commit_author
+	git config user.email $commit_author_email
 	git sparse-checkout init
 	git sparse-checkout set ${sparse_checkout_path}
 	git checkout --quiet
@@ -75,7 +77,7 @@ done
 if [[ $(git status --porcelain --untracked-files=no) ]]; then
 	# adds modified and deleted files, not new/untracked
 	git add -u
-	git commit --quiet --author="${commit_author} <${commit_author_email}>" -m "${commit_message}"
+	git commit --quiet -m "${commit_message}"
 	git push --quiet
 	echo "Pushed changes to git"
 else

@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: tls-appdaemon-ingress
-  namespace: default
+  namespace: iot
 spec:
   secretName: tls-appdaemon-ingress
   commonName: appdaemon.absolutist.it

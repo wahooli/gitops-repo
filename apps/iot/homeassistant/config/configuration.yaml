@@ -10,6 +10,7 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 influxdb: !include influxdb.yaml
+light: !include lights.yaml
 
 homeassistant:
   name: Home

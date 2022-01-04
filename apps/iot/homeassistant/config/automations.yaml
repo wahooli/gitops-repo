@@ -244,13 +244,13 @@
   trigger:
   - platform: device
     domain: mqtt
-    device_id: b98fc56f327edc16772f2ab86ac7ce20
+    device_id: 44b3981dbe6fdab04661fe246c402804
     type: action
     subtype: on_press
     discovery_id: 0x0017880104e45156 action_on_press
   - platform: device
     domain: mqtt
-    device_id: 3559ef1e819e4be08e85d99c01bd1879
+    device_id: 18c9ba81a40a8ba0d55db7dfa0cc4994
     type: action
     subtype: arrow_right_click
     discovery_id: 0x000d6ffffe49ceb2 action_arrow_right_click
@@ -291,7 +291,7 @@
   trigger:
   - platform: device
     domain: mqtt
-    device_id: 3559ef1e819e4be08e85d99c01bd1879
+    device_id: 18c9ba81a40a8ba0d55db7dfa0cc4994
     type: action
     subtype: arrow_left_click
     discovery_id: 0x000d6ffffe49ceb2 action_arrow_left_click

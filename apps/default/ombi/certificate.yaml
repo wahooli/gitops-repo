@@ -7,7 +7,7 @@ spec:
   secretName: tls-ombi-ingress
   commonName: ombi.absolutist.it
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
   - ombi.absolutist.it

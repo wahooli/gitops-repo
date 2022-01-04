@@ -7,7 +7,7 @@ spec:
   secretName: tls-longhorn-ingress
   commonName: longhorn.absolutist.it
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
   - longhorn.absolutist.it

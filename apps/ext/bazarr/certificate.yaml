@@ -7,7 +7,7 @@ spec:
   secretName: tls-bazarr-ingress
   commonName: bazarr.absolutist.it
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
   - bazarr.absolutist.it

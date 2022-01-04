@@ -1,0 +1,19 @@
+  - platform: mqtt
+    unique_id: zigbee2mqttbedroomlightsgroup
+    schema: json
+    name: Bedroom lights group
+    icon: "mdi:lightbulb-group"
+    command_topic: "zigbee2mqtt/bedroom lights/set"
+    state_topic: "zigbee2mqtt/bedroom lights"
+    color_temp: true
+    brightness: true
+    rgb: true
+    effect: true
+    effect_list:
+    - blink
+    - breathe
+    - okay
+    - channel_change
+    - finish_effect
+    - stop_effect
+#    command_off_template: '{"state": "off", "transition": 1}'

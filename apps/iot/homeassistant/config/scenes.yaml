@@ -1,23 +1,35 @@
 - id: '1589327182393'
   name: Bedroom Bright
   entities:
-    light.bedroom_lights:
+    light.bedroom_lights_group:
       min_mireds: 153
       max_mireds: 500
-      brightness: 253
-      color_temp: 259
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
+      brightness: 254
       hs_color:
-      - 40
-      - 43.529
+      - 40.396
+      - 39.608
       rgb_color:
       - 255
-      - 218
-      - 144
+      - 221
+      - 153
       xy_color:
-      - 0.428
-      - 0.401
-      friendly_name: Bedroom lights
-      supported_features: 59
+      - 0.419
+      - 0.396
+      color_temp: 303
+      friendly_name: Bedroom lights group
+      icon: mdi:lightbulb-group
+      supported_features: 63
       state: 'on'
 - id: '1598166626429'
   name: Movie time
@@ -304,23 +316,35 @@
 - id: '1611255096364'
   name: Bedroom Nightlight
   entities:
-    light.bedroom_lights:
+    light.bedroom_lights_group:
       min_mireds: 153
       max_mireds: 500
-      brightness: 26
-      color_temp: 157
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
+      brightness: 28
       hs_color:
-      - 29.581
-      - 84.314
+      - 37.161
+      - 60.784
       rgb_color:
       - 255
-      - 145
-      - 39
+      - 195
+      - 100
       xy_color:
-      - 0.58
-      - 0.387
-      friendly_name: Bedroom lights
-      supported_features: 59
+      - 0.484
+      - 0.412
+      color_temp: 411
+      friendly_name: Bedroom lights group
+      icon: mdi:lightbulb-group
+      supported_features: 63
       state: 'on'
 - id: '1611256983282'
   name: Relax Bedroom
@@ -346,23 +370,35 @@
 - id: '1611274892465'
   name: Bedroom Cold
   entities:
-    light.bedroom_lights:
+    light.bedroom_lights_group:
       min_mireds: 153
       max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
       brightness: 252
-      color_temp: 144
       hs_color:
-      - 216.923
-      - 5.098
+      - 225.405
+      - 14.51
       rgb_color:
-      - 242
-      - 247
+      - 217
+      - 226
       - 255
       xy_color:
-      - 0.312
-      - 0.321
-      friendly_name: Bedroom lights
-      supported_features: 59
+      - 0.292
+      - 0.297
+      color_temp: 120
+      friendly_name: Bedroom lights group
+      icon: mdi:lightbulb-group
+      supported_features: 63
       state: 'on'
 - id: '1611323523321'
   name: Kitchen Warm

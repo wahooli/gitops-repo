@@ -49,7 +49,7 @@ vacuum_clean_area:
   sequence:
   - service: mqtt.publish
     data_template:
-      topic: valetudo/rockrobo/custom_command
+      topic: valetudo/roborock/MapSegmentationCapability/clean/set
       payload_template: '{% set seg = [] %} {% set vacuum_input = ''input_boolean.vacuum_''
         %} {% set seg = seg + [17] if is_state(vacuum_input ~ ''kitchen'', ''on'')
         else seg %} {% set seg = seg + [18] if is_state(vacuum_input ~ ''living_room'',
@@ -57,7 +57,7 @@ vacuum_clean_area:
         ''on'') else seg %} {% set seg = seg + [20] if is_state(vacuum_input ~ ''hallway'',
         ''on'') else seg %} {% set seg = seg + [19] if is_state(vacuum_input ~ ''bathroom'',
         ''on'') else seg %} { "command": "segmented_cleanup", "segment_ids": {{seg}},
-        "repeats": {{states(''input_number.vacuum_repeats'') | int}}  }'
+        "iterations": {{states(''input_number.vacuum_repeats'') | int}}  }'
   - service: input_boolean.turn_off
     data: {}
     entity_id: input_boolean.vacuum_bathroom

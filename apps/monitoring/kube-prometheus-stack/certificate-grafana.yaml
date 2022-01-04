@@ -7,7 +7,7 @@ spec:
   secretName: tls-grafana-ingress
   commonName: grafana.absolutist.it
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
   - grafana.absolutist.it

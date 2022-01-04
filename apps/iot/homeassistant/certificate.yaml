@@ -2,12 +2,12 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: tls-homeassistant-ingress
-  namespace: default
+  namespace: iot
 spec:
   secretName: tls-homeassistant-ingress
   commonName: ha.absolutist.it
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
   - ha.absolutist.it

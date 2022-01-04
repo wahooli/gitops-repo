@@ -16,6 +16,10 @@ spec:
       version: ">=11.1.0"
   interval: 1h0m0s
   values:
+    image:
+      repository: linuxserver/ombi
+      tag: 4.3.3
+      pullPolicy: IfNotPresent
     env:
       TZ: Europe/Helsinki
     persistence:

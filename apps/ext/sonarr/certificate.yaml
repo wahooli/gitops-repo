@@ -7,7 +7,7 @@ spec:
   secretName: tls-sonarr-ingress
   commonName: sonarr.absolutist.it
   issuerRef:
-    name: letsencrypt-staging
+    name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
   - sonarr.absolutist.it
