@@ -1,35 +1,3 @@
-bedroom_lights:
-  name: Bedroom lights
-  entities:
-    - light.bedroom_floor_light
-    - light.bedroom_roof_light
-    - light.bedroom_desk_light
-living_room_lights:
-  name: Living room lights
-  entities:
-    - light.living_room_roof_1
-    - light.living_room_roof_2
-    - light.living_room_roof_3
-    - light.tv_left
-    - light.tv_right
-    - light.tv_background
-living_room_roof_lights:
-  name: Living room roof lights
-  entities:
-    - light.living_room_roof_1
-    - light.living_room_roof_2
-    - light.living_room_roof_3
-hallway_lights:
-  name: Hallway lights
-  entities:
-    - light.front_door_light_1
-    - light.front_door_light_2
-kitchen_lights:
-  name: Kitchen lights
-  entities:
-    - light.kitchen_light
-    - light.kitchen_roof_light_1
-    - light.kitchen_roof_light_2
 bathroom_lights:
   name: Bathroom lights
   entities:

@@ -22,7 +22,7 @@ spec:
       postgresql:
         existingSecret: postgresql-password-secret
     image:
-      tag: 11.14.0-debian-10-r17
+      tag: 14.1.0-debian-10-r52
     replication:
       enabled: false
     diagnosticMode:

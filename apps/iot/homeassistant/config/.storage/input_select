@@ -49,10 +49,10 @@
                 "options": [
                     "Cold",
                     "Bright",
-                    "Relax",
+                    "Warm",
                     "Dimmed",
-                    "Nightlight",
-                    "Movie time"
+                    "Movie time",
+                    "Nightlight"
                 ],
                 "id": "living_room_scenes"
             }

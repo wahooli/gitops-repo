@@ -10,7 +10,10 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 influxdb: !include influxdb.yaml
-light: !include lights.yaml
+
+spotify:
+ client_id: !secret spotify_client_id
+ client_secret: !secret spotify_client_secret
 
 homeassistant:
   name: Home
@@ -36,7 +39,6 @@ recorder:
 
 http:
   server_host: 0.0.0.0
-  base_url: https://ha.wahoo.li
   ip_ban_enabled: true
   login_attempts_threshold: 5
   use_x_forwarded_for: true

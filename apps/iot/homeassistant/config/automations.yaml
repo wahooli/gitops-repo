@@ -256,13 +256,13 @@
     discovery_id: 0x000d6ffffe49ceb2 action_arrow_right_click
   condition:
   - condition: state
-    entity_id: group.bedroom_lights
+    entity_id: light.bedroom_lights
     state: 'on'
   action:
   - service: input_select.select_next
     data: {}
     entity_id: input_select.bedroom_scenes
-  mode: restart
+  mode: single
 - id: '1611255960569'
   alias: Bedroom scenes change by input select
   description: ''
@@ -283,7 +283,7 @@
       minutes: 0
       seconds: 0
       milliseconds: 500
-  mode: queued
+  mode: single
   max: 2
 - id: '1611256666651'
   alias: Bedroom scenes input select previous
@@ -297,7 +297,7 @@
     discovery_id: 0x000d6ffffe49ceb2 action_arrow_left_click
   condition:
   - condition: state
-    entity_id: group.bedroom_lights
+    entity_id: light.bedroom_lights
     state: 'on'
   action:
   - service: input_select.select_previous
@@ -362,13 +362,13 @@
   trigger:
   - platform: device
     domain: mqtt
-    device_id: f10b944916f5172aac20fecb63ca2a94
+    device_id: 21ffdeb169f1bbec2a111103ca7809e9
     type: action
     subtype: arrow_right_click
     discovery_id: 0x000d6ffffe18dfb6 action_arrow_right_click
   condition:
   - condition: state
-    entity_id: group.kitchen_lights
+    entity_id: light.kitchen_lights
     state: 'on'
   action:
   - service: input_select.select_next
@@ -382,13 +382,13 @@
   trigger:
   - platform: device
     domain: mqtt
-    device_id: f10b944916f5172aac20fecb63ca2a94
+    device_id: 21ffdeb169f1bbec2a111103ca7809e9
     type: action
     subtype: arrow_left_click
     discovery_id: 0x000d6ffffe18dfb6 action_arrow_left_click
   condition:
   - condition: state
-    entity_id: group.kitchen_lights
+    entity_id: light.kitchen_lights
     state: 'on'
   action:
   - service: input_select.select_previous
@@ -490,22 +490,23 @@
         '
       transition: 0.5
   mode: single
+  max: 3
 - id: '1611796610275'
   alias: Living room turn off lights
   description: Fallback functionality for background lights etc
   trigger:
   - platform: device
     domain: mqtt
-    device_id: 925435617af3c6d64716880bcd818d2a
+    device_id: 912feb174069d10aa019383b81121186
     type: action
     subtype: off_press
     discovery_id: 0x0017880104e451b8 action_off_press
   condition: []
   action:
-  - service: light.turn_off
-    data:
-      transition: 1
+  - type: turn_off
+    device_id: ef448d091cd411f2022eba47b5c24e66
     entity_id: light.living_room_lights
+    domain: light
   mode: single
 - id: '1611799326957'
   alias: Intruder alert
@@ -543,49 +544,50 @@
   trigger:
   - platform: device
     domain: mqtt
-    device_id: 925435617af3c6d64716880bcd818d2a
+    device_id: 912feb174069d10aa019383b81121186
     type: action
     subtype: on_press
     discovery_id: 0x0017880104e451b8 action_on_press
   condition:
-  - condition: state
-    entity_id: group.living_room_roof_lights
-    state: 'on'
+  - condition: or
+    conditions:
+    - condition: device
+      type: is_on
+      device_id: e5ab7685c8a2a8625dd89cd00f64a440
+      entity_id: light.living_room_roof_light_1
+      domain: light
+    - condition: device
+      type: is_on
+      device_id: b6747ee264390a82fac890f2453822e1
+      entity_id: light.living_room_roof_light_2
+      domain: light
+    - condition: device
+      type: is_on
+      device_id: 79d322fb51328a43e6f5217f1c631fbc
+      entity_id: light.living_room_roof_light_3
+      domain: light
   action:
   - service: input_select.select_next
     data: {}
     entity_id: input_select.living_room_scenes
   mode: single
-- id: '1614550296147'
-  alias: Aqara Magic Cube (Z2M)
-  description: ''
-  use_blueprint:
-    path: luckypoppy/z2m-xiaomi-cube-controller.yaml
-    input:
-      remote: sensor.bedroom_magic_cube_action_2
-      slide_face_0: []
-      rotate_cw_face_0:
-      - condition: state
-        entity_id: light.bedroom_lights
-        state: 'on'
-      - service: light.turn_on
-        entity_id: light.bedroom_lights
-        data_template:
-          transition: 0.5
-          brightness_step_pct: '{{states.sensor.bedroom_magic_cube_action_2.attributes.angle
-            / 1.8 }}'
-      rotate_ccw_face_0:
-      - condition: state
-        entity_id: light.bedroom_lights
-        state: 'on'
-      - service: light.turn_on
-        entity_id: light.bedroom_lights
-        data_template:
-          transition: 0.5
-          brightness_step_pct: '{{states.sensor.bedroom_magic_cube_action_2.attributes.angle
-            / 1.8 }}'
-      shake:
-      - service: light.toggle
-        data:
-          transition: 1
-        entity_id: light.bedroom_lights
+- id: '1641379620125'
+  alias: Turn on TV Background lights if scene matches
+  description: Fallback functionality for background lights etc
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 912feb174069d10aa019383b81121186
+    type: action
+    subtype: on_press
+    discovery_id: 0x0017880104e451b8 action_on_press
+  condition:
+  - condition: state
+    entity_id: input_select.living_room_scenes
+    state: Movie time
+  action:
+  - type: turn_on
+    device_id: d6f2e2f94c003951e0a72eb2efb7ab47
+    entity_id: light.tv_lights
+    domain: light
+  mode: single

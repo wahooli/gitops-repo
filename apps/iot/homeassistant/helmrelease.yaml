@@ -30,7 +30,7 @@ spec:
           mountPath: /src/.storage
     image:
       repository: homeassistant/home-assistant
-      tag: 2021.6.3
+      tag: 2021.12.7
       pullPolicy: IfNotPresent
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
@@ -79,9 +79,6 @@ spec:
         - path: secrets.yaml
           mountPath: /config/secrets.yaml
           readOnly: true
-        - path: google-service-account.yaml
-          mountPath: /config/google-service-account.yaml
-          readOnly: true
     ingress:
       main:
         enabled: true
@@ -89,6 +86,8 @@ spec:
         ingressClassName: nginx
         annotations:
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+          nginx.ingress.kubernetes.io/proxy-send-timeout: "3600" #websocket timeout to one hour
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "3600" #websocket timeout to one hour
         hosts: 
         - host: ha.absolutist.it
           paths:
