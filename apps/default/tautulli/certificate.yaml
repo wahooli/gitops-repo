@@ -1,14 +1,14 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: tls-ombi-ingress
+  name: tls-tautulli-ingress
   namespace: default
 spec:
-  secretName: tls-ombi-ingress
-  commonName: ombi.absolutist.it
+  secretName: tls-tautulli-ingress
+  commonName: tautulli.absolutist.it
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
-  - ombi.absolutist.it
-  - ombi.wahoo.li
+  - tautulli.absolutist.it
+  - tautulli.wahoo.li

@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-uptime-kuma-ingress
+  namespace: monitoring
+spec:
+  secretName: tls-uptime-kuma-ingress
+  commonName: status.absolutist.it
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  dnsNames:
+  - status.absolutist.it
+  - status.wahoo.li

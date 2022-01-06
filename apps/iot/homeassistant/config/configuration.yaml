@@ -1,9 +1,44 @@
 # Configure a default setup of Home Assistant (frontend, api, etc)
-default_config:
+#default_config:
+
+# personal "default config", excluding homeassistant cloud
+config:
+counter:
+dhcp:
+energy:
+frontend:
+image:
+input_boolean:
+input_datetime:
+input_number:
+input_select:
+input_text:
+map:
+mobile_app:
+person:
+ssdp:
+stream:
+#  ll_hls: true
+#  part_duration: 0.75  # Range of 0.2 to 1.5
+#  segment_duration: 6  # Range of 2 to 10
+sun:
+system_health:
+updater:
+webhook:
+zeroconf:
+zone:
+
+# enable myhomeassistant redirects
+my:
 
 # Text to speech
 tts:
-  - platform: google_translate
+- platform: google_translate
+  cache: true
+  cache_dir: /config/tts_cache
+  time_memory: 3600
+  base_url: https://ha.wahoo.li
+  service_name: google_say
 
 group: !include groups.yaml
 automation: !include automations.yaml
@@ -28,14 +63,40 @@ mqtt:
   username: homeassistant
   password: !secret mosquitto_password
 
+# enable logbook component
+logbook:
+  exclude:
+    entities:
+      - sensor.last_boot
+      - sensor.date
+    entity_globs:
+      - sensor.weather_*
+    domains:
+      - sun
+
+history:
+  exclude:
+    domains:
+    - automation
+    - updater
+    entities:
+    - sensor.last_boot
+    - sensor.date
+
 recorder:
   db_url: !secret psql_connection_string
   auto_purge: true
   purge_keep_days: 20
   commit_interval: 0 # default 1
   exclude:
+    domains:
+    - automation
+    - updater
     entities:
+    - camera.valetudo_roborock_map_data
     - sensor.xiaomi_map
+    - sensor.last_boot
+    - sensor.date
 
 http:
   server_host: 0.0.0.0

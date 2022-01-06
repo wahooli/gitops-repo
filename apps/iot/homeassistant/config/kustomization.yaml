@@ -23,6 +23,7 @@ secretGenerator:
   - name: homeassistant-secret
     files:
       - secrets.yaml=secrets.yaml.encrypted
+      - google-service-account.yaml=google-service-account.yaml.encrypted
     options:
       disableNameSuffixHash: true
       labels:

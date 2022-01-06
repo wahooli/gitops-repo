@@ -9,9 +9,15 @@ exposed_domains:
   - scene
   - fan
 entity_config:
+  cover.bedroom_blinds:
+    expose: false
   light.bedroom_lights:
     expose: false
+  light.bathroom_lights:
+    expose: false
   light.living_room_lights:
+    expose: false
+  light.living_room_roof_lights:
     expose: false
   light.kitchen_lights:
     expose: false
@@ -43,8 +49,6 @@ entity_config:
   input_boolean.leaving:
     expose: true
     name: Leaving home toggle
-  vacuum.johnny:
+  vacuum.valetudo_roborock:
     name: Johnny
     room: Living Room
-  vacuum.mqtt_vacuum:
-    expose: false

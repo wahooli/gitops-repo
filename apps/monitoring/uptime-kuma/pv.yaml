@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: monitoring-uptime-kuma-pv
+  namespace: monitoring
+spec:
+  capacity:
+    storage: 3Gi 
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: driver.longhorn.io 
+    fsType: ext4
+    volumeAttributes:
+      numberOfReplicas: "3"
+      staleReplicaTimeout: "30" 
+    volumeHandle: monitoring-uptime-kuma 
+  storageClassName: longhorn 

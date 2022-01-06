@@ -81,5 +81,12 @@ data:
           "daily",
           "weekly"
         ]
+      },
+      "monitoring-uptime-kuma": {
+        "createPV": false,
+        "createPVC": false,
+        "groups": [
+          "weekly"
+        ]
       }
     }

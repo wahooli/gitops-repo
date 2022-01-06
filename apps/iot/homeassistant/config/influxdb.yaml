@@ -10,7 +10,12 @@ tags_attributes:
   - friendly_name
 default_measurement: units
 exclude:
-  entities:
-    - zone.home
   domains:
-    - persistent_notification
+  - automation
+  - updater
+  - persistent_notification
+  entities:
+  - zone.home
+  - camera.valetudo_roborock_map_data
+  - sensor.last_boot
+  - sensor.date

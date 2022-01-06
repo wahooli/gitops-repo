@@ -23,7 +23,7 @@ spec:
       wait-ser2soc-available: 
         image: bash:5.1.12
         imagePullPolicy: IfNotPresent
-        command: ['bash', '-c', 'until printf "" 2>>/dev/null >>/dev/tcp/10.0.1.250/42603; do sleep 1; done']
+        command: ['bash', '-c', 'until printf "" 2>>/dev/null >>/dev/tcp/10.0.1.249/42603; do sleep 1; done']
     image:
       repository: koenkk/zigbee2mqtt
       tag: "1.22.2"
@@ -57,7 +57,7 @@ spec:
         port: 8080
         url: 'https://zigbee.absolutist.it'
       serial:
-        port: tcp://10.0.1.250:42603
+        port: tcp://10.0.1.249:42603
         adapter: auto
         disable_led: true
       advanced:
