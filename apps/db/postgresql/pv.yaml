@@ -4,6 +4,8 @@ kind: PersistentVolume
 metadata:
   name: db-postgresql-pv
   namespace: db
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
 spec:
   capacity:
     storage: 16Gi

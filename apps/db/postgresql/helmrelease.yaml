@@ -21,6 +21,8 @@ spec:
     global:
       postgresql:
         existingSecret: postgresql-password-secret
+        auth:
+          postgresPassword: ${postgrespw}
     image:
       tag: 14.1.0-debian-10-r52
     replication:

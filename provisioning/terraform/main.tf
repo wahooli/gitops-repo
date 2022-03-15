@@ -17,9 +17,10 @@ provider "proxmox" {
     pm_tls_insecure     = var.proxmox_ignore_tls
     pm_parallel         = 4 # having 6 as parallel, gives errors for already running vm for some reason
     pm_log_enable       = false
-    pm_debug            = false
-    pm_log_levels = {
-        _default = "debug"
+    pm_log_file         = "terraform-plugin-proxmox.log"
+    pm_debug            = true
+    pm_log_levels       = {
+        _default    = "debug"
         _capturelog = ""
     }
 }

@@ -33,7 +33,7 @@ spec:
         whenUnsatisfiable: DoNotSchedule
         labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: ingress-nginx-internal
+            app.kubernetes.io/instance: ingress-nginx
       metrics:
         enabled: true
         serviceMonitor:

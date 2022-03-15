@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: db-postgresql-pvc
   namespace: db
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
 spec:
   accessModes:
   - ReadWriteOnce

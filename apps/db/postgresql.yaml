@@ -10,6 +10,10 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: postgresql-password-secret
   healthChecks:
     - apiVersion: apps/v1
       kind: StatefulSet
