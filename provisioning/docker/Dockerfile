@@ -45,11 +45,12 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - \
 
 WORKDIR /provisioning
 USER ${UID}:${GID}
-ENV PATH="/home/${user}/.local/bin:${PATH}"
+ENV PATH="/home/${user}/.local/bin:/usr/bin/:/bin/:${PATH}"
 RUN pip install --upgrade pip && python3 -m venv /home/$user/provisioner \
     && /bin/bash -c "source /home/$user/provisioner/bin/activate" \
     && pip install ansible \
     && mkdir -p /home/${user}/.ssh \
     && touch /home/${user}/.ssh/known_hosts
 
+WORKDIR /workdir
 
