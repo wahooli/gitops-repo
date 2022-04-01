@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-vip-ds
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: kube-vip-ds
+  template:
+    metadata:
+      labels:
+        name: kube-vip-ds
+    spec:
+      containers:
+      - args:
+        - manager
+        env:
+        - name: vip_arp
+          value: "false"
+        - name: vip_interface
+          value: lo
+        - name: port
+          value: "6443"
+        - name: vip_cidr
+          value: "32"
+        - name: cp_enable
+          value: "true"
+        - name: cp_namespace
+          value: kube-system
+        - name: vip_startleader
+          value: "false"
+        - name: bgp_enable
+          value: "true"
+        - name: bgp_routerid
+        - name: bgp_routerinterface
+          value: "{{ kubevip.interface }}"
+        - name: bgp_as
+          value: "{{ kubevip.bgp.node_as }}"
+        - name: bgp_peeraddress
+          value: "{{ kubevip.bgp.peer_ip }}"
+        - name: bgp_peeras
+          value: "{{ kubevip.bgp.peer_as_number }}"
+        - name: vip_address
+          value: "{{ kubevip.address }}"
+        image: ghcr.io/kube-vip/kube-vip:v0.3.8
+        imagePullPolicy: IfNotPresent
+        name: kube-vip
+        resources: {}
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+            - SYS_TIME
+      hostNetwork: true
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      serviceAccountName: kube-vip
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+  updateStrategy: {}

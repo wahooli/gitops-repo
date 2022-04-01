@@ -1,0 +1,9 @@
+---
+apiVersion: crd.projectcalico.org/v1
+kind: BGPPeer
+metadata:
+  name: default-peer
+spec:
+  nodeSelector: {{ calico.bgp.node_selector }}
+  peerIP: {{ calico.bgp.peer_ip }}
+  asNumber: {{ calico.bgp.peer_as }}

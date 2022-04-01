@@ -1,0 +1,13 @@
+[Unit]
+Description=Adds blackhole network rule for external ip range
+Wants=network-online.target
+After=network-online.target k3s.service
+
+[Install]
+WantedBy=multi-user.target k3s.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/sh -c "/usr/bin/ip route add blackhole {{ k3s_server.external_ip_cidr }}; exit 0"
+ExecStop=/bin/sh -c "/usr/bin/ip route delete blackhole {{ k3s_server.external_ip_cidr }}; exit 0"

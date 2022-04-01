@@ -5,16 +5,35 @@
     name: gnupg
     state: present
 
+- name: Ensure dnsutils installed
+  become: true
+  package:
+    name: dnsutils
+    state: present
+
 - name: Ensure apt-transport-https installed
   become: true
   package:
     name: apt-transport-https
     state: present
 
-- name: Ensure dnsutils installed
+- name: Ensure krb5-user installed
   become: true
   package:
-    name: dnsutils
+    name: krb5-user
+    state: present
+
+- name: Ensure jq installed
+  become: true
+  package:
+    name: jq
+    state: present
+
+
+- name: Ensure krb5-config installed
+  become: true
+  package:
+    name: krb5-config
     state: present
 
 - name: Ensure parted installed

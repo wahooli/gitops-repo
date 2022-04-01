@@ -199,7 +199,7 @@ module "kubeconfig" {
     user                = var.remote_user
     host_addr           = module.kubernetes_masters.ip_addresses.0
     remote_file         = "~/.kube/config"
-    local_path          = "${path.module}/../../outputs/kubeconfig"
+    local_path          = "${path.module}/../../../outputs/kubeconfig"
     private_key_path    = local_file.private_key.filename
 }
 

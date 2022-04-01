@@ -28,8 +28,12 @@ ExecStartPre=-/sbin/modprobe overlay
 ExecStart=/usr/local/bin/k3s \
     agent \
  '--node-ip={{ansible_host}}' \
- '--server=https://{{k3s.server_address}}:6443' \
- '--node-label=node.longhorn.io/create-default-disk=true' \
- '--node-label=router-peer=true' \
+ '--server=https://{{k3s_server.server_address}}:6443' \
+{% for taint in k3s_server.agent_taints %}
+ '--node-taint={{ taint.name }}={{ taint.value }}:{{ taint.effect }}' \
+{% endfor %}
+{% for label in k3s_server.agent_labels %}
+ '--node-label={{ label.name }}={{ label.value }}' \
+{% endfor %}
  '--token={{ hostvars[groups['master_nodes'][0]]['token'] }}' \
  '--kubelet-arg=feature-gates=GracefulNodeShutdown=true' 

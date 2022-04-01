@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ longhorn.target_namespace }}
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: longhorn
+  namespace: kube-system
+spec:
+  bootstrap: true
+  repo: https://charts.longhorn.io
+  version: {{ longhorn.longhorn_version }}
+  chart: longhorn
+  targetNamespace: {{ longhorn.target_namespace }}
+  valuesContent: |-
+    defaultSettings:
+      {{ longhorn.defaultSettings | to_nice_yaml | indent(6) }}
+    longhornManager:
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+    longhornDriver:
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+    longhornUI:
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+    ingress:
+      {{ longhorn.ingress | to_nice_yaml | indent(6) }}

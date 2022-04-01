@@ -1,0 +1,34 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: calico
+  namespace: kube-system
+spec:
+  bootstrap: true
+  repo: https://docs.projectcalico.org/charts
+  version: {{ calico.calico_version }}
+  chart: tigera-operator
+  valuesContent: |-
+    apiServer:
+      enabled: true
+    installation:
+      enabled: true
+      # nodeMetricsPort: for prometheus
+      # typhaMetricsPort: for prometheus
+      controlPlaneTolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      calicoNetwork:
+        linuxDataplane: "{{ calico.linuxDataplane }}"
+        containerIPForwarding: "{{ calico.containerIPForwarding }}"
+        ipPools:
+        - blockSize: 26
+          cidr: "{{ k3s_server.cidr.cluster }}"
+          encapsulation: "{{ calico.encapsulation }}"
+          natOutgoing: Enabled
+          nodeSelector: all()
+        nodeAddressAutodetectionV4:
+          cidrs:
+          - "{{ calico.node_cidr }}"

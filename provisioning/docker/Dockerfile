@@ -21,6 +21,8 @@ RUN apt-get update -qq \
     software-properties-common \
     lsb-release \
     python3-pip \
+    krb5-config \
+    krb5-user \
     python3-venv \
     && apt-get clean all
 
@@ -54,3 +56,5 @@ RUN pip install --upgrade pip && python3 -m venv /home/$user/provisioner \
 
 WORKDIR /workdir
 
+COPY entrypoint.sh /
+ENTRYPOINT [ "/entrypoint.sh" ]

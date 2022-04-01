@@ -17,36 +17,31 @@ provider "proxmox" {
     pm_tls_insecure     = var.proxmox_ignore_tls
     pm_parallel         = 4 # having 6 as parallel, gives errors for already running vm for some reason
     pm_log_enable       = false
-    pm_log_file         = "terraform-plugin-proxmox.log"
     pm_debug            = true
-    pm_log_levels       = {
-        _default    = "debug"
+    pm_log_file         = "terraform-plugin-proxmox.log"
+    pm_log_levels = {
+        _default = "debug"
         _capturelog = ""
     }
 }
 
-
-# # github provider for fluxcd
-# provider "github" {
-#     token           = var.github_token
-#     owner           = var.github_owner
-# }
-
 module "k3s_cluster" {
-    source          = "./deployments/k3s_cluster"
-    flux_path       = "cluster"
-    repository_name = "homelab"
-    github_owner    = var.github_owner
-    github_token    = var.github_token
-    key_fp          = var.key_fp
+    source                  = "./deployments/k3s_cluster_new"
+    cluster_name_prefix     = var.k3s.cluster_name_prefix
+    bgp_config              = var.k3s.bgp_config
+    vm_config               = var.k3s.vm_config
+    k3s_config              = var.k3s.server_config
+    github_config = {
+        branch = "dev"
+        owner = var.github_owner
+        repo_name = "homelab"
+        token = var.github_token
+    }
+    fluxcd_config = {
+        deploy_key_title_prefix = "FluxCD"
+        flux_namespace = "flux-system"
+        target_path = "test-cluster"
+        flux_version = "v0.28.5"
+        key_fp = var.key_fp
+    }
 }
-
-# module "fluxcd" {
-#     source = "./modules/fluxcd"
-#     # depends_on = [
-#     #     module.k3s_cluster.kubeconfig
-#     # ]
-#     github_token = var.github_token
-#     github_owner = var.github_owner
-#     target_path = "${path.module}/../clusters/k3s-at-home"
-# }

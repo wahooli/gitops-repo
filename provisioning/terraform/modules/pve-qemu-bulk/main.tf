@@ -30,7 +30,7 @@ locals {
     cpuflags                = "+pdpe1gb;+aes"
 }
 
-resource "proxmox_vm_qemu" "pve-qemu-bulk" {
+resource "proxmox_vm_qemu" "pve_qemu_bulk" {
     onboot          = local.onboot
     tablet          = local.tablet
     agent           = local.agent

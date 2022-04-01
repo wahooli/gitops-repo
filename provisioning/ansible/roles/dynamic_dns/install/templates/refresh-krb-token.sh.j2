@@ -1,0 +1,17 @@
+#!/bin/bash
+keytab=${KEYTAB_PATH:-/etc/krb5/dyndns.keytab}
+realm=${REALM:-{{ dynamic_dns.realm|upper }}}
+principal=${PRINCIPAL:-{{ dynamic_dns.user }}}
+
+klist 2>&1 | grep $realm | grep '/' > /dev/null
+if [ "$?" = 1 ]; then
+    expiration=0
+else
+    expiration=$(klist | grep $realm | grep '/' | awk -F ' ' '{system ("date -d \""$2"\" +%s")}' | sort | head -n 1)
+fi
+
+now=$(date +%s)
+if [ "$now" -ge "$expiration" ]; then
+    echo "Getting new ticket, old one expired $expiration, now is $now"
+    kinit -F -k -t $keytab $principal
+fi

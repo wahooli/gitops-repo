@@ -1,28 +1,5 @@
 ---
 
-- name: Partition storage mount
-  become: yes
-  parted:
-    device: /dev/vdb
-    label: gpt
-    number: 1
-    state: present
-    fs_type: ext4
-
-- name: Create a ext4 filesystem on /dev/vdb1
-  become: yes
-  community.general.filesystem:
-    fstype: ext4
-    dev: /dev/vdb1
-
-- name: Mount /dev/vdb1 as longhorn storage
-  become: yes
-  ansible.posix.mount:
-    path: /var/lib/longhorn
-    src: /dev/vdb1
-    fstype: ext4
-    state: mounted
-
 - name: Create k3s config directory
   become: yes
   file:
@@ -30,6 +7,7 @@
     state: directory
 
 - name: Copy registry config
+  when: k3s_server.docker_proxy_address|length > 4
   template:
     src: registries.yaml.j2
     dest: /etc/rancher/k3s/registries.yaml
@@ -41,7 +19,7 @@
   template:
     src: "k3s.service.j2"
     dest: "{{ systemd_dir }}/k3s.service"
-    force: no
+    force: yes
     owner: root
     group: root
     mode: 0644
@@ -51,6 +29,6 @@
   become: yes
   systemd:
     name: k3s
-    state: restarted
+    state: started
     daemon_reload: yes
     enabled: yes

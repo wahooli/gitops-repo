@@ -1,16 +1,5 @@
 ---
 # - name: Remove manifest directory if exists
-- name: Generate shared secret
-  run_once: true
-  set_fact:
-    k3s_shared_secret: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=32') }}"
-
-- name: Create manifests directory
-  become: yes
-  file:
-    path: /var/lib/rancher/k3s/server/manifests
-    state: directory
-
 - name: Create k3s config directory
   become: yes
   file:
@@ -18,67 +7,14 @@
     state: directory
 
 - name: Copy registry config
+  when: k3s_server.docker_proxy_address|length > 4 # ansible doesn't support direct null checking
   template:
     src: registries.yaml.j2
     dest: /etc/rancher/k3s/registries.yaml
     owner: root
     group: root
 
-- name: Copy kube-vip rbac file
-  run_once: true
-  become: yes
-  template:
-    src: kube-vip/rbac.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/kube-vip.rbac.yaml
-    owner: root
-    group: root
-
-- name: Copy kube-vip daemonset file
-  run_once: true
-  become: yes
-  template:
-    src: kube-vip/daemonset.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/kube-vip.daemonset.yaml
-    owner: root
-    group: root
-
-- name: Copy calico bgp configuration
-  run_once: true
-  become: yes
-  template:
-    src: calico/bgpconfiguration.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/calico-bgpconfiguration.yaml
-    owner: root
-    group: root
-
-- name: Copy calico bgp peer config
-  run_once: true
-  become: yes
-  template:
-    src: calico/bgppeer.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/calico-bgppeer.yaml
-    owner: root
-    group: root
-
-- name: Copy calico installation config
-  run_once: true
-  become: yes
-  template:
-    src: calico/installation.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/calico-installation.yaml
-    owner: root
-    group: root
-
-- name: Copy metallb helm chart
-  run_once: true
-  become: yes
-  template:
-    src: helm/metallb-controller.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/helm-metallb.yaml
-    owner: root
-    group: root
-
-- name: Check if service file exists
+- name: Check if service env file exists
   stat: path={{ systemd_dir }}/k3s.service.env
   register: serviceenvfile
 
@@ -87,7 +23,7 @@
   register: k3s_service_env
   when: not serviceenvfile.stat.exists
   template:
-    src: "systemd/k3s.service.env.j2"
+    src: "k3s.service.env.j2"
     dest: "{{ systemd_dir }}/k3s.service.env"
     owner: root
     group: root
@@ -98,7 +34,7 @@
   become: yes
   run_once: true
   template:
-    src: "systemd/k3s.cluster-init-service.j2"
+    src: "k3s.cluster-init-service.j2"
     dest: "{{ systemd_dir }}/k3s.service"
     owner: root
     group: root
@@ -113,7 +49,7 @@
   become: yes
   when: not servicefile.stat.exists
   template:
-    src: "systemd/k3s.service.j2"
+    src: "k3s.service.j2"
     dest: "{{ systemd_dir }}/k3s.service"
     force: no
     owner: root
@@ -135,30 +71,6 @@
     name: k3s
     state: started
     enabled: yes
-
-- name: Add Calico helm repo
-  become: yes
-  command: helm repo add projectcalico https://docs.projectcalico.org/charts
-
-- name: Install Calico from helm chart
-  run_once: true
-  become: yes
-  block:
-    - name: Check calico chart is installed
-      command: helm status calico
-      environment:
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  rescue:
-    - name: Install calico
-      command: helm install calico projectcalico/tigera-operator --set installation.enabled=false,apiServer.enabled=true --version v3.21.2
-      environment:
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-
-# - name: Create calico operator manifest
-#   become: yes
-#   run_once: true
-#   ignore_errors: yes
-#   command: kubectl apply -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
 
 - name: Wait for node-token
   run_once: true
@@ -214,10 +126,10 @@
     owner: "{{ ansible_user }}"
     mode: "u=rw,g=,o="
 
-- name: Replace https://localhost:6443 by https://{{ k3s.server_address }}:6443
+- name: Replace https://localhost:6443 by https://{{ k3s_server.server_address }}:6443
   command: >-
     k3s kubectl config set-cluster default
-      --server=https://{{ k3s.server_address }}:6443
+      --server=https://{{ k3s_server.server_address }}:6443
       --kubeconfig ~{{ ansible_user }}/.kube/config
   changed_when: true
 

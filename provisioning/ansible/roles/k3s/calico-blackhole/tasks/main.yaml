@@ -1,0 +1,20 @@
+---
+
+- name: Copy calico-blackhole service file
+  become: yes
+  when: k3s_server.external_ip_cidr|length > 6
+  template:
+    src: "service.j2"
+    dest: "{{ systemd_dir }}/calico-blackhole.service"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable dyndns-update timer
+  when: k3s_server.external_ip_cidr|length > 6
+  become: yes
+  systemd:
+    name: calico-blackhole.service
+    state: started
+    enabled: yes
+    daemon_reload: yes

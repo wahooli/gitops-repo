@@ -1,0 +1,25 @@
+---
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  # nodeMetricsPort: for prometheus
+  # typhaMetricsPort: for prometheus
+  controlPlaneTolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  calicoNetwork:
+    linuxDataplane: "{{ calico.linuxDataplane }}" #https://projectcalico.docs.tigera.io/about/about-ebpf
+    containerIPForwarding: "{{ calico.containerIPForwarding }}" #allow forwarding from container, ie wireguard?
+    ipPools:
+    - blockSize: 26
+      cidr: "{{ k3s_server.cidr.cluster }}"
+      encapsulation: "{{ calico.encapsulation }}"
+      natOutgoing: Enabled
+      nodeSelector: all()
+    nodeAddressAutodetectionV4:
+      cidrs:
+      - "{{ calico.node_cidr }}"

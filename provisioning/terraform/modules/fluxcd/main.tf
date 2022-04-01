@@ -42,6 +42,8 @@ resource "null_resource" "flux_namespace" {
 
 data "flux_install" "main" {
     target_path = var.target_path
+    version     = var.flux_version
+    components_extra = var.extra_components
 }
 
 data "flux_sync" "main" {
