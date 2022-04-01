@@ -3,50 +3,7 @@ terraform {
 }
 
 locals {
-    # calico = defaults(var.calico, {
-    #     encapsulation       = "None"
-    #     calicoctl_version   = "v3.21.2"
-    #     node_cidr           = "10.0.0.0/24"
-    #     bgp                 = {
-    #         enabled         = true
-    #         node_selector   = "has(router-peer)"
-    #         external_ips    = "10.3.0.0/24"
-    #         peer_ip         = "172.16.0.4"
-    #         peer_as         = "65536"
-    #         node_as         = "65537"
-    #     }
-    # })
-    # metallb = defaults(var.metallb, {
-    #     enabled             = true
-    #     target_namespace    = "metallb-system"
-    #     protocol            = "bgp"
-    #     addresses           = "10.4.0.2-10.4.0.254"
-    #     speaker             = {
-    #         enabled         = false
-    #         frr             = {
-    #             enabled     = false
-    #         }
-    #     }
-    # })
-    # network = defaults(var.network, {
-    #     cluster             = "172.24.0.0/16"
-    #     service             = "172.22.0.0/16"
-    # })
-    # kubevip = defaults(var.kubevip, {
-    #     enabled             = true
-    #     interface           = "eth0"
-    #     address             = "10.4.1.1" # basically kubernetes api address, if used
-    #     bgp                 = {
-    #         peer_ip         = "172.16.0.4"
-    #         peer_as         = "65536"
-    #         node_as         = "65538"
-    #     }
-    # })
-
-    # note, for some weird reason defaults only work on top level keys for objects
-    # nested defaults are found in variables.tf
     node_config = defaults(var.node, {
-        # vmid_start          = null
         cpus                = 1
         bridge              = "vmbr0"
         memory_mb           = 1024
@@ -84,12 +41,11 @@ locals {
             add_static_host_entries = var.dynamic_dns.enabled == false ? true : false
         }
         systemd_dir                 = "/etc/systemd/system"
-        # docker_proxy_address= "dockerproxy.absolutist.it"
     })
     longhorn_config = defaults(var.longhorn, {
         enabled             = var.storage_operator == "longhorn" ? true : false
         target_namespace    = "longhorn-system"
-        longhorn_version    = "v1.2.0" #"v1.2.4" 124 is latest
+        longhorn_version    = "v1.2.4"
         defaultSettings     = {
             defaultDataPath = "/var/lib/longhorn"
             storageMinimalAvailablePercentage = 5
@@ -136,7 +92,6 @@ locals {
         ssd         = local.disk_type != "virtio" ? 1 : 0
         discard     = "on"
     }]) : local.os_disk
-    # ipconfig0               = tomap(toset(var.node_ip_addresses))
 
     ansible_roles = compact([
         local.calico_config.install_calicoctl == true ? "k3s/calicoctl" : "",
@@ -202,7 +157,6 @@ resource "proxmox_vm_qemu" "k3s_server_node" {
     memory          = local.node_config.memory_mb
     sshkeys         = local.node_config.ssh_public_keys
     dynamic "disk" {
-        #for_each = toset(each.value.disk)
         for_each = {for i, d in local.disk : i => d}
 
         content {

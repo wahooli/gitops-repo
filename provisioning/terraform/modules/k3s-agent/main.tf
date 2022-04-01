@@ -4,7 +4,6 @@ terraform {
 
 locals {
     node_config = defaults(var.node, {
-        # vmid_start          = null
         cpus                = 1
         bridge              = "vmbr0"
         memory_mb           = 2048
@@ -26,7 +25,6 @@ locals {
     tablet                  = false
     onboot                  = true
     disk_type               = "virtio"
-    # sshkeys                 = var.ssh_public_keys
     cpu                     = "host"
     cpuflags                = "+pdpe1gb;+aes"
     node_id                 = range(1, (var.node_count+1))
@@ -88,7 +86,6 @@ resource "proxmox_vm_qemu" "k3s_agent_node" {
     memory          = local.node_config.memory_mb
     sshkeys         = local.node_config.ssh_public_keys
     dynamic "disk" {
-        #for_each = toset(each.value.disk)
         for_each = {for i, d in local.disk : i => d}
 
         content {
@@ -104,6 +101,7 @@ resource "proxmox_vm_qemu" "k3s_agent_node" {
     network {
         model = local.network_model
         firewall = false
+        mtu = 9000
         bridge = local.node_config.bridge
         macaddr = lookup(local.macaddr, each.key - 1, null)
     }

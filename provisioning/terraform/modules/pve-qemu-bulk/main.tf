@@ -117,12 +117,4 @@ resource "proxmox_vm_qemu" "pve_qemu_bulk" {
             disk[1].format
         ]
     }
-
-    // Clear existing records (if exists) from known_hosts to prevent possible ssh connection issues
-    # provisioner "local-exec" {
-    #     command = "ssh-keygen -f ~/.ssh/known_hosts -R ${element(split("/", each.value.network[0].cidr), 0)}"
-    # }
-    # provisioner "local-exec" {
-    #     command = "ssh-keyscan -H ${element(split("/", each.value.network[0].cidr), 0)} >> ~/.ssh/known_hosts "
-    # }
 }

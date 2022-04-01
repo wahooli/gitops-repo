@@ -144,8 +144,6 @@ variable "install" {
                 cluster             = "172.24.0.0/16"
                 service             = "172.22.0.0/16"
             }
-            # server_labels           = []
-            # server_taints           = []
         }
         systemd_dir                 = "/etc/systemd/system"
     }

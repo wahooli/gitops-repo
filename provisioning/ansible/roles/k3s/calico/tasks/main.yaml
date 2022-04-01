@@ -15,16 +15,6 @@
     group: root
   when: calico.enabled == true and calico.bgp.enabled == true
 
-# - name: Copy calico felix configuration
-#   run_once: true
-#   become: yes
-#   template:
-#     src: felixconfiguration.yaml.j2
-#     dest: /var/lib/rancher/k3s/server/manifests/calico-felixconfiguration.yaml
-#     owner: root
-#     group: root
-#   when: calico.enabled == true and calico.bgp.enabled == true
-
 - name: Copy calico bgp peer config
   run_once: true
   become: yes
@@ -66,16 +56,6 @@
   command: kubectl wait --namespace=kube-system --for=condition=Complete=true jobs -l helmcharts.helm.cattle.io/chart=calico
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-
-# - name: Wait for tigera-operator rollout
-#   become: yes
-#   run_once: true
-#   when: calico.enabled == true
-#   command: kubectl rollout status deployment/tigera-operator -n tigera-operator --timeout=120s
-#   retries: 10
-#   delay: 2
-#   environment:
-#     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
 - name: Wait for calico-system namespace created
   become: true

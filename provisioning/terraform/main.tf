@@ -26,7 +26,7 @@ provider "proxmox" {
 }
 
 module "k3s_cluster" {
-    source                  = "./deployments/k3s_cluster_new"
+    source                  = "./deployments/k3s_cluster"
     cluster_name_prefix     = var.k3s.cluster_name_prefix
     bgp_config              = var.k3s.bgp_config
     vm_config               = var.k3s.vm_config
