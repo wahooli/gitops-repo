@@ -43,6 +43,7 @@ variable "calico" {
         encapsulation           = optional(string)
         calico_version          = optional(string)
         install_calicoctl       = optional(bool)
+        mtu                     = optional(number)
         node_cidr               = optional(string)
         linuxDataplane          = optional(string)
         containerIPForwarding   = optional(string)
@@ -150,6 +151,16 @@ variable "install" {
     description             = "Generates ansible group vars section from values. Used with k3s server bootstrap"
 }
 
+variable "proxmox" {
+    type = object({
+        host        = string
+        user        = string
+        password    = string
+    })
+    sensitive = true
+    description = "Used to push custom cloudinit config files. Might work with ssh keys, i'm too lazy to fix"
+}
+
 variable "kubevip" {
     type = object({
         enabled     = bool
@@ -192,6 +203,15 @@ variable "proxmox_hosts" {
     description = "Proxmox hosts to allocate VMs. Uses element() function to loop trough each possible value. Requires at least one value"
 }
 
+variable "cloud_init" {
+    type        = object({
+        cdrom_storage       = optional(string)
+        custom_file_path    = optional(string)
+        custom_storage_name = optional(string)
+    })
+    description = "Values for cicustom files"
+}
+
 variable "node_count" {
     type        = number
     description = "How many node VMs will be created"
@@ -213,14 +233,19 @@ variable "node" {
         disk_size       = optional(string) # node storage size, allocated to storage backend
         disk_storage    = optional(string)
         ssh_username    = optional(string)
+        user_password   = optional(string)
         default_gateway = optional(string)
         name_prefix     = optional(string)
-        ssh_public_keys = optional(string)
-        searchdomain    = optional(string)
-        nameserver      = optional(string)
+        eth0_mtu        = optional(number)
+        ssh_private_key = optional(string)
+        ssh_public_keys = optional(list(string))
+        searchdomains   = optional(list(string))
+        nameservers     = list(string)
+        additional_networks = optional(list(string))
     })
     default = {
         name_prefix = "k3s-server-"
+        nameservers = ["1.1.1.1", "1.0.0.1"]
     }
     description = "Node VM configuration. Each node shares configuration"
 }

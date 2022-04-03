@@ -9,6 +9,12 @@ resource "local_file" "private_key" {
     file_permission = "0600"
 }
 
+resource "random_password" "vm_password" {
+    length           = 32
+    special          = true
+    override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 module "k3s_server" {
     source                  = "../../modules/k3s-server"
     storage_operator        = "longhorn"
@@ -19,15 +25,24 @@ module "k3s_server" {
     node = {
         vmid_start = var.vm_config.vmid_start
         ssh_username = var.vm_config.ssh_username
+        user_password = random_password.vm_password.result
         cpus = var.vm_config.server_node_cpus
         bridge = var.vm_config.bridge
         memory_mb = var.vm_config.server_node_memory
+        eth0_mtu = var.vm_config.mtu
         os_disk_storage = var.vm_config.os_disk_storage
         name_prefix = "${var.cluster_name_prefix}-server-"
-        ssh_public_keys = tls_private_key.node_ssh_pk.public_key_openssh
-        nameserver = var.vm_config.nameserver
-        searchdomain = var.vm_config.searchdomain
+        ssh_private_key = tls_private_key.node_ssh_pk.private_key_pem
+        ssh_public_keys = [tls_private_key.node_ssh_pk.public_key_openssh]
+        nameservers = var.vm_config.nameservers
+        searchdomains = var.vm_config.searchdomains
     }
+    cloud_init = {
+        cdrom_storage       = var.vm_config.ci_storage
+        custom_file_path    = var.vm_config.ci_remote_path
+        custom_storage_name = var.vm_config.ci_custom_storage
+    }
+    proxmox = var.proxmox
     longhorn = {
         target_namespace    = "longhorn-system"
         longhorn_version    = var.k3s_config.longhorn_version
@@ -51,7 +66,7 @@ module "k3s_server" {
             docker_proxy_address    = var.k3s_config.docker_proxy_address
             k3s_version             = var.k3s_config.k3s_version
             external_ip_cidr        = var.bgp_config.external_ipv4_cidr
-            server_address          = "${var.cluster_name_prefix}.${var.vm_config.searchdomain}"
+            server_address          = "${var.cluster_name_prefix}.${var.vm_config.searchdomains[0]}"
             cidr                    = {
                 cluster             = "172.24.0.0/16"
                 service             = "172.22.0.0/16"
@@ -96,6 +111,7 @@ module "k3s_server" {
         node_cidr               = var.vm_config.cidr
         linuxDataplane          = "BPF" # "Iptables" #BPF
         containerIPForwarding   = "Enabled"
+        mtu                     = var.vm_config.mtu
         bgp = {
             enabled             = true
             node_to_node_mesh   = false
@@ -111,7 +127,7 @@ module "k3s_server" {
         keytab_filepath = abspath("${path.module}/../../../outputs/pk/externaldns.keytab")
         user = "externaldns"
         install_path = "/usr/local/bin"
-        realm = var.vm_config.searchdomain
+        realm = var.vm_config.searchdomains[0]
         nameserver = var.vm_config.nameserver_name
     }
 }
@@ -126,15 +142,24 @@ module "k3s_agent" {
         cpus = var.vm_config.agent_node_cpus
         bridge = var.vm_config.bridge
         ssh_username = var.vm_config.ssh_username
+        user_password = random_password.vm_password.result
         memory_mb = var.vm_config.agent_node_memory
         os_disk_storage = var.vm_config.os_disk_storage
         disk_size = var.vm_config.longhorn_disk_size
         disk_storage = var.vm_config.longhorn_disk_storage
         name_prefix = "${var.cluster_name_prefix}-agent-"
-        ssh_public_keys = tls_private_key.node_ssh_pk.public_key_openssh
-        nameserver = var.vm_config.nameserver
-        searchdomain = var.vm_config.searchdomain
+        ssh_private_key = tls_private_key.node_ssh_pk.private_key_pem
+        ssh_public_keys = [tls_private_key.node_ssh_pk.public_key_openssh]
+        nameservers = var.vm_config.nameservers
+        eth0_mtu = var.vm_config.mtu
+        searchdomains = var.vm_config.searchdomains
     }
+    cloud_init = {
+        cdrom_storage       = var.vm_config.ci_storage
+        custom_file_path    = var.vm_config.ci_remote_path
+        custom_storage_name = var.vm_config.ci_custom_storage
+    }
+    proxmox = var.proxmox
     mount_longhorn_disk = true
 }
 
@@ -148,6 +173,7 @@ module "ansible_playbook" {
             gather_facts = true
             any_errors_fatal = true
             roles = [
+                "cloud-init-wait",
                 "update_os",
                 "prepare",
                 "dynamic_dns/install",
@@ -185,8 +211,8 @@ module "ansible_playbook" {
 module "ansible_inventory" {
     source  = "../../modules/ansible-inventory-new"
     content = {
-        "master_nodes" = module.k3s_server.ansible_hosts,
-        "worker_nodes" = module.k3s_agent.ansible_hosts
+        "master_nodes" = tomap(module.k3s_server.ansible_hosts),
+        "worker_nodes" = tomap(module.k3s_agent.ansible_hosts)
     }
     filename = "inventory/generated_inventory.yaml"
 }
@@ -194,7 +220,7 @@ module "ansible_inventory" {
 module "ansible_provisioner" {
     source = "../../modules/ansible-provisioner"
     depends_on = [
-        module.ansible_inventory,
+        # module.ansible_inventory,
         module.ansible_playbook,
         module.k3s_server,
         module.k3s_agent,

@@ -9,6 +9,25 @@ variable "proxmox_hosts" {
     description = "Proxmox hosts to allocate VMs. Uses element() function to loop trough each possible value. Requires at least one value"
 }
 
+variable "cloud_init" {
+    type        = object({
+        cdrom_storage       = optional(string)
+        custom_file_path    = optional(string)
+        custom_storage_name = optional(string)
+    })
+    description = "Values for cicustom files"
+}
+
+variable "proxmox" {
+    type = object({
+        host        = string
+        user        = string
+        password    = string
+    })
+    sensitive = true
+    description = "Used to push custom cloudinit config files. Might work with ssh keys, i'm too lazy to fix"
+}
+
 variable "node_count" {
     type        = number
     description = "How many node VMs will be created"
@@ -30,11 +49,15 @@ variable "node" {
         disk_size       = optional(string) # node storage size, allocated to storage backend
         disk_storage    = optional(string)
         ssh_username    = optional(string)
+        user_password   = optional(string)
         default_gateway = optional(string)
         name_prefix     = optional(string)
-        ssh_public_keys = optional(string)
-        searchdomain    = optional(string)
-        nameserver      = optional(string)
+        eth0_mtu        = optional(number)
+        ssh_private_key = optional(string)
+        ssh_public_keys = optional(list(string))
+        searchdomains   = optional(list(string))
+        nameservers     = optional(list(string))
+        additional_networks = optional(list(string))
     })
     default = {
         name_prefix = "k3s-agent-"

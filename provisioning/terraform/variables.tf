@@ -40,6 +40,15 @@ variable "key_fp" {
     sensitive   = true
 }
 
+variable "proxmox" {
+    type = object({
+        host        = string
+        user        = string
+        password    = string
+    })
+    sensitive = true
+}
+
 variable "k3s" {
     type = object({
         cluster_name_prefix         = string
@@ -60,15 +69,19 @@ variable "k3s" {
             server_node_count       = number
             server_node_cpus        = number
             server_node_memory      = number
-            nameserver              = string
+            nameservers             = list(string)
             nameserver_name         = string
-            searchdomain            = string
+            searchdomains           = list(string)
+            mtu                     = number
             os_disk_storage         = string
             longhorn_disk_size      = string
             longhorn_disk_storage   = string
             bridge                  = string
             ssh_username            = string
             cidr                    = string
+            ci_storage              = string
+            ci_remote_path          = string
+            ci_custom_storage       = string
         })
         bgp_config = object({
             external_ipv4_cidr = string # external Ip range used by calico

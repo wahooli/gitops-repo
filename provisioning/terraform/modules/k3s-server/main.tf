@@ -11,13 +11,16 @@ locals {
         os_disk_size        = "15G"
         ssh_username        = "debian"
         name_prefix         = "k3s-server-"
-        nameserver          = "1.1.1.1 1.0.0.1"
+        eth0_mtu            = 1500
+        nameservers         = "1.1.1.1 1.0.0.1"
+        # nameservers = ["1.1.1.1", "1.0.0.1"]
     })
     calico_config = defaults(var.calico, {
         enabled             = var.networking == "calico" ? true : false
         encapsulation       = "IPIP"
         calico_version      = "v3.22.1"
         node_cidr           = "10.0.0.0/24"
+        mtu                 = 1500
         bgp = {
             enabled = false
         }
@@ -56,8 +59,11 @@ locals {
             # createDefaultDiskLabeledNodes = true
         }
     })
-
-
+    cloud_init_config = defaults(var.cloud_init, {
+        cdrom_storage       = "local" # creates cloudinit cdrom drive to this storage
+        custom_file_path    = "/var/lib/vz" # stores cicustom files here. preferrably shared storage. omit /snippets suffix
+        custom_storage_name = "local" # loads cicustom files from here
+    })
 
     full_clone              = true
     clone                   = "debian-11-cloudinit"
@@ -73,8 +79,8 @@ locals {
     cpu                     = "host"
     cpuflags                = "+pdpe1gb;+aes"
     node_id                 = range(1, (var.node_count+1))
-    ipconfig0               = {for i, d in var.node_ip_addresses : i => local.node_config.default_gateway != null && local.node_config.default_gateway != "" ? "ip=${d},gw=${local.node_config.default_gateway}" : null}
-    macaddr                 = {for i, d in var.node_ip_macaddr : i => d}
+    # ipconfig0               = {for i, d in var.node_ip_addresses : i => local.node_config.default_gateway != null && local.node_config.default_gateway != "" ? "ip=${d},gw=${local.node_config.default_gateway}" : null}
+    macaddr                 = {for i, d in var.node_ip_macaddr : i => lower(d)}
     os_disk                 = [{
         type        = local.disk_type
         storage     = local.node_config.os_disk_storage
@@ -103,6 +109,8 @@ locals {
     ])
 
     hostnames = formatlist("${local.node_config.name_prefix}%02s", local.node_id)
+    id_start = local.node_config.vmid_start != null && local.node_config.vmid_start != 0 ? local.node_config.vmid_start : 1
+    id_iterator = range(local.id_start, (local.id_start + var.node_count))
 }
 
 resource "random_password" "master_nodes_shared_secret" {
@@ -127,17 +135,108 @@ module "master_vars" {
     }
 }
 
-resource "random_password" "vm_password" {
-    length           = 16
-    special          = true
-    override_special = "!#$%&*()-_=+[]{}<>:?"
+resource "local_file" "cloud_init_user_data_file" {
+    count    = var.node_count
+    content  = templatefile("${path.module}/templates/user_data.cfg",
+    {
+        ssh_pub_keys    = local.node_config.ssh_public_keys
+        hostname        = "${format("${local.node_config.name_prefix}%02s", count.index + 1)}"
+        fqdn            = "${format("${local.node_config.name_prefix}%02s", count.index + 1)}.${local.node_config.searchdomains[0]}"
+        user            = local.node_config.ssh_username
+        password        = bcrypt(local.node_config.user_password)
+        eth0_mtu        = local.node_config.eth0_mtu
+    })
+    filename = "${path.module}/rendered/user_data_vm-${local.id_iterator[count.index]}.yml"
+}
+
+resource "local_file" "cloud_init_network_data_file" {
+    count    = var.node_count
+    content  = templatefile("${path.module}/templates/network_data_v2.cfg",
+    {
+        interfaces = [
+            {
+                macaddress = lower(lookup(local.macaddr, count.index, null))
+                address = "dhcp"
+            }
+        ]
+        searchdomains = jsonencode(local.node_config.searchdomains)
+        nameservers = jsonencode(local.node_config.nameservers)
+        eth0_mtu = local.node_config.eth0_mtu
+    })
+    filename = "${path.module}/rendered/network_data_vm-${local.id_iterator[count.index]}.yml"
+}
+
+# v1 network file
+# resource "local_file" "cloud_init_network_data_file" {
+#     count    = var.node_count
+#     content  = templatefile("${path.module}/templates/network_data_v1.cfg",
+#     {
+#         interfaces = [
+#             {
+#                 macaddress = lower(lookup(local.macaddr, count.index, null))
+#                 address = "dhcp"
+#             }
+#         ]
+#         searchdomains = local.node_config.searchdomains
+#         nameservers = local.node_config.nameservers
+#     })
+#     filename = "${path.module}/rendered/network_data_vm-${local.id_iterator[count.index]}.yml"
+# }
+
+resource "null_resource" "cloud_init_config_files" {
+    depends_on = [
+        local_file.cloud_init_network_data_file,
+        local_file.cloud_init_user_data_file
+    ]
+    count    = var.node_count
+    triggers = {
+        network_files = join(" ", [for i in range(var.node_count) : "${local.cloud_init_config.custom_file_path}/snippets/${basename(local_file.cloud_init_network_data_file[i].filename)}"])
+        user_files = join(" ", [for i in range(var.node_count) : "${local.cloud_init_config.custom_file_path}/snippets/${basename(local_file.cloud_init_user_data_file[i].filename)}"])
+        ssh_user = sensitive(var.proxmox.user)
+        ssh_pass = sensitive(var.proxmox.password)
+        ssh_host = sensitive(var.proxmox.host)
+        # files_sha = join(" ", [for i in range(var.node_count) : filesha256(local_file.cloud_init_network_data_file[i].filename)])
+    }
+    connection {
+        type     = "ssh"
+        user     = self.triggers.ssh_user
+        password = self.triggers.ssh_pass
+        host     = self.triggers.ssh_host
+    }
+
+    provisioner "file" {
+        source      = local_file.cloud_init_user_data_file[count.index].filename
+        destination = "${split(" ", self.triggers.user_files)[count.index]}"
+    }
+
+    provisioner "file" {
+        source      = local_file.cloud_init_network_data_file[count.index].filename
+        destination = "${split(" ", self.triggers.network_files)[count.index]}"
+    }
+
+    provisioner "remote-exec" {
+        when        = destroy
+        inline      = [
+            "rm -f ${split(" ", self.triggers.network_files)[count.index]}"
+        ]
+    }
+
+    provisioner "remote-exec" {
+        when        = destroy
+        inline      = [
+            "rm -f ${split(" ", self.triggers.user_files)[count.index]}"
+        ]
+    }
 }
 
 resource "proxmox_vm_qemu" "k3s_server_node" {
+    depends_on = [
+        null_resource.cloud_init_config_files,
+    ]
     for_each        = toset(formatlist("%s", local.node_id))
     target_node     = element(var.proxmox_hosts, each.key - 1)
-    ciuser          = local.node_config.ssh_username
-    cipassword      = random_password.vm_password.result
+    # ciuser          = local.node_config.ssh_username
+    # cipassword      = random_password.vm_password.result
     onboot          = local.onboot
     tablet          = local.tablet
     agent           = local.agent
@@ -145,17 +244,19 @@ resource "proxmox_vm_qemu" "k3s_server_node" {
     full_clone      = local.full_clone
     bios            = local.bios
     qemu_os         = local.qemu_os # linux
-    searchdomain    = local.node_config.searchdomain
-    nameserver      = local.node_config.nameserver
+    # searchdomain    = local.node_config.searchdomain
+    # nameserver      = local.node_config.nameserver
     os_type         = local.os_type
     scsihw          = local.scsihw
     cpu             = "${local.cpu},flags=${local.cpuflags}"
-    ipconfig0       = lookup(local.ipconfig0, each.key - 1, null)
+    # ipconfig0       = lookup(local.ipconfig0, each.key - 1, null)
     name            = "${format("${local.node_config.name_prefix}%02s", each.key)}"
     vmid            = local.node_config.vmid_start != null && local.node_config.vmid_start != 0 ? (local.node_config.vmid_start + (each.key -1)) : null
     cores           = local.node_config.cpus
     memory          = local.node_config.memory_mb
-    sshkeys         = local.node_config.ssh_public_keys
+    # sshkeys         = local.node_config.ssh_public_keys
+    cicustom        = "network=${local.cloud_init_config.custom_storage_name}:snippets/${basename(local_file.cloud_init_network_data_file[each.key - 1].filename)},user=${local.cloud_init_config.custom_storage_name}:snippets/${basename(local_file.cloud_init_user_data_file[each.key - 1].filename)}"
+    cloudinit_cdrom_storage = local.cloud_init_config.cdrom_storage
     dynamic "disk" {
         for_each = {for i, d in local.disk : i => d}
 
@@ -173,7 +274,7 @@ resource "proxmox_vm_qemu" "k3s_server_node" {
         model = local.network_model
         firewall = false
         bridge = local.node_config.bridge
-        macaddr = lookup(local.macaddr, each.key - 1, null)
+        macaddr = lower(lookup(local.macaddr, each.key - 1, null))
     }
 
     serial {
@@ -197,4 +298,38 @@ resource "proxmox_vm_qemu" "k3s_server_node" {
             disk[1].format
         ]
     }
+}
+
+resource "null_resource" "cloud_init_ready" {
+    depends_on = [
+        proxmox_vm_qemu.k3s_server_node
+    ]
+    count    = var.node_count
+    triggers = {
+        ssh_user = sensitive(local.node_config.ssh_username)
+        ssh_pk = sensitive(local.node_config.ssh_private_key)
+        ssh_host = sensitive(proxmox_vm_qemu.k3s_server_node[count.index + 1].default_ipv4_address)
+    }
+    connection {
+        type        = "ssh"
+        user        = self.triggers.ssh_user
+        private_key = self.triggers.ssh_pk
+        host        = self.triggers.ssh_host
+    }
+
+    provisioner "remote-exec" {
+        when        = create
+        on_failure  = continue
+
+        inline      = [
+            "sudo cloud-init status --wait"
+        ]
+    }
+}
+
+# yeah this sucks
+resource "time_sleep" "wait_after_cloudinit" {
+    depends_on = [null_resource.cloud_init_ready]
+
+    create_duration = "30s"
 }

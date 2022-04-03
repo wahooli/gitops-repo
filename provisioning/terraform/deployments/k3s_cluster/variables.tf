@@ -29,6 +29,15 @@ variable "k3s_config" {
     })
 }
 
+variable "proxmox" {
+    type = object({
+        host        = string
+        user        = string
+        password    = string
+    })
+    sensitive = true
+}
+
 variable "vm_config" {
     type = object({
         proxmox_hosts           = list(string)
@@ -39,15 +48,19 @@ variable "vm_config" {
         server_node_count       = number
         server_node_cpus        = number
         server_node_memory      = number
-        nameserver              = string
+        nameservers             = list(string)
         nameserver_name         = string
-        searchdomain            = string
+        searchdomains           = list(string)
+        mtu                     = number
         os_disk_storage         = string
         longhorn_disk_size      = string
         longhorn_disk_storage   = string
         bridge                  = string
         ssh_username            = string
         cidr                    = string
+        ci_storage              = string
+        ci_remote_path          = string
+        ci_custom_storage       = string
     })
 }
 

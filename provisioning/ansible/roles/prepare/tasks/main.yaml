@@ -29,7 +29,6 @@
     name: jq
     state: present
 
-
 - name: Ensure krb5-config installed
   become: true
   package:

@@ -16,7 +16,7 @@ provider "proxmox" {
     pm_api_token_secret = var.proxmox_api_token_secret
     pm_tls_insecure     = var.proxmox_ignore_tls
     pm_parallel         = 4 # having 6 as parallel, gives errors for already running vm for some reason
-    pm_log_enable       = false
+    pm_log_enable       = true
     pm_debug            = true
     pm_log_file         = "terraform-plugin-proxmox.log"
     pm_log_levels = {
@@ -31,6 +31,7 @@ module "k3s_cluster" {
     bgp_config              = var.k3s.bgp_config
     vm_config               = var.k3s.vm_config
     k3s_config              = var.k3s.server_config
+    proxmox                 = var.proxmox
     github_config = {
         branch = "dev"
         owner = var.github_owner
