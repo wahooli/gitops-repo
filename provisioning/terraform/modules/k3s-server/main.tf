@@ -79,7 +79,6 @@ locals {
     cpu                     = "host"
     cpuflags                = "+pdpe1gb;+aes"
     node_id                 = range(1, (var.node_count+1))
-    # ipconfig0               = {for i, d in var.node_ip_addresses : i => local.node_config.default_gateway != null && local.node_config.default_gateway != "" ? "ip=${d},gw=${local.node_config.default_gateway}" : null}
     macaddr                 = {for i, d in var.node_ip_macaddr : i => lower(d)}
     os_disk                 = [{
         type        = local.disk_type
@@ -235,8 +234,6 @@ resource "proxmox_vm_qemu" "k3s_server_node" {
     ]
     for_each        = toset(formatlist("%s", local.node_id))
     target_node     = element(var.proxmox_hosts, each.key - 1)
-    # ciuser          = local.node_config.ssh_username
-    # cipassword      = random_password.vm_password.result
     onboot          = local.onboot
     tablet          = local.tablet
     agent           = local.agent
@@ -244,17 +241,13 @@ resource "proxmox_vm_qemu" "k3s_server_node" {
     full_clone      = local.full_clone
     bios            = local.bios
     qemu_os         = local.qemu_os # linux
-    # searchdomain    = local.node_config.searchdomain
-    # nameserver      = local.node_config.nameserver
     os_type         = local.os_type
     scsihw          = local.scsihw
     cpu             = "${local.cpu},flags=${local.cpuflags}"
-    # ipconfig0       = lookup(local.ipconfig0, each.key - 1, null)
     name            = "${format("${local.node_config.name_prefix}%02s", each.key)}"
     vmid            = local.node_config.vmid_start != null && local.node_config.vmid_start != 0 ? (local.node_config.vmid_start + (each.key -1)) : null
     cores           = local.node_config.cpus
     memory          = local.node_config.memory_mb
-    # sshkeys         = local.node_config.ssh_public_keys
     cicustom        = "network=${local.cloud_init_config.custom_storage_name}:snippets/${basename(local_file.cloud_init_network_data_file[each.key - 1].filename)},user=${local.cloud_init_config.custom_storage_name}:snippets/${basename(local_file.cloud_init_user_data_file[each.key - 1].filename)}"
     cloudinit_cdrom_storage = local.cloud_init_config.cdrom_storage
     dynamic "disk" {

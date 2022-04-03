@@ -209,7 +209,7 @@ module "ansible_playbook" {
 }
 
 module "ansible_inventory" {
-    source  = "../../modules/ansible-inventory-new"
+    source  = "../../modules/ansible-inventory"
     content = {
         "master_nodes" = tomap(module.k3s_server.ansible_hosts),
         "worker_nodes" = tomap(module.k3s_agent.ansible_hosts)
