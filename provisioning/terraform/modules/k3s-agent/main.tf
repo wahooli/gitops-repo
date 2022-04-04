@@ -1,5 +1,6 @@
-terraform {
-    experiments = [module_variable_optional_attrs]
+# this also creates useless resources, if you use static node mac addresses. 
+resource "macaddress" "agent_mac_address" {
+    count = length(var.node.additional_networks) > 0 ? (length(var.node.additional_networks) * var.node_count) + var.node_count : var.node_count
 }
 
 locals {
@@ -13,6 +14,7 @@ locals {
         name_prefix         = "k3s-agent-"
         eth0_mtu            = 1500
         nameservers         = "1.1.1.1 1.0.0.1"
+        dhcp_additional_networks = false
         # nameservers = ["1.1.1.1", "1.0.0.1"]
     })
     cloud_init_config = defaults(var.cloud_init, {
@@ -36,6 +38,7 @@ locals {
     cpuflags                = "+pdpe1gb;+aes"
     node_id                 = range(1, (var.node_count+1))
     macaddr                 = {for i, d in var.node_ip_macaddr : i => lower(d)}
+    eth0_ip                 = {for i, d in var.node_ip_addresses : i => d}
     os_disk                 = [{
         type        = local.disk_type
         storage     = local.node_config.os_disk_storage
@@ -58,6 +61,39 @@ locals {
         var.mount_longhorn_disk == true && length(local.disk) > 1 ? "k3s/mount-longhorn-storage" : "",
         "k3s/worker",
     ])
+
+# = concat([
+#         {
+#             model = local.network_model
+#             firewall = false
+#             # mtu = 9000
+#             bridge = local.node_config.bridge
+#             macaddr = lower(lookup(local.macaddr, each.key - 1, null))
+#         }
+#     ])
+    networks = {for node_num in range(var.node_count) : node_num => concat([
+        {
+            model = local.network_model
+            firewall = false
+            bridge = local.node_config.bridge
+            macaddr = lower(lookup(local.macaddr, node_num, macaddress.agent_mac_address[node_num * (length(local.node_config.additional_networks) + 1)].address))
+            address = lookup(local.eth0_ip, node_num, "dhcp")
+            gw = local.node_config.default_gateway == null ? "" : local.node_config.default_gateway
+        }
+        ], [
+            for i, br in local.node_config.additional_networks : 
+                {
+                    model = local.network_model
+                    firewall = false
+                    bridge = br
+                    # macaddr = "${(i + 1 + node_num) + (length(local.node_config.additional_networks) * node_num)}"
+                    macaddr = lower(macaddress.agent_mac_address[(i + 1 + node_num) + (length(local.node_config.additional_networks) * node_num)].address)
+                    address = local.node_config.dhcp_additional_networks == true ? "dhcp" : ""
+                    gw = ""
+                }
+        ]
+        )
+    }
 
     hostnames = formatlist("${local.node_config.name_prefix}%02s", local.node_id)
     id_start = local.node_config.vmid_start != null && local.node_config.vmid_start != 0 ? local.node_config.vmid_start : 1
@@ -82,12 +118,13 @@ resource "local_file" "cloud_init_network_data_file" {
     count    = var.node_count
     content  = templatefile("${path.module}/templates/network_data_v2.cfg",
     {
-        interfaces = [
-            {
-                macaddress = lower(lookup(local.macaddr, count.index, null))
-                address = "dhcp"
-            }
-        ]
+        # interfaces = [
+        #     {
+        #         macaddr = lower(lookup(local.macaddr, count.index, null))
+        #         address = "dhcp"
+        #     }
+        # ]
+        interfaces = local.networks[count.index]
         searchdomains = jsonencode(local.node_config.searchdomains)
         nameservers = jsonencode(local.node_config.nameservers)
         eth0_mtu = local.node_config.eth0_mtu
@@ -176,12 +213,22 @@ resource "proxmox_vm_qemu" "k3s_agent_node" {
         }
     }
 
-    network {
-        model = local.network_model
-        firewall = false
-        # mtu = 9000
-        bridge = local.node_config.bridge
-        macaddr = lower(lookup(local.macaddr, each.key - 1, null))
+    # network {
+    #     model = local.network_model
+    #     firewall = false
+    #     # mtu = 9000
+    #     bridge = local.node_config.bridge
+    #     macaddr = lower(lookup(local.macaddr, each.key - 1, null))
+    # }
+    dynamic "network" {
+        for_each = {for i, d in local.networks[each.key - 1]: i => d}
+
+        content {
+            model       = network.value["model"]
+            firewall    = network.value["firewall"]
+            bridge      = network.value["bridge"]
+            macaddr     = network.value["macaddr"]
+        }
     }
 
     serial {

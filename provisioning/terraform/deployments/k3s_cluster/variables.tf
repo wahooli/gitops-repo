@@ -40,27 +40,28 @@ variable "proxmox" {
 
 variable "vm_config" {
     type = object({
-        proxmox_hosts           = list(string)
-        vmid_start              = number
-        agent_node_count        = number
-        agent_node_cpus         = number
-        agent_node_memory       = number
-        server_node_count       = number
-        server_node_cpus        = number
-        server_node_memory      = number
-        nameservers             = list(string)
-        nameserver_name         = string
-        searchdomains           = list(string)
-        mtu                     = number
-        os_disk_storage         = string
-        longhorn_disk_size      = string
-        longhorn_disk_storage   = string
-        bridge                  = string
-        ssh_username            = string
-        cidr                    = string
-        ci_storage              = string
-        ci_remote_path          = string
-        ci_custom_storage       = string
+        proxmox_hosts               = list(string)
+        vmid_start                  = number
+        agent_node_count            = number
+        agent_node_cpus             = number
+        agent_node_memory           = number
+        server_node_count           = number
+        server_node_cpus            = number
+        server_node_memory          = number
+        nameservers                 = list(string)
+        nameserver_name             = string
+        searchdomains               = list(string)
+        mtu                         = number
+        os_disk_storage             = string
+        longhorn_disk_size          = string
+        longhorn_disk_storage       = string
+        bridge                      = string
+        ssh_username                = string
+        cidr                        = string
+        ci_storage                  = string
+        ci_remote_path              = string
+        ci_custom_storage           = string
+        agent_additional_networks   = list(string)
     })
 }
 

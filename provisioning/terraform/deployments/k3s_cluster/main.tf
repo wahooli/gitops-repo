@@ -3,8 +3,8 @@ resource "tls_private_key" "node_ssh_pk" {
     ecdsa_curve = var.ssh_pk_ecdsa_curve
 }
 
-resource "local_file" "private_key" {
-    sensitive_content = tls_private_key.node_ssh_pk.private_key_pem
+resource "local_sensitive_file" "private_key" {
+    content = tls_private_key.node_ssh_pk.private_key_pem
     filename = abspath("${path.module}/../../../outputs/pk/${var.cluster_name_prefix}-pk.pem")
     file_permission = "0600"
 }
@@ -137,7 +137,9 @@ module "k3s_agent" {
     proxmox_hosts           = var.vm_config.proxmox_hosts
     node_count              = var.vm_config.agent_node_count
     node_ip_macaddr         = ["0A:DF:58:1A:F2:4B", "D2:1C:C4:DE:9B:E4", "CE:19:CA:60:FB:83"]
+    # node_ip_addresses       = ["192.168.1.22/24"]
     node = {
+        # default_gateway = "192.168.1.1"
         vmid_start = var.vm_config.vmid_start + var.vm_config.server_node_count + 1
         cpus = var.vm_config.agent_node_cpus
         bridge = var.vm_config.bridge
@@ -153,6 +155,8 @@ module "k3s_agent" {
         nameservers = var.vm_config.nameservers
         eth0_mtu = var.vm_config.mtu
         searchdomains = var.vm_config.searchdomains
+        additional_networks = var.vm_config.agent_additional_networks
+        # dhcp_additional_networks = true
     }
     cloud_init = {
         cdrom_storage       = var.vm_config.ci_storage
@@ -229,7 +233,7 @@ module "ansible_provisioner" {
     config_path         = "${path.module}/../../../ansible/ansible.cfg"
     inventory_path      = "${path.module}/../../../ansible/inventory"
     playbook_path       = module.ansible_playbook.filepath
-    private_key_path    = local_file.private_key.filename
+    private_key_path    = local_sensitive_file.private_key.filename
     triggers = {
         master_roles = join(",", module.k3s_server.ansible_roles)
         agent_roles = join(",", module.k3s_agent.ansible_roles)
@@ -247,7 +251,7 @@ module "kubeconfig" {
     host_addr           = module.k3s_server.ip_addresses.0
     remote_file         = "~/.kube/config"
     local_path          = "${path.module}/../../../outputs/kubeconfig"
-    private_key_path    = local_file.private_key.filename
+    private_key_path    = local_sensitive_file.private_key.filename
 }
 
 # this cannot be done for some reason when joining cluster, dunno why

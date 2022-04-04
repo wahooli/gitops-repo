@@ -58,6 +58,7 @@ variable "node" {
         searchdomains   = optional(list(string))
         nameservers     = optional(list(string))
         additional_networks = optional(list(string))
+        dhcp_additional_networks = optional(bool)
     })
     default = {
         name_prefix = "k3s-agent-"
@@ -67,13 +68,13 @@ variable "node" {
 
 variable "node_ip_addresses" {
     type        = list(string)
-    description = "Static ip addresses for eth0 adapter. If empty, or not defined for node, will allocate dhcp address"
+    description = "Static ip addresses with netmask for eth0 adapter. Requires node.default_gateway to be set. If empty, or not defined for node, will allocate dhcp address"
     default     = []
 }
 
 variable "node_ip_macaddr" {
     type        = list(string)
-    description = "Static ip addresses for eth0 adapter. If empty, or not defined for node, will allocate dhcp address"
+    description = "Static mac address for eth0 adapter. If empty, or not defined for node, will generate one."
     default     = []
 }
 
