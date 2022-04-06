@@ -86,6 +86,7 @@ locals {
                     model = local.network_model
                     firewall = false
                     bridge = br
+                    name = br
                     # macaddr = "${(i + 1 + node_num) + (length(local.node_config.additional_networks) * node_num)}"
                     macaddr = lower(macaddress.agent_mac_address[(i + 1 + node_num) + (length(local.node_config.additional_networks) * node_num)].address)
                     address = local.node_config.dhcp_additional_networks == true ? "dhcp" : ""
