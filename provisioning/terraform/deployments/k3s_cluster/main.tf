@@ -88,8 +88,17 @@ module "k3s_server" {
                 {
                     name = "node.longhorn.io/create-default-disk"
                     value = "true"
+                },
+                {
+                    name = "multi-interface-node"
+                    value = "true"
                 }
             ]
+        }
+        cni_plugins = {
+            install = true
+            install_path = "/opt/cni/bin"
+            version = var.k3s_config.cni_plugins_version
         }
     }
     metallb = {
@@ -181,6 +190,7 @@ module "ansible_playbook" {
                 "update_os",
                 "prepare",
                 "dynamic_dns/install",
+                "cni-plugins-install",
                 "k3s/download",
                 "k3s/pre-configure",
                 "k3s/calico-blackhole"

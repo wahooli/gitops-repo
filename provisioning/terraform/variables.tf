@@ -59,6 +59,7 @@ variable "k3s" {
             longhorn_backup_target  = string
             longhorn_backup_secret  = string
             calico_version          = string
+            cni_plugins_version     = string
         })
         vm_config = object({
             proxmox_hosts               = list(string)

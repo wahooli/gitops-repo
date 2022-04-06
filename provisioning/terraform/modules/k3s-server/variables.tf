@@ -136,6 +136,11 @@ variable "install" {
             })
         })
         systemd_dir                 = optional(string)
+        cni_plugins                 = optional(object({
+            install                 = bool
+            install_path            = string
+            version                 = string
+        }))
     })
     default = {
         k3s_server = {

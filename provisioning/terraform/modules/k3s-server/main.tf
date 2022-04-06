@@ -44,6 +44,9 @@ locals {
             add_static_host_entries = var.dynamic_dns.enabled == false ? true : false
         }
         systemd_dir                 = "/etc/systemd/system"
+        cni_plugins = {
+            install                 = false
+        }
     })
     longhorn_config = defaults(var.longhorn, {
         enabled             = var.storage_operator == "longhorn" ? true : false
