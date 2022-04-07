@@ -4,15 +4,16 @@ metadata:
   name: cert-manager
   namespace: flux-system
 spec:
-  interval: 3m
+  interval: 60m
   path: "./infrastructure/cert-manager"
+  retryInterval: 30s
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
   healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: cert-manager
-      namespace: cert-manager
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: cert-manager
+    namespace: cert-manager
   timeout: 10m

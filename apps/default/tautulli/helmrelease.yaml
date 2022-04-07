@@ -38,11 +38,11 @@ spec:
         annotations: 
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
         hosts: 
-        - host: tautulli.absolutist.it
+        - host: tautulli.${dns_suffix:=absolutist.it}
           paths:
             - path: "/"
               pathType: "Prefix"
-        - host: tautulli.wahoo.li
+        - host: tautulli.${dns_suffix2:=wahoo.li}
           paths:
             - path: "/"
               pathType: "Prefix"

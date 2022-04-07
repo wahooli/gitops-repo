@@ -15,3 +15,8 @@ spec:
     kind: Deployment
     name: ingress-nginx-controller
     namespace: ingress-nginx
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-vars
+      optional: true

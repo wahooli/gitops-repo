@@ -4,14 +4,16 @@ metadata:
   name: influxdb
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 60m
+  timeout: 15m0s
+  retryInterval: 2m0s # retry every two minutes on apply or waiting failures
   path: "./apps/db/influxdb"
-  prune: true
+  prune: false
   sourceRef:
     kind: GitRepository
     name: flux-system
   healthChecks:
-    - apiVersion: apps/v1
-      kind: StatefulSet
-      name: influxdb2
-      namespace: db
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: influxdb2
+    namespace: db

@@ -5,12 +5,12 @@ metadata:
   namespace: iot
 spec:
   secretName: tls-appdaemon-ingress
-  commonName: appdaemon.absolutist.it
+  commonName: appdaemon.${dns_suffix:=absolutist.it}
   issuerRef:
     name: letsencrypt-staging
     kind: ClusterIssuer
   dnsNames:
-  - appdaemon.absolutist.it
-  - ha-dash.absolutist.it
-  - appdaemon.wahoo.li
-  - ha-dash.wahoo.li
+  - appdaemon.${dns_suffix:=absolutist.it}
+  - ha-dash.${dns_suffix:=absolutist.it}
+  - appdaemon.${dns_suffix2:=wahoo.li}
+  - ha-dash.${dns_suffix2:=wahoo.li}

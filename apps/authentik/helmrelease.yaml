@@ -48,11 +48,11 @@ spec:
       annotations: 
         nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       hosts: 
-      - host: auth.absolutist.it
+      - host: auth.${dns_suffix:=absolutist.it}
         paths:
           - path: "/"
             pathType: "Prefix"
-      - host: auth.wahoo.li
+      - host: auth.${dns_suffix2:=wahoo.li}
         paths:
           - path: "/"
             pathType: "Prefix"

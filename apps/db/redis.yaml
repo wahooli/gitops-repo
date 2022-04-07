@@ -4,7 +4,9 @@ metadata:
   name: redis
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 60m
+  timeout: 15m0s
+  retryInterval: 2m0s # retry every two minutes on apply or waiting failures
   path: "./apps/db/redis"
   prune: true
   sourceRef:

@@ -5,10 +5,10 @@ metadata:
   namespace: ext
 spec:
   secretName: tls-sonarr-ingress
-  commonName: sonarr.absolutist.it
+  commonName: sonarr.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - sonarr.absolutist.it
-  - sonarr.wahoo.li
+  - sonarr.${dns_suffix:=absolutist.it}
+  - sonarr.${dns_suffix2:=wahoo.li}

@@ -8,7 +8,8 @@ spec:
     - name: cert-manager-issuers
     - name: external-snapshotter-crd
     - name: external-snapshotter-controller
-  interval: 3m
+  interval: 30m
+  retryInterval: 1m0s
   path: "./infrastructure/longhorn"
   prune: true
   sourceRef:
@@ -28,3 +29,8 @@ spec:
     name: longhorn-csi-plugin
     namespace: longhorn-system
   timeout: 20m
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-vars
+      optional: true

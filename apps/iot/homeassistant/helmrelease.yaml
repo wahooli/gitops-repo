@@ -89,11 +89,11 @@ spec:
           nginx.ingress.kubernetes.io/proxy-send-timeout: "3600" #websocket timeout to one hour
           nginx.ingress.kubernetes.io/proxy-read-timeout: "3600" #websocket timeout to one hour
         hosts: 
-        - host: ha.absolutist.it
+        - host: ha.${dns_suffix:=absolutist.it}
           paths:
             - path: "/"
               pathType: "Prefix"
-        - host: ha.wahoo.li
+        - host: ha.${dns_suffix2:=wahoo.li}
           paths:
             - path: "/"
               pathType: "Prefix"

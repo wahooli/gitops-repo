@@ -5,10 +5,12 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: cert-manager
-  interval: 5m
+  - name: cert-manager
+  interval: 2h
   path: "./infrastructure/cert-manager/issuers"
-  prune: true
+  retryInterval: 1m0s
+  prune: false
+  wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system

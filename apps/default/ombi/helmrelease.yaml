@@ -37,11 +37,11 @@ spec:
         annotations: 
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
         hosts: 
-        - host: ombi.absolutist.it
+        - host: ombi.${dns_suffix:=absolutist.it}
           paths:
             - path: "/"
               pathType: "Prefix"
-        - host: ombi.wahoo.li
+        - host: ombi.${dns_suffix2:=wahoo.li}
           paths:
             - path: "/"
               pathType: "Prefix"

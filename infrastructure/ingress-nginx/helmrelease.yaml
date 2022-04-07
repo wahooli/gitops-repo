@@ -20,6 +20,9 @@ spec:
       retries: 3
   values:
     controller:
+      admissionWebhooks:
+        enabled: true
+        timeoutSeconds: 30
       dnsPolicy: ClusterFirstWithHostNet
       replicaCount: 3
       ingressClassResource:
@@ -42,5 +45,5 @@ spec:
           enabled: false
       service:
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: nginx.absolutist.it.
-        externalTrafficPolicy: Local
+          external-dns.alpha.kubernetes.io/hostname: "nginx.${dns_suffix:=absolutist.it}."
+        # externalTrafficPolicy: Local

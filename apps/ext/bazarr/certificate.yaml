@@ -5,10 +5,10 @@ metadata:
   namespace: ext
 spec:
   secretName: tls-bazarr-ingress
-  commonName: bazarr.absolutist.it
+  commonName: bazarr.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - bazarr.absolutist.it
-  - bazarr.wahoo.li
+  - bazarr.${dns_suffix:=absolutist.it}
+  - bazarr.${dns_suffix2:=wahoo.li}
