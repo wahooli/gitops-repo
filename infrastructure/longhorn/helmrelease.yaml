@@ -24,22 +24,22 @@ spec:
       createDefaultDiskLabeledNodes: true
       defaultDataLocality: best-effort
       storageOverProvisioningPercentage: 150
-      taintToleration: "node-role.kubernetes.io/master=true:NoSchedule"
+      taintToleration: "CriticalAddonsOnly=true:NoSchedule"
     longhornManager:
       tolerations:
-      - key: "node-role.kubernetes.io/master"
+      - key: "CriticalAddonsOnly"
         operator: "Equal"
         value: "true"
         effect: "NoSchedule"
     longhornDriver:
       tolerations:
-      - key: "node-role.kubernetes.io/master"
+      - key: "CriticalAddonsOnly"
         operator: "Equal"
         value: "true"
         effect: "NoSchedule"
     longhornUI:
       tolerations:
-      - key: "node-role.kubernetes.io/master"
+      - key: "CriticalAddonsOnly"
         operator: "Equal"
         value: "true"
         effect: "NoSchedule"

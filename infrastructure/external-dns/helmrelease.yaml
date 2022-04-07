@@ -35,7 +35,7 @@ spec:
         name: external-dns-krb5.conf
       name: kerberos-config-volume
     tolerations:
-    - key: "node-role.kubernetes.io/master"
+    - key: "CriticalAddonsOnly"
       operator: "Equal"
       value: "true"
       effect: "NoSchedule"
