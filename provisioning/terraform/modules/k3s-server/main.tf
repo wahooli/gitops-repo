@@ -327,5 +327,5 @@ resource "null_resource" "cloud_init_ready" {
 resource "time_sleep" "wait_after_cloudinit" {
     depends_on = [null_resource.cloud_init_ready]
 
-    create_duration = "30s"
+    create_duration = "40s"
 }

@@ -17,3 +17,7 @@ spec:
     kind: Job
     name: longhorn-data-restore
     namespace: longhorn-system
+  - apiVersion: v1
+    kind: Secret
+    name: longhorn-restore-complete
+    namespace: longhorn-system

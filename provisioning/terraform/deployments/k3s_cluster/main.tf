@@ -120,7 +120,7 @@ module "k3s_server" {
         node_cidr               = var.vm_config.cidr
         linuxDataplane          = "BPF" # "Iptables" #BPF
         containerIPForwarding   = "Enabled"
-        mtu                     = var.vm_config.mtu
+        mtu                     = (var.vm_config.mtu - 60)
         bgp = {
             enabled             = true
             node_to_node_mesh   = false

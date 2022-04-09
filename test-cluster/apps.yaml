@@ -7,7 +7,7 @@ spec:
   dependsOn:
     - name: infrastructure
     - name: longhorn-data-restore
-    # - name: monitoring
+    - name: monitoring
   interval: 60m0s
   prune: true
   validation: client

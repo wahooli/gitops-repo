@@ -18,3 +18,10 @@ spec:
     substituteFrom:
       - kind: Secret
         name: cloudflare-issuer-secrets
+  healthChecks:
+  - apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    name: letsencrypt-production
+  - apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    name: letsencrypt-staging

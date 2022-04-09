@@ -5,10 +5,10 @@ metadata:
   namespace: monitoring
 spec:
   secretName: tls-grafana-ingress
-  commonName: grafana.absolutist.it
+  commonName: grafana.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - grafana.absolutist.it
-  - grafana.wahoo.li
+  - grafana.${dns_suffix:=absolutist.it}
+  - grafana.${dns_suffix2:=wahoo.li}

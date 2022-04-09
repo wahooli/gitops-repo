@@ -135,8 +135,8 @@ resource "kubernetes_secret" "hass_deploy_key" {
     depends_on = [null_resource.iot_namespace]
 
     metadata {
-        annotations     = {}
-        labels          = {}
+        # annotations     = {}
+        # labels          = {}
         name            = "homeassistant-deploy-key"
         namespace       = "iot"
     }

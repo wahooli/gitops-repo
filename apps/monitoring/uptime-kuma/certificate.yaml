@@ -5,10 +5,10 @@ metadata:
   namespace: monitoring
 spec:
   secretName: tls-uptime-kuma-ingress
-  commonName: status.absolutist.it
+  commonName: status.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - status.absolutist.it
-  - status.wahoo.li
+  - status.${dns_suffix:=absolutist.it}
+  - status.${dns_suffix2:=wahoo.li}
