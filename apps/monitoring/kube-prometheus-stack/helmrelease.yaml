@@ -14,9 +14,12 @@ spec:
         name: prometheus-community
         namespace: flux-system
       version: 25.2.0
-  interval: 5m
+      interval: 1h
+  interval: 15m
   install:
     crds: Create
+    remediation:
+      retries: -1
   upgrade:
     crds: CreateReplace
   values:

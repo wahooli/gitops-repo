@@ -6,7 +6,7 @@ metadata:
 spec:
   dependsOn:
     - name: cert-manager
-  interval: 10m0s
+  interval: 15m0s
   prune: true
   validation: client
   sourceRef:

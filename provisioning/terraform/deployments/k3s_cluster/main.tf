@@ -114,7 +114,7 @@ module "k3s_server" {
         }
     }
     calico = {
-        encapsulation           = "IPIPCrossSubnet" #"None"
+        encapsulation           = "None" #"IPIPCrossSubnet" #"None"
         calico_version          = var.k3s_config.calico_version
         install_calicoctl       = true
         node_cidr               = var.vm_config.cidr
@@ -123,7 +123,7 @@ module "k3s_server" {
         mtu                     = (var.vm_config.mtu - 60)
         bgp = {
             enabled             = true
-            node_to_node_mesh   = false
+            node_to_node_mesh   = true
             node_selector       = "all()" # has(router-peer)
             external_ips        = var.bgp_config.external_ipv4_cidr
             peer_ip             = var.bgp_config.peer_ip
