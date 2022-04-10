@@ -3,6 +3,8 @@ kind: Certificate
 metadata:
   name: tls-uptime-kuma-ingress
   namespace: monitoring
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   secretName: tls-uptime-kuma-ingress
   commonName: status.${dns_suffix:=absolutist.it}

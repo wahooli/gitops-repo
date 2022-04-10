@@ -5,7 +5,8 @@ metadata:
   namespace: longhorn-system
 spec:
   backoffLimit: 5
-  activeDeadlineSeconds: 120
+  activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: 60
   template:
     spec:
       serviceAccountName: longhorn-data-restore

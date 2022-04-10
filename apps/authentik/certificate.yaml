@@ -3,6 +3,8 @@ kind: Certificate
 metadata:
   name: tls-authentik-ingress
   namespace: authentik
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   secretName: tls-authentik-ingress
   commonName: auth.${dns_suffix:=absolutist.it}

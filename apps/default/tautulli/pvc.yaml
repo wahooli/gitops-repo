@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: default-tautulli-pvc
   namespace: default
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   accessModes:
   - ReadWriteOnce

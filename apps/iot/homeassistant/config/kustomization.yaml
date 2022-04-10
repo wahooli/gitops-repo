@@ -1,6 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: iot
+metadata:
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
 resources:
   - .storage
 configMapGenerator:
@@ -19,11 +22,13 @@ configMapGenerator:
       disableNameSuffixHash: true
       labels:
         type: generated
+      annotations:
+        kustomize.toolkit.fluxcd.io/substitute: disabled
 secretGenerator:
   - name: homeassistant-secret
     files:
       - secrets.yaml=secrets.yaml.encrypted
-      - google-service-account.yaml=google-service-account.yaml.encrypted
+      # - google-service-account.yaml=google-service-account.yaml.encrypted
     options:
       disableNameSuffixHash: true
       labels:

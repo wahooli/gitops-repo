@@ -12,7 +12,8 @@ spec:
         name: jetstack
         namespace: flux-system
       version: '>=1.6.1'
-  interval: 1h0m0s
+      interval: 1h
+  interval: 2m
   releaseName: cert-manager
   targetNamespace: cert-manager
   values:

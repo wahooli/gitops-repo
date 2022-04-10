@@ -3,6 +3,8 @@ kind: Certificate
 metadata:
   name: tls-alertmanager-ingress
   namespace: monitoring
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   secretName: tls-alertmanager-ingress
   commonName: alertmanager.${dns_suffix:=absolutist.it}

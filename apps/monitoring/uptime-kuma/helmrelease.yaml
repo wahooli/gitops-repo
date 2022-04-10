@@ -14,7 +14,11 @@ spec:
         name: k8s-at-home
         namespace: flux-system
       version: "1.1.0"
-  interval: 1h0m0s
+      interval: 1h
+  interval: 1m
+  install:
+    remediation:
+      retries: -1
   values:
     image:
       repository: louislam/uptime-kuma

@@ -14,7 +14,11 @@ spec:
         name: goauthentik
         namespace: flux-system
       version: ">=5.1.1"
-  interval: 1h0m0s
+      interval: 1h
+  interval: 2m
+  install:
+    remediation:
+      retries: -1
   values:
     authentik:
       secret_key: ${secret_key}

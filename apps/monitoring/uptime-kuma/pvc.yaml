@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: monitoring-uptime-kuma-pvc
   namespace: monitoring
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   accessModes:
   - ReadWriteOnce

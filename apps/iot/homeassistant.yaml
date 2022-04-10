@@ -20,10 +20,14 @@ spec:
       name: cluster-vars
       optional: true
   healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: home-assistant
-      namespace: iot
+  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: home-assistant
+    namespace: flux-system
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: home-assistant
+    namespace: iot
   decryption:
     provider: sops
     secretRef:

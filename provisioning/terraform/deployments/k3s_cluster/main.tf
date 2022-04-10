@@ -114,7 +114,7 @@ module "k3s_server" {
         }
     }
     calico = {
-        encapsulation           = "None"
+        encapsulation           = "IPIPCrossSubnet" #"None"
         calico_version          = var.k3s_config.calico_version
         install_calicoctl       = true
         node_cidr               = var.vm_config.cidr

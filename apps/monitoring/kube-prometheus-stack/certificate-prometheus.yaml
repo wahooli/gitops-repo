@@ -3,6 +3,8 @@ kind: Certificate
 metadata:
   name: tls-prometheus-ingress
   namespace: monitoring
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   secretName: tls-prometheus-ingress
   commonName: prometheus.${dns_suffix:=absolutist.it}

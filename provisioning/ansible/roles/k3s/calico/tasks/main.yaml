@@ -1,13 +1,13 @@
 ---
 - name: Create manifests directory
-  become: yes
+  become: true
   file:
     path: /var/lib/rancher/k3s/server/manifests
     state: directory
 
 - name: Copy calico bgp configuration
   run_once: true
-  become: yes
+  become: true
   template:
     src: bgpconfiguration.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/calico-bgpconfiguration.yaml
@@ -17,7 +17,7 @@
 
 - name: Copy calico bgp peer config
   run_once: true
-  become: yes
+  become: true
   template:
     src: bgppeer.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/calico-bgppeer.yaml
@@ -27,7 +27,7 @@
 
 - name: Copy calico helm chart
   run_once: true
-  become: yes
+  become: true
   template:
     src: calico-helmchart.yaml.j2
     dest: /var/lib/rancher/k3s/server/manifests/helm-calico.yaml
@@ -50,9 +50,13 @@
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
 - name: Wait for calico helm install
-  become: yes
+  become: true
   run_once: true
   when: calico.enabled == true
+  retries: 30
+  delay: 5
+  register: calico_helm_rollout
+  until: calico_helm_rollout.rc == 0
   command: kubectl wait --namespace=kube-system --for=condition=Complete=true jobs -l helmcharts.helm.cattle.io/chart=calico
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
@@ -72,11 +76,11 @@
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
 - name: Wait for calico rollout
-  become: yes
+  become: true
   run_once: true
   when: calico.enabled == true
   command: kubectl rollout status ds/calico-node -n calico-system --timeout=120s
-  retries: 10
+  retries: 20
   delay: 5
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
@@ -96,7 +100,7 @@
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
 - name: Patch FelixConfiguration to use DSR
-  become: yes
+  become: true
   run_once: true
   when: calico.enabled == true and calico.bgp.enabled == true
   command: >

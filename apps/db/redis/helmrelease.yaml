@@ -15,6 +15,9 @@ spec:
         namespace: flux-system
       version: ">=10.1.1"
   interval: 1h0m0s
+  install:
+    remediation:
+      retries: -1
   values:
     image:
       tag: 6.2.6-debian-10-r53

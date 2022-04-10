@@ -8,7 +8,7 @@ spec:
     - name: cert-manager-issuers
     - name: external-snapshotter-crd
     - name: external-snapshotter-controller
-  interval: 30m
+  interval: 5m
   retryInterval: 1m0s
   path: "./infrastructure/longhorn"
   prune: true

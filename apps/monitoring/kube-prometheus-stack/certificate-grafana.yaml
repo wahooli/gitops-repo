@@ -3,6 +3,8 @@ kind: Certificate
 metadata:
   name: tls-grafana-ingress
   namespace: monitoring
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   secretName: tls-grafana-ingress
   commonName: grafana.${dns_suffix:=absolutist.it}

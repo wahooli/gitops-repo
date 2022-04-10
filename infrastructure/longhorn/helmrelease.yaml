@@ -12,7 +12,11 @@ spec:
         name: longhorn
         namespace: flux-system
       # version: '>=1.6.1'
-  interval: 1h0m0s
+      interval: 1h
+  interval: 2m
+  install:
+    remediation:
+      retries: -1
   releaseName: longhorn
   targetNamespace: longhorn-system
   values:
