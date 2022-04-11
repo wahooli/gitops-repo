@@ -5,10 +5,10 @@ metadata:
   namespace: iot
 spec:
   secretName: tls-homebridge-ingress
-  commonName: homebridge.absolutist.it
+  commonName: homebridge.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - homebridge.absolutist.it
-  - homebridge.wahoo.li
+  - homebridge.${dns_suffix:=absolutist.it}
+  - homebridge.${dns_suffix2:=wahoo.li}

@@ -14,7 +14,11 @@ spec:
         name: k8s-at-home
         namespace: flux-system
       version: "1.1.0"
-  interval: 1h0m0s
+      interval: 1h
+  interval: 15m
+  install:
+    remediation:
+      retries: -1
   values:
     image:
       repository: louislam/uptime-kuma
@@ -38,11 +42,11 @@ spec:
         annotations:
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
         hosts: 
-        - host: status.absolutist.it
+        - host: status.${dns_suffix:=absolutist.it}
           paths:
             - path: "/"
               pathType: "Prefix"
-        - host: status.wahoo.li
+        - host: status.${dns_suffix2:=wahoo.li}
           paths:
             - path: "/"
               pathType: "Prefix"

@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: db-redis-pvc
   namespace: db
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   accessModes:
   - ReadWriteOnce

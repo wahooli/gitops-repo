@@ -13,8 +13,11 @@ spec:
         kind: HelmRepository
         name: bitnami
         namespace: flux-system
-      version: ">=10.1.1"
+      version: ">=10.1.1 <10.6.0"
   interval: 1h0m0s
+  install:
+    remediation:
+      retries: -1
   values:
     image:
       tag: 10.5.13-debian-10-r32

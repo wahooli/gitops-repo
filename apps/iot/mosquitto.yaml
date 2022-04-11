@@ -10,8 +10,17 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-vars
+      optional: true
   healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: mosquitto
-      namespace: iot
+  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: mosquitto
+    namespace: flux-system
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: mosquitto
+    namespace: iot

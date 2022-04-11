@@ -3,12 +3,14 @@ kind: Certificate
 metadata:
   name: tls-authentik-ingress
   namespace: authentik
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   secretName: tls-authentik-ingress
-  commonName: auth.absolutist.it
+  commonName: auth.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - auth.absolutist.it
-  - auth.wahoo.li
+  - auth.${dns_suffix:=absolutist.it}
+  - auth.${dns_suffix2:=wahoo.li}

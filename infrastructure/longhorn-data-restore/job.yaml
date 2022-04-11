@@ -4,8 +4,12 @@ metadata:
   name: longhorn-data-restore
   namespace: longhorn-system
 spec:
+  backoffLimit: 5
+  activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: 60
   template:
     spec:
+      serviceAccountName: longhorn-data-restore
       containers:
       - name: restore
         imagePullPolicy: Always
@@ -13,6 +17,10 @@ spec:
         env:
         - name: LONGHORN_URL
           value: http://longhorn-frontend.longhorn-system/v1
+        - name: NOTIFY_COMPLETE
+          value: "true"
+        - name: SECRET_NAME
+          value: "longhorn-restore-complete"
         volumeMounts:
         - name: config-json
           mountPath: /config/config.json
@@ -22,4 +30,3 @@ spec:
       - name: config-json
         configMap:
           name: longhorn-data-restore-job-config
-  backoffLimit: 0

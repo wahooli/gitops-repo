@@ -42,5 +42,9 @@ provisioning/ansible/inventory/*.yml
 provisioning/terraform/outputs/*
 # private keys
 provisioning/pk/*
+provisioning/outputs/**/*
+provisioning/ansible/inventory/**/*.yaml
+provisioning/ansible/playbooks/generated_playbook.yaml
+provisioning/terraform/terraform.tfvars
 unencrypted/*
-hidden_folder
+**/.hidden/*

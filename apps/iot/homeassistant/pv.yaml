@@ -4,6 +4,8 @@ kind: PersistentVolume
 metadata:
   name: iot-homeassistant-pv
   namespace: iot
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   capacity:
     storage: 1Gi 

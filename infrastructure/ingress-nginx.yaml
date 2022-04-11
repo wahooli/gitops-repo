@@ -4,14 +4,25 @@ metadata:
   name: ingress-nginx
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 1h
   path: "./infrastructure/ingress-nginx"
   prune: true
+  retryInterval: 2m30s
+  timeout: 3m0s
   sourceRef:
     kind: GitRepository
     name: flux-system
   healthChecks:
+  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: ingress-nginx
+    namespace: flux-system
   - apiVersion: apps/v1
     kind: Deployment
     name: ingress-nginx-controller
     namespace: ingress-nginx
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-vars
+      optional: true

@@ -7,7 +7,16 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   rules:
-  - host: cloud.absolutist.it
+  - host: cloud.${dns_suffix:=absolutist.it}
+    http:
+      paths:
+      - backend:
+          service:
+            name: nextcloud
+            port:
+              number: 80
+        pathType: ImplementationSpecific
+  - host: cloud.${dns_suffix2:=wahoo.li}
     http:
       paths:
       - backend:

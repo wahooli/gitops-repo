@@ -1,9 +1,0 @@
----
-
-k3s:
-  server_address: k3s.absolutist.it
-  version: v1.21.5+k3s1
-  install_path: /usr/local/bin
-  docker_proxy_address: http://dockerproxy.absolutist.it
-
-systemd_dir: /etc/systemd/system

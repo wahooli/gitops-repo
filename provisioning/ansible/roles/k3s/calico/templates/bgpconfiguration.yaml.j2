@@ -1,0 +1,12 @@
+---
+apiVersion: crd.projectcalico.org/v1
+kind: BGPConfiguration
+metadata:
+  name: default
+spec:
+  nodeToNodeMeshEnabled: {{ calico.bgp.node_to_node_mesh }}
+  asNumber: {{ calico.bgp.node_as }}
+  serviceExternalIPs:
+  - cidr: "{{ calico.bgp.external_ips }}"
+  serviceLoadBalancerIPs:
+  - cidr: "{{ calico.bgp.external_ips }}"

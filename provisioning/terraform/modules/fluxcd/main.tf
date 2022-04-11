@@ -13,6 +13,22 @@ provider "kubectl" {
     config_path = var.kubeconfig_path
 }
 
+locals {
+    install = [for v in data.kubectl_file_documents.install.documents : {
+        data : yamldecode(v)
+            content : v
+        }
+    ]
+    sync = [for v in data.kubectl_file_documents.sync.documents : {
+        data : yamldecode(v)
+            content : v
+        }
+    ]
+    patches = {
+        deployments  = file("${path.module}/patches/deployments.yaml")
+    }
+}
+
 resource "null_resource" "flux_namespace" {
     triggers = {
         namespace   = var.flux_namespace
@@ -42,12 +58,16 @@ resource "null_resource" "flux_namespace" {
 
 data "flux_install" "main" {
     target_path = var.target_path
+    version     = var.flux_version
+    components_extra = var.extra_components
+    toleration_keys = ["CriticalAddonsOnly"]
 }
 
 data "flux_sync" "main" {
     target_path = var.target_path
     url         = "ssh://git@github.com/${var.github_owner}/${var.repository_name}.git"
     branch      = var.branch
+    patch_names = keys(local.patches)
 }
 
 data "kubectl_file_documents" "install" {
@@ -56,19 +76,6 @@ data "kubectl_file_documents" "install" {
 
 data "kubectl_file_documents" "sync" {
     content = data.flux_sync.main.content
-}
-
-locals {
-    install = [for v in data.kubectl_file_documents.install.documents : {
-        data : yamldecode(v)
-            content : v
-        }
-    ]
-    sync = [for v in data.kubectl_file_documents.sync.documents : {
-        data : yamldecode(v)
-            content : v
-        }
-    ]
 }
 
 resource "kubectl_manifest" "install" {
@@ -133,8 +140,8 @@ resource "kubernetes_secret" "hass_deploy_key" {
     depends_on = [null_resource.iot_namespace]
 
     metadata {
-        annotations     = {}
-        labels          = {}
+        # annotations     = {}
+        # labels          = {}
         name            = "homeassistant-deploy-key"
         namespace       = "iot"
     }
@@ -185,6 +192,18 @@ resource "github_repository_file" "kustomize" {
     content             = data.flux_sync.main.kustomize_content
     branch              = var.branch
     overwrite_on_create = true
+}
+
+resource "github_repository_file" "patches" {
+    #  `patch_file_paths` is a map keyed by the keys of `flux_sync.main`
+    #  whose values are the paths where the patch files should be installed.
+    for_each        = data.flux_sync.main.patch_file_paths
+    commit_author   = "FluxCD"
+    commit_email    = "terraform@fluxcd.com"
+    repository      = var.repository_name
+    file            = each.value
+    content         = local.patches[each.key] # Get content of our patch files
+    branch          = var.branch
 }
 
 # For flux to fetch source

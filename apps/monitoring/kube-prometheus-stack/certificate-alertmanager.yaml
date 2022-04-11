@@ -3,12 +3,14 @@ kind: Certificate
 metadata:
   name: tls-alertmanager-ingress
   namespace: monitoring
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   secretName: tls-alertmanager-ingress
-  commonName: alertmanager.absolutist.it
+  commonName: alertmanager.${dns_suffix:=absolutist.it}
   issuerRef:
     name: letsencrypt-staging
     kind: ClusterIssuer
   dnsNames:
-  - alertmanager.absolutist.it
-  - alertmanager.wahoo.li
+  - alertmanager.${dns_suffix:=absolutist.it}
+  - alertmanager.${dns_suffix2:=wahoo.li}

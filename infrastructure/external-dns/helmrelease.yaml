@@ -14,10 +14,12 @@ spec:
         name: external-dns
         namespace: flux-system
       version: ">=1.6.0"
-  interval: 1h0m0s
+      interval: 1h
+  interval: 5m
+  timeout: 15m
   install:
     remediation:
-      retries: 3
+      retries: -1
   values:
     domainFilters:
       - absolutist.it
@@ -35,7 +37,7 @@ spec:
         name: external-dns-krb5.conf
       name: kerberos-config-volume
     tolerations:
-    - key: "node-role.kubernetes.io/master"
+    - key: "CriticalAddonsOnly"
       operator: "Equal"
       value: "true"
       effect: "NoSchedule"

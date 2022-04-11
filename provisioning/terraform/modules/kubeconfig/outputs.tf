@@ -15,5 +15,5 @@ output "kubeconfig" {
         client_certificate      = local.client_certificate
         client_key              = local.client_key
     }
-    # sensitive = true
+    sensitive = true
 }

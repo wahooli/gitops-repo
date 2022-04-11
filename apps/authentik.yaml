@@ -15,8 +15,11 @@ spec:
     name: flux-system
   postBuild:
     substituteFrom:
-      - kind: Secret
-        name: authentik-secret-vars
+    - kind: Secret
+      name: authentik-secret-vars
+    - kind: Secret
+      name: cluster-vars
+      optional: true
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment

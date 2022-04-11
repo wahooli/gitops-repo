@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: iot-homeassistant-pvc
   namespace: iot
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   accessModes:
   - ReadWriteOnce

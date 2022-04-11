@@ -1,4 +1,4 @@
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
   name: kube-prometheus-stack
@@ -6,10 +6,28 @@ metadata:
 spec:
   dependsOn:
     - name: cert-manager
-  interval: 10m0s
+  interval: 15m0s
   prune: true
   validation: client
   sourceRef:
     kind: GitRepository
     name: flux-system
   path: ./apps/monitoring/kube-prometheus-stack
+  healthChecks:
+  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: kube-prometheus-stack
+    namespace: flux-system
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: kube-prometheus-stack-operator
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: kube-prometheus-stack-grafana
+    namespace: monitoring
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-vars
+      optional: true

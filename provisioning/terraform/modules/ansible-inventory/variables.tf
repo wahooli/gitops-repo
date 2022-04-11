@@ -1,10 +1,12 @@
-variable "servers" {
-  type = map
-  default = {}
-  description = "A map of inventory group names to IP addresses."
+variable "content" {
+    type        = map(object({
+        hosts   = map(any)
+    }))
+    description = "Content to be encoded as yaml"
+
 }
 
-variable "ansible_inventory_filename" {
-  type = string
-  description = "Filename for Ansible inventory file."
+variable "filename" {
+    type        = string
+    description = "Filename to be generated. Relative to ansible directory"
 }

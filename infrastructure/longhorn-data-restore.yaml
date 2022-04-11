@@ -4,7 +4,9 @@ metadata:
   name: longhorn-data-restore
   namespace: flux-system
 spec:
-  interval: 5m
+  interval: 4m
+  timeout: 15m30s
+  retryInterval: 0m30s
   dependsOn:
     - name: longhorn
   path: "./infrastructure/longhorn-data-restore"
@@ -13,7 +15,7 @@ spec:
     kind: GitRepository
     name: flux-system
   healthChecks:
-  - apiVersion: batch/v1
-    kind: Job
-    name: longhorn-data-restore
+  - apiVersion: v1
+    kind: Secret
+    name: longhorn-restore-complete
     namespace: longhorn-system

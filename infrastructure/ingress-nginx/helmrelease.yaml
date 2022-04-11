@@ -14,12 +14,17 @@ spec:
         name: ingress-nginx
         namespace: flux-system
       version: ">=4.0.13"
-  interval: 1h0m0s
+      interval: 1h
+  interval: 5m
+  timeout: 15m
   install:
     remediation:
-      retries: 3
+      retries: -1
   values:
     controller:
+      admissionWebhooks:
+        enabled: true
+        timeoutSeconds: 30
       dnsPolicy: ClusterFirstWithHostNet
       replicaCount: 3
       ingressClassResource:
@@ -42,5 +47,5 @@ spec:
           enabled: false
       service:
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: nginx.absolutist.it.
-        externalTrafficPolicy: Local
+          external-dns.alpha.kubernetes.io/hostname: "nginx.${dns_suffix:=absolutist.it}."
+        # externalTrafficPolicy: Local

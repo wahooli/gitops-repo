@@ -4,15 +4,20 @@ metadata:
   name: cert-manager
   namespace: flux-system
 spec:
-  interval: 3m
+  interval: 60m
   path: "./infrastructure/cert-manager"
+  retryInterval: 1m30s
+  timeout: 3m0s
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
   healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: cert-manager
-      namespace: cert-manager
-  timeout: 10m
+  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: cert-manager
+    namespace: flux-system
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: cert-manager
+    namespace: cert-manager

@@ -1,15 +1,39 @@
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
   name: infrastructure
   namespace: flux-system
 spec:
   dependsOn:
-    - name: secrets
-  interval: 10m0s
+  - name: secrets
+  interval: 20m0s
+  retryInterval: 5m30s
+  timeout: 20m
   prune: true
   validation: client
   sourceRef:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure
+  healthChecks:
+  - apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+    kind: Kustomization
+    name: ingress-nginx
+    namespace: flux-system
+  - apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+    kind: Kustomization
+    name: cert-manager
+    namespace: flux-system
+  - apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+    kind: Kustomization
+    name: cert-manager-issuers
+    namespace: flux-system
+  - apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+    kind: Kustomization
+    name: longhorn-data-restore
+    namespace: flux-system
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-vars
+      optional: true

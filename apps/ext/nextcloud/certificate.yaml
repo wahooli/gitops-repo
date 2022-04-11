@@ -5,10 +5,10 @@ metadata:
   namespace: ext
 spec:
   secretName: tls-nextcloud-ingress
-  commonName: cloud.absolutist.it
+  commonName: cloud.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - cloud.absolutist.it
-  - cloud.wahoo.li
+  - cloud.${dns_suffix:=absolutist.it}
+  - cloud.${dns_suffix2:=wahoo.li}

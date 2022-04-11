@@ -4,6 +4,8 @@ kind: PersistentVolume
 metadata:
   name: db-redis-pv
   namespace: db
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   capacity:
     storage: 8Gi

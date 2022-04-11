@@ -6,6 +6,7 @@ metadata:
   namespace: db
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   capacity:
     storage: 16Gi

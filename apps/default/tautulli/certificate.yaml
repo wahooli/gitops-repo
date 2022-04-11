@@ -5,10 +5,10 @@ metadata:
   namespace: default
 spec:
   secretName: tls-tautulli-ingress
-  commonName: tautulli.absolutist.it
+  commonName: tautulli.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - tautulli.absolutist.it
-  - tautulli.wahoo.li
+  - tautulli.${dns_suffix:=absolutist.it}
+  - tautulli.${dns_suffix2:=wahoo.li}

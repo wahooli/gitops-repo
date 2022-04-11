@@ -3,12 +3,14 @@ kind: Certificate
 metadata:
   name: tls-prometheus-ingress
   namespace: monitoring
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   secretName: tls-prometheus-ingress
-  commonName: prometheus.absolutist.it
+  commonName: prometheus.${dns_suffix:=absolutist.it}
   issuerRef:
     name: letsencrypt-staging
     kind: ClusterIssuer
   dnsNames:
-  - prometheus.absolutist.it
-  - prometheus.wahoo.li
+  - prometheus.${dns_suffix:=absolutist.it}
+  - prometheus.${dns_suffix2:=wahoo.li}

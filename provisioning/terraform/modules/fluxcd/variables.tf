@@ -31,6 +31,18 @@ variable "flux_namespace" {
     default     = "flux-system"
 }
 
+variable "flux_version" {
+    type        = string
+    description = "FluxCD version to be installed"
+    default     = "v0.28.5"
+}
+
+variable "extra_components" {
+    description = "Extra components to install"
+    default     = []
+}
+
+
 variable "kubeconfig_path" {
     type        = string
     description = "Path to the kubeconfig file."

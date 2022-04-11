@@ -5,10 +5,10 @@ metadata:
   namespace: iot
 spec:
   secretName: tls-homeassistant-ingress
-  commonName: ha.absolutist.it
+  commonName: ha.${dns_suffix:=absolutist.it}
   issuerRef:
-    name: letsencrypt-production
+    name: ${cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - ha.absolutist.it
-  - ha.wahoo.li
+  - ha.${dns_suffix:=absolutist.it}
+  - ha.${dns_suffix2:=wahoo.li}

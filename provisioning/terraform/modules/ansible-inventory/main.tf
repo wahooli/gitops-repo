@@ -1,4 +1,5 @@
-resource "local_file" "inventory" {
-  content  = templatefile("${path.module}/inventory.tpl", { servers = var.servers })
-  filename = "${path.module}/../../../ansible/inventory/${var.ansible_inventory_filename}.yml"
+module "yaml_file" {
+    source = "../yaml-file"
+    content = { all = {children = var.content} }
+    filename = "${path.module}/../../../ansible/${var.filename}"
 }

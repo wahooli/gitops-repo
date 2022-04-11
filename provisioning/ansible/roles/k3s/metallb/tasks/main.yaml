@@ -1,0 +1,16 @@
+---
+- name: Create manifests directory
+  become: yes
+  file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+
+- name: Copy metallb helm chart
+  run_once: true
+  become: yes
+  template:
+    src: metallb-chart.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/helm-metallb.yaml
+    owner: root
+    group: root
+  when: metallb.enabled == true

@@ -12,15 +12,22 @@ spec:
         name: jetstack
         namespace: flux-system
       version: '>=1.6.1'
-  interval: 1h0m0s
+      interval: 1h
+  interval: 5m
+  timeout: 15m
+  install:
+    remediation:
+      retries: -1
   releaseName: cert-manager
   targetNamespace: cert-manager
   values:
     tolerations:
-    - key: "node-role.kubernetes.io/master"
+    - key: "CriticalAddonsOnly"
       operator: "Equal"
       value: "true"
       effect: "NoSchedule"
+    webhook:
+      timeoutSeconds: 30
     extraArgs: 
       - --dns01-recursive-nameservers-only
       - --dns01-recursive-nameservers=1.1.1.1:53,1.0.0.1:53

@@ -5,10 +5,10 @@ metadata:
   namespace: longhorn-system
 spec:
   secretName: tls-longhorn-ingress
-  commonName: longhorn.absolutist.it
+  commonName: "longhorn.${dns_suffix:=absolutist.it}"
   issuerRef:
-    name: letsencrypt-production
+    name: "${cluster_issuer:=letsencrypt-production}"
     kind: ClusterIssuer
   dnsNames:
-  - longhorn.absolutist.it
-  - longhorn.wahoo.li
+  - "longhorn.${dns_suffix:=absolutist.it}"
+  - "longhorn.${dns_suffix2:=wahoo.li}"

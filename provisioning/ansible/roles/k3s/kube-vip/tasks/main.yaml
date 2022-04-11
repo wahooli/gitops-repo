@@ -1,0 +1,26 @@
+---
+- name: Create manifests directory
+  become: yes
+  file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+
+- name: Copy kube-vip rbac file
+  run_once: true
+  become: yes
+  template:
+    src: rbac.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/kube-vip.rbac.yaml
+    owner: root
+    group: root
+  when: kubevip.enabled == true
+
+- name: Copy kube-vip daemonset file
+  run_once: true
+  become: yes
+  template:
+    src: daemonset.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/kube-vip.daemonset.yaml
+    owner: root
+    group: root
+  when: kubevip.enabled == true

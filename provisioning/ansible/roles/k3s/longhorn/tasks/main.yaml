@@ -1,0 +1,16 @@
+---
+- name: Create manifests directory
+  become: yes
+  file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+
+- name: Copy longhorn helm chart
+  run_once: true
+  become: yes
+  template:
+    src: longhorn-chart.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/helm-longhorn.yaml
+    owner: root
+    group: root
+  when: longhorn.enabled == true

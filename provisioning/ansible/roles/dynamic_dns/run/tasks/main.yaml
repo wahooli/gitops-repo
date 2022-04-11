@@ -1,0 +1,9 @@
+---
+
+- name: Run dyndns-update.sh
+  become: yes
+  command: "{{ dynamic_dns.install_path }}/dyndns-update.sh"
+  environment:
+    REALM: "{{ dynamic_dns.realm|lower }}"
+    PRINCIPAL: "{{ dynamic_dns.user }}"
+    DNS_SERVER: "{{ dynamic_dns.nameserver }}"
