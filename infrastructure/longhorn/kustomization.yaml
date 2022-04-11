@@ -6,4 +6,4 @@ resources:
 - namespace.yaml
 - certificate.yaml
 - helmrelease.yaml
-- volumesnapshotclass.yaml
+# - volumesnapshotclass.yaml

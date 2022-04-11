@@ -4,8 +4,8 @@ metadata:
   name: longhorn-data-restore
   namespace: flux-system
 spec:
-  interval: 6m
-  timeout: 10m30s
+  interval: 4m
+  timeout: 15m30s
   retryInterval: 0m30s
   dependsOn:
     - name: longhorn

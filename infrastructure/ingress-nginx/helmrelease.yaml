@@ -15,7 +15,8 @@ spec:
         namespace: flux-system
       version: ">=4.0.13"
       interval: 1h
-  interval: 2m
+  interval: 5m
+  timeout: 15m
   install:
     remediation:
       retries: -1

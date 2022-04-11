@@ -23,9 +23,9 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
-    prometheusOperator:
-      admissionWebhooks:
-        enabled: false
+    # prometheusOperator:
+    #   admissionWebhooks:
+    #     enabled: false
     alertmanager:
       enabled: true
       alertmanagerSpec:

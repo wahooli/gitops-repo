@@ -13,8 +13,12 @@ spec:
         kind: HelmRepository
         name: bitnami
         namespace: flux-system
-      version: ">=10.14.0"
-  interval: 1h0m0s
+      version: ">=10.14.0 <11.0.0"
+      interval: 1h
+  interval: 15m
+  install:
+    remediation:
+      retries: -1
   values:
     fullnameOverride: postgresql
     postgresqlUsername: admin

@@ -7,6 +7,9 @@
     owner: root
     group: root
     mode: 0755
+  register: calicoctl_dl
+  retries: 10
+  until: calicoctl_dl is success
   when:
     - calico.install_calicoctl == true
     - ansible_facts.architecture == "x86_64"
@@ -18,6 +21,9 @@
     owner: root
     group: root
     mode: 0755
+  register: calicoctl_dl
+  retries: 10
+  until: calicoctl_dl is success
   when:
     - calico.install_calicoctl == true
     - ( ansible_facts.architecture is search("arm") and
@@ -31,6 +37,9 @@
     owner: root
     group: root
     mode: 0755
+  register: calicoctl_dl
+  retries: 10
+  until: calicoctl_dl is success
   when:
     - calico.install_calicoctl == true
     - ansible_facts.architecture is search("arm")

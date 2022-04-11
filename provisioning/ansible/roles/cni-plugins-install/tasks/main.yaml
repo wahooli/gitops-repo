@@ -7,37 +7,46 @@
   when:
     - cni_plugins.install == true
 
-- name: Download calicoctl binary x64
+- name: Download cni plugin binaries x64
   get_url:
     url: https://github.com/containernetworking/plugins/releases/download/{{ cni_plugins.version }}/cni-plugins-linux-amd64-{{ cni_plugins.version }}.tgz
     dest: /tmp/cniplugins.tgz
     owner: root
     group: root
     mode: 0755
+  register: cni_plugin_dl
+  retries: 10
+  until: cni_plugin_dl is success
   when:
     - cni_plugins.install == true
     - ansible_facts.architecture == "x86_64"
 
-- name: Download calicoctl binary arm64
+- name: Download cni plugin binaries arm64
   get_url:
     url: https://github.com/containernetworking/plugins/releases/download/{{ calico.calico_version }}/cni-plugins-linux-arm64-{{ cni_plugins.version }}.tgz
     dest: /tmp/cniplugins.tgz
     owner: root
     group: root
     mode: 0755
+  register: cni_plugin_dl
+  retries: 10
+  until: cni_plugin_dl is success
   when:
     - cni_plugins.install == true
     - ( ansible_facts.architecture is search("arm") and
         ansible_facts.userspace_bits == "64" ) or
       ansible_facts.architecture is search("aarch64")
 
-- name: Download calicoctl binary armhf
+- name: Download cni plugin binaries armhf
   get_url:
     url: https://github.com/containernetworking/plugins/releases/download/{{ calico.calico_version }}/cni-plugins-linux-arm-{{ cni_plugins.version }}.tgz
     dest: /tmp/cniplugins.tgz
     owner: root
     group: root
     mode: 0755
+  register: cni_plugin_dl
+  retries: 10
+  until: cni_plugin_dl is success
   when:
     - cni_plugins.install == true
     - ansible_facts.architecture is search("arm")

@@ -14,7 +14,11 @@ spec:
         name: k8s-at-home
         namespace: flux-system
       version: ">=11.1.0"
-  interval: 1h0m0s
+      interval: 1h
+  interval: 15m
+  install:
+    remediation:
+      retries: -1
   values:
     image:
       repository: linuxserver/ombi
