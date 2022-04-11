@@ -13,9 +13,9 @@ spec:
         kind: HelmRepository
         name: goauthentik
         namespace: flux-system
-      version: ">=5.1.1"
+      version: "5.2.2"
       interval: 1h
-  interval: 2m
+  interval: 15m
   install:
     remediation:
       retries: -1

@@ -8,10 +8,10 @@ spec:
     - name: cert-manager-issuers
     - name: external-snapshotter-crd
     - name: external-snapshotter-controller
-  interval: 5m
-  retryInterval: 1m0s
+  interval: 15m
+  retryInterval: 2m0s
   path: "./infrastructure/longhorn"
-  prune: true
+  prune: false
   sourceRef:
     kind: GitRepository
     name: flux-system

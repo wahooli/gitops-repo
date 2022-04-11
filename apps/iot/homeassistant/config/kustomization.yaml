@@ -12,7 +12,6 @@ configMapGenerator:
       - git_backup.sh
       - configuration.yaml
       - google_assistant.yaml
-      - webostv.yaml
       - groups.yaml
       - scenes.yaml
       - scripts.yaml

@@ -6,7 +6,8 @@ metadata:
 spec:
   interval: 60m
   path: "./infrastructure/cert-manager"
-  retryInterval: 30s
+  retryInterval: 1m30s
+  timeout: 3m0s
   prune: true
   sourceRef:
     kind: GitRepository
@@ -20,4 +21,3 @@ spec:
     kind: Deployment
     name: cert-manager
     namespace: cert-manager
-  timeout: 10m

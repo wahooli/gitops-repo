@@ -14,7 +14,11 @@ spec:
         name: k8s-at-home
         namespace: flux-system
       version: ">=11.2.1"
-  interval: 5m
+      interval: 1h
+  interval: 15m
+  install:
+    remediation:
+      retries: -1
   values:
     initContainers:
       copy-configuration: 
@@ -30,7 +34,7 @@ spec:
           mountPath: /src/.storage
     image:
       repository: homeassistant/home-assistant
-      tag: 2021.12.7
+      tag: 2022.4.1
       pullPolicy: IfNotPresent
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
@@ -78,7 +82,7 @@ spec:
         subPath:
         - path: secrets.yaml
           mountPath: /config/secrets.yaml
-          readOnly: true
+          readOnly: false
     ingress:
       main:
         enabled: true
