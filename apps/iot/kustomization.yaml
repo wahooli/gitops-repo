@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
 - namespace.yaml
 - mosquitto.yaml
-# - zigbee2mqtt.yaml
+- zigbee2mqtt.yaml
 - homebridge
 - homeassistant.yaml
 - appdaemon.yaml

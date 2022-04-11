@@ -50,9 +50,9 @@ module "k3s_server" {
             backupTarget = var.k3s_config.longhorn_backup_target
             backupTargetCredentialSecret = var.k3s_config.longhorn_backup_secret
             defaultDataPath = "/var/lib/longhorn"
-            storageMinimalAvailablePercentage = 5
+            storageMinimalAvailablePercentage = 10
             defaultDataLocality = "best-effort"
-            storageOverProvisioningPercentage = 135
+            storageOverProvisioningPercentage = 150
             taintToleration = "CriticalAddonsOnly=true:NoSchedule"
             # below creates disks only on hosts which are labeled node.longhorn.io/create-default-disk=true
             createDefaultDiskLabeledNodes = true

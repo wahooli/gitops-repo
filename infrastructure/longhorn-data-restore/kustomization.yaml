@@ -4,6 +4,6 @@ resources:
 - rbac
 - configmap.yaml
 - job.yaml
-# - backup-daily-job.yaml
-# - backup-weekly-job.yaml
-# - backup-hourly-job.yaml
+- backup-daily-job.yaml
+- backup-weekly-job.yaml
+- backup-hourly-job.yaml

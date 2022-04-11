@@ -16,7 +16,7 @@ provider "proxmox" {
     pm_api_token_secret = var.proxmox_api_token_secret
     pm_tls_insecure     = var.proxmox_ignore_tls
     pm_parallel         = 4 # having 6 as parallel, gives errors for already running vm for some reason
-    pm_log_enable       = true
+    pm_log_enable       = false
     pm_debug            = true
     pm_log_file         = "terraform-plugin-proxmox.log"
     pm_log_levels = {
@@ -33,7 +33,7 @@ module "k3s_cluster" {
     k3s_config              = var.k3s.server_config
     proxmox                 = var.proxmox
     github_config = {
-        branch = "dev"
+        branch = "main"
         owner = var.github_owner
         repo_name = "homelab"
         token = var.github_token
@@ -41,7 +41,7 @@ module "k3s_cluster" {
     fluxcd_config = {
         deploy_key_title_prefix = "FluxCD"
         flux_namespace = "flux-system"
-        target_path = "test-cluster"
+        target_path = "cluster"
         flux_version = "v0.28.5"
         key_fp = var.key_fp
     }
