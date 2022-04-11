@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: source-controller
+  namespace: flux-system
+spec:
+  # replicas: 2
+  template:
+    # metadata:
+    #   annotations:
+    #     # Required by Kubernetes node autoscaler
+    #     cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      containers:
+        - $patch: merge
+        - name: manager
+          args:
+          - --events-addr=http://notification-controller.flux-system.svc.cluster.local./
+          - --watch-all-namespaces=true
+          - --log-level=info
+          - --log-encoding=json
+          - --enable-leader-election
+          - --storage-path=/data
+          - --storage-adv-addr=source-controller.$(RUNTIME_NAMESPACE).svc.cluster.local.
+          - --concurrent=20
+          - --kube-api-qps=500
+          - --kube-api-burst=1000
+          - --requeue-dependency=5s
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helm-controller
+  namespace: flux-system
+spec:
+  replicas: 2
+  template:
+    metadata:
+      annotations:
+        # Required by Kubernetes node autoscaler
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      containers:
+        - $patch: merge
+        - name: manager
+          args:
+          - --events-addr=http://notification-controller.flux-system.svc.cluster.local./
+          - --watch-all-namespaces=true
+          - --log-level=info
+          - --log-encoding=json
+          - --enable-leader-election
+          - --concurrent=20
+          - --kube-api-qps=500
+          - --kube-api-burst=1000
+          - --requeue-dependency=5s
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kustomize-controller
+  namespace: flux-system
+spec:
+  replicas: 2
+  template:
+    metadata:
+      annotations:
+        # Required by Kubernetes node autoscaler
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      containers:
+        - $patch: merge
+        - name: manager
+          args:
+          - --events-addr=http://notification-controller.flux-system.svc.cluster.local./
+          - --watch-all-namespaces=true
+          - --log-level=info
+          - --log-encoding=json
+          - --enable-leader-election
+          - --concurrent=20
+          - --kube-api-qps=500
+          - --kube-api-burst=1000
+          - --requeue-dependency=5s
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-controller
+  namespace: flux-system
+spec:
+  replicas: 2
+  template:
+    metadata:
+      annotations:
+        # Required by Kubernetes node autoscaler
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      containers:
+        - $patch: merge
+        - name: manager
+          args:
+          - --watch-all-namespaces=true
+          - --log-level=info
+          - --log-encoding=json
+          - --enable-leader-election
+          - --concurrent=20
+          - --kube-api-qps=500
+          - --kube-api-burst=1000
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
