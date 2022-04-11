@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-vars
+  namespace: flux-system
+type: Opaque
+stringData:
+  dns_suffix: "absolutist.it"
+  dns_suffix2: "wahoo.li"
+  cluster_issuer: "letsencrypt-production"
