@@ -3,6 +3,8 @@ kind: Role
 metadata:
   name: longhorn-data-restore-role
   namespace: longhorn-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
     app: longhorn-data-restore
 rules:

@@ -1,0 +1,116 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: paperless
+  namespace: flux-system
+spec:
+  releaseName: paperless
+  targetNamespace: default
+  chart:
+    spec:
+      chart: paperless
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: "8.6.0"
+  interval: 1h0m0s
+  values:
+    image:
+      repository: ghcr.io/paperless-ngx/paperless-ngx
+      tag: 1.6.0
+      pullPolicy: IfNotPresent
+    env:
+      PAPERLESS_TIME_ZONE: Europe/Helsinki
+      TZ: Europe/Helsinki
+      PAPERLESS_PORT: 8000
+      PAPERLESS_OCR_LANGUAGES: "fin eng"
+      PAPERLESS_WEBSERVER_WORKERS: 2
+      PAPERLESS_TIKA_ENABLED: 0
+      PAPERLESS_LOGROTATE_MAX_BACKUPS: 10
+      # PAPERLESS_TIKA_ENDPOINT: "http://tika.default.svc.cluster.local:9998"
+      # PAPERLESS_TIKA_GOTENBERG_ENDPOINT: "http://gotenberg.default.svc.cluster.local:3000"
+      PAPERLESS_ALLOWED_HOSTS: "paperless${dns_suffix:=absolutist.it},paperless${dns_suffix2:=wahoo.li}"
+      PAPERLESS_CORS_ALLOWED_HOSTS: "https://paperless${dns_suffix:=absolutist.it},https://paperless${dns_suffix2:=wahoo.li}"
+      PAPERLESS_TASK_WORKERS: 2
+      PAPERLESS_THREADS_PER_WORKER: 3
+      PAPERLESS_REDIS: "redis://redis-master.db.svc.cluster.local:6379"
+      PAPERLESS_DBHOST: "postgresql.db.svc.cluster.local"
+      PAPERLESS_DBPORT: "5432"
+      PAPERLESS_DBUSER:
+        valueFrom:
+          secretKeyRef:
+            name: paperless-secret
+            key: PAPERLESS_DBUSER
+      PAPERLESS_DBPASS:
+        valueFrom:
+          secretKeyRef:
+            name: paperless-secret
+            key: PAPERLESS_DBPASS
+      PAPERLESS_SECRET_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: paperless-secret
+            key: PAPERLESS_SECRET_KEY
+      PAPERLESS_ADMIN_USER:
+        valueFrom:
+          secretKeyRef:
+            name: paperless-secret
+            key: PAPERLESS_ADMIN_USER
+      PAPERLESS_ADMIN_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: paperless-secret
+            key: PAPERLESS_ADMIN_PASSWORD
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "600m"
+      limits:
+        memory: "2048Mi"
+        cpu: "6000m"
+    service:
+      main:
+        ports:
+          http:
+            port: 8000
+    persistence:
+      media:
+        enabled: false
+      data:
+        enabled: true
+        type: pvc
+        existingClaim: default-paperless-pvc
+        mountPath: null
+        subPath:
+          - path: data
+            mountPath: /usr/src/paperless/data
+          - path: media
+            mountPath: /usr/src/paperless/media
+      consume:
+        enabled: false # maybe set up these both into nfs
+      export:
+        enabled: false
+    postgresql:
+      enabled: false
+    redis:
+      enabled: false
+    ingress:
+      main:
+        enabled: true
+        primary: true
+        ingressClassName: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+          nginx.ingress.kubernetes.io/proxy-body-size: 25m
+        hosts:
+        - host: paperless${dns_suffix:=absolutist.it}
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        - host: paperless${dns_suffix2:=wahoo.li}
+          paths:
+            - path: "/"
+              pathType: "Prefix"
+        tls:
+          - secretName: tls-paperless-ingress
