@@ -104,11 +104,11 @@ spec:
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
           nginx.ingress.kubernetes.io/proxy-body-size: 25m
         hosts:
-        - host: paperless${dns_suffix:=absolutist.it}
+        - host: paperless.${dns_suffix:=absolutist.it}
           paths:
             - path: "/"
               pathType: "Prefix"
-        - host: paperless${dns_suffix2:=wahoo.li}
+        - host: paperless.${dns_suffix2:=wahoo.li}
           paths:
             - path: "/"
               pathType: "Prefix"

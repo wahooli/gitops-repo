@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-vaultwarden-ingress
+  namespace: default
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  secretName: tls-vaultwarden-ingress
+  commonName: vault.${dns_suffix:=absolutist.it}
+  issuerRef:
+    name: ${cluster_issuer:=letsencrypt-production}
+    kind: ClusterIssuer
+  dnsNames:
+  - vault.${dns_suffix:=absolutist.it}
+  - vault.${dns_suffix2:=wahoo.li}

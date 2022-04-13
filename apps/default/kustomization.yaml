@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
 - ombi.yaml
 - tautulli
-- paperless
+- paperless.yaml
+- vaultwarden.yaml

@@ -17,7 +17,9 @@ spec:
     driver: driver.longhorn.io
     fsType: ext4
     volumeAttributes:
+      diskSelector: ""
+      nodeSelector: ""
       numberOfReplicas: "3"
-      staleReplicaTimeout: "30"
+      staleReplicaTimeout: "20"
     volumeHandle: default-paperless
   storageClassName: longhorn
