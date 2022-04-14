@@ -14,7 +14,11 @@ spec:
         name: k8s-at-home
         namespace: flux-system
       version: "8.6.0"
-  interval: 1h0m0s
+      interval: 2h
+  interval: 1h
+  install:
+    remediation:
+      retries: -1
   values:
     image:
       repository: ghcr.io/paperless-ngx/paperless-ngx
