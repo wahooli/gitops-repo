@@ -31,6 +31,7 @@ module "k3s_server" {
         memory_mb = var.vm_config.server_node_memory
         eth0_mtu = var.vm_config.mtu
         os_disk_storage = var.vm_config.os_disk_storage
+        os_disk_size = "35G"
         name_prefix = "${var.cluster_name_prefix}-server-"
         ssh_private_key = tls_private_key.node_ssh_pk.private_key_pem
         ssh_public_keys = [tls_private_key.node_ssh_pk.public_key_openssh]
@@ -52,7 +53,7 @@ module "k3s_server" {
             defaultDataPath = "/var/lib/longhorn"
             storageMinimalAvailablePercentage = 10
             defaultDataLocality = "best-effort"
-            storageOverProvisioningPercentage = 150
+            storageOverProvisioningPercentage = 25
             taintToleration = "CriticalAddonsOnly=true:NoSchedule"
             # below creates disks only on hosts which are labeled node.longhorn.io/create-default-disk=true
             createDefaultDiskLabeledNodes = true
@@ -149,12 +150,13 @@ module "k3s_agent" {
     # node_ip_addresses       = ["192.168.1.22/24"]
     node = {
         # default_gateway = "192.168.1.1"
-        vmid_start = var.vm_config.vmid_start + var.vm_config.server_node_count + 1
+        vmid_start = var.vm_config.vmid_start + var.vm_config.server_node_count
         cpus = var.vm_config.agent_node_cpus
         bridge = var.vm_config.bridge
         ssh_username = var.vm_config.ssh_username
         user_password = random_password.vm_password.result
         memory_mb = var.vm_config.agent_node_memory
+        os_disk_size = "35G"
         os_disk_storage = var.vm_config.os_disk_storage
         disk_size = var.vm_config.longhorn_disk_size
         disk_storage = var.vm_config.longhorn_disk_storage

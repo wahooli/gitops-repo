@@ -197,13 +197,14 @@ resource "github_repository_file" "kustomize" {
 resource "github_repository_file" "patches" {
     #  `patch_file_paths` is a map keyed by the keys of `flux_sync.main`
     #  whose values are the paths where the patch files should be installed.
-    for_each        = data.flux_sync.main.patch_file_paths
-    commit_author   = "FluxCD"
-    commit_email    = "terraform@fluxcd.com"
-    repository      = var.repository_name
-    file            = each.value
-    content         = local.patches[each.key] # Get content of our patch files
-    branch          = var.branch
+    for_each            = data.flux_sync.main.patch_file_paths
+    commit_author       = "FluxCD"
+    commit_email        = "terraform@fluxcd.com"
+    repository          = var.repository_name
+    file                = each.value
+    content             = local.patches[each.key] # Get content of our patch files
+    branch              = var.branch
+    overwrite_on_create = true
 }
 
 # For flux to fetch source

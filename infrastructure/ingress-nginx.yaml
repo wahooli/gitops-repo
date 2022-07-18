@@ -4,11 +4,11 @@ metadata:
   name: ingress-nginx
   namespace: flux-system
 spec:
-  interval: 1h
+  interval: 30m
   path: "./infrastructure/ingress-nginx"
   prune: true
-  retryInterval: 2m30s
-  timeout: 3m0s
+  retryInterval: 4m30s
+  timeout: 6m30s
   sourceRef:
     kind: GitRepository
     name: flux-system

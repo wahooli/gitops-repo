@@ -6,11 +6,10 @@ metadata:
 spec:
   dependsOn:
   - name: cert-manager
-  interval: 2h
+  interval: 45m
   path: "./infrastructure/cert-manager/issuers"
-  retryInterval: 1m0s
+  retryInterval: 2m30s
   prune: false
-  wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system

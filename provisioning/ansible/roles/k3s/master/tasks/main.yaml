@@ -80,6 +80,7 @@
 - name: Run K3s service for other nodes
   become: yes
   throttle: 1
+  when: "groups['master_nodes'] | length > 1"
   systemd:
     name: k3s
     state: started

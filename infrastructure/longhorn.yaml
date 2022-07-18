@@ -5,9 +5,10 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: cert-manager-issuers
-    - name: external-snapshotter-crd
-    - name: external-snapshotter-controller
+  - name: ingress-nginx
+  - name: cert-manager-issuers
+  - name: external-snapshotter-crd
+  - name: external-snapshotter-controller
   interval: 15m
   retryInterval: 2m0s
   path: "./infrastructure/longhorn"
@@ -16,10 +17,10 @@ spec:
     kind: GitRepository
     name: flux-system
   healthChecks:
-  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-    kind: HelmRelease
-    name: longhorn
-    namespace: flux-system
+  # - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+  #   kind: HelmRelease
+  #   name: longhorn
+  #   namespace: flux-system
   - apiVersion: apps/v1
     kind: Deployment
     name: longhorn-ui
@@ -32,7 +33,7 @@ spec:
     kind: DaemonSet
     name: longhorn-csi-plugin
     namespace: longhorn-system
-  timeout: 20m
+  timeout: 5m
   postBuild:
     substituteFrom:
     - kind: Secret

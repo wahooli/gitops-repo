@@ -10,11 +10,18 @@
     state: present
     fs_type: ext4
 
+- name: Run e2fsck on /dev/vdb1
+  become: true
+  command: e2fsck -fy /dev/vdb1
+  register: e2fsck_result
+  failed_when: "'FAILED' in e2fsck_result.stderr"
+
 - name: Create a ext4 filesystem on /dev/vdb1
   become: yes
   when: longhorn.enabled == true
   community.general.filesystem:
     fstype: ext4
+    resizefs: yes
     dev: /dev/vdb1
 
 - name: Mount /dev/vdb1 as longhorn storage

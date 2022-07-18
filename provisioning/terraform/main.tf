@@ -42,7 +42,7 @@ module "k3s_cluster" {
         deploy_key_title_prefix = "FluxCD"
         flux_namespace = "flux-system"
         target_path = "cluster"
-        flux_version = "v0.28.5"
+        flux_version = "v0.31.3"
         key_fp = var.key_fp
     }
 }

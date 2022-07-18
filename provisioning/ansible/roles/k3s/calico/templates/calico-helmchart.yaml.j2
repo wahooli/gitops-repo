@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tigera-operator
+---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
@@ -8,6 +13,7 @@ spec:
   repo: https://docs.projectcalico.org/charts
   version: {{ calico.calico_version }}
   chart: tigera-operator
+  targetNamespace: tigera-operator
   valuesContent: |-
     apiServer:
       enabled: true
@@ -21,6 +27,7 @@ spec:
         value: "true"
         effect: "NoSchedule"
       calicoNetwork:
+        bgp: {{ 'Enabled' if calico.bgp.enabled else 'Disabled' }}
         mtu: {{ calico.mtu }}
         linuxDataplane: "{{ calico.linuxDataplane }}"
         containerIPForwarding: "{{ calico.containerIPForwarding }}"

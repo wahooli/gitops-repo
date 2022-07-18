@@ -75,18 +75,6 @@
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
-- name: Wait for calico rollout
-  become: true
-  run_once: true
-  when: calico.enabled == true
-  command: kubectl rollout status ds/calico-node -n calico-system --timeout=300s
-  register: calico_ds_rolled_out
-  until: calico_ds_rolled_out is success
-  retries: 30
-  delay: 5
-  environment:
-    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-
 - name: Wait for felixconfiguration crd created
   become: true
   run_once: true
@@ -107,5 +95,18 @@
   when: calico.enabled == true and calico.bgp.enabled == true
   command: >
     kubectl patch felixconfiguration default --type=merge --patch='{"spec": {"bpfEnabled": true, "bpfExternalServiceMode": "DSR"}}'
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+- name: Wait for calico rollout
+  become: true
+  run_once: true
+  when:
+  - calico.enabled == true
+  command: kubectl rollout status ds/calico-node -n calico-system --timeout=300s
+  register: calico_ds_rolled_out
+  until: calico_ds_rolled_out is success
+  retries: 30
+  delay: 5
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml

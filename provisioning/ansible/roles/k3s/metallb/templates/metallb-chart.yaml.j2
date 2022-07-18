@@ -26,9 +26,3 @@ spec:
         operator: "Equal"
         value: "true"
         effect: "NoSchedule"
-    configInline:
-      address-pools:
-      - name: default
-        protocol: {{ metallb.protocol }}
-        addresses:
-        - {{ metallb.addresses }}
