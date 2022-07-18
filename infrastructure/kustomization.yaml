@@ -10,3 +10,5 @@ resources:
 - external-dns
 - longhorn-data-restore.yaml
 - cloudflare-tunnel.yaml
+- multus.yaml
+- multus-interfaces.yaml

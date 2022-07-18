@@ -138,6 +138,60 @@
     state: present
     reload: no
 
+- name: Increase inotify watches
+  become: yes
+  sysctl:
+    name: fs.inotify.max_user_watches
+    value: 10485760
+    sysctl_file: /etc/sysctl.d/99-kubernetes.conf
+    state: present
+    reload: no
+
+- name: Increase inotify instances
+  become: yes
+  sysctl:
+    name: fs.inotify.max_user_instances
+    value: 2560
+    sysctl_file: /etc/sysctl.d/99-kubernetes.conf
+    state: present
+    reload: no
+
+- name: Increase fs.aio-max-nr
+  become: yes
+  sysctl:
+    name: fs.aio-max-nr
+    value: 2560
+    sysctl_file: /etc/sysctl.d/99-kubernetes.conf
+    state: present
+    reload: no
+
+- name: Increase fs.file-max
+  become: yes
+  sysctl:
+    name: fs.file-max
+    value: 10485760
+    sysctl_file: /etc/sysctl.d/99-kubernetes.conf
+    state: present
+    reload: no
+
+- name: Increase kernel.pid_max
+  become: yes
+  sysctl:
+    name: kernel.pid_max
+    value: 10485760
+    sysctl_file: /etc/sysctl.d/99-kubernetes.conf
+    state: present
+    reload: no
+
+- name: Increase kernel.threads-max
+  become: yes
+  sysctl:
+    name: kernel.threads-max
+    value: 10485760
+    sysctl_file: /etc/sysctl.d/99-kubernetes.conf
+    state: present
+    reload: no
+
 - name: Enable iptables bridge netfilter IPv6
   become: yes
   sysctl:
