@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: avahi
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: ./charts/avahi
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  interval: 60m0s
+  releaseName: avahi
+  targetNamespace: default
+  values:
+    serviceAccount:
+      create: true
+    # resources:
+    #   limits:
+    #     cpu: 1000m
+    #     memory: 128Mi
+    #   requests:
+    #     cpu: 100m
+    #     memory: 128Mi
+    image:
+      repository: flungo/avahi
+      pullPolicy: IfNotPresent
+      digest: "1ca78a72b58f55565bdb585d00d1ab6168f35281616bde0e65c4bdead37f5ded"
+    podAnnotations: 
+      k8s.v1.cni.cncf.io/networks: vmbr90-conf,vmbr110-conf,vmbr120-conf,vmbr200-conf
+    env:
+      values:
+        SERVER_DENY_INTERFACES: "eth,lo"
+        SERVER_USE_IPV6: "no"
+        SERVER_HOST_NAME: "avahi"
+        PUBLISH_PUBLISH_AAAA_ON_IPV4: "no"
+        REFLECTOR_ENABLE_REFLECTOR: "yes"
