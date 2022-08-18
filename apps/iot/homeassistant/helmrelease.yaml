@@ -34,7 +34,7 @@ spec:
           mountPath: /src/.storage
     image:
       repository: homeassistant/home-assistant
-      tag: 2022.4.1
+      tag: 2022.8.6
       pullPolicy: IfNotPresent
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
