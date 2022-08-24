@@ -20,18 +20,18 @@ spec:
     remediation:
       retries: -1
   values:
-    initContainers:
-      copy-configuration: 
-        image: bash:5.1.12
-        imagePullPolicy: IfNotPresent
-        command: ['bash', '-c', 'find /src/ /src/.storage/ -type l ! -name "*..data" -maxdepth 1 | while read -r file; do install -D -m 664 $(readlink -f $file) /dest${file#/src}; done; find /dest -type f -maxdepth 1 -name "*.sh" -exec chmod +x {} \; ; echo copied'] # heccin oneliner
-        volumeMounts:
-        - name: config
-          mountPath: /dest
-        - name: configyaml
-          mountPath: /src
-        - name: configstorage
-          mountPath: /src/.storage
+    # initContainers:
+    #   copy-configuration: 
+    #     image: bash:5.1.12
+    #     imagePullPolicy: IfNotPresent
+    #     command: ['bash', '-c', 'find /src/ /src/.storage/ -type l ! -name "*..data" -maxdepth 1 | while read -r file; do install -D -m 664 $(readlink -f $file) /dest${file#/src}; done; find /dest -type f -maxdepth 1 -name "*.sh" -exec chmod +x {} \; ; echo copied'] # heccin oneliner
+    #     volumeMounts:
+    #     - name: config
+    #       mountPath: /dest
+    #     - name: configyaml
+    #       mountPath: /src
+    #     - name: configstorage
+    #       mountPath: /src/.storage
     image:
       repository: homeassistant/home-assistant
       tag: 2022.8.6
