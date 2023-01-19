@@ -21,6 +21,7 @@ spec:
       retries: -1
   values:
     authentik:
+      geoip: /tmp/non-existent-file
       secret_key: ${secret_key}
       error_reporting:
         enabled: false
