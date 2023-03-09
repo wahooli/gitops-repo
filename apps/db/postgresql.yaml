@@ -17,10 +17,10 @@ spec:
       - kind: Secret
         name: postgresql-password-secret
   healthChecks:
-  - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-    kind: HelmRelease
-    name: postgresql
-    namespace: flux-system
+  # - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+  #   kind: HelmRelease
+  #   name: postgresql
+  #   namespace: flux-system
   - apiVersion: apps/v1
     kind: StatefulSet
     name: postgresql

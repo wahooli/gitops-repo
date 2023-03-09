@@ -38,9 +38,7 @@ spec:
           service: http://vaultwarden.default
         - hostname: status.wahoo.li
           service: http://uptime-kuma.monitoring:3001
-        - hostname: test.wahoo.li
-          service: http://home-assistant.iot:8123
-        - hostname: ha.wahoo.li
+        - hostname: old-ha.wahoo.li
           service: http://home-assistant.iot:8123
         - hostname: ombi.wahoo.li
           service: http://ombi.default:3579

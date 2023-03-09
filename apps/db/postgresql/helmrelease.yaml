@@ -13,9 +13,10 @@ spec:
         kind: HelmRepository
         name: bitnami
         namespace: flux-system
-      version: ">=10.14.0 <11.0.0"
+      version: ">=11.6.2 <11.7.0"
       interval: 1h
   interval: 15m
+  timeout: 10m
   install:
     remediation:
       retries: -1
