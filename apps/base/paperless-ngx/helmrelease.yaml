@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: base-paperless-ngx
+  namespace: flux-system
+spec:
+  releaseName: base-paperless-ngx
+  chart:
+    spec:
+      reconcileStrategy: Revision
+      chart: ./charts/paperless-ngx
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: paperless-ngx-values
+    valuesKey: values-base.yaml

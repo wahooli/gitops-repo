@@ -1,0 +1,29 @@
+useLegacy: false
+image:
+  pullPolicy: IfNotPresent
+
+scheduler:
+  enabled: true
+  type: daemonset
+
+lvmd:
+  managed: true
+
+controller:
+  replicaCount: 1
+
+storageClasses: []
+
+podSecurityPolicy:
+  create: false
+
+cert-manager:
+  enabled: false
+
+priorityClass:
+  enabled: true
+  name: topolvm
+  value: 1000000
+
+snapshot:
+  enabled: false

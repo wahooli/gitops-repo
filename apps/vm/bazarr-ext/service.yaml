@@ -1,0 +1,25 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: bazarr-external
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: http
+    port: 9767
+    protocol: TCP
+    targetPort: 9767
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: bazarr-external
+  namespace: default
+subsets:
+  - addresses:
+    - ip: ${bazarr_external_ip}
+    ports:
+    - port: 9767
+      name: http
+      protocol: TCP

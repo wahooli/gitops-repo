@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Authentication flow
+  # labels:
+  #   blueprints.goauthentik.io/instantiate: "true"
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Shared policies
+    required: false
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Plex source
+    required: false
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Recovery with email verification
+    required: false
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Registration with invitation token
+    required: false
+- attrs:
+    designation: authentication
+    name: Welcome to auth.wahoo.li
+    title: Login
+    authentication: none
+  identifiers:
+    slug: login
+  model: authentik_flows.flow
+  id: flow
+- attrs:
+    backends:
+    - authentik.core.auth.InbuiltBackend
+    - authentik.sources.ldap.auth.LDAPBackend
+    - authentik.core.auth.TokenBackend
+    configure_flow: !Find [authentik_flows.flow, [slug, default-password-change]]
+  identifiers:
+    name: login-password
+  id: login-password
+  model: authentik_stages_password.passwordstage
+- attrs:
+    deny_message: Login denied for user
+  id: login-deny
+  identifiers:
+    name: login-deny
+  model: authentik_stages_deny.denystage
+- identifiers:
+    name: login-mfa-validation
+  id: login-mfa-validation
+  model: authentik_stages_authenticator_validate.authenticatorvalidatestage
+- attrs:
+    show_source_labels: true
+    pretend_user_exists: true
+    recovery_flow: !Find [authentik_flows.flow, [slug, password-reset]]
+    enrollment_flow: !Find [authentik_flows.flow, [slug, register]]
+    user_fields:
+    - email
+    - username
+    sources:
+    - !Find [authentik_core.source, [slug, authentik-built-in]]
+    - !Find [authentik_sources_plex.plexsource, [slug, plex]]
+  identifiers:
+    name: login-identification
+  id: login-identification
+  model: authentik_stages_identification.identificationstage
+- identifiers:
+    name: login-user-login
+  id: login-user-login
+  model: authentik_stages_user_login.userloginstage
+- identifiers:
+    order: 10
+    stage: !KeyOf login-identification
+    target: !KeyOf flow
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 20
+    stage: !KeyOf login-deny
+    target: !KeyOf flow
+  attrs:
+    re_evaluate_policies: true
+    policy_engine_mode: all
+  id: login-deny-stage
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 30
+    stage: !KeyOf login-password
+    target: !KeyOf flow
+  attrs:
+    re_evaluate_policies: true
+    policy_engine_mode: all
+  id: login-password-binding
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 40
+    stage: !KeyOf login-mfa-validation
+    target: !KeyOf flow
+  id: login-mfa-validation-stage
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 100
+    stage: !KeyOf login-user-login
+    target: !KeyOf flow
+  model: authentik_flows.flowstagebinding
+- model: authentik_policies.policybinding
+  attrs:
+    negate: true
+  identifiers:
+    order: 10
+    target: !KeyOf login-deny-stage
+    policy: !Find [authentik_policies_expression.expressionpolicy, [name, check-login-denied]]
+- model: authentik_policies.policybinding
+  identifiers:
+    order: 10
+    target: !KeyOf login-password-binding
+    policy: !Find [authentik_policies_expression.expressionpolicy, [name, login-password-optional]]
+- model: authentik_policies.policybinding
+  attrs:
+    negate: true
+    enabled: true
+    timeout: 30
+  identifiers:
+    order: 10
+    target: !KeyOf login-mfa-validation-stage
+    policy: !Find [authentik_policies_expression.expressionpolicy, [name, check-ip-in-private-net]]

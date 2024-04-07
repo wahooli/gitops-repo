@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Users
+  labels:
+    blueprints.goauthentik.io/system: "true"
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Groups
+    required: true
+- model: authentik_core.user
+  identifiers:
+    username: jellyfin-ldap-bind-user
+  state: present
+  attrs:
+    attributes:
+      disable-normal-login: true
+    groups:
+    - !Find [authentik_core.group, [name, Jellyfin Users]]
+    is_active: true
+    path: users
+    type: service_account
+    name: Jellyfin LDAP Bind user
+    username: jellyfin-ldap-bind-user
+    password: ${authentik_jellyfin_bind_user_password}
+  id: jellyfin-ldap-bind-user

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.helpers.names.fullname" . }}-extra-scripts
+  labels:
+    {{- include "common.helpers.labels" . | nindent 4 }}
+data:
+  livenessCheck.sh: |
+    #!/bin/bash
+
+    set -o errexit
+    set -o nounset
+    set -o pipefail
+
+    . /opt/bitnami/scripts/libopenldap.sh
+    # Load LDAP environment variables
+    eval "$(ldap_env)"
+
+    if is_ldap_not_running; then
+      exit 1
+    fi

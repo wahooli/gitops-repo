@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-errors
+  namespace: default
+  labels:
+    app.kubernetes.io/name: nginx-errors
+spec:
+  selector:
+    app.kubernetes.io/name: nginx-errors
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http

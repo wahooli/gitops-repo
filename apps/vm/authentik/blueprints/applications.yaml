@@ -1,0 +1,449 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Applications
+  # labels:
+  #   blueprints.goauthentik.io/instantiate: "true"
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Groups
+    required: false
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Authentication flow
+    required: false
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - LDAP Authentication flow
+    required: false
+
+- model: authentik_providers_proxy.proxyprovider
+  state: present
+  attrs:
+    access_token_validity: hours=24
+    authentication_flow: !Find [authentik_flows.flow, [slug, login]]
+    authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+    external_host: https://ombi.wahoo.li
+    intercept_header_auth: true
+    internal_host_ssl_validation: true
+    mode: forward_single
+    name: ombi-proxy
+    refresh_token_validity: days=30
+  id: ombi-provider
+  identifiers:
+    name: ombi-proxy
+
+- model: authentik_core.application
+  state: present
+  attrs:
+    name: Ombi
+    meta_description: Media request system
+    meta_launch_url: https://ombi.wahoo.li
+    policy_engine_mode: any
+    provider: !KeyOf ombi-provider
+    icon: https://raw.githubusercontent.com/Ombi-app/Ombi/gh-pages/img/android-chrome-512x512.png
+    slug: ombi
+  id: ombi-app
+  identifiers:
+    slug: ombi
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Plex Users]]
+    order: 0
+    target: !KeyOf ombi-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Jellyfin Users]]
+    order: 0
+    target: !KeyOf ombi-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, authentik Admins]]
+    order: 0
+    target: !KeyOf ombi-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_providers_proxy.proxyprovider
+  state: present
+  attrs:
+    access_token_validity: hours=24
+    authentication_flow: !Find [authentik_flows.flow, [slug, login]]
+    authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+    external_host: https://sonarr.wahoo.li
+    intercept_header_auth: true
+    internal_host_ssl_validation: true
+    mode: forward_single
+    name: sonarr-proxy
+    refresh_token_validity: days=30
+  id: sonarr-provider
+  identifiers:
+    name: sonarr-proxy
+
+- model: authentik_core.application
+  state: present
+  attrs:
+    name: Sonarr
+    meta_launch_url: https://sonarr.wahoo.li/
+    policy_engine_mode: any
+    provider: !KeyOf sonarr-provider
+    icon: https://raw.githubusercontent.com/Sonarr/Sonarr/develop/Logo/512.png
+    slug: sonarr
+  id: sonarr-app
+  identifiers:
+    slug: sonarr
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Arr Users]]
+    order: 0
+    target: !KeyOf sonarr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, authentik Admins]]
+    order: 0
+    target: !KeyOf sonarr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_providers_proxy.proxyprovider
+  state: present
+  attrs:
+    access_token_validity: hours=24
+    authentication_flow: !Find [authentik_flows.flow, [slug, login]]
+    authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+    external_host: https://bazarr.wahoo.li
+    intercept_header_auth: true
+    internal_host_ssl_validation: true
+    mode: forward_single
+    name: bazarr-proxy
+    refresh_token_validity: days=30
+  id: bazarr-provider
+  identifiers:
+    name: bazarr-proxy
+
+- model: authentik_core.application
+  state: present
+  attrs:
+    name: Bazarr
+    meta_launch_url: https://bazarr.wahoo.li/
+    policy_engine_mode: any
+    provider: !KeyOf bazarr-provider
+    icon: https://raw.githubusercontent.com/morpheus65535/bazarr/master/frontend/public/images/logo128.png
+    slug: bazarr
+  id: bazarr-app
+  identifiers:
+    slug: bazarr
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Arr Users]]
+    order: 0
+    target: !KeyOf bazarr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, authentik Admins]]
+    order: 0
+    target: !KeyOf bazarr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_providers_proxy.proxyprovider
+  state: present
+  attrs:
+    access_token_validity: hours=24
+    authentication_flow: !Find [authentik_flows.flow, [slug, login]]
+    authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+    external_host: https://radarr.wahoo.li
+    intercept_header_auth: true
+    internal_host_ssl_validation: true
+    mode: forward_single
+    name: radarr-proxy
+    refresh_token_validity: days=30
+  id: radarr-provider
+  identifiers:
+    name: radarr-proxy
+
+- model: authentik_core.application
+  state: present
+  attrs:
+    name: Radarr
+    meta_launch_url: https://radarr.wahoo.li/
+    policy_engine_mode: any
+    provider: !KeyOf radarr-provider
+    icon: https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/512.png
+    slug: radarr
+  id: radarr-app
+  identifiers:
+    slug: radarr
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Arr Users]]
+    order: 0
+    target: !KeyOf radarr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, authentik Admins]]
+    order: 0
+    target: !KeyOf radarr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_crypto.certificatekeypair
+  state: present
+  identifiers:
+    name: authentik Self-signed Certificate
+  attrs:
+    name: authentik Self-signed Certificate
+  id: self-signed-cert
+
+- model: authentik_providers_oauth2.oauth2provider
+  state: present
+  attrs:
+    access_code_validity: minutes=1
+    access_token_validity: minutes=5
+    authentication_flow: !Find [authentik_flows.flow, [slug, login]]
+    authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+    client_id: ${authentik_paperless_client_id}
+    client_secret: ${authentik_paperless_client_secret}
+    client_type: confidential
+    include_claims_in_id_token: true
+    issuer_mode: per_provider
+    property_mappings:
+    - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+    - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+    - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+    - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-offline_access]]
+    name: paperless-ngx-oauth2
+    redirect_uris: https://paperless.wahoo.li/accounts/oidc/authentik/login/callback/
+    refresh_token_validity: days=30
+    signing_key: !KeyOf self-signed-cert
+    sub_mode: user_username
+  conditions: []
+  id: paperless-ngx-provider
+  identifiers:
+    name: paperless-ngx-oauth2
+
+- model: authentik_core.application
+  state: present
+  attrs:
+    meta_launch_url: https://paperless.wahoo.li/accounts/oidc/authentik/login/?process=&next=%2F
+    name: Paperless-ngx
+    policy_engine_mode: any
+    provider: !KeyOf paperless-ngx-provider
+    icon: https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/dev/docs/assets/favicon.png
+    slug: paperless-ngx
+  id: paperless-ngx-app
+  identifiers:
+    slug: paperless-ngx
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Paperless Users]]
+    order: 0
+    target: !KeyOf paperless-ngx-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, authentik Admins]]
+    order: 0
+    target: !KeyOf paperless-ngx-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_providers_ldap.ldapprovider
+  identifiers:
+    name: jellyfin-ldap-provider
+  attrs:
+    authorization_flow: !Find [authentik_flows.flow, [slug, ldap-login]]
+    base_dn: DC=ldap,DC=goauthentik,DC=io
+    bind_mode: cached
+    gid_start_number: 4000
+    mfa_support: true
+    name: jellyfin-ldap-provider
+    search_group: !Find [authentik_core.group, [name, Jellyfin Users]]
+    search_mode: cached
+    uid_start_number: 2000
+  id: jellyfin-provider
+
+- model: authentik_core.application
+  attrs:
+    meta_launch_url: https://jellyfin.wahoo.li/
+    meta_description: Media streaming service. You need to set password for your account to login
+    name: Jellyfin
+    policy_engine_mode: any
+    provider: !KeyOf jellyfin-provider
+    icon: https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/NSIS/modern-install.png
+    slug: jellyfin
+  id: jellyfin-app
+  identifiers:
+    slug: jellyfin
+
+- model: authentik_providers_oauth2.oauth2provider
+  state: present
+  attrs:
+    access_code_validity: minutes=1
+    access_token_validity: minutes=5
+    authentication_flow: !Find [authentik_flows.flow, [slug, login]]
+    authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+    client_id: ${authentik_overseerr_client_id}
+    client_secret: ${authentik_overseerr_client_secret}
+    client_type: confidential
+    include_claims_in_id_token: true
+    issuer_mode: per_provider
+    property_mappings:
+    - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+    - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+    - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+    - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-offline_access]]
+    name: overseerr-oauth2
+    redirect_uris: https://overseerr.wahoo.li/api/v1/auth/oidc-callback
+    refresh_token_validity: days=30
+    signing_key: !KeyOf self-signed-cert
+    sub_mode: user_username
+  conditions: []
+  id: overseerr-provider
+  identifiers:
+    name: overseerr-oauth2
+
+- model: authentik_core.application
+  state: present
+  attrs:
+    meta_description: Media request system, like Ombi
+    meta_launch_url: https://overseerr.wahoo.li
+    name: Overseerr
+    policy_engine_mode: any
+    provider: !KeyOf overseerr-provider
+    icon: https://raw.githubusercontent.com/sct/overseerr/develop/public/android-chrome-512x512.png
+    slug: overseerr
+  id: overseerr-app
+  identifiers:
+    slug: overseerr
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Plex Users]]
+    order: 0
+    target: !KeyOf overseerr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Jellyfin Users]]
+    order: 0
+    target: !KeyOf overseerr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, authentik Admins]]
+    order: 0
+    target: !KeyOf overseerr-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_providers_proxy.proxyprovider
+  state: present
+  attrs:
+    access_token_validity: hours=24
+    authentication_flow: !Find [authentik_flows.flow, [slug, login]]
+    authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+    external_host: https://tautulli-admin.wahoo.li
+    basic_auth_enabled: true
+    basic_auth_password_attribute: ${authentik_tautulli_password}
+    basic_auth_user_attribute: ${authentik_tautulli_username}
+    intercept_header_auth: true
+    internal_host_ssl_validation: true
+    mode: forward_single
+    name: tautulli-proxy
+    refresh_token_validity: days=30
+  id: tautulli-provider
+  identifiers:
+    name: tautulli-proxy
+
+- model: authentik_core.application
+  state: present
+  attrs:
+    name: tautulli
+    meta_description: Media request system
+    meta_launch_url: https://tautulli-admin.wahoo.li
+    policy_engine_mode: any
+    provider: !KeyOf tautulli-provider
+    icon: https://raw.githubusercontent.com/Tautulli/tautulli.github.io/master/images/logo.png
+    slug: tautulli
+  id: tautulli-app
+  identifiers:
+    slug: tautulli
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, Tautulli Admins]]
+    order: 0
+    target: !KeyOf tautulli-app
+    timeout: 30
+  model: authentik_policies.policybinding
+
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    group: !Find [authentik_core.group, [name, authentik Admins]]
+    order: 0
+    target: !KeyOf tautulli-app
+    timeout: 30
+  model: authentik_policies.policybinding

@@ -1,0 +1,61 @@
+# envFrom:
+#   envs:
+#     type: configMap
+#     useFromChart: false
+#     name: jellyfin-env
+
+podAnnotations:
+  backup.velero.io/backup-volumes: data
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: jellyfin
+
+# resources:
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  data:
+    enabled: true
+    mount:
+    - path: /config
+      subPath: config
+    - path: /cache
+      subPath: cache
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "60Gi"
+      storageClassName: topolvm-default
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      # nginx.ingress.kubernetes.io/proxy-body-size: 25m
+      cert-manager.io/cluster-issuer: letsencrypt-production
+    hosts:
+    - host: jellyfin.wahoo.li
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+    - host: jellyfin.absolutist.it
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+    tls:
+    - secretName: tls-jellyfin-ingress
+      hosts:
+      - jellyfin.wahoo.li
+      - jellyfin.absolutist.it

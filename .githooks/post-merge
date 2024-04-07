@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -o nounset
+FILE_PATTERN="^inventory/.*secret\..*$|^inventory/.*vault\..*$"
+ENCRYPTED_PATTERN="\$ANSIBLE_VAULT"
+HAS_ANSIBLE_VAULT="$(command -v ansible-vault)" 
+VAULT_PASSWORD_FILE=${VAULT_PASSWORD_FILE:-vault-password.txt}
+COMMIT_DRY_RUN=${COMMIT_DRY_RUN:-false}
+HOOK_NAME=$(basename "$0")
+
+decrypt_file() {
+  local file=$1
+  password_type=--ask-vault-password
+  [[ -f "$VAULT_PASSWORD_FILE" ]] && password_type="--vault-password-file $VAULT_PASSWORD_FILE"
+  [[ $COMMIT_DRY_RUN == false ]]  && ansible-vault decrypt $password_type $file 1> /dev/null
+}
+
+function listFiles() {
+  local msg="$1"   # Save first argument in a variable
+  shift            # Shift all arguments to the left (original $1 gets lost)
+  local arr=("$@") # Rebuild the array with rest of arguments
+  NC='\033[0m' # No Color
+  for i in "${arr[@]}"; do
+      echo -e "${GREEN}  $msg   $i${NC}"
+  done
+}
+
+DECRYPTED_FILES=()
+
+# iterate files only if ansible-vault exists
+if [ -x "$HAS_ANSIBLE_VAULT" ]; then
+  # iterate files tracked by git repo
+  for file in $(git ls-tree --full-tree --name-only -r HEAD | grep -E $FILE_PATTERN); do
+    if git show :"$file" | grep --quiet "^${ENCRYPTED_PATTERN}" && grep --quiet "^${ENCRYPTED_PATTERN}" $file; then
+      decrypt_file $file
+      DECRYPTED_FILES+=($file)
+    fi
+  done
+fi
+
+GREEN='\033[0;32m'
+if [ ${#DECRYPTED_FILES[@]} -ne 0 ]; then
+  echo "Changes made by ${HOOK_NAME} hook:"
+  listFiles "${GREEN}decrypted:" "${DECRYPTED_FILES[@]}"
+fi
+
+exit 0

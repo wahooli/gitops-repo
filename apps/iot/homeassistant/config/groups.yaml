@@ -1,5 +1,0 @@
-bedroom_blinds:
-  name: Bedroom blinds
-  entities:
-    - cover.bedroom_big_blinds
-    - cover.bedroom_small_blinds

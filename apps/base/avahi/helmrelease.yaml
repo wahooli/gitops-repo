@@ -1,0 +1,18 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: base-avahi
+  namespace: flux-system
+spec:
+  releaseName: base-avahi
+  chart:
+    spec:
+      chart: ./charts/avahi
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  valuesFrom:
+  - kind: ConfigMap
+    name: avahi-values
+    valuesKey: values-base.yaml

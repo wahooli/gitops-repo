@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mail-relay-certificate
+  namespace: default
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  secretName: tls-mail-relay
+  commonName: mail-relay
+  issuerRef:
+    name: selfsigned-ca
+    kind: ClusterIssuer
+  dnsNames:
+  - mail-relay
+  - mail-relay.default
+  - mail-relay.default.svc.cluster.local
+  - mail.absolutist.it

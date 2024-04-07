@@ -1,0 +1,16 @@
+tolerations:
+- key: "CriticalAddonsOnly"
+  operator: "Exists"
+  effect: "NoSchedule"
+configuration:
+  kubernetes:
+    skipTlsVerify: true
+  logging:
+    minimumLevel: Information
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: false
+  runAsUser: 0

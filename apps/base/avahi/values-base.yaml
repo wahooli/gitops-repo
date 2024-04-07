@@ -1,0 +1,6 @@
+serviceAccount:
+  create: true
+image:
+  repository: flungo/avahi
+  pullPolicy: IfNotPresent
+  digest: "1ca78a72b58f55565bdb585d00d1ab6168f35281616bde0e65c4bdead37f5ded"

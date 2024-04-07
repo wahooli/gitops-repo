@@ -1,0 +1,8 @@
+serviceMonitor:
+  enabled: false # will be added manually after prometheus install
+logLevel: error
+tolerations:
+- key: "CriticalAddonsOnly"
+  operator: "Equal"
+  value: "true"
+  effect: "NoSchedule"

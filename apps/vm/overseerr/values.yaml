@@ -1,0 +1,82 @@
+# envFrom:
+#   envs:
+#     type: configMap
+#     useFromChart: false
+#     name: overseerr-env
+
+env:
+  LOG_LEVEL: warn
+  TZ: Europe/Helsinki
+
+image:
+  repository: ghcr.io/lenaxia/overseerr-oidc
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "oidc-support"
+
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: overseerr
+
+# resources:
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /app/config
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "2Gi"
+      storageClassName: topolvm-default
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      # nginx.ingress.kubernetes.io/proxy-body-size: 25m
+    hosts:
+    - host: overseerr.wahoo.li
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+        - path: "/setup"
+          pathType: "Prefix"
+          backend:
+            service:
+              name: nginx-errors
+              port:
+                number: 80
+    - host: overseerr.absolutist.it
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+        - path: "/setup"
+          pathType: "Prefix"
+          backend:
+            service:
+              name: nginx-errors
+              port:
+                number: 80
+    tls:
+    - secretName: tls-overseerr-ingress
+      hosts:
+      - overseerr.absolutist.it
+      - overseerr.wahoo.li

@@ -1,48 +1,49 @@
-# Default values for cloudflare-tunnel.
+# Default values for openldap.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
 
-# Cloudflare parameters.
-cloudflare:
-  secret:
-    existing: 
-    values:
-      # Your Cloudflare account number.
-      account: ""
-      # The ID of the above tunnel.
-      tunnelId: ""
-      # The secret for the tunnel.
-      secret: ""
+replicaCount: 1
+workloadType: Deployment
 
-  # The name of the tunnel this instance will serve
-  tunnelName: "d"
-
-  # If true, turn on WARP routing for TCP
-  enableWarp: false
-  # Define ingress rules for the tunnel. See
-  # https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/configuration-file/ingress
-  ingress: []
-    # The first rule proxies traffic to the httpbin sample service named web-server at port 80
-    # - hostname: tunnel.example.com
-    #  service: http://web-service:80
-    # This rule sends traffic to the built-in hello-world HTTP server. This can help debug connectivity
-    # issues. If hello.example.com resolves and tunnel.example.com does not, then the problem is
-    # in the connection from cloudflared to your local service, not from the internet to cloudflared.
-    # - hostname: hello.example.com
-    #   service: hello_world
+strategy:
+  type: RollingUpdate
 
 image:
   repository: cloudflare/cloudflared
   pullPolicy: IfNotPresent
-  # If supplied, this overrides "appVersion"
+  # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-replicaCount: 2
-
+hostname: cloudflare-tunnel
+# subdomain: localdomain
+dnsPolicy: "ClusterFirst"
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+configMaps:
+  config:
+    data:
+      config.yaml: |-
+        {{ include "cloudflare-tunnel.config" . }}
+
+config:
+
+command:
+- cloudflared
+- tunnel
+- --config
+- /home/nonroot/config.yaml
+- run
+# args:
+# - tunnel
+# - --config
+# - /home/nonroot/config.yaml
+# - run
+
 serviceAccount:
-  create: true
+  # Specifies whether a service account should be created
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -51,19 +52,68 @@ serviceAccount:
 
 podAnnotations: {}
 
-# Security items common to everything in the pod.  Here we require that it
-# does not run as the user defined in the image, literally named "nonroot".
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 65532
+  # fsGroup: 2000
 
-# Security items for one container. We lock it down.
 securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
     - ALL
   readOnlyRootFilesystem: true
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  create: false
+  ports:
+  - name: metrics
+    port: 2000
+    protocol: TCP
+
+probe:
+  liveness:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 10
+    httpGet:
+      path: /ready
+      port: metrics
+
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /home/nonroot/config.yaml
+      subPath: config.yaml
+    spec:
+      configMap:
+        name: config
+  # creds:
+  #   enabled: true
+  #   mount:
+  #   - path: /etc/cloudflared/config
+  #     subPath: cert.pem
+  #   - path: /etc/cloudflared/config
+  #     subPath: credentials.json
+  #   spec:
+  #     secret:
+  #       name: [your-secret-containing cert.pem and credentials.json]
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -81,5 +131,4 @@ nodeSelector: {}
 
 tolerations: []
 
-# Default affinity is to spread out over nodes; use this to override.
 affinity: {}

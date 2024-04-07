@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Shared policies
+  # labels:
+  #   blueprints.goauthentik.io/instantiate: "true"
+entries:
+- model: authentik_policies_expression.expressionpolicy
+  id: login-password-optional
+  identifiers:
+    name: login-password-optional
+  attrs:
+    expression: |
+      flow_plan = request.context.get("flow_plan")
+      if not flow_plan:
+          return True
+      # If the user does not have a backend attached to it, they haven't
+      # been authenticated yet and we need the password stage
+      return not hasattr(flow_plan.context.get("pending_user"), "backend")
+- model: authentik_policies_expression.expressionpolicy
+  id: check-login-denied
+  identifiers:
+    name: check-login-denied
+  attrs:
+    expression: |
+      flow_plan = request.context.get("flow_plan")
+      if not flow_plan:
+          return True
+
+      requestUser = flow_plan.context.get("pending_user")
+      if(requestUser.id is not None):
+        disableLogin = requestUser.attributes.get("disable-normal-login", None)
+        if disableLogin:
+          return False
+        if ak_is_group_member(requestUser, name="authentik Admins"):
+          result = ak_call_policy("check-ip-in-private-net")
+          return result.passing
+      return True
+- model: authentik_policies_expression.expressionpolicy
+  id: check-ip-in-private-net
+  identifiers:
+    name: check-ip-in-private-net
+  attrs:
+    expression: |
+      return ak_client_ip in ip_network('172.16.2.0/24') or ak_client_ip in ip_network('192.168.251.0/24') or ak_client_ip in ip_network('192.168.255.0/24')
+- model: authentik_policies_expression.expressionpolicy
+  identifiers:
+    name: add-user-to-jellyfin-group
+  attrs:
+    expression: |
+      from authentik.core.models import Group
+      group, _ = Group.objects.get_or_create(name="Jellyfin Users")
+
+      # ["groups"] *must* be set to an array of Group objects, names alone are not enough.
+      request.context["flow_plan"].context["groups"] = [group]
+      return True
+  id: add-user-to-jellyfin-group

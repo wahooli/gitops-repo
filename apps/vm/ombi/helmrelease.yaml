@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: to-be-patched
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: default--ombi-mariadb
+    namespace: flux-system
+  releaseName: ombi
+  interval: 5m
+  targetNamespace: default
+  valuesFrom:
+  - kind: ConfigMap
+    name: ombi-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: ombi-values
+    valuesKey: values.yaml
+  values:
+    persistence:
+      jsonConfig:
+        name: ombi-config
+        enabled: true
+        spec:
+          useFromChart: false
+          configMap:
+            name: ombi-configuration

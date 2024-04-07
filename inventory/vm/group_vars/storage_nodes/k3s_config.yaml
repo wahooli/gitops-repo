@@ -1,0 +1,6 @@
+k3s_node_labels:
+- node_type=storage
+k3s_systemd_service_dependencies:
+- mnt-k3s_data.mount
+k3s_kubelet_root_dir: /mnt/k3s_data/kubelet
+k3s_data_dir: /mnt/k3s_data/k3s

@@ -1,0 +1,103 @@
+envFrom:
+  envs:
+    type: configMap
+    useFromChart: false
+    name: vaultwarden-env
+
+initContainers:
+  wait-for-psql:
+    image: wahooli/wait-for-it:latest
+    imagePullPolicy: IfNotPresent
+    args:
+    - vaultwarden-postgresql:5432
+    - -t
+    - "300" # wait for 5 minutes
+env:
+  SMTP_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: ${mail_relay_app_secret_name}
+        key: vaultwarden_mail_password
+  SMTP_FROM:
+    valueFrom:
+      secretKeyRef:
+        name: ${mail_relay_app_secret_name}
+        key: vaultwarden_mail_address_1
+  ADMIN_TOKEN:
+    valueFrom:
+      secretKeyRef:
+        name: ${vaultwarden_app_secret_name}
+        key: admin_token
+  PUSH_INSTALLATION_ID:
+    valueFrom:
+      secretKeyRef:
+        name: ${vaultwarden_app_secret_name}
+        key: installation_id
+  PUSH_INSTALLATION_KEY:
+    valueFrom:
+      secretKeyRef:
+        name: ${vaultwarden_app_secret_name}
+        key: installation_key
+
+
+# controller:
+#   type: statefulset
+podAnnotations:
+  backup.velero.io/backup-volumes: data
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: vaultwarden
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "400m"
+  limits:
+    memory: "3072Mi"
+    cpu: "1000m"
+persistence:
+  data:
+    enabled: true
+    mount:
+    - path: /data
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "10Gi"
+      storageClassName: topolvm-default
+  # config:
+  #   enabled: true
+  #   mount:
+  #   - path: /config
+  #   spec:
+  #     emptyDir: {}
+
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: 25m
+      cert-manager.io/cluster-issuer: letsencrypt-production
+    hosts:
+    - host: vault.wahoo.li
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+    - host: vault.absolutist.it
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+    tls:
+    - secretName: tls-vaultwarden-ingress
+      hosts:
+      - vault.wahoo.li
+      - vault.absolutist.it

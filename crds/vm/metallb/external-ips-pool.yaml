@@ -1,0 +1,8 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: external-ips
+  namespace: metallb-system
+spec:
+  addresses:
+  - ${cluster_bgp_loadbalaner_ip}/32

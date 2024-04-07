@@ -1,0 +1,25 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sonarr-external
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: http
+    port: 9989
+    protocol: TCP
+    targetPort: 9989
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: sonarr-external
+  namespace: default
+subsets:
+  - addresses:
+    - ip: ${sonarr_external_ip}
+    ports:
+    - port: 9989
+      name: http
+      protocol: TCP

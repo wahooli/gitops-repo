@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: default--jellyfin
+  namespace: flux-system
+spec:
+  releaseName: jellyfin
+  interval: 5m
+  targetNamespace: default
+  # values:
+  #   envFrom:
+  #     envs:
+  #       name: jellyfin-env
+  valuesFrom:
+  - kind: ConfigMap
+    name: jellyfin-values
+    valuesKey: values.yaml

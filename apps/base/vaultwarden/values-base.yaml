@@ -1,0 +1,8 @@
+image:
+  tag: 1.30.5
+  pullPolicy: IfNotPresent
+strategy:
+  type: Recreate
+
+env:
+  ROCKET_PORT: 80

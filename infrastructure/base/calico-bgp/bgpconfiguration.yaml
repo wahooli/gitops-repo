@@ -1,0 +1,10 @@
+apiVersion: projectcalico.org/v3
+kind: BGPConfiguration
+metadata:
+  name: default
+spec:
+  nodeToNodeMeshEnabled: true
+  nodeMeshMaxRestartTime: 60s
+  asNumber: 1
+  serviceExternalIPs: []
+  bindMode: NodeIP

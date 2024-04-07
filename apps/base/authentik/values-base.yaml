@@ -1,0 +1,8 @@
+authentik:
+  log_level: info
+  error_reporting:
+    enabled: false
+    send_pii: false
+prometheus:
+  rules:
+    enabled: false

@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Plex registration
+  labels:
+    blueprints.goauthentik.io/instantiate: "true"
+context:
+  group_name: Plex Users
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Shared policies
+    required: false
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - SSO registration
+    required: false
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: !Context group_name
+  id: plex-users-group
+- model: authentik_flows.flow
+  attrs:
+    designation: enrollment
+    name: Plex user enrollment
+    title: Plex sign up
+    authentication: none
+  identifiers:
+    slug: plex-registration
+  id: flow
+- attrs:
+    expression: |
+      # This policy ensures that this flow can only be used when there's username and email present
+      return 'username' in context.get('prompt_data', {}) and 'email' in context.get('prompt_data', {})
+  identifiers:
+    name: plex-registration-check-data
+  id: plex-registration-check-data
+  model: authentik_policies_expression.expressionpolicy
+- attrs:
+    create_users_group: !KeyOf plex-users-group
+    user_creation_mode: always_create
+    user_type: external
+  id: plex-registration-write
+  identifiers:
+    name: plex-registration-write
+  model: authentik_stages_user_write.userwritestage
+- attrs:
+    deny_message: Username or email missing
+  id: plex-registration-deny
+  identifiers:
+    name: plex-registration-deny
+  model: authentik_stages_deny.denystage
+- identifiers:
+    order: 10
+    stage: !KeyOf plex-registration-deny
+    target: !KeyOf flow
+  id: deny-stage
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 20
+    stage: !KeyOf plex-registration-write
+    target: !KeyOf flow
+  id: write-binding
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 30
+    stage: !Find [authentik_stages_user_login.userloginstage, [name, sso-registration-login]]
+    target: !KeyOf flow
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 0
+    policy: !KeyOf plex-registration-check-data
+    target: !KeyOf deny-stage
+  attrs:
+    negate: true
+  model: authentik_policies.policybinding
+- identifiers:
+    order: 0
+    policy: !Find [authentik_policies_expression.expressionpolicy, [name, sso-registration-if-sso]]
+    target: !KeyOf flow
+  model: authentik_policies.policybinding
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    order: 0
+    target: !KeyOf write-binding
+    policy: !Find [authentik_policies_expression.expressionpolicy, [name, add-user-to-jellyfin-group]]

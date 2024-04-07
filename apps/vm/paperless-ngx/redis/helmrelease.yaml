@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: default--paperless-ngx-redis # replaced in kustomization.yaml
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      version: "18.19.2"
+  releaseName: paperless-ngx-redis
+  interval: 5m
+  targetNamespace: default
+  valuesFrom:
+  - kind: ConfigMap
+    name: paperless-ngx-redis-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: paperless-ngx-redis-values
+    valuesKey: values.yaml

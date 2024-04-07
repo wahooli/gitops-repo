@@ -1,0 +1,18 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: metallb-system--metallb
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: metallb
+  chart:
+    spec:
+      version: "0.14.3"
+  valuesFrom:
+  - kind: ConfigMap
+    name: cert-manager-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: cert-manager-values
+    valuesKey: values.yaml

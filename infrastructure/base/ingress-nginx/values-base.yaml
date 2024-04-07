@@ -1,0 +1,25 @@
+controller:
+  admissionWebhooks:
+    enabled: true
+    timeoutSeconds: 30
+  dnsPolicy: ClusterFirstWithHostNet
+  ingressClassResource:
+    name: nginx
+    enabled: true
+    default: true
+  terminationGracePeriodSeconds: 300
+  topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: ingress-nginx
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
+    prometheusRule:
+      enabled: false
+  service:
+    type: LoadBalancer

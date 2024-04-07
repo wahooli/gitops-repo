@@ -1,0 +1,7 @@
+dietpi_configure_packages:
+- curl
+- sudo
+- python3-pip
+- qemu-guest-agent
+- nfs-common
+ansible_user: root

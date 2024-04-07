@@ -1,0 +1,16 @@
+# resources:
+#   limits:
+#     cpu: 1000m
+#     memory: 128Mi
+#   requests:
+#     cpu: 100m
+#     memory: 128Mi
+podAnnotations: 
+  k8s.v1.cni.cncf.io/networks: vmbr90-conf,vmbr110-conf,vmbr120-conf,vmbr200-conf
+env:
+  values:
+    SERVER_DENY_INTERFACES: "eth,lo"
+    SERVER_USE_IPV6: "no"
+    SERVER_HOST_NAME: "avahi"
+    PUBLISH_PUBLISH_AAAA_ON_IPV4: "no"
+    REFLECTOR_ENABLE_REFLECTOR: "yes"

@@ -1,0 +1,27 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: base-topolvm
+  namespace: flux-system
+spec:
+  releaseName: base-topolvm
+  targetNamespace: topolvm-system
+  chart:
+    spec:
+      chart: topolvm
+      sourceRef:
+        kind: HelmRepository
+        name: topolvm
+        namespace: flux-system
+      interval: 24h
+  install:
+    timeout: 15m
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+  valuesFrom:
+  - kind: ConfigMap
+    name: topolvm-values
+    valuesKey: values-base.yaml

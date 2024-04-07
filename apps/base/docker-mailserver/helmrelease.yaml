@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: base-docker-mailserver
+  namespace: flux-system
+spec:
+  releaseName: base-docker-mailserver
+  chart:
+    spec:
+      chart: docker-mailserver
+      sourceRef:
+        kind: HelmRepository
+        name: docker-mailserver
+        namespace: flux-system
+      version: "3.0.8"
+      interval: 24h
+  interval: 5m
+  # timeout: 10m
+  install:
+    timeout: 5m
+    remediation:
+      remediateLastFailure: true
+      retries: -1
+  test:
+    enable: false
+  valuesFrom:
+  - kind: ConfigMap
+    name: docker-mailserver-values
+    valuesKey: values-base.yaml

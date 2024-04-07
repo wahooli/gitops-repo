@@ -1,0 +1,16 @@
+lvm_enable_fstrim: true
+lvm_vgs:
+- name: vg.data
+  pvs:
+  - /dev/vda
+  lvols:
+  - name: k3s_data
+    size: 20G
+    fs:
+      type: ext4
+    mount:
+      path: /mnt/k3s_data
+      opts: nofail,x-systemd.device-timeout=15
+      boot: true
+  - thinpool: topolvm_data
+    size: +100%FREE

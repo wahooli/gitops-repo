@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: base-authentik-remote-cluster
+  namespace: flux-system
+spec:
+  releaseName: base-authentik-remote-cluster
+  targetNamespace: authentik
+  chart:
+    spec:
+      chart: authentik-remote-cluster
+      sourceRef:
+        kind: HelmRepository
+        name: goauthentik
+        namespace: flux-system
+      version: "2.0.0"
+      interval: 24h
+  interval: 5m
+  # timeout: 10m
+  install:
+    timeout: 10m
+    remediation:
+      remediateLastFailure: true
+      retries: -1
+  values:
+    fullnameOverride: authentik
+    serviceAccountSecret:
+      enabled: false
+    clusterRole:
+      enabled: true

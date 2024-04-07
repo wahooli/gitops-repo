@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -o nounset
+FILE_PATTERN="^inventory/.*secret\..*$|^inventory/.*vault\..*$"
+ENCRYPTED_PATTERN="\$ANSIBLE_VAULT"
+HAS_ANSIBLE_VAULT="$(command -v ansible-vault)" 
+COMMIT_DRY_RUN=${COMMIT_DRY_RUN:-false}
+VAULT_PASSWORD_FILE=${VAULT_PASSWORD_FILE:-vault-password.txt}
+EXIT_CODE=0
+HOOK_NAME=$(basename "$0")
+
+encrypt_and_stage_file() {
+  local file=$1
+  password_type=--ask-vault-password
+  [[ -f "$VAULT_PASSWORD_FILE" ]] && password_type="--vault-password-file $VAULT_PASSWORD_FILE"
+  [[ $COMMIT_DRY_RUN == false ]]  && ansible-vault encrypt $password_type $file 1> /dev/null
+  [[ $COMMIT_DRY_RUN == false ]]  && git add $file
+}
+
+list_files() {
+  local msg="$1"    # Save first argument in a variable
+  shift             # Shift all arguments to the left (original $1 gets lost)
+  local arr=("$@")  # Rebuild the array with rest of arguments
+  NC='\033[0m'      # No Color
+  for i in "${arr[@]}"; do
+    echo -e "  $msg   $i${NC}"
+  done
+}
+
+[[ $COMMIT_DRY_RUN == true ]] && EXIT_CODE=1
+
+ENCRYPTED_FILES=()
+UNSTAGED_FILES=()
+STAGED_FILES=()
+
+# iterate staged files with grep pattern
+for file in $(git diff --cached --name-only | grep -E $FILE_PATTERN); do
+  if [ ! -x "$HAS_ANSIBLE_VAULT" ]; then
+    # unstage modified file if there's no ansible-vault
+    [[ $COMMIT_DRY_RUN == false ]] && git restore --staged $file
+    UNSTAGED_FILES+=($file)
+  elif (! git show :"$file" | grep --quiet "^${ENCRYPTED_PATTERN}") && ! grep --quiet "^${ENCRYPTED_PATTERN}" $file ; then
+    # file unencrypted staged and on disk
+    encrypt_and_stage_file $file
+    ENCRYPTED_FILES+=($file)
+  elif grep --quiet "^${ENCRYPTED_PATTERN}" $file; then
+    # if file is unstaged only, but encrypted on disk
+    [[ $COMMIT_DRY_RUN == false ]] && git add $file
+    STAGED_FILES+=($file)
+  else
+    echo "unknown error with file: $file"
+    exit 1
+  fi
+done
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+if [ ${#UNSTAGED_FILES[@]} -ne 0 ] || [ ${#ENCRYPTED_FILES[@]} -ne 0 ] || [ ${#STAGED_FILES[@]} -ne 0 ]; then
+  [ ! -x "$HAS_ANSIBLE_VAULT" ] && echo -e "${YELLOW}WARNING${NC}: ansible-vault was not found, files containing secrets were unstaged"
+  echo "Changes made by ${HOOK_NAME} hook:"
+  [ ${#UNSTAGED_FILES[@]} -ne 0 ]   && list_files "${RED}unstaged: " "${UNSTAGED_FILES[@]}"
+  [ ${#ENCRYPTED_FILES[@]} -ne 0 ]  && list_files "${GREEN}encrypted:" "${ENCRYPTED_FILES[@]}"
+  [ ${#STAGED_FILES[@]} -ne 0 ]     && list_files "${YELLOW}staged:   " "${STAGED_FILES[@]}"
+fi
+if [[ -z $(git diff --cached --name-only) ]]; then
+  echo -e "\nno changes added to commit (use \"git add\" and/or \"git commit -a\")"
+  EXIT_CODE=1
+fi
+exit $EXIT_CODE

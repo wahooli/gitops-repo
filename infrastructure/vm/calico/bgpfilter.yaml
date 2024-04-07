@@ -1,0 +1,12 @@
+kind: BGPFilter
+apiVersion: projectcalico.org/v3
+metadata:
+  name: pods-and-services
+spec:
+  exportV4:
+  - action: Reject
+    matchOperator: In
+    cidr: ${cluster_pod_cidr}
+  - action: Reject
+    matchOperator: In
+    cidr: ${cluster_service_cidr}

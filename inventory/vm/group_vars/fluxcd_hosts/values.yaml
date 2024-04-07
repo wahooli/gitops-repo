@@ -1,0 +1,12 @@
+fluxcd_bootstrap_github_deploy_key_create: true
+fluxcd_bootstrap_github_deploy_key_repo_name: homelab-test
+fluxcd_bootstrap_git_branch: main
+fluxcd_bootstrap_git_path: clusters/vm
+fluxcd_bootstrap_key_name: fluxcd_vm
+fluxcd_bootstrap_allow: true
+fluxcd_bootstrap_git_url: ssh://git@github.com/wahooli/homelab-test.git
+fluxcd_version: 2.2.3
+fluxcd_bootstrap_components_extra:
+- image-reflector-controller
+- image-automation-controller
+# fluxcd_bootstrap_force: true

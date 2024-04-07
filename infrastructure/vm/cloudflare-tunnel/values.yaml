@@ -1,0 +1,56 @@
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /home/nonroot/config.yaml
+      subPath: config.yaml
+    spec:
+      configMap:
+        name: config
+  creds:
+    enabled: true
+    mount:
+    - path: /home/nonroot/.cloudflared
+    spec:
+      secret:
+        name: wahooli-staging-credentials
+# command:
+# - cloudflared
+# - tunnel
+# - --config
+# - /home/nonroot/config.yaml
+# - run
+args:
+- 7e8d8e06-b9e2-4dc6-a8fa-bb811e8e972b
+
+config:
+  tunnel: 7e8d8e06-b9e2-4dc6-a8fa-bb811e8e972b
+  metrics: 0.0.0.0:2000
+  credentials-file: /home/nonroot/.cloudflared/credentials.json
+  warp-routing:
+    enabled: false
+  originRequest:
+    noTLSVerify: true
+  ingress:
+  - service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 10
+        podAffinityTerm:
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - cloudflare-tunnel

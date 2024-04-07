@@ -1,0 +1,70 @@
+# Default values for metallb.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+loadBalancerClass: ""
+
+rbac:
+  # create specifies whether to install and use RBAC rules.
+  create: true
+
+prometheus:
+  podMonitor:
+    enabled: false
+  serviceMonitor:
+    enabled: false
+
+  prometheusRule:
+    enabled: false
+    staleConfig:
+      enabled: true
+    configNotLoaded:
+      enabled: true
+    addressPoolExhausted:
+      enabled: true
+    addressPoolUsage:
+      enabled: true
+    bgpSessionDown:
+      enabled: true
+
+# controller contains configuration specific to the MetalLB cluster
+# controller.
+controller:
+  enabled: true
+  # -- Controller log level. Must be one of: `all`, `debug`, `info`, `warn`, `error` or `none`
+  logLevel: info
+  image:
+    repository: quay.io/metallb/controller
+  # command: /controller
+  # webhookMode: enabled
+
+# speaker contains configuration specific to the MetalLB speaker
+# daemonset.
+speaker:
+  enabled: true
+  # command: /speaker
+  # -- Speaker log level. Must be one of: `all`, `debug`, `info`, `warn`, `error` or `none`
+  logLevel: info
+  memberlist:
+    enabled: true
+  excludeInterfaces:
+    enabled: true
+  serviceAccount:
+    create: true
+  # frr contains configuration specific to the MetalLB FRR container,
+  # for speaker running alongside FRR.
+  frr:
+    enabled: true
+    image:
+      repository: quay.io/frrouting/frr
+      tag: 8.5.2
+      pullPolicy:
+    metricsPort: 7473
+    resources: {}
+
+crds:
+  enabled: true
+  validationFailurePolicy: Fail

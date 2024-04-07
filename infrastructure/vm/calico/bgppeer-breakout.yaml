@@ -1,0 +1,9 @@
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: bgppeer-global-breakout
+spec:
+  peerIP: ${breakout_bgp_peer_ip}
+  asNumber: ${breakout_bgp_peer_as}
+  filters:
+  - pods-and-services

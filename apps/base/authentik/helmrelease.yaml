@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: base-authentik
+  namespace: flux-system
+spec:
+  releaseName: base-authentik
+  targetNamespace: authentik
+  chart:
+    spec:
+      chart: authentik
+      sourceRef:
+        kind: HelmRepository
+        name: goauthentik
+        namespace: flux-system
+      version: "2024.2.2"
+      interval: 24h
+  interval: 5m
+  # timeout: 10m
+  install:
+    timeout: 10m
+    remediation:
+      remediateLastFailure: true
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: authentik-values
+    valuesKey: values-base.yaml

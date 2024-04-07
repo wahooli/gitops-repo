@@ -1,0 +1,6 @@
+kind: BGPFilter
+apiVersion: projectcalico.org/v3
+metadata:
+  name: pods-and-services
+spec:
+  exportV4: []

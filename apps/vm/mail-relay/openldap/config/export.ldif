@@ -1,0 +1,71 @@
+dn: dc=wahooli,dc=homelab
+objectClass: dcObject
+objectClass: organization
+dc: wahooli
+o: wahooli homelab
+
+dn: ou=users,dc=wahooli,dc=homelab
+objectClass: organizationalUnit
+ou: users
+
+dn: cn=mailserver,ou=users,dc=wahooli,dc=homelab
+objectClass: inetOrgPerson
+objectClass: PostfixBookMailAccount
+uid: mailserver
+sn: mailserver
+cn: mailserver
+mail: mailserver@default.svc.cluster.local
+mailEnabled: FALSE
+userPassword: ${ldap_bind_password}
+
+dn: cn=authentik,ou=users,dc=wahooli,dc=homelab
+objectClass: inetOrgPerson
+objectClass: PostfixBookMailAccount
+uid: authentik
+sn: authentik
+cn: authentik
+userPassword: ${authentik_mail_password}
+mailEnabled: TRUE
+mail: ${authentik_mail_address_1}
+mailAlias: ${authentik_mail_address_2}
+
+dn: cn=ombi,ou=users,dc=wahooli,dc=homelab
+objectClass: inetOrgPerson
+objectClass: PostfixBookMailAccount
+uid: ombi
+sn: ombi
+cn: ombi
+userPassword: ${ombi_mail_password}
+mailEnabled: TRUE
+mail: ${ombi_mail_address_1}
+mailAlias: ${ombi_mail_address_2}
+
+dn: cn=paperless,ou=users,dc=wahooli,dc=homelab
+objectClass: inetOrgPerson
+objectClass: PostfixBookMailAccount
+uid: paperless
+sn: paperless
+cn: paperless
+userPassword: ${paperless_mail_password}
+mailEnabled: TRUE
+mail: ${paperless_mail_address_1}
+mailAlias: ${paperless_mail_address_2}
+
+dn: cn=vaultwarden,ou=users,dc=wahooli,dc=homelab
+objectClass: inetOrgPerson
+objectClass: PostfixBookMailAccount
+uid: vaultwarden
+sn: vaultwarden
+cn: vaultwarden
+userPassword: ${vaultwarden_mail_password}
+mailEnabled: TRUE
+mail: ${vaultwarden_mail_address_1}
+mailAlias: ${vaultwarden_mail_address_2}
+
+dn: cn=mailUsers,ou=users,dc=wahooli,dc=homelab
+cn: mailUsers
+objectClass: groupOfNames
+member: cn=authentik,ou=users,dc=wahooli,dc=homelab
+member: cn=paperless,ou=users,dc=wahooli,dc=homelab
+member: cn=ombi,ou=users,dc=wahooli,dc=homelab
+member: cn=vaultwarden,ou=users,dc=wahooli,dc=homelab

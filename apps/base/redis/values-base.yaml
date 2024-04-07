@@ -1,0 +1,5 @@
+image:
+  tag: 6.2.6-debian-10-r53
+architecture: standalone
+diagnosticMode:
+  enabled: false

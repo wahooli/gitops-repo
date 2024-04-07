@@ -1,0 +1,14 @@
+controller:
+  enabled: true
+  logLevel: warn
+  # webhookMode: enabled
+
+speaker:
+  enabled: false
+  logLevel: none
+  memberlist:
+    enabled: false
+  serviceAccount:
+    create: false
+  frr:
+    enabled: false

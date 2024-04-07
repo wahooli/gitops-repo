@@ -1,0 +1,124 @@
+credentials:
+  existingSecret:
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=${velero_access_key_id}
+      aws_secret_access_key=${velero_access_key}
+
+dnsPolicy: ClusterFirstWithHostNet
+snapshotsEnabled: false
+
+schedules:
+  weekly:
+    disabled: false
+    labels:
+      schedule: weekly
+    schedule: "5 2 */7 * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: "720h" # month retain
+      labelSelector:
+        matchLabels:
+          backupWeekly: "true"
+      storageLocation: minio
+      excludedResources:
+      - storageclasses.storage.k8s.io
+      - certificaterequests.cert-manager.io
+      - certificates.cert-manager.io
+      - orders.acme.cert-manager.io
+      # - ingress
+      - networkpolicy
+      excludedNamespaces:
+      - kube-public
+      - kube-node-lease
+      # - flux-system  # required for configmapgenerator envs
+      - calico-apiserver
+      - calico-system
+      - cert-manager
+      - ingress-nginx
+      - kube-system
+      - metallb-system
+      - tigera-operator
+      - topolvm-system
+      - velero
+  daily:
+    disabled: false
+    labels:
+      schedule: daily
+    schedule: "5 1 * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: "168h" # week retain
+      labelSelector:
+        matchLabels:
+          backupDaily: "true"
+      storageLocation: minio
+      excludedNamespaces:
+      - kube-public
+      - kube-node-lease
+      # - flux-system  # required for configmapgenerator envs
+      - calico-apiserver
+      - calico-system
+      - cert-manager
+      - ingress-nginx
+      - kube-system
+      - metallb-system
+      - tigera-operator
+      - topolvm-system
+      - velero
+  hourly:
+    disabled: true
+    labels:
+      schedule: hourly
+    annotations:
+      velero.io/csi-volumesnapshot-class_topolvm.io: topolvm-provisioner-thin
+    schedule: "10 * * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      labelSelector:
+        matchLabels:
+          backupHourly: "true"
+      ttl: "6h"
+      storageLocation: minio
+      excludedNamespaces:
+      - kube-public
+      - kube-node-lease
+      # - flux-system  # required for configmapgenerator envs
+      - calico-apiserver
+      - calico-system
+      - cert-manager
+      - ingress-nginx
+      - kube-system
+      - metallb-system
+      - tigera-operator
+      - topolvm-system
+      - velero
+
+configuration:
+  defaultBackupStorageLocation: minio
+  defaultBackupTTL: 72h
+  backupStorageLocation:
+  - name: minio
+    provider: aws
+    bucket: ${velero_backup_bucket}
+    # accessMode: ReadOnly
+    accessMode: ReadWrite
+    default: true
+    config:
+      region: ${velero_backup_bucket_region}
+      s3ForcePathStyle: true
+      s3Url: ${velero_backup_bucket_url}
+
+  # volumeSnapshotLocation:
+  # - name: minio
+  #   provider: aws
+  #   bucket: ${velero_snapshot_bucket}
+  #   accessMode: ReadWrite
+  #   config:
+  #     region: ${velero_snapshot_bucket_region}
+  #     s3ForcePathStyle: true
+  #     s3Url: ${velero_snapshot_bucket_url}
+
+nodeAgent:
+  podVolumePath: /mnt/k3s_data/kubelet/pods

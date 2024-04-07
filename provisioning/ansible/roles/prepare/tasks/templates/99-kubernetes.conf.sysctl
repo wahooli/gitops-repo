@@ -1,9 +1,0 @@
-net.bridge.bridge-nf-call-iptables  = 1
-net.ipv4.ip_forward                 = 1
-net.bridge.bridge-nf-call-ip6tables = 1
-fs.inotify.max_user_watches         = 10485760
-fs.inotify.max_user_instances       = 2560
-fs.aio-max-nr                       = 10485760
-fs.file-max                         = 10485760
-kernel.pid_max                      = 10485760
-kernel.threads-max                  = 10485760

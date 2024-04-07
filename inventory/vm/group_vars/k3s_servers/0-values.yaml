@@ -1,0 +1,53 @@
+k3s_role: server
+k3s_kubescheduler_config:
+  leaderElection:
+    leaderElect: true
+  extenders:
+  - urlPrefix: "http://127.0.0.1:9251"
+    filterVerb: "predicate"
+    prioritizeVerb: "prioritize"
+    nodeCacheCapable: false
+    weight: 100
+    managedResources:
+    - name: "topolvm.io/capacity"
+      ignoredByScheduler: true
+k3s_config:
+  write-kubeconfig-mode: 644
+  flannel-backend: none
+  cluster-domain: cluster.local
+  disable-kube-proxy: true
+  disable-network-policy: true
+  disable-helm-controller: true
+  disable-cloud-controller: true
+  disable:
+  - servicelb
+  - local-storage
+  - traefik
+  kube-controller-manager-arg:
+  - bind-address=0.0.0.0
+  - terminated-pod-gc-threshold=10
+  kube-proxy-arg:
+  - metrics-bind-address=0.0.0.0
+  kube-scheduler-arg:
+  - bind-address=0.0.0.0
+calico_enable_bpf_dsr: true
+calico_iptables_backend: Legacy
+calico_disable_file_logging: true
+calico_helm_values:
+  installation:
+    registry: quay.io
+    enabled: true
+    logging:
+      cni:
+        logSeverity: Error
+        logFileMaxCount: 1
+        logFileMaxSize: 1Mi
+    controlPlaneTolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    calicoNetwork:
+      linuxDataplane: "BPF"
+      hostPorts: null
+      containerIPForwarding: "Enabled"

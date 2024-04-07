@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Groups
+  # labels:
+  #   blueprints.goauthentik.io/instantiate: "true"
+entries:
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Plex Users
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Invite Users
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Paperless Users
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Arr Users
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Jellyfin Users
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Jellyfin Admins
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Tautulli Admins

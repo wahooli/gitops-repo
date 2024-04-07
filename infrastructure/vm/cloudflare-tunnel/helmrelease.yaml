@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: wahooli-staging-tunnel
+  namespace: flux-system
+spec:
+  releaseName: wahooli-staging
+  interval: 10m
+  values:
+    image:
+      tag: 2024.3.0
+  valuesFrom:
+  - kind: ConfigMap
+    name: cloudflare-tunnel-values
+    valuesKey: values.yaml

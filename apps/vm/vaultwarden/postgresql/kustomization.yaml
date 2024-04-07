@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/postgresql
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-postgresql
+- target:
+    kind: HelmRelease
+    name: base-postgresql
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: default--vaultwarden-postgresql 
+configMapGenerator:
+- name: vaultwarden-postgresql-values
+  namespace: flux-system
+  # behavior: merge
+  files:
+  - values-base.yaml=../../../base/postgresql/values-base.yaml
+  - values.yaml=values.yaml
+configurations:
+- ../../../base/kustomize-config/valuesFrom.yaml

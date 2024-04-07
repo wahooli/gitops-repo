@@ -1,0 +1,9 @@
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: bgppeer-global-quantum
+spec:
+  peerIP: ${quantum_bgp_peer_ip}
+  asNumber: ${quantum_bgp_peer_as}
+  filters:
+  - pods-and-services

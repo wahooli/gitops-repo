@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - LDAP Authentication flow
+  labels:
+    blueprints.goauthentik.io/instantiate: "true"
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - Authentication flow
+    required: false
+- attrs:
+    authentication: require_outpost
+    designation: authentication
+    name: Welcome to auth.wahoo.li
+    title: LDAP login
+  identifiers:
+    slug: ldap-login
+  model: authentik_flows.flow
+  id: flow
+- identifiers:
+    order: 10
+    stage: !Find [authentik_stages_identification.identificationstage, [name, login-identification]]
+    target: !KeyOf flow
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 20
+    stage: !Find [authentik_stages_password.passwordstage, [name, login-password]]
+    target: !KeyOf flow
+  attrs:
+    re_evaluate_policies: true
+    policy_engine_mode: all
+  id: ldap-login-flow-password-binding
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 100
+    stage: !Find [authentik_stages_user_login.userloginstage, [name, login-user-login]]
+    target: !KeyOf flow
+  model: authentik_flows.flowstagebinding
+# - model: authentik_policies.policybinding
+#   identifiers:
+#     order: 20
+#     target: !KeyOf default-authentication-flow-password-binding
+#     policy: !Find [authentik_policies_expression.expressionpolicy, [name, check-admin-ip-in-private-net]]
+# - model: authentik_policies.policybinding
+#   identifiers:
+#     order: 10
+#     target: !KeyOf ldap-login-flow-password-binding
+#     policy: !Find [authentik_policies_expression.expressionpolicy, [name, login-password-optional]]

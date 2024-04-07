@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: docker-mailserver
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      reconcileStrategy: Revision
+      chart: ./charts/docker-mailserver
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  dependsOn:
+  - name: default--mail-relay-openldap
+    namespace: flux-system
+  releaseName: mail-relay
+  # install:
+  #   timeout: 2m
+  interval: 5m
+  targetNamespace: default
+  values:
+    envFrom:
+      envs:
+        name: mail-relay-env
+    persistence:
+      config:
+        spec:
+          configMap:
+            name: mail-relay-config
+  valuesFrom:
+  - kind: ConfigMap
+    name: docker-mailserver-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: docker-mailserver-values
+    valuesKey: values.yaml

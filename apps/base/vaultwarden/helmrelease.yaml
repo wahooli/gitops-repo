@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: base-vaultwarden
+  namespace: flux-system
+spec:
+  releaseName: base-vaultwarden
+  chart:
+    spec:
+      reconcileStrategy: Revision
+      chart: ./charts/vaultwarden
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: vaultwarden-values
+    valuesKey: values-base.yaml

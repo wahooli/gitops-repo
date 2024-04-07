@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+configMapGenerator:
+- files:
+  - values.yaml=values.yaml
+  name: tautulli-values
+  namespace: flux-system
+configurations:
+- ../../base/kustomize-config/valuesFrom.yaml
+kind: Kustomization
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-tautulli
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: default--tautulli
+  target:
+    kind: HelmRelease
+    name: base-tautulli
+resources:
+- ../../base/tautulli

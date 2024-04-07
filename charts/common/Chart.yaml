@@ -1,0 +1,9 @@
+apiVersion: v2
+name: common
+description: Template function library
+type: library
+version: 0.0.1
+
+# home: https://library-charts.wahoo.li
+sources:
+- https://github.com/wahooli/homelab

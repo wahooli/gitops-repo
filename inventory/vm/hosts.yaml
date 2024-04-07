@@ -1,0 +1,37 @@
+all:
+  hosts:
+    test-k3s-server-01:
+k3s_hosts:
+  children:
+    k3s_servers:
+    k3s_agents:
+k3s_servers:
+  hosts:
+    test-k3s-server-01:
+storage_nodes:
+  hosts:
+    test-k3s-server-01:
+bootstrap_hosts:
+  hosts:
+    test-k3s-server-01:
+helm_hosts:
+  children:
+    bootstrap_hosts:
+fluxcd_hosts:
+  children:
+    bootstrap_hosts:
+kubectl_hosts:
+  children:
+    bootstrap_hosts:
+calico_hosts:
+  children:
+    bootstrap_hosts:
+dietpi_hosts:
+  children:
+    k3s_hosts:
+swap_nodes:
+  children:
+    k3s_hosts:
+lvm_hosts:
+  children:
+    storage_nodes:
