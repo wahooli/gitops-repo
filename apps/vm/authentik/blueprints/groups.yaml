@@ -31,5 +31,9 @@ entries:
     name: Jellyfin Admins
 - model: authentik_core.group
   state: present
+  attrs:
+    attributes:
+      tautulli_password: ${authentik_tautulli_password}
+      tautulli_username: ${authentik_tautulli_username}
   identifiers:
-    name: Tautulli Admins
+    name: Tautulli Users

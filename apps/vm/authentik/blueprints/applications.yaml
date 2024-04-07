@@ -405,9 +405,12 @@ entries:
     basic_auth_enabled: true
     basic_auth_password_attribute: ${authentik_tautulli_password}
     basic_auth_user_attribute: ${authentik_tautulli_username}
-    intercept_header_auth: true
-    internal_host_ssl_validation: true
-    mode: forward_single
+    basic_auth_enabled: true
+    basic_auth_password_attribute: tautulli_password
+    basic_auth_user_attribute: tautulli_username
+    external_host: https://tautulli.wahoo.li
+    internal_host: http://tautulli:8181
+    mode: proxy
     name: tautulli-proxy
     refresh_token_validity: days=30
   id: tautulli-provider
@@ -432,7 +435,7 @@ entries:
   attrs:
     enabled: true
   identifiers:
-    group: !Find [authentik_core.group, [name, Tautulli Admins]]
+    group: !Find [authentik_core.group, [name, Tautulli Users]]
     order: 0
     target: !KeyOf tautulli-app
     timeout: 30
