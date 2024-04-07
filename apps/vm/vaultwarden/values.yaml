@@ -53,10 +53,10 @@ global:
 resources:
   requests:
     memory: "256Mi"
-    cpu: "400m"
+    cpu: "600m"
   limits:
     memory: "3072Mi"
-    cpu: "1000m"
+    # cpu: "1000m"
 persistence:
   data:
     enabled: true

@@ -128,19 +128,22 @@ ingress:
       paths:
         - path: "/"
           pathType: "Prefix"
-        - path: "/admin"
-          pathType: "Prefix"
-          backend:
-            service:
-              name: nginx-errors
-              port:
-                number: 80
+        - path: /admin
+          pathType: Prefix
+          service:
+            name: nginx-errors
+            port:
+              number: 80
     - host: paperless.absolutist.it
       paths:
         - path: "/"
           pathType: "Prefix"
-        - path: "/admin" # consider blocking
-          pathType: "Prefix"
+        - path: /admin
+          pathType: Prefix
+          service:
+            name: nginx-errors
+            port:
+              number: 80
     tls:
     - secretName: tls-paperless-ingress
       hosts:

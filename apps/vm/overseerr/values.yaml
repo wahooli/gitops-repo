@@ -57,24 +57,22 @@ ingress:
       paths:
         - path: "/"
           pathType: "Prefix"
-        - path: "/setup"
-          pathType: "Prefix"
-          backend:
-            service:
-              name: nginx-errors
-              port:
-                number: 80
+        - path: /setup
+          pathType: Prefix
+          service:
+            name: nginx-errors
+            port:
+              number: 80
     - host: overseerr.absolutist.it
       paths:
         - path: "/"
           pathType: "Prefix"
-        - path: "/setup"
-          pathType: "Prefix"
-          backend:
-            service:
-              name: nginx-errors
-              port:
-                number: 80
+        - path: /setup
+          pathType: Prefix
+          service:
+            name: nginx-errors
+            port:
+              number: 80
     tls:
     - secretName: tls-overseerr-ingress
       hosts:
