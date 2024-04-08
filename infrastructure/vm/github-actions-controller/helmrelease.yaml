@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: arc-systems--arc
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: arc
+  chart:
+    spec:
+      version: "0.9.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: gha-arc-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: gha-arc-values
+    valuesKey: values.yaml
+  postRenderers:
+  - kustomize:
+      patches:
+      # add access to reading secrets, since helm chart itself doesn't provide that
+      - target:
+          version: rbac.authorization.k8s.io/v1
+          kind: Role
+          namespace: arc-runners
+        patch: |
+          - op: add
+            path: /rules/-
+            value: { "apiGroups": [ "" ], "resources": [ "secrets" ], "verbs": [ "list", "watch", "get" ] }

@@ -1,0 +1,24 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: base-arc-runner-set
+  namespace: flux-system
+spec:
+  releaseName: base-arc-runner-set
+  targetNamespace: arc-runners
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      sourceRef:
+        kind: HelmRepository
+        name: github-actions
+        namespace: flux-system
+      interval: 24h
+  install:
+    timeout: 10m
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: gha-arc-runners-values
+    valuesKey: values-base.yaml

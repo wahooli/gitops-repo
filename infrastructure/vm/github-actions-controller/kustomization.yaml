@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/github-actions-controller
+patches:
+- target:
+    kind: Namespace
+    name: arc-systems
+  patch: |-
+    - op: add
+      path: /metadata/labels/topolvm.io~1webhook
+      value: "ignore"
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-arc
+- target:
+    kind: HelmRelease
+    name: base-arc
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: arc-systems--arc
+
+configMapGenerator:
+- name: gha-arc-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values.yaml=values.yaml
+configurations:
+- kustomizeconfig.yaml

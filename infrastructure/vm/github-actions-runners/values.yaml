@@ -1,0 +1,7 @@
+githubConfigUrl: "https://github.com/wahooli/homelab-test"
+githubConfigSecret: github-runners-secret
+minRunners: 0
+maxRunners: 5
+controllerServiceAccount:
+  namespace: arc-systems
+  name: arc-gha-rs-controller
