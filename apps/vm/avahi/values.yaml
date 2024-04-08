@@ -1,0 +1,32 @@
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+image:
+  digest: "803451d0200610298d30d3151240f47c5de4d6558f6a3a36340692048cdf28e0"
+
+podAnnotations:
+  k8s.v1.cni.cncf.io/networks: |-
+    [{
+      "name": "lan-hostdevice",
+      "namespace": "default"
+    },
+    {
+      "name": "guest-hostdevice",
+      "namespace": "default"
+    },
+    {
+      "name": "iot-hostdevice",
+      "namespace": "default"
+    }]
+env:
+  values:
+    # SERVER_DENY_INTERFACES: "eth0,lo"
+    SERVER_ALLOW_INTERFACES: "net1,net2,net3"
+    SERVER_USE_IPV6: "no"
+    SERVER_HOST_NAME: "avahi"
+    PUBLISH_PUBLISH_AAAA_ON_IPV4: "no"
+    REFLECTOR_ENABLE_REFLECTOR: "yes"

@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "avahi.labels" . | nindent 4 }}
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "avahi.selectorLabels" . | nindent 6 }}

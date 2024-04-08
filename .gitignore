@@ -1,7 +1,8 @@
 *
 !.gitignore
+!.gitconfig
 !/LICENSE
-!/README.md
+!README.md
 !*/
 # ignore directories starting with underscore
 _*

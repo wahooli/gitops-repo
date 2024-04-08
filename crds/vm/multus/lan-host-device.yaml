@@ -1,0 +1,19 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: lan-hostdevice
+  namespace: default
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "plugins": [
+        {
+          "type": "host-device",
+          "pciBusID": "0000:06:14.0",
+          "ipam": {
+            "type": "dhcp"
+          }
+        }
+      ]
+    }

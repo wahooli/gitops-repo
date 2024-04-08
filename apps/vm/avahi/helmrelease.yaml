@@ -1,0 +1,16 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: default--avahi
+  namespace: flux-system
+spec:
+  releaseName: avahi
+  interval: 5m
+  targetNamespace: default
+  valuesFrom:
+  - kind: ConfigMap
+    name: avahi-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: avahi-values
+    valuesKey: values.yaml
