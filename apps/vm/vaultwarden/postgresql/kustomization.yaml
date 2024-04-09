@@ -13,7 +13,7 @@ patches:
   patch: |-
     - op: replace
       path: /metadata/name
-      value: default--vaultwarden-postgresql 
+      value: default--vaultwarden-postgresql
 configMapGenerator:
 - name: vaultwarden-postgresql-values
   namespace: flux-system

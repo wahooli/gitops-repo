@@ -1,6 +1,6 @@
 controller:
   replicaCount: 1
-  allowSnippetAnnotations: true # authentik forward auth
+  allowSnippetAnnotations: true  # authentik forward auth
   terminationGracePeriodSeconds: 30
   config:
     use-forwarded-headers: true

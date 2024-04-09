@@ -55,24 +55,24 @@ ingress:
     hosts:
     - host: overseerr.wahoo.li
       paths:
-        - path: "/"
-          pathType: "Prefix"
-        - path: /setup
-          pathType: Prefix
-          service:
-            name: nginx-errors
-            port:
-              number: 80
+      - path: "/"
+        pathType: "Prefix"
+      - path: /setup
+        pathType: Prefix
+        service:
+          name: nginx-errors
+          port:
+            number: 80
     - host: overseerr.absolutist.it
       paths:
-        - path: "/"
-          pathType: "Prefix"
-        - path: /setup
-          pathType: Prefix
-          service:
-            name: nginx-errors
-            port:
-              number: 80
+      - path: "/"
+        pathType: "Prefix"
+      - path: /setup
+        pathType: Prefix
+        service:
+          name: nginx-errors
+          port:
+            number: 80
     tls:
     - secretName: tls-overseerr-ingress
       hosts:

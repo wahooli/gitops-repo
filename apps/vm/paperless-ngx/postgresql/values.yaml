@@ -43,4 +43,4 @@ auth:
     adminPasswordKey: paperless_postgres_password
     userPasswordKey: paperless_database_password
     replicationPasswordKey: paperless_database_replication_password
-  usePasswordFiles: false # would break velero hooks
+  usePasswordFiles: false  # would break velero hooks

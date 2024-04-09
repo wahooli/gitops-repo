@@ -4,4 +4,5 @@ dietpi_configure_packages:
 - python3-pip
 - qemu-guest-agent
 - nfs-common
+- ncurses-term
 ansible_user: root

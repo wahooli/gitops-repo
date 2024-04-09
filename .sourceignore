@@ -1,0 +1,9 @@
+# Flux ignore
+# https://fluxcd.io/flux/components/source/gitrepositories/#excluding-files
+.githooks
+.github
+.ci
+inventory
+*.md
+LICENSE
+.yamllint

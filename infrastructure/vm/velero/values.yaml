@@ -17,7 +17,7 @@ schedules:
     schedule: "5 2 */7 * *"
     useOwnerReferencesInBackup: false
     template:
-      ttl: "720h" # month retain
+      ttl: "720h"  # month retain
       labelSelector:
         matchLabels:
           backupWeekly: "true"
@@ -49,7 +49,7 @@ schedules:
     schedule: "5 1 * * *"
     useOwnerReferencesInBackup: false
     template:
-      ttl: "168h" # week retain
+      ttl: "168h"  # week retain
       labelSelector:
         matchLabels:
           backupDaily: "true"

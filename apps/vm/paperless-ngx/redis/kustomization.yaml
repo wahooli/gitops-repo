@@ -13,7 +13,7 @@ patches:
   patch: |-
     - op: replace
       path: /metadata/name
-      value: default--paperless-ngx-redis 
+      value: default--paperless-ngx-redis
 configMapGenerator:
 - name: paperless-ngx-redis-values
   namespace: flux-system

@@ -41,4 +41,4 @@ auth:
     adminPasswordKey: postgres_password
     userPasswordKey: database_password
     replicationPasswordKey: database_replication_password
-  usePasswordFiles: false # would break velero hooks
+  usePasswordFiles: false  # would break velero hooks

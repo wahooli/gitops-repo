@@ -48,12 +48,12 @@ ingress:
     hosts:
     - host: jellyfin.wahoo.li
       paths:
-        - path: "/"
-          pathType: "Prefix"
+      - path: "/"
+        pathType: "Prefix"
     - host: jellyfin.absolutist.it
       paths:
-        - path: "/"
-          pathType: "Prefix"
+      - path: "/"
+        pathType: "Prefix"
     tls:
     - secretName: tls-jellyfin-ingress
       hosts:

@@ -13,7 +13,7 @@ patches:
   patch: |-
     - op: replace
       path: /metadata/name
-      value: default--paperless-ngx-postgresql 
+      value: default--paperless-ngx-postgresql
 configMapGenerator:
 - name: paperless-ngx-postgresql-values
   namespace: flux-system

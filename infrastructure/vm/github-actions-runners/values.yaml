@@ -1,7 +1,70 @@
-githubConfigUrl: "https://github.com/wahooli/homelab-test"
+githubConfigUrl: "https://github.com/wahooli/gitops-repo"
 githubConfigSecret: github-runners-secret
 minRunners: 0
 maxRunners: 5
 controllerServiceAccount:
   namespace: arc-systems
   name: arc-gha-rs-controller
+template:
+  spec:
+    dnsPolicy: ClusterFirstWithHostNet
+    initContainers:
+    - name: init-dind-externals
+      imagePullPolicy: IfNotPresent
+      image: ghcr.io/actions/actions-runner:2.315.0
+      command: ["cp", "-r", "-v", "/home/runner/externals/.", "/home/runner/tmpDir/"]
+      volumeMounts:
+      - name: dind-externals
+        mountPath: /home/runner/tmpDir
+    containers:
+    - name: runner
+      imagePullPolicy: IfNotPresent
+      image: ghcr.io/actions/actions-runner:2.315.0  # {"$imagepolicy": "flux-system:gh-actions-runner"}
+      command: ["/home/runner/run.sh"]
+      env:
+      # - name: ACTIONS_RUNNER_CONTAINER_HOOKS
+      #   value: /home/runner/k8s/index.js
+      - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+        value: "false"
+      - name: DOCKER_HOST
+        value: unix:///var/run/docker.sock
+      - name: ACTIONS_RUNNER_POD_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
+      volumeMounts:
+      - name: work
+        mountPath: /home/runner/_work
+      - name: dind-sock
+        mountPath: /var/run
+    - name: dind
+      image: docker:26.0.0-dind
+      imagePullPolicy: IfNotPresent
+      args:
+      - dockerd
+      - --host=unix:///var/run/docker.sock
+      - --group=$(DOCKER_GROUP_GID)
+      env:
+      - name: DOCKER_GROUP_GID
+        value: "123"
+      securityContext:
+        privileged: true
+      volumeMounts:
+      - name: dind-sock
+        mountPath: /var/run
+      - name: dind-externals
+        mountPath: /home/runner/externals
+    volumes:
+    - name: dind-externals
+      emptyDir: {}
+    - name: dind-sock
+      emptyDir: {}
+    - name: work
+      ephemeral:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: "topolvm-default"
+            resources:
+              requests:
+                storage: 1Gi

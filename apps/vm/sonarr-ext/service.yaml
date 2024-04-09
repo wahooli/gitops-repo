@@ -17,9 +17,9 @@ metadata:
   name: sonarr-external
   namespace: default
 subsets:
-  - addresses:
-    - ip: ${sonarr_external_ip}
-    ports:
-    - port: 9989
-      name: http
-      protocol: TCP
+- addresses:
+  - ip: ${sonarr_external_ip}
+  ports:
+  - port: 9989
+    name: http
+    protocol: TCP

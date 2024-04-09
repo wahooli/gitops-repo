@@ -42,12 +42,12 @@ spec:
         - name: socketpath
           mountPath: /host/run/cni
       volumes:
-        - name: binpath
-          hostPath:
-            path: /opt/cni
-        - name: socketpath
-          hostPath:
-            path: /run/cni
-        - name: netnspath
-          hostPath:
-            path: /run/netns
+      - name: binpath
+        hostPath:
+          path: /opt/cni
+      - name: socketpath
+        hostPath:
+          path: /run/cni
+      - name: netnspath
+        hostPath:
+          path: /run/netns

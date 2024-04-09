@@ -33,4 +33,3 @@ entries:
     slug: plex
     user_matching_mode: username_link
     user_path_template: goauthentik.io/sources/%(slug)s
-

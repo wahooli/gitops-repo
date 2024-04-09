@@ -1,7 +1,7 @@
 flags:
   ## Log level can be set here with one of the following values: "debug", "info", "warn", "error".
   ## Defaults to "debug".
-  logLevel: "debug"
+  logLevel: "warn"
   # change to json when proper logging system is in place
   logFormat: "text"
   watchSingleNamespace: "arc-runners"

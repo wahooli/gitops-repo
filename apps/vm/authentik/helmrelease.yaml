@@ -9,8 +9,8 @@ spec:
   targetNamespace: authentik
   values:
     blueprints:
-        configMaps:
-        - authentik-blueprints
+      configMaps:
+      - authentik-blueprints
   valuesFrom:
   - kind: ConfigMap
     name: authentik-values

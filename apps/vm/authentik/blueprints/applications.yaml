@@ -59,7 +59,6 @@ entries:
     order: 0
     target: !KeyOf ombi-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -69,7 +68,6 @@ entries:
     order: 0
     target: !KeyOf ombi-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -79,7 +77,6 @@ entries:
     order: 0
     target: !KeyOf ombi-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_providers_proxy.proxyprovider
   state: present
@@ -118,7 +115,6 @@ entries:
     order: 0
     target: !KeyOf sonarr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -128,7 +124,6 @@ entries:
     order: 0
     target: !KeyOf sonarr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_providers_proxy.proxyprovider
   state: present
@@ -167,7 +162,6 @@ entries:
     order: 0
     target: !KeyOf bazarr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -177,7 +171,6 @@ entries:
     order: 0
     target: !KeyOf bazarr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_providers_proxy.proxyprovider
   state: present
@@ -216,7 +209,6 @@ entries:
     order: 0
     target: !KeyOf radarr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -226,7 +218,6 @@ entries:
     order: 0
     target: !KeyOf radarr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_crypto.certificatekeypair
   state: present
@@ -284,7 +275,6 @@ entries:
     order: 0
     target: !KeyOf paperless-ngx-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -294,7 +284,6 @@ entries:
     order: 0
     target: !KeyOf paperless-ngx-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_providers_ldap.ldapprovider
   identifiers:
@@ -373,7 +362,6 @@ entries:
     order: 0
     target: !KeyOf overseerr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -383,7 +371,6 @@ entries:
     order: 0
     target: !KeyOf overseerr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -393,7 +380,6 @@ entries:
     order: 0
     target: !KeyOf overseerr-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_providers_proxy.proxyprovider
   state: present
@@ -401,10 +387,6 @@ entries:
     access_token_validity: hours=24
     authentication_flow: !Find [authentik_flows.flow, [slug, login]]
     authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-    external_host: https://tautulli-admin.wahoo.li
-    basic_auth_enabled: true
-    basic_auth_password_attribute: ${authentik_tautulli_password}
-    basic_auth_user_attribute: ${authentik_tautulli_username}
     basic_auth_enabled: true
     basic_auth_password_attribute: tautulli_password
     basic_auth_user_attribute: tautulli_username
@@ -439,7 +421,6 @@ entries:
     order: 0
     target: !KeyOf tautulli-app
     timeout: 30
-  model: authentik_policies.policybinding
 
 - model: authentik_policies.policybinding
   attrs:
@@ -449,4 +430,3 @@ entries:
     order: 0
     target: !KeyOf tautulli-app
     timeout: 30
-  model: authentik_policies.policybinding

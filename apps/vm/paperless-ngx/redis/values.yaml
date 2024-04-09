@@ -18,7 +18,7 @@ master:
   - name: dummydata
     mountPath: /dummy
   podAnnotations:
-    backup.velero.io/backup-volumes: dummydata # backups essentially empty volume, so always new instance is initialized
+    backup.velero.io/backup-volumes: dummydata  # backups essentially empty volume, so always new instance is initialized
     pre.hook.backup.velero.io/timeout: 5m
     pre.hook.restore.velero.io/timeout: 5m
     post.hook.restore.velero.io/timeout: 5m

@@ -8,6 +8,8 @@
 _*
 !.github/*
 !.githooks/*
+!.sourceignore
+!.yamllint
 # allow anything in charts directory at the moment. the idea is to move them into own repo later
 !charts/**/*
 # allow anything under config directory within apps

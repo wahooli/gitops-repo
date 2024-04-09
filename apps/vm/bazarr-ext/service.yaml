@@ -17,9 +17,9 @@ metadata:
   name: bazarr-external
   namespace: default
 subsets:
-  - addresses:
-    - ip: ${bazarr_external_ip}
-    ports:
-    - port: 9767
-      name: http
-      protocol: TCP
+- addresses:
+  - ip: ${bazarr_external_ip}
+  ports:
+  - port: 9767
+    name: http
+    protocol: TCP

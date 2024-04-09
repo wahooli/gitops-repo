@@ -33,7 +33,7 @@ storageClasses:
     isDefaultClass: true
     volumeBindingMode: WaitForFirstConsumer
     allowVolumeExpansion: true
-    additionalParameters: 
+    additionalParameters:
       'topolvm.io/device-class': "thinpool"
 
 snapshot:

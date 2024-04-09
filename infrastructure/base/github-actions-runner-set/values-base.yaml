@@ -7,9 +7,9 @@ githubConfigUrl: ""
 githubConfigSecret:
   ### GitHub Apps Configuration
   ## NOTE: IDs MUST be strings, use quotes
-  #github_app_id: ""
-  #github_app_installation_id: ""
-  #github_app_private_key: |
+  # github_app_id: ""
+  # github_app_installation_id: ""
+  # github_app_private_key: |
 
   ### GitHub PAT Configuration
   github_token: ""
@@ -188,9 +188,9 @@ template:
   ##                   storage: 1Gi
   spec:
     containers:
-      - name: runner
-        image: ghcr.io/actions/actions-runner:latest
-        command: ["/home/runner/run.sh"]
+    - name: runner
+      image: ghcr.io/actions/actions-runner:latest
+      command: ["/home/runner/run.sh"]
 
 ## Optional controller service account that needs to have required Role and RoleBinding
 ## to operate this gha-runner-scale-set installation.

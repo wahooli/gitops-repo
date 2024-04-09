@@ -39,6 +39,6 @@ entries:
     branding_logo: /static/dist/assets/icons/icon_left_brand.svg
   identifiers:
     domain: auth-wahooli
-    default: False
+    default: false
   state: created
   model: authentik_brands.brand

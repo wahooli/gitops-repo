@@ -8,14 +8,14 @@ initContainers:
     args:
     - paperless-ngx-redis-master:6379
     - -t
-    - "300" # wait for 5 minutes
+    - "300"  # wait for 5 minutes
   wait-for-psql:
     image: wahooli/wait-for-it:latest
     imagePullPolicy: IfNotPresent
     args:
     - paperless-ngx-postgresql:5432
     - -t
-    - "300" # wait for 5 minutes
+    - "300"  # wait for 5 minutes
 env:
   PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
   PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
@@ -126,28 +126,26 @@ ingress:
     hosts:
     - host: paperless.wahoo.li
       paths:
-        - path: "/"
-          pathType: "Prefix"
-        - path: /admin
-          pathType: Prefix
-          service:
-            name: nginx-errors
-            port:
-              number: 80
+      - path: "/"
+        pathType: "Prefix"
+      - path: /admin
+        pathType: Prefix
+        service:
+          name: nginx-errors
+          port:
+            number: 80
     - host: paperless.absolutist.it
       paths:
-        - path: "/"
-          pathType: "Prefix"
-        - path: /admin
-          pathType: Prefix
-          service:
-            name: nginx-errors
-            port:
-              number: 80
+      - path: "/"
+        pathType: "Prefix"
+      - path: /admin
+        pathType: Prefix
+        service:
+          name: nginx-errors
+          port:
+            number: 80
     tls:
     - secretName: tls-paperless-ingress
       hosts:
       - paperless.wahoo.li
       - paperless.absolutist.it
-
-

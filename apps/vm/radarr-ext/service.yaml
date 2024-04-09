@@ -17,9 +17,9 @@ metadata:
   name: radarr-external
   namespace: default
 subsets:
-  - addresses:
-    - ip: ${radarr_external_ip}
-    ports:
-    - port: 9876
-      name: http
-      protocol: TCP
+- addresses:
+  - ip: ${radarr_external_ip}
+  ports:
+  - port: 9876
+    name: http
+    protocol: TCP

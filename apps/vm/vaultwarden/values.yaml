@@ -11,7 +11,7 @@ initContainers:
     args:
     - vaultwarden-postgresql:5432
     - -t
-    - "300" # wait for 5 minutes
+    - "300"  # wait for 5 minutes
 env:
   SMTP_PASSWORD:
     valueFrom:
@@ -90,12 +90,12 @@ ingress:
     hosts:
     - host: vault.wahoo.li
       paths:
-        - path: "/"
-          pathType: "Prefix"
+      - path: "/"
+        pathType: "Prefix"
     - host: vault.absolutist.it
       paths:
-        - path: "/"
-          pathType: "Prefix"
+      - path: "/"
+        pathType: "Prefix"
     tls:
     - secretName: tls-vaultwarden-ingress
       hosts:

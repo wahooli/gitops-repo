@@ -10,7 +10,7 @@ configuration:
 securityContext:
   capabilities:
     drop:
-      - ALL
+    - ALL
   readOnlyRootFilesystem: false
   runAsNonRoot: false
   runAsUser: 0
