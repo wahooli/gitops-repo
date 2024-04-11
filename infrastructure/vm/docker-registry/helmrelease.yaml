@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: registry--docker-registry-mirror
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: registry-mirror
+  targetNamespace: registry
+  chart:
+    spec:
+      version: "2.2.3"
+  valuesFrom:
+  - kind: ConfigMap
+    name: docker-registry-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: docker-registry-values
+    valuesKey: values.yaml

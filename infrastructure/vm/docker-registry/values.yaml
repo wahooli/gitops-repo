@@ -1,0 +1,11 @@
+image:
+  tag: 2.8.3
+persistence:
+  enabled: true
+  size: 5Gi
+storage: filesystem
+fullnameOverride: registry-mirror
+proxy:
+  enabled: true
+  remoteurl: https://registry-1.docker.io
+  secretRef: docker-proxy-credentials
