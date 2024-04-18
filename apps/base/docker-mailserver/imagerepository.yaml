@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: docker-mailserver
+  namespace: flux-system
+spec:
+  image: ghcr.io/docker-mailserver/docker-mailserver
+  interval: 24h

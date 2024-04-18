@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - helmrepository.yaml
 - helmrelease.yaml
+- imagerepository.yaml
 configMapGenerator:
 - name: docker-mailserver-values
   namespace: flux-system

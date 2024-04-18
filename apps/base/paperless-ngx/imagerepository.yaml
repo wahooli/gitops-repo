@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: paperless-ngx
+  namespace: flux-system
+spec:
+  image: ghcr.io/paperless-ngx/paperless-ngx
+  interval: 24h

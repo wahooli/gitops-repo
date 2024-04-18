@@ -1,0 +1,31 @@
+name: FluxCD Auto-PR
+on:
+  push:
+    branches:
+    - flux-image-updates
+    paths-ignore:
+    - 'charts/**'
+    - 'inventory/**'
+    - 'githooks/**'
+    - '*.md'
+    - 'LICENSE'
+    - 'charts/**'
+    - 'clusters/**'
+    - '.ci/**'
+    - '.github/**'
+
+jobs:
+  pull-request:
+    name: Open PR to main
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      name: checkout
+
+    - name: pull-request
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        OWNER: ${{ github.repository_owner }}
+      run: |
+        gh_pr_up() { gh pr create $* || gh pr edit $* }
+        gh_pr_up --title "Image updates" --fill-verbose --reviewer $OWNER --base main --head flux-image-updates

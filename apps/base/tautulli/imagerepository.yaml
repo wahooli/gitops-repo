@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: tautulli
+  namespace: flux-system
+spec:
+  image: ghcr.io/linuxserver/tautulli
+  interval: 24h

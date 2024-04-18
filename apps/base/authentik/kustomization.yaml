@@ -4,6 +4,7 @@ resources:
 - namespace.yaml
 - helmrepository.yaml
 - helmrelease.yaml
+- imagerepository.yaml
 configMapGenerator:
 - name: authentik-values
   namespace: flux-system
