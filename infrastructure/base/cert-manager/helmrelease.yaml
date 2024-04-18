@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-cert-manager
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: cert-manager
 spec:
   releaseName: base-cert-manager
   targetNamespace: cert-manager

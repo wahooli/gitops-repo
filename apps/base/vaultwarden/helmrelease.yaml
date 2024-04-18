@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-vaultwarden
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: vaultwarden
 spec:
   releaseName: base-vaultwarden
   chart:

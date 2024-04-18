@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-paperless-ngx
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: paperless-ngx
 spec:
   releaseName: base-paperless-ngx
   chart:

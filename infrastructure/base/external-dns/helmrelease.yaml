@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-external-dns
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: external-dns
 spec:
   releaseName: base-external-dns
   targetNamespace: kube-system

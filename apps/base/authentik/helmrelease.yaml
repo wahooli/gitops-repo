@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-authentik
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: authentik
 spec:
   releaseName: base-authentik
   targetNamespace: authentik

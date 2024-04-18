@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-topolvm
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: topolvm
 spec:
   releaseName: base-topolvm
   targetNamespace: topolvm-system

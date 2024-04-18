@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-ombi
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: ombi
 spec:
   releaseName: base-ombi
   chart:

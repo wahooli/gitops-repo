@@ -54,7 +54,6 @@ primary:
     enabled: false
   persistence:
     enabled: true
-    storageClass: topolvm-default
     size: 4Gi
 auth:
   database: Ombi

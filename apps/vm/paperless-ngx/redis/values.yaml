@@ -9,7 +9,6 @@ commonLabels:
 master:
   persistence:
     enabled: true
-    storageClass: topolvm-default
     size: 1Gi
   extraVolumes:
   - name: dummydata

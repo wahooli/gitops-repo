@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-cloudflare-tunnel
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: cloudflare-tunnel
 spec:
   chart:
     spec:

@@ -28,12 +28,12 @@ persistence:
     - path: /cache
       subPath: cache
     spec:
+      isPersistentVolumeClaim: true
       accessModes:
       - "ReadWriteOnce"
       resources:
         requests:
           storage: "60Gi"
-      storageClassName: topolvm-default
 
 ingress:
   main:

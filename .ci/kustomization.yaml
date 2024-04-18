@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- cloudflare-tunnel-namespace.yaml
+- cluster-infrastructure-vars.yaml
+- cluster-app-vars.yaml
+- mail-relay-secret.yaml
+- ombi-secret.yaml
+- paperless-secret.yaml
+- vaultwarden-secret.yaml
+- arc-runners-namespace.yaml
+- registry-namespace.yaml
+- docker-proxy-credentials.yaml
+- authentik-app-vars.yaml
+- wahooli-staging-credentials.yaml

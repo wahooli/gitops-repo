@@ -27,8 +27,8 @@ schedules:
       - certificaterequests.cert-manager.io
       - certificates.cert-manager.io
       - orders.acme.cert-manager.io
-      # - ingress
       - networkpolicy
+      # - ingress
       excludedNamespaces:
       - kube-public
       - kube-node-lease
@@ -54,6 +54,13 @@ schedules:
         matchLabels:
           backupDaily: "true"
       storageLocation: minio
+      excludedResources:
+      - storageclasses.storage.k8s.io
+      - certificaterequests.cert-manager.io
+      - certificates.cert-manager.io
+      - orders.acme.cert-manager.io
+      - networkpolicy
+      # - ingress
       excludedNamespaces:
       - kube-public
       - kube-node-lease

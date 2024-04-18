@@ -1,24 +1,23 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../../base/avahi
+- ../../../base/topolvm
 patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-    name: base-avahi
 - target:
     kind: HelmRelease
-    name: base-avahi
+    name: base-topolvm
   patch: |-
     - op: replace
       path: /metadata/name
-      value: default--avahi
+      value: topolvm-system--topolvm
 configMapGenerator:
-- name: avahi-values
+- name: topolvm-values
   namespace: flux-system
   behavior: merge
   files:
   - values.yaml=values.yaml
 configurations:
-- ../../base/kustomize-config/valuesFrom.yaml
+- kustomizeconfig.yaml

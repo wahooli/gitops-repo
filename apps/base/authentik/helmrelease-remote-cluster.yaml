@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-authentik-remote-cluster
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: authentik-remote-cluster
 spec:
   releaseName: base-authentik-remote-cluster
   targetNamespace: authentik

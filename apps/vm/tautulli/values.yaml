@@ -22,12 +22,12 @@ persistence:
     mount:
     - path: /config
     spec:
+      isPersistentVolumeClaim: true
       accessModes:
       - "ReadWriteOnce"
       resources:
         requests:
           storage: "2Gi"
-      storageClassName: topolvm-default
 
 ingress:
   main:

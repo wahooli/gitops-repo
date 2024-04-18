@@ -30,7 +30,6 @@ primary:
     # PGPASSWORD=$POSTGRES_PASSWORD pg_restore -U $POSTGRES_USER -d $POSTGRES_DATABASE --clean --if-exists < /dbdump/backup.psql && rm -f /dbdump/backup.psql;"]
   persistence:
     enabled: true
-    storageClass: topolvm-default
     size: 2Gi
 auth:
   enablePostgresUser: true

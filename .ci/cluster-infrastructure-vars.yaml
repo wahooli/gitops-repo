@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-infrastructure-vars
+  namespace: flux-system
+type: Opaque
+stringData:
+  cluster_bgp_loadbalaner_ip: "192.168.0.1"
+  cluster_service_cidr: "192.168.0.1/32"
+  lvm_volumegroup: abc
+  lvm_thinpool_name: cde
+  kubelet_workdir: /var/lib/kubelet
+  velero_access_key_id: abc
+  velero_access_key: cde
+  velero_backup_bucket: bucket
+  velero_backup_bucket_region: region
+  velero_backup_bucket_url: http://192.168.0.2
+  velero_snapshot_bucket: snapshots
+  velero_snapshot_bucket_region: region
+  velero_snapshot_bucket_url: http://192.168.0.3
+  cloudflare_api_token: abcdefg

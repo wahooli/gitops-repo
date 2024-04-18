@@ -2,6 +2,9 @@ githubConfigUrl: "https://github.com/wahooli/gitops-repo"
 githubConfigSecret: github-runners-secret
 minRunners: 0
 maxRunners: 5
+runnerScaleSetName: "gitops-repo-runners"
+containerMode:
+  type: "not-kubernetes"
 controllerServiceAccount:
   namespace: arc-systems
   name: arc-gha-rs-controller

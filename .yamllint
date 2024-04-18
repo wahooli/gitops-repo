@@ -1,9 +1,9 @@
 ---
 
 ignore: |
-  _*
   charts/
   clusters/**/flux-system/
+  _*
 
 yaml-files:
 - '*.yaml'
@@ -11,7 +11,7 @@ yaml-files:
 - '.yamllint'
 
 rules:
-  anchors: enable
+  # anchors: enable
   braces: enable
   brackets: enable
   colons: enable
@@ -23,7 +23,7 @@ rules:
   document-start: disable
   empty-lines: enable
   empty-values: disable
-  float-values: disable
+  # float-values: disable
   hyphens: enable
   indentation:
     spaces: consistent

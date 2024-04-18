@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-tautulli
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: tautulli
 spec:
   releaseName: base-tautulli
   chart:

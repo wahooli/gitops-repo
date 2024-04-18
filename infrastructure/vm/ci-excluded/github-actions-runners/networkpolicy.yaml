@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: isolate-egress
+  namespace: arc-runners
+spec:
+  # Apply to all pods in this namespace
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    # Allow Pod traffic to own namespace
+    - podSelector: {}
+    # Allow traffic to internet (but not internal network)
+    - ipBlock:
+        cidr: '0.0.0.0/0'
+        except:
+        - '10.0.0.0/8'
+        - '172.16.0.0/12'
+        - '192.168.0.0/16'
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - port: 53
+      protocol: UDP
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: registry
+      podSelector:
+        matchLabels:
+          release: registry-mirror
+    ports:
+    - port: 5000
+      protocol: TCP
