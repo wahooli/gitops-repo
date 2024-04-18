@@ -1,4 +1,4 @@
-k3s_release_channel: v1.28
+k3s_release_channel: v1.29
 # k3s_containerd_pause_image: rancher/mirrored-pause:3.9
 helm_diff_install: true
 k3s_kubelet_config:

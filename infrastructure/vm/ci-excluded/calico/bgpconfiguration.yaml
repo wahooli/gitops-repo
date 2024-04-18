@@ -8,5 +8,4 @@ spec:
   asNumber: ${cluster_bgp_as_number}
   serviceExternalIPs:
   - cidr: ${cluster_bgp_loadbalaner_ip}/32
-  - cidr: 10.2.0.2/32
   bindMode: NodeIP

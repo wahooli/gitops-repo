@@ -2,8 +2,8 @@
 Readme will be updated later, maybe
 
 ## How to's
-Include local gitconfig  
-`git config --local include.path .gitconfig`
+Include repo githooks
+`git config core.hooksPath .githooks/`
 
 Ensure you have ansible-vault installed  
 Create file `vault-password.txt` into repo root, containing the decryption key for inventory  
