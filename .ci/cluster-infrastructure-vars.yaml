@@ -19,3 +19,5 @@ stringData:
   velero_snapshot_bucket_region: region
   velero_snapshot_bucket_url: http://192.168.0.3
   cloudflare_api_token: abcdefg
+  external_dns_app_secret_name: external-dns-secret
+  wahooli_extenal_dns_provider: inmemory
