@@ -14,3 +14,10 @@ patches:
   target:
     kind: Deployment
     name: "(source-controller|kustomize-controller|helm-controller)"
+- patch: |
+    - op: replace
+      path: /spec/interval
+      value: 24h
+  target:
+    kind: GitRepository
+    name: flux-system

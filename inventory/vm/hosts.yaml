@@ -1,19 +1,19 @@
 all:
   hosts:
-    test-k3s-server-01:
+    vm-k3s-server-01:
 k3s_hosts:
   children:
     k3s_servers:
     k3s_agents:
 k3s_servers:
   hosts:
-    test-k3s-server-01:
+    vm-k3s-server-01:
 storage_nodes:
   hosts:
-    test-k3s-server-01:
+    vm-k3s-server-01:
 bootstrap_hosts:
   hosts:
-    test-k3s-server-01:
+    vm-k3s-server-01:
 helm_hosts:
   children:
     bootstrap_hosts:

@@ -30,11 +30,15 @@ list_files() {
 
 ENCRYPTED_FILES=()
 UNSTAGED_FILES=()
+DELETED_FILES=()
 STAGED_FILES=()
 
 # iterate staged files with grep pattern
 for file in $(git diff --cached --name-only | grep -E $FILE_PATTERN); do
-  if [ ! -x "$HAS_ANSIBLE_VAULT" ]; then
+  if [ ! -f $file ]; then
+    # file most likely deleted if not found
+    DELETED_FILES+=($file)
+  elif [ ! -x "$HAS_ANSIBLE_VAULT" ]; then
     # unstage modified file if there's no ansible-vault
     [[ $COMMIT_DRY_RUN == false ]] && git restore --staged $file
     UNSTAGED_FILES+=($file)
@@ -62,6 +66,7 @@ if [ ${#UNSTAGED_FILES[@]} -ne 0 ] || [ ${#ENCRYPTED_FILES[@]} -ne 0 ] || [ ${#S
   [ ${#UNSTAGED_FILES[@]} -ne 0 ]   && list_files "${RED}unstaged: " "${UNSTAGED_FILES[@]}"
   [ ${#ENCRYPTED_FILES[@]} -ne 0 ]  && list_files "${GREEN}encrypted:" "${ENCRYPTED_FILES[@]}"
   [ ${#STAGED_FILES[@]} -ne 0 ]     && list_files "${YELLOW}staged:   " "${STAGED_FILES[@]}"
+  [ ${#DELETED_FILES[@]} -ne 0 ]    && list_files "${RED}deleted:  " "${DELETED_FILES[@]}"
 fi
 if [[ -z $(git diff --cached --name-only) ]]; then
   echo -e "\nno changes added to commit (use \"git add\" and/or \"git commit -a\")"
