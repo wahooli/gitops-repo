@@ -13,3 +13,4 @@ resources:
 - docker-proxy-credentials.yaml
 - authentik-app-vars.yaml
 - wahooli-staging-credentials.yaml
+- external-dns-secret.yaml

@@ -1,6 +1,9 @@
 serviceMonitor:
   enabled: false  # will be added manually after prometheus install
 logLevel: error
+image:
+  pullPolicy: IfNotPresent
+  repository: registry.k8s.io/external-dns/external-dns
 tolerations:
 - key: "CriticalAddonsOnly"
   operator: "Equal"
