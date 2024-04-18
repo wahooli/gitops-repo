@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webhook-receiver
+  namespace: flux-system
+  annotations:
+    external-dns.alpha.kubernetes.io/target: 7e8d8e06-b9e2-4dc6-a8fa-bb811e8e972b.cfargotunnel.com
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  rules:
+  - host: ${repository_webhook_host}
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: webhook-receiver
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - ${repository_webhook_host}
+    secretName: tls-fluxcd-webhook-receiver
