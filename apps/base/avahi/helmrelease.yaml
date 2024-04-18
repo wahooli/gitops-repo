@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-avahi
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: avahi
 spec:
   releaseName: base-avahi
   chart:

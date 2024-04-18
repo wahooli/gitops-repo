@@ -17,6 +17,7 @@ _*
 !apps/**/.env
 !*.yaml
 !*.yml
+!.ci/**/*.sh
 # ignore yaml files starting with underscore
 _*.yaml
 _*.yml

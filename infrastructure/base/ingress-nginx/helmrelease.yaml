@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-ingress-nginx
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: ingress-nginx
 spec:
   releaseName: base-ingress-nginx
   targetNamespace: ingress-nginx

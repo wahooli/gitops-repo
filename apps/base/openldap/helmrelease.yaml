@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-openldap
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: open-ldap
 spec:
   chart:
     spec:

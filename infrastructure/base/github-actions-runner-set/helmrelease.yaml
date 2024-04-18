@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-arc-runner-set
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: gha-runner-set
 spec:
   releaseName: base-arc-runner-set
   targetNamespace: arc-runners

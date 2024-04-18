@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-docker-mailserver
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: docker-mailserver
 spec:
   releaseName: base-docker-mailserver
   chart:

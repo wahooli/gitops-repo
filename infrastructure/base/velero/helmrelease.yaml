@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-velero
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: velero
 spec:
   releaseName: base-velero
   targetNamespace: velero

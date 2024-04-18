@@ -89,12 +89,12 @@ persistence:
     # labels:
     #   asdf: yeet
     spec:
+      isPersistentVolumeClaim: true
       accessModes:
       - "ReadWriteOnce"
       resources:
         requests:
           storage: "10Gi"
-      storageClassName: topolvm-default
   consume:
     name: consume
     enabled: true

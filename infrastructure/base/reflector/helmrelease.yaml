@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-reflector
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: reflector
 spec:
   releaseName: base-reflector
   targetNamespace: reflector

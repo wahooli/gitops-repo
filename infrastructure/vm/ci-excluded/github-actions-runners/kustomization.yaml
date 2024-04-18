@@ -21,4 +21,5 @@ patches:
     kind: HelmRelease
     name: base-arc-runner-set
 resources:
-- ../../base/github-actions-runner-set
+- ../../../base/github-actions-runner-set
+- networkpolicy.yaml

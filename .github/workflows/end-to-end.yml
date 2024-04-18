@@ -1,0 +1,120 @@
+name: End to end test
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster:
+        description: 'Comma-separated list of directories to run reconcile against'
+        default: 'vm'
+        required: true
+  push:
+    branches: ['*']
+    tags-ignore: ['*']
+
+jobs:
+  lint:
+    name: Lint YAML and get modified helmreleases
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.helmreleases.outputs.test_matrix || steps.clusters.outputs.test_matrix }}
+    steps:
+    - name: Install git, yamllint, wget, curl and yq
+      run: |
+        sudo apt-get update -qy
+        sudo apt-get install git yamllint curl wget -y --no-install-recommends
+        sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+        sudo chmod a+x /usr/bin/yq
+    - name: Setup Flux
+      if: github.event_name != 'workflow_dispatch'
+      uses: fluxcd/flux2/action@main
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: 🚀 Run yamllint
+      run: |
+        yamllint -s -c .yamllint .
+    - name: Get changed directories
+      id: changed-directories
+      if: github.event_name != 'workflow_dispatch'
+      uses: tj-actions/changed-files@v44.0.1
+      with:
+        dir_names_exclude_current_dir: true
+        files: |
+          apps/**/*
+          infrastructure/**/*
+          clusters/**/*
+        files_ignore: |
+          *.md
+          **/ci-excluded/**
+          clusters/**/flux-system/*
+    - name: Get changed helmreleases
+      if: github.event_name != 'workflow_dispatch'
+      id: helmreleases
+      run: |
+        .ci/end-to-end/get-changed-helmreleases.sh "${{ steps.changed-directories.outputs.all_changed_files }}"
+    - name: Define test matrix
+      if: github.event_name == 'workflow_dispatch'
+      id: clusters
+      run: |
+        .ci/end-to-end/parse-workflow-dispatch-input.sh "${{ inputs.cluster }}"
+
+  kubernetes:
+    runs-on: ubuntu-latest
+    needs: lint
+    name: Test flux reconciliation for ${{ matrix.test.tenant }}
+    strategy:
+      fail-fast: false
+      matrix:
+        test: ${{ fromJSON(needs.lint.outputs.matrix ) }}
+    if: ${{ needs.lint.outputs.matrix != '[]' && needs.lint.outputs.matrix != '' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install required dependencies
+      run: |
+        sudo apt-get update -qy
+        sudo apt-get install curl nfs-common -y --no-install-recommends
+    - name: Setup Flux
+      uses: fluxcd/flux2/action@main
+    - name: Setup Kubernetes
+      uses: helm/kind-action@v1.9.0
+      with:
+        cluster_name: flux
+        config: .ci/end-to-end/kind-config.yaml
+    - name: Deploy nfs container within kind network
+      env:
+        IMAGE: nimbix/unfs3:20190318-1
+      run: docker run -itd --name nfs_share --network kind $IMAGE
+    - name: Install Flux in Kubernetes Kind
+      run: flux install
+    - name: Setup cluster reconciliation in tenant ${{ matrix.test.tenant }}
+      run: |
+        flux create source git flux-system \
+        --url=${{ github.event.repository.html_url }} \
+        --branch=${GITHUB_REF#refs/heads/} \
+        --username=${GITHUB_ACTOR} \
+        --commit=${GITHUB_SHA} \
+        --password=${{ secrets.GITHUB_TOKEN }} \
+        --ignore-paths="clusters/**/flux-system/,inventory/,**/ci-excluded"
+
+        kubectl apply -k .ci/
+
+        kubectl create secret --namespace flux-system generic github-token --from-literal=token=${{ secrets.GITHUB_TOKEN }}
+
+        flux create kustomization flux-system \
+        --source=flux-system \
+        --path=./clusters/${{ matrix.test.tenant }}
+    - name: Verify cluster reconciliation
+      env:
+        TENANT: "${{ matrix.test.tenant }}"
+      run: .ci/end-to-end/verify-cluster.sh
+    - name: Verify helmrelease reconciliation
+      id: helmrelease-verify
+      if: github.event_name != 'workflow_dispatch'
+      env:
+        HELM_RELEASES: "${{ join(matrix.test.helmreleases, ',') }}"
+      run: .ci/end-to-end/reconcile-helmreleases.sh
+    - name: Debug failure
+      if: failure()
+      env:
+        HELM_RELEASES: "${{ steps.helmrelease-verify.outputs.failing_helmrelease || join(matrix.test.helmreleases, ',') }}"
+      run: .ci/end-to-end/debug-failure.sh

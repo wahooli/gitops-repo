@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-arc
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: gha-controller
 spec:
   releaseName: base-arc
   targetNamespace: arc-systems

@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-sonarr
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: sonarr
 spec:
   releaseName: base-sonarr
   chart:

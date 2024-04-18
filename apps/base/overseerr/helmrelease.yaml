@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-overseerr
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: overseerr
 spec:
   releaseName: base-overseerr
   chart:

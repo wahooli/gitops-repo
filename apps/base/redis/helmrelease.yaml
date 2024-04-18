@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-redis
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: redis
 spec:
   releaseName: base-redis
   chart:

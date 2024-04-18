@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-postgresql
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: postgresql
 spec:
   releaseName: base-postgresql
   chart:

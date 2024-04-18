@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-metallb
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: metallb
 spec:
   releaseName: base-metallb
   targetNamespace: metallb-system

@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: base-mariadb
   namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: mariadb
 spec:
   releaseName: base-mariadb
   chart:

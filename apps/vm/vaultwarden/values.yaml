@@ -63,12 +63,12 @@ persistence:
     mount:
     - path: /data
     spec:
+      isPersistentVolumeClaim: true
       accessModes:
       - "ReadWriteOnce"
       resources:
         requests:
           storage: "10Gi"
-      storageClassName: topolvm-default
   # config:
   #   enabled: true
   #   mount:
