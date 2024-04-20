@@ -14,3 +14,4 @@ resources:
 - authentik-app-vars.yaml
 - wahooli-staging-credentials.yaml
 - external-dns-secret.yaml
+- discord-webhook.yaml
