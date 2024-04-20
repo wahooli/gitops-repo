@@ -1,6 +1,6 @@
 workloadType: Deployment
 image:
-  tag: 2.6.2 # {"$imagepolicy": "flux-system:paperless-ngx:tag"}
+  tag: 2.7.2 # {"$imagepolicy": "flux-system:paperless-ngx:tag"}
 initContainers:
   wait-for-redis:
     image: wahooli/wait-for-it:latest
@@ -8,18 +8,19 @@ initContainers:
     args:
     - paperless-ngx-redis-master:6379
     - -t
-    - "300"  # wait for 5 minutes
+    - "300" # wait for 5 minutes
   wait-for-psql:
     image: wahooli/wait-for-it:latest
     imagePullPolicy: IfNotPresent
     args:
     - paperless-ngx-postgresql:5432
     - -t
-    - "300"  # wait for 5 minutes
+    - "300" # wait for 5 minutes
 env:
   PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
   PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
     {
+
       "openid_connect": {
         "APPS": [
           {
@@ -35,6 +36,7 @@ env:
         "OAUTH_PKCE_ENABLED": "True"
       }
     }
+
   PAPERLESS_DBUSER:
     valueFrom:
       secretKeyRef:
@@ -60,7 +62,6 @@ env:
       secretKeyRef:
         name: ${paperless_app_secret_name}
         key: paperless_admin_password
-
 # controller:
 #   type: statefulset
 podAnnotations:
@@ -70,7 +71,6 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: paperless-ngx
-
 resources:
   requests:
     memory: "2048Mi"
@@ -112,7 +112,6 @@ persistence:
       nfs:
         path: ${paperless_nfs_export_path}
         server: ${paperless_nfs_server}
-
 ingress:
   main:
     enabled: true
