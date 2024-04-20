@@ -19,13 +19,43 @@ jobs:
     name: Open PR to main
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      name: checkout
+    - name: Install github cli and yq
+      if: runner.environment == 'self-hosted'
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qqy wget curl
+        sudo mkdir -p -m 755 /etc/apt/keyrings
+        wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+        sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+        sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+        sudo chmod a+x /usr/bin/yq
+        sudo apt-get update -qq
+        sudo apt-get install -qqy gh
 
-    - name: pull-request
+    - name: Setup Flux
+      uses: fluxcd/flux2/action@main
+      with:
+        version: 'latest'
+
+    - uses: actions/checkout@v4
+      name: Clone repository
+      with:
+        fetch-depth: 0
+
+    - name: Create or update pull request
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         OWNER: ${{ github.repository_owner }}
+        OUTPUT_MODE: pr_description
+        HEAD_BRANCH: main
+        SOURCE_BRANCH: flux-image-updates
+      shell: bash
       run: |
-        gh_pr_up() { gh pr create $* || gh pr edit $* }
-        gh_pr_up --title "Image updates" --fill-verbose --reviewer $OWNER --base main --head flux-image-updates
+        export TITLE=$(git log --name-only origin/${HEAD_BRANCH}..${SOURCE_BRANCH} --format="%B" | head -n 1 )
+        export FILES=$(git diff --name-only origin/${HEAD_BRANCH})
+        export BODY_FILE="/tmp/pr-body.txt"
+        echo "# ${TITLE}" > $BODY_FILE
+        .ci/end-to-end/get-changed-helmreleases.sh >> $BODY_FILE
+        git reset --hard >/dev/null 2>&1
+        gh pr create --title "${TITLE}" --reviewer $OWNER --base ${HEAD_BRANCH} --head ${SOURCE_BRANCH} -l FluxCD -l Update --body-file $BODY_FILE || gh pr edit ${SOURCE_BRANCH} --add-label FluxCD --add-label Update --title "${TITLE}" --body-file $BODY_FILE

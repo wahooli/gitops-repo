@@ -1,0 +1,11 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: docker-registry
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: registry
+  policy:
+    semver:
+      range: x.x.x

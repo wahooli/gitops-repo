@@ -1,21 +1,55 @@
 #!/bin/bash
-
-PREV_IFS=$IFS
-
-FILES="${@:1}"
+OUTPUT_MODE=${OUTPUT_MODE:-github_json}
+ORIG_IFS=$IFS
+HEAD_BRANCH=main
+SOURCE_BRANCH=flux-image-updates
+FILES="${FILES}"
+if [ -z "$FILES" ]; then
+    FILES="${@:1}"
+fi
 CLUSTERS_PATH="clusters/"
 APPS_PATH="apps/"
 INFRASTRUCTURE_PATH="infrastructure/"
 CRDS_PATH="crds/"
 REPO_PATHS=("clusters/" "apps/" "infrastructure/" "crds/")
 
+function msg() {
+    if [[ "github_json" == $OUTPUT_MODE ]]; then
+        echo "$1"
+    fi
+}
+
+function debug() {
+    local messages="${*@Q}"
+    if [ "$DEBUG" = true ]; then
+        local prev_ifs=$IFS
+        echo "--DEBUG--" >> /dev/stderr
+        IFS=$ORIG_IFS
+        for msg in $messages; do
+            echo ${msg//\'/} >> /dev/stderr
+        done
+        IFS=$prev_ifs
+        echo -e "--DEBUG--\n" >> /dev/stderr
+    fi
+}
+
 function find_helmrelease_name() {
     local file=$1
     local kustomization=$2
     local kustomization_file=$3
     local selector=$4
+    local debug=$5
     local max_depth=$(yq -r ".spec.path" $kustomization_file)
     current_dir=$file
+    local previous_debug=$DEBUG
+    if [ "$debug" = true ]; then
+        DEBUG=$debug
+    fi
+    debug "file: $file" \
+        "kustomization: $kustomization" \
+        "kustomization_file: $kustomization_file" \
+        "selector: $selector" \
+        "max_depth: $max_depth"
     # this function iterates directories relative to repository root
     # if there's no slashes in current_dir or somehow this while has iterated into repo root or system root, this should break
     while [ "$current_dir" != "/" ] && [ "$current_dir" != "." ] && [[ $current_dir == *"/"* ]]; do
@@ -25,6 +59,7 @@ function find_helmrelease_name() {
         elif [ -f $current_dir ]; then
             kustomization_build=$(yq -r "${selector}" $current_dir)
         fi
+        debug "current_dir: $current_dir"
         # if yq selector finds non empty string result, break loop and echo result
         if [ -n "$kustomization_build" ]; then
             echo $kustomization_build
@@ -35,6 +70,7 @@ function find_helmrelease_name() {
             [[ $current_dir -ef $max_depth ]] && break
         fi
     done
+    DEBUG=$previous_debug
 }
 
 
@@ -78,19 +114,20 @@ function add_helmreleases_for_tenant() {
 
 declare -A HELM_RELEASES
 declare -A KUSTOMIZATION_FILES
-IFS=" "
+IFS=$'\n '
 for file in $FILES; do
     tenant=$file
     for path in "${REPO_PATHS[@]}"; do
         tenant=${tenant#"$path"}
     done
+    [[ $file == $tenant ]] && continue
     tenant=${tenant%%"/"*}
     kustomization=${file%%"/"*}
-    IFS=$PREV_IFS
+    IFS=$ORIG_IFS
     kustomization_file=""
     base_helmrelease=""
     helmreleases=""
-    echo "::group::File $file"
+    msg "::group::File $file"
     if [[ "base" = "$tenant" ]]; then
         # this overrides tenant variable if modifications were done in base overlay
         for tenant in $(find $kustomization -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) -printf '%f '); do
@@ -99,7 +136,7 @@ for file in $FILES; do
             [ ! -f $kustomization_file ] && continue
             base_helmrelease=$(find_helmrelease_name $file $kustomization $kustomization_file 'select(.kind == "HelmRelease") | .metadata.annotations."homelab.wahoo.li/base-helmrelease"')
             if [ ! -n "$base_helmrelease" ] || [ "null" = "$base_helmrelease" ] ; then
-                echo "Could not determine base helmrelease!"
+                msg "Could not determine base helmrelease!"
                 # break whole loop if base helmrelease could not be determined
                 break
             fi
@@ -107,12 +144,12 @@ for file in $FILES; do
             helmreleases=$(find_helmrelease_name $tenant_kustomization_path $kustomization $kustomization_file 'select(.kind == "HelmRelease" and .metadata.annotations."homelab.wahoo.li/base-helmrelease" == "'$base_helmrelease'") | .metadata.name')
             helmreleases=("${helmreleases[@]/---}")
             if [ -z "${helmreleases[*]}" ]; then
-                echo "Tenant: $tenant; Didn't find any helmreleases with base helmrelease: $base_helmrelease"
+                msg "Tenant: $tenant; Didn't find any helmreleases with base helmrelease: $base_helmrelease"
                 # skip this tenant if helmreleases could not be determined
                 continue
             fi
             add_helmreleases_for_tenant $tenant "${helmreleases[*]}"
-            echo "Tenant: $tenant, Added helmreleases: ${helmreleases[*]}"
+            msg "Tenant: $tenant, Added helmreleases: ${helmreleases[*]}"
         done
     else
         kustomization_file=$(find_kustomization_file "$tenant" "$kustomization")
@@ -121,25 +158,70 @@ for file in $FILES; do
             helmreleases=( "${helmreleases[@]/---}" )
             if [ -n "${helmreleases[*]}" ]; then
                 add_helmreleases_for_tenant $tenant "${helmreleases[*]}"
-                echo "Tenant: $tenant, Added helmreleases: ${helmreleases[*]}"
+                msg "Tenant: $tenant, Added helmreleases: ${helmreleases[*]}"
             fi
         fi
     fi
-    echo "::endgroup::"
+    msg "::endgroup::"
     IFS=" "
 done
-IFS=$PREV_IFS
+IFS=$ORIG_IFS
 
-helmreleases_out="["
-for key in "${!HELM_RELEASES[@]}"; do
-    releases_unique=$(echo "${HELM_RELEASES[$key]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
-    releases_unique=${releases_unique## }
-    releases_unique=${releases_unique%% }
-    helmreleases_out+="{\"tenant\": \"$key\", \"helmreleases\": [\""
-    helmreleases_out+=${releases_unique// /'", "'}
-    helmreleases_out+="\"]}, "
-done
-helmreleases_out=${helmreleases_out%%, }
-helmreleases_out+="]"
+if [[ "github_json" == $OUTPUT_MODE ]]; then
+    helmreleases_out="["
+    for key in "${!HELM_RELEASES[@]}"; do
+        releases_unique=$(echo "${HELM_RELEASES[$key]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+        releases_unique=${releases_unique## }
+        releases_unique=${releases_unique%% }
+        helmreleases_out+="{\"tenant\": \"$key\", \"helmreleases\": [\""
+        helmreleases_out+=${releases_unique// /'", "'}
+        helmreleases_out+="\"]}, "
+    done
+    helmreleases_out=${helmreleases_out%%, }
+    helmreleases_out+="]"
 
-echo "test_matrix=$helmreleases_out" >> "$GITHUB_OUTPUT"
+    echo "test_matrix=$helmreleases_out" >> "$GITHUB_OUTPUT"
+    
+elif [[ "pr_description" == $OUTPUT_MODE ]]; then
+    affected_helmreleases=()
+    for key in "${!HELM_RELEASES[@]}"; do
+        affected_helmreleases+=("### Tenant: $key")
+        releases_unique=$(echo "${HELM_RELEASES[$key]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+        for release in $releases_unique; do
+            affected_helmreleases+=("- $release")
+        done
+    done
+    if (( ${#affected_helmreleases[@]} )); then
+        echo "## Affected HelmReleases"
+        printf '%s\n' "${affected_helmreleases[@]}"
+        echo ""
+    fi
+
+    IFS=$'\n'
+    git_log=$(git log origin/${HEAD_BRANCH}..${SOURCE_BRANCH} --format="%B")
+    changed_images=()
+    parsing_images=false
+    debug ${git_log[*]}
+    for line in $git_log; do
+        if [ -f "$line" ]; then
+            parsing_images=false
+        elif [[ "Images:" == $line ]]; then
+            parsing_images=true
+        elif [ "$parsing_images" = true ]; then
+            # if line starts with dash, images are being parsed from commit message
+            [[ $line = -* ]] && changed_images+=($line)|| parsing_images=false  
+        fi
+    done
+
+    if (( ${#changed_images[@]} )); then
+        echo "## Updated images"
+        printf '%s\n' "${changed_images[@]}"
+        echo ""
+    fi
+    
+    IFS=$'\n '
+    echo "## Changed files"
+    for file in $FILES; do 
+        echo "- $file"
+    done
+fi

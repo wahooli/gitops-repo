@@ -3,6 +3,8 @@
 #     type: configMap
 #     useFromChart: false
 #     name: jellyfin-env
+image:
+  tag: "10.8.13" # {"$imagepolicy": "flux-system:jellyfin:tag"}
 
 podAnnotations:
   backup.velero.io/backup-volumes: data

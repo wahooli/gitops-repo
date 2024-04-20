@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - ../../base/authentik
 - ../../base/authentik/helmrelease-remote-cluster.yaml
+- imagepolicy.yaml
 patches:
 - path: helmrelease.yaml
   target:

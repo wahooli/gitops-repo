@@ -1,5 +1,6 @@
 #!/bin/bash
 HELM_RELEASES="${HELM_RELEASES:-$1}"
+DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 echo "::group::flux-system GitRepository definition"
 kubectl get gitrepository -n flux-system flux-system -o yaml
 echo "::endgroup::"
@@ -24,41 +25,44 @@ echo "::group::All FluxCD resources"
 flux get all --all-namespaces
 echo "::endgroup::"
 
-echo "::group::Pods in default namespace"
-kubectl get pods -n default
+echo "::group::Pods in all namespaces"
+kubectl get pods --all-namespaces
 echo "::endgroup::"
 
 echo "::group::Describe pods in default namespace"
 kubectl describe pods -n default
 echo "::endgroup::"
 
-echo "::group::All PVCs"
-kubectl get pvc -A
-echo "::endgroup::"
+if [ "$DEBUG_STORAGE" = true ]; then
+    echo "::group::All PVCs"
+    kubectl get pvc -A
+    echo "::endgroup::"
 
-echo "::group::Describe all PVCs"
-kubectl describe pvc -A
-echo "::endgroup::"
+    echo "::group::Describe all PVCs"
+    kubectl describe pvc -A
+    echo "::endgroup::"
 
-echo "::group::Get all PVs"
-kubectl get pv -A
-echo "::endgroup::"
+    echo "::group::Get all PVs"
+    kubectl get pv -A
+    echo "::endgroup::"
 
-echo "::group::Describe all PVs"
-kubectl describe pv
-echo "::endgroup::"
+    echo "::group::Describe all PVs"
+    kubectl describe pv
+    echo "::endgroup::"
 
-echo "::group::Describe all StorageClasses"
-kubectl describe sc
-echo "::endgroup::"
+    echo "::group::Describe all StorageClasses"
+    kubectl describe sc
+    echo "::endgroup::"
 
-echo "::group::local-path-provisioner logs"
-kubectl logs -n local-path-storage deploy/local-path-provisioner
-echo "::endgroup::"
+    echo "::group::local-path-provisioner logs"
+    kubectl logs -n local-path-storage deploy/local-path-provisioner
+    echo "::endgroup::"
 
-echo "::group::local-path-storage namespaced events"
-kubectl events -n local-path-storage
-echo "::endgroup::"
+    echo "::group::local-path-storage namespaced events"
+    kubectl events -n local-path-storage
+    echo "::endgroup::"
+fi
+
 
 IFS=","
 for helmrelease in $HELM_RELEASES; do

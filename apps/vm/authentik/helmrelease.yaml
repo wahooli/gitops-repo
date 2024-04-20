@@ -7,6 +7,9 @@ spec:
   releaseName: authentik
   interval: 5m
   targetNamespace: authentik
+  chart:
+    spec:
+      version: "2024.2.2" # {"$imagepolicy": "flux-system:authentik:tag"}
   values:
     blueprints:
       configMaps:

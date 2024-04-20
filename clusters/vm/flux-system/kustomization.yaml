@@ -16,8 +16,18 @@ patches:
     name: "(source-controller|kustomize-controller|helm-controller)"
 - patch: |
     - op: replace
+      path: /spec/replicas
+      value: 2
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --concurrent=6
+  target:
+    kind: Deployment
+    name: "notification-controller"
+- patch: |
+    - op: replace
       path: /spec/interval
-      value: 24h
+      value: 48h
   target:
     kind: GitRepository
     name: flux-system

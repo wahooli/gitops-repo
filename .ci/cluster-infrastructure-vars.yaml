@@ -21,3 +21,4 @@ stringData:
   cloudflare_api_token: abcdefg
   external_dns_app_secret_name: external-dns-secret
   wahooli_extenal_dns_provider: inmemory
+  repository_webhook_host: webhook.example.com

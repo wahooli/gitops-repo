@@ -5,7 +5,7 @@ lvm_vgs:
   - /dev/vda
   lvols:
   - name: k3s_data
-    size: 20G
+    size: 64G
     fs:
       type: ext4
     mount:

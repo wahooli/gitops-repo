@@ -22,13 +22,13 @@ function validate_kustomization() {
         echo "kustomization file path: $kustomization_file"
 
         echo -n "flux build kustomization $kustomization"
-        flux build kustomization $kustomization -n $namespace --kustomization-file $kustomization_file --path $path > /dev/null && echo ": success!" || echo ": failure!"
+        flux build kustomization $kustomization -n $namespace --kustomization-file $kustomization_file --path $path > /dev/null && echo ": success!" || (echo ": failure!" && exit 1)
         
         echo "flux reconcile"
-        flux reconcile kustomization $kustomization -n $namespace --timeout=10m
+        flux reconcile kustomization $kustomization -n $namespace --timeout=10m || exit 1
 
         echo "kubectl wait"
-        kubectl -n $namespace wait kustomization/$kustomization  --for=condition=ready --timeout=10m
+        kubectl -n $namespace wait kustomization/$kustomization  --for=condition=ready --timeout=10m || exit 1
 
         echo "::endgroup::"
     fi

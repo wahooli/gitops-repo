@@ -1,3 +1,5 @@
+image:
+  tag: "2.6.7" # {"$imagepolicy": "flux-system:openldap:tag"}
 env:
   LDAP_ADMIN_USERNAME:
     valueFrom:

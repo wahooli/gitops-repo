@@ -4,6 +4,7 @@ resources:
 - namespace.yaml
 - helmrepository.yaml
 - helmrelease.yaml
+- imagerepository.yaml
 configMapGenerator:
 - name: docker-registry-values
   namespace: flux-system

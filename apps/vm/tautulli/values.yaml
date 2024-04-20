@@ -1,3 +1,6 @@
+image:
+  tag: "2.13.4" # {"$imagepolicy": "flux-system:tautulli:tag"}
+
 env:
   TZ: Europe/Helsinki
 

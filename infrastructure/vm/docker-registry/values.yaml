@@ -1,5 +1,5 @@
 image:
-  tag: 2.8.3
+  tag: 2.8.3 # {"$imagepolicy": "flux-system:docker-registry:tag"}
 persistence:
   enabled: true
   size: 5Gi
