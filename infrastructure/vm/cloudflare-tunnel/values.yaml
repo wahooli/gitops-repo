@@ -1,6 +1,5 @@
 image:
-  tag: "2024.3.0" # {"$imagepolicy": "flux-system:cloudflare-tunnel:tag"}
-
+  tag: "2024.4.0" # {"$imagepolicy": "flux-system:cloudflare-tunnel:tag"}
 persistence:
   config:
     enabled: true
@@ -25,7 +24,6 @@ persistence:
 # - run
 args:
 - 7e8d8e06-b9e2-4dc6-a8fa-bb811e8e972b
-
 config:
   tunnel: 7e8d8e06-b9e2-4dc6-a8fa-bb811e8e972b
   metrics: 0.0.0.0:2000
@@ -36,7 +34,6 @@ config:
     noTLSVerify: true
   ingress:
   - service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
-
 resources:
   limits:
     cpu: 1000m
@@ -44,7 +41,6 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
