@@ -20,10 +20,6 @@ env:
   PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
   PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
     {
-
-
-
-
       "openid_connect": {
         "APPS": [
           {
