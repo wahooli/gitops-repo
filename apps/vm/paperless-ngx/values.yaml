@@ -1,6 +1,6 @@
 workloadType: Deployment
 image:
-  tag: 2.8.4 # {"$imagepolicy": "flux-system:paperless-ngx:tag"}
+  tag: 2.8.5 # {"$imagepolicy": "flux-system:paperless-ngx:tag"}
 initContainers:
   wait-for-redis:
     image: wahooli/wait-for-it:latest
@@ -20,6 +20,7 @@ env:
   PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
   PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
     {
+
 
       "openid_connect": {
         "APPS": [
