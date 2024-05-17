@@ -1,5 +1,5 @@
 image:
-  tag: "2024.4.1" # {"$imagepolicy": "flux-system:cloudflare-tunnel:tag"}
+  tag: "2024.5.0" # {"$imagepolicy": "flux-system:cloudflare-tunnel:tag"}
 persistence:
   config:
     enabled: true
