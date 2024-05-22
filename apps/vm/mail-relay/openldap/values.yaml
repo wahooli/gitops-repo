@@ -1,5 +1,5 @@
 image:
-  tag: "2.6.7" # {"$imagepolicy": "flux-system:openldap:tag"}
+  tag: "2.6.8" # {"$imagepolicy": "flux-system:openldap:tag"}
 env:
   LDAP_ADMIN_USERNAME:
     valueFrom:
@@ -23,7 +23,6 @@ env:
   LDAP_TLS_KEY_FILE: /certs/tls.key
   LDAP_TLS_CA_FILE: /certs/ca.crt
   LDAP_EXTRA_SCHEMAS: cosine,inetorgperson
-
 initContainers:
   copy-configuration:
     image: wahooli/envsubst:latest
@@ -36,7 +35,6 @@ initContainers:
       name: ldifs
     - mountPath: /src
       name: custom-ldif
-
 persistence:
   ldif:
     name: custom-ldif
