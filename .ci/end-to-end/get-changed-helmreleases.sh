@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 OUTPUT_MODE=${OUTPUT_MODE:-github_json}
 ORIG_IFS=$IFS
 HEAD_BRANCH=main
@@ -11,7 +11,7 @@ CLUSTERS_PATH="clusters/"
 APPS_PATH="apps/"
 INFRASTRUCTURE_PATH="infrastructure/"
 CRDS_PATH="crds/"
-REPO_PATHS=("clusters/" "apps/" "infrastructure/" "crds/")
+REPO_PATHS=("${CLUSTERS_PATH}" "${APPS_PATH}" "${INFRASTRUCTURE_PATH}" "${CRDS_PATH}")
 
 function msg() {
     if [[ "github_json" == $OUTPUT_MODE ]]; then
@@ -73,6 +73,19 @@ function find_helmrelease_name() {
     DEBUG=$previous_debug
 }
 
+function get_cluster_flux_version() {
+    local $tenant=$1
+    if [[ ! -v FLUX_VERSIONS[$tenant] ]]; then
+        local filename="${CLUSTERS_PATH}${tenant}/flux-system/gotk-components.yaml"
+        # Defaults to "latest" version
+        local flux_version="latest"
+        if [ -f $filename ]; then
+            flux_version=$(yq -r 'select(.kind == "Namespace") | .metadata.labels."app.kubernetes.io/version"' $filename 2>/dev/null)
+        fi
+        FLUX_VERSIONS[$tenant]="$flux_version"
+    fi
+    echo "${FLUX_VERSIONS[$tenant]}"
+}
 
 function find_kustomization_file() {
     local tenant=$1
@@ -81,7 +94,7 @@ function find_kustomization_file() {
     if [[ ! -v KUSTOMIZATION_FILES[$key] ]]; then
         # iterate files under clusters/[tenant]
         local kustomization_file=""
-        for filename in clusters/$tenant/*; do
+        for filename in ${CLUSTERS_PATH%/}/$tenant/*; do
             # not file
             [ ! -f "$filename" ] && continue
 
@@ -113,6 +126,7 @@ function add_helmreleases_for_tenant() {
 }
 
 declare -A HELM_RELEASES
+declare -A FLUX_VERSIONS
 declare -A KUSTOMIZATION_FILES
 IFS=$'\n '
 for file in $FILES; do
@@ -173,7 +187,8 @@ if [[ "github_json" == $OUTPUT_MODE ]]; then
         releases_unique=$(echo "${HELM_RELEASES[$key]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
         releases_unique=${releases_unique## }
         releases_unique=${releases_unique%% }
-        helmreleases_out+="{\"tenant\": \"$key\", \"helmreleases\": [\""
+        flux_version=$(get_cluster_flux_version $key)
+        helmreleases_out+="{\"tenant\": \"$key\", \"flux_version\": \"$flux_version\", \"helmreleases\": [\""
         helmreleases_out+=${releases_unique// /'", "'}
         helmreleases_out+="\"]}, "
     done

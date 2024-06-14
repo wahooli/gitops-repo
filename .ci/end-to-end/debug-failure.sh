@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 echo "::group::flux-system GitRepository definition"
