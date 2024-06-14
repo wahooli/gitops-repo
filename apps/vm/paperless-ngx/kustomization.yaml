@@ -3,6 +3,7 @@ configMapGenerator:
 - behavior: merge
   files:
   - values.yaml=values.yaml
+  - imagetag.yaml=imagetag.yaml
   name: paperless-ngx-values
   namespace: flux-system
 - name: paperless-ngx-env
