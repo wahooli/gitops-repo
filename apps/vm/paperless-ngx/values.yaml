@@ -1,6 +1,4 @@
 workloadType: Deployment
-image:
-  tag: 2.8.3 # {"$imagepolicy": "flux-system:paperless-ngx:tag"}
 initContainers:
   wait-for-redis:
     image: wahooli/wait-for-it:latest

@@ -1,6 +1,5 @@
 image:
-  tag: "13.3.1" # {"$imagepolicy": "flux-system:docker-mailserver:tag"}
-
+  tag: "14.0.0" # {"$imagepolicy": "flux-system:docker-mailserver:tag"}
 fullnameOverride: mail-relay
 strategy:
   type: RollingUpdate
@@ -13,7 +12,6 @@ resources:
     cpu: 100m
     ephemeral-storage: 200Mi
     memory: 256Mi
-
 env:
   LDAP_BIND_PW:
     valueFrom:
@@ -30,7 +28,6 @@ envFrom:
     type: configMap
     useFromChart: false
     name: mail-relay-env
-
 initContainers:
   copy-configuration:
     image: wahooli/envsubst:latest
@@ -44,7 +41,6 @@ initContainers:
       subPath: config
     - mountPath: /src
       name: mail-relay-config
-
 persistence:
   data:
     name: data

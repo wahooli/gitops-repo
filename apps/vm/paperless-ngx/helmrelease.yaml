@@ -25,3 +25,6 @@ spec:
   - kind: ConfigMap
     name: paperless-ngx-values
     valuesKey: values.yaml
+  - kind: ConfigMap
+    name: paperless-ngx-values
+    valuesKey: imagetag.yaml

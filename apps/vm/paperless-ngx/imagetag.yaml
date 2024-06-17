@@ -1,0 +1,2 @@
+image:
+  tag: 2.9.0 # {"$imagepolicy": "flux-system:paperless-ngx:tag"}

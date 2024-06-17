@@ -4,12 +4,9 @@ nameReference:
   fieldSpecs:
   - path: spec/values/persistence/ldif/spec/configMap/name
     kind: HelmRelease
-    namespace: flux-system
   - path: spec/values/persistence/config/spec/configMap/name
     kind: HelmRelease
-    namespace: flux-system
   - path: spec/values/persistence/schemas/spec/configMap/name
     kind: HelmRelease
-    namespace: flux-system
   - path: spec/values/envFrom/envs/name
     kind: HelmRelease

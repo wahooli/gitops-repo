@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 OUTPUT_MODE=${OUTPUT_MODE:-github_json}
 ORIG_IFS=$IFS
 HEAD_BRANCH=main
@@ -11,7 +11,7 @@ CLUSTERS_PATH="clusters/"
 APPS_PATH="apps/"
 INFRASTRUCTURE_PATH="infrastructure/"
 CRDS_PATH="crds/"
-REPO_PATHS=("clusters/" "apps/" "infrastructure/" "crds/")
+REPO_PATHS=("${CLUSTERS_PATH}" "${APPS_PATH}" "${INFRASTRUCTURE_PATH}" "${CRDS_PATH}")
 
 function msg() {
     if [[ "github_json" == $OUTPUT_MODE ]]; then
@@ -50,18 +50,30 @@ function find_helmrelease_name() {
         "kustomization_file: $kustomization_file" \
         "selector: $selector" \
         "max_depth: $max_depth"
+    
+    local error=""
     # this function iterates directories relative to repository root
     # if there's no slashes in current_dir or somehow this while has iterated into repo root or system root, this should break
     while [ "$current_dir" != "/" ] && [ "$current_dir" != "." ] && [[ $current_dir == *"/"* ]]; do
         local kustomization_build=""
         if [ -d $current_dir ]; then
             kustomization_build=$(flux build kustomization $kustomization --kustomization-file $kustomization_file --path $current_dir --dry-run 2>/dev/null | yq -r "${selector}")
+            if [ ! -n "$kustomization_build" ]; then
+                error=$(flux build kustomization $kustomization --kustomization-file $kustomization_file --path $current_dir --dry-run 2>&1 >/dev/null)
+                [ -n "$error" ] && error+="\n[ command: flux build kustomization $kustomization --kustomization-file $kustomization_file --path $current_dir --dry-run ]"
+            fi
         elif [ -f $current_dir ]; then
             kustomization_build=$(yq -r "${selector}" $current_dir)
+            if [ ! -n "$kustomization_build" ]; then
+                error=$(yq -r "${selector}" $current_dir 2>&1 >/dev/null)
+                [ -n "$error" ] && error+="\n[ command: yq -r \"${selector}\" $current_dir ]"
+            fi
         fi
         debug "current_dir: $current_dir"
         # if yq selector finds non empty string result, break loop and echo result
-        if [ -n "$kustomization_build" ]; then
+        if [ -n "$error" ]; then
+            break
+        elif [ -n "$kustomization_build" ]; then
             echo $kustomization_build
             break
         else
@@ -71,8 +83,25 @@ function find_helmrelease_name() {
         fi
     done
     DEBUG=$previous_debug
+    if [ -n "$error" ]; then
+        echo -e "Error in function \"find_helmrelease_name\":\n( $error )" > /dev/stderr
+        exit 1
+    fi
 }
 
+function get_cluster_flux_version() {
+    local $tenant=$1
+    if [[ ! -v FLUX_VERSIONS[$tenant] ]]; then
+        local filename="${CLUSTERS_PATH}${tenant}/flux-system/gotk-components.yaml"
+        # Defaults to "latest" version
+        local flux_version="latest"
+        if [ -f $filename ]; then
+            flux_version=$(yq -r 'select(.kind == "Namespace") | .metadata.labels."app.kubernetes.io/version"' $filename 2>/dev/null)
+        fi
+        FLUX_VERSIONS[$tenant]="$flux_version"
+    fi
+    echo "${FLUX_VERSIONS[$tenant]}"
+}
 
 function find_kustomization_file() {
     local tenant=$1
@@ -81,7 +110,7 @@ function find_kustomization_file() {
     if [[ ! -v KUSTOMIZATION_FILES[$key] ]]; then
         # iterate files under clusters/[tenant]
         local kustomization_file=""
-        for filename in clusters/$tenant/*; do
+        for filename in ${CLUSTERS_PATH%/}/$tenant/*; do
             # not file
             [ ! -f "$filename" ] && continue
 
@@ -113,6 +142,7 @@ function add_helmreleases_for_tenant() {
 }
 
 declare -A HELM_RELEASES
+declare -A FLUX_VERSIONS
 declare -A KUSTOMIZATION_FILES
 IFS=$'\n '
 for file in $FILES; do
@@ -132,9 +162,19 @@ for file in $FILES; do
         # this overrides tenant variable if modifications were done in base overlay
         for tenant in $(find $kustomization -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) -printf '%f '); do
             kustomization_file=$(find_kustomization_file $tenant $kustomization)
+            exit_status=$?
+            if [ ${exit_status} -ne 0 ]; then
+                echo "We have error - finding kustomization file failed!"
+                exit "${exit_status}"
+            fi
             # continue loop if empty value is returned
             [ ! -f $kustomization_file ] && continue
             base_helmrelease=$(find_helmrelease_name $file $kustomization $kustomization_file 'select(.kind == "HelmRelease") | .metadata.annotations."homelab.wahoo.li/base-helmrelease"')
+            exit_status=$?
+            if [ ${exit_status} -ne 0 ]; then
+                echo "We have error - finding helmreleases failed!"
+                exit "${exit_status}"
+            fi
             if [ ! -n "$base_helmrelease" ] || [ "null" = "$base_helmrelease" ] ; then
                 msg "Could not determine base helmrelease!"
                 # break whole loop if base helmrelease could not be determined
@@ -142,6 +182,11 @@ for file in $FILES; do
             fi
             tenant_kustomization_path=$(yq -r ".spec.path" $kustomization_file)
             helmreleases=$(find_helmrelease_name $tenant_kustomization_path $kustomization $kustomization_file 'select(.kind == "HelmRelease" and .metadata.annotations."homelab.wahoo.li/base-helmrelease" == "'$base_helmrelease'") | .metadata.name')
+            exit_status=$?
+            if [ ${exit_status} -ne 0 ]; then
+                echo "We have error - finding helmreleases failed!"
+                exit "${exit_status}"
+            fi
             helmreleases=("${helmreleases[@]/---}")
             if [ -z "${helmreleases[*]}" ]; then
                 msg "Tenant: $tenant; Didn't find any helmreleases with base helmrelease: $base_helmrelease"
@@ -155,6 +200,11 @@ for file in $FILES; do
         kustomization_file=$(find_kustomization_file "$tenant" "$kustomization")
         if [ -f $kustomization_file ]; then
             helmreleases=($(find_helmrelease_name "$file" "$kustomization" "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.name'))
+            exit_status=$?
+            if [ ${exit_status} -ne 0 ]; then
+                echo "We have error - finding helmreleases failed!"
+                exit "${exit_status}"
+            fi
             helmreleases=( "${helmreleases[@]/---}" )
             if [ -n "${helmreleases[*]}" ]; then
                 add_helmreleases_for_tenant $tenant "${helmreleases[*]}"
@@ -173,7 +223,8 @@ if [[ "github_json" == $OUTPUT_MODE ]]; then
         releases_unique=$(echo "${HELM_RELEASES[$key]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
         releases_unique=${releases_unique## }
         releases_unique=${releases_unique%% }
-        helmreleases_out+="{\"tenant\": \"$key\", \"helmreleases\": [\""
+        flux_version=$(get_cluster_flux_version $key)
+        helmreleases_out+="{\"tenant\": \"$key\", \"flux_version\": \"$flux_version\", \"helmreleases\": [\""
         helmreleases_out+=${releases_unique// /'", "'}
         helmreleases_out+="\"]}, "
     done

@@ -4,4 +4,3 @@ nameReference:
   fieldSpecs:
   - path: spec/values/persistence/jsonConfig/spec/configMap/name
     kind: HelmRelease
-    namespace: flux-system
