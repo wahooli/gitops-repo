@@ -7,9 +7,17 @@ on:
         description: 'Comma-separated list of directories to run reconcile against'
         default: 'vm'
         required: true
+  pull_request:
+    types:
+    - opened
+    - synchronize
+    - reopened
   push:
-    branches: ['*']
-    tags-ignore: ['*']
+    branches:
+    - '*'
+    - '!flux-image-updates'
+    tags-ignore:
+    - '*'
     paths-ignore:
     - 'charts/**'
     - 'inventory/**'
@@ -42,7 +50,7 @@ jobs:
     - name: Get changed directories
       id: changed-directories
       if: github.event_name != 'workflow_dispatch'
-      uses: tj-actions/changed-files@v44.0.1
+      uses: tj-actions/changed-files@v44.5.2
       with:
         dir_names_exclude_current_dir: true
         files: |
@@ -117,9 +125,8 @@ jobs:
       run: |
         flux create source git flux-system \
         --url=${{ github.event.repository.html_url }} \
-        --branch=${GITHUB_REF#refs/heads/} \
+        --branch=${GITHUB_HEAD_REF} \
         --username=${GITHUB_ACTOR} \
-        --commit=${GITHUB_SHA} \
         --password=${{ secrets.GITHUB_TOKEN }} \
         --ignore-paths="clusters/**/flux-system/,inventory/,**/ci-excluded"
 
