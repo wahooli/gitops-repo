@@ -1,0 +1,131 @@
+image:
+  tag: "0.7.1-nbxyz2"
+
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+  k8s.v1.cni.cncf.io/networks: |-
+    [{
+      "name": "${netboot_xyz_interface:=eth0-ipvlan}",
+      "ips": [ "${pxe_ip}/32" ],
+      "namespace": "default"
+    }]
+
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: netbootxyz
+
+netbootxyz:
+  assetDownload: ${enable_netbootxyz_asset_download:=true}
+  assets:
+  - source: https://mirrors.edge.kernel.org/archlinux/iso/2024.06.01/arch/x86_64/airootfs.sfs
+    dest: /archlinux/iso/2024.06.01/arch/x86_64/airootfs.sfs
+  - source: https://mirrors.edge.kernel.org/archlinux/iso/2024.06.01/arch/x86_64/airootfs.sfs.cms.sig
+    dest: /archlinux/iso/2024.06.01/arch/x86_64/airootfs.sfs.cms.sig
+  - source: https://mirrors.edge.kernel.org/archlinux/iso/2024.06.01/arch/x86_64/airootfs.sha512
+    dest: /archlinux/iso/2024.06.01/arch/x86_64/airootfs.sha512
+  - source: https://mirrors.edge.kernel.org/archlinux/iso/2024.06.01/arch/boot/x86_64/initramfs-linux.img
+    dest: /archlinux/iso/2024.06.01/arch/boot/x86_64/initramfs-linux.img
+  - source: https://mirrors.edge.kernel.org/archlinux/iso/2024.06.01/arch/boot/x86_64/initramfs-linux.img.ipxe.sig
+    dest: /archlinux/iso/2024.06.01/arch/boot/x86_64/initramfs-linux.img.ipxe.sig
+  - source: https://mirrors.edge.kernel.org/archlinux/iso/2024.06.01/arch/boot/x86_64/vmlinuz-linux
+    dest: /archlinux/iso/2024.06.01/arch/boot/x86_64/vmlinuz-linux
+  - source: https://mirrors.edge.kernel.org/archlinux/iso/2024.06.01/arch/boot/x86_64/vmlinuz-linux.ipxe.sig
+    dest: /archlinux/iso/2024.06.01/arch/boot/x86_64/vmlinuz-linux.ipxe.sig
+
+env:
+  MENU_VERSION: 2.0.79
+  CONFIG_SOURCE_DIR: /configmap
+  # CONFIG_FORCE_COPY: "true"
+
+probe:
+  liveness:
+    enabled: false
+  readiness:
+    enabled: false
+  startup:
+    enabled: false
+
+service:
+  main:
+    enabled: true
+    ports:
+    - name: http
+      port: 3000
+      ingress: true
+      protocol: TCP
+    - name: assets
+      port: 80
+      protocol: TCP
+  tftp:
+    enabled: false
+
+persistence:
+  data:
+    enabled: true
+    mount:
+    - path: /config
+      subPath: config
+    - path: /assets
+      subPath: assets
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "20Gi"
+  local-config:
+    name: custom-config
+    mount:
+    - path: /configmap
+    enabled: true
+    spec:
+      configMap:
+        name: netbootxyz-config
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      # nginx.ingress.kubernetes.io/proxy-body-size: 25m
+    hosts:
+    - host: netboot.absolutist.it
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    tls:
+    - secretName: tls-netbootxyz-ingress
+      hosts:
+      - netboot.absolutist.it
+      - netboot.wahoo.li
+      - assets.netboot.absolutist.it
+      - assets.netboot.wahoo.li
+  assets:
+    enabled: true
+    className: nginx
+    targetSelector:
+      main: assets
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      # nginx.ingress.kubernetes.io/proxy-body-size: 25m
+    hosts:
+    - host: assets.netboot.absolutist.it
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    tls:
+    - secretName: tls-netbootxyz-ingress
+      hosts:
+      - netboot.absolutist.it
+      - netboot.wahoo.li
+      - assets.netboot.absolutist.it
+      - assets.netboot.wahoo.li

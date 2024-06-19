@@ -3,16 +3,7 @@
   {{- if .Values.ingress -}}
   {{- $fullName := include "common.helpers.names.fullname" . -}}
   {{- $commonLabels := include "common.helpers.labels" . -}}
-  {{- $defaultPort := false -}}
-  {{- if (.Values.service).ingressPort -}}
-    {{- $defaultPort = .Values.service.ingressPort -}}
-  {{- else -}}
-    {{- range $_, $port := (.Values.service).ports -}}
-        {{- if and (not $defaultPort) $port.ingress -}}
-            {{- $defaultPort = $port.port -}}
-        {{- end -}}
-    {{- end -}}
-  {{- end -}}
+  {{- $services := .Values.service -}}
   {{- $kubeVersion := .Capabilities.KubeVersion.GitVersion -}}
   {{- $apiVersion := "extensions/v1beta1" -}}
   {{- if semverCompare ">=1.19-0" $kubeVersion -}}
@@ -22,6 +13,39 @@
   {{- end -}}
   {{- range $name, $ingress := .Values.ingress -}}
     {{- if and (kindIs "map" $ingress) ($ingress).enabled -}}
+      {{- $defaultPort := false -}}
+      {{- $serviceKey := "main" }}
+      {{- $portName := "http" -}}
+      {{- if $ingress.targetSelector -}}
+        {{- $serviceKey = $ingress.targetSelector | keys | first -}}
+        {{- $portName = index $ingress.targetSelector $serviceKey -}}
+        {{- /* Selector can accept port number also */ -}}
+        {{- if kindIs "float64" $portName -}}
+          {{- $defaultPort = $portName -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- $serviceName := printf "%s-%s" $fullName $serviceKey -}}
+      {{- if eq "main" $serviceKey -}}
+        {{- $serviceName = $fullName -}}
+      {{- end -}}
+      {{- if hasKey $services $serviceKey -}}
+        {{- $service := index $services $serviceKey -}}
+        {{- if ($service).name -}}
+          {{- $serviceName = printf "%s-%s" $fullName $service.name -}}
+        {{- end -}}
+        {{- if and ($service).ports (not $defaultPort) -}}
+          {{- range $_, $port := $service.ports -}}
+            {{- if eq $port.name $portName -}}
+              {{- $defaultPort = $port.containerPort | default $port.port -}}
+            {{- end -}}
+          {{- end -}}
+        {{- else -}}
+          {{- fail (printf ".Values.service.%s.ports undefined!" $serviceKey) -}}
+        {{- end -}}
+      {{- else -}}
+        {{- fail (printf "Service: %s is not defined under .Values.service!" $serviceKey) -}}
+      {{- end -}}
       {{- $name = $ingress.name | default $name -}}
       {{- $ingressName := $fullName -}}
       {{- if ne "main" $name -}}
@@ -62,12 +86,15 @@ spec:
   {{- end }}
   rules:
     {{- range $ingress.hosts -}}
-    {{- $hostPort := .servicePort | default $defaultPort }}
+    {{- $hostPort := .servicePort | default $defaultPort -}}
+    {{- if not $hostPort -}}
+      {{- fail "Could not determine ingress port!" -}}
+    {{- end }}
     - host: {{ .host | quote }}
       http:
         paths:
           {{- range .paths }}
-          {{- $svcName := .serviceName | default $fullName }}
+          {{- $svcName := .serviceName | default $serviceName }}
           - path: {{ .path }}
             {{- if and .pathType (semverCompare ">=1.18-0" $kubeVersion) }}
             pathType: {{ .pathType }}

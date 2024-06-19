@@ -40,13 +40,21 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/* Returns service name, headless if enabled */}}
-{{- define "common.helpers.names.serviceName" -}}
-  {{- $isSts := eq "StatefulSet" (include "common.helpers.names.workloadType" .) -}}
-  {{- $headlessSvcEnabled := hasKey .Values.service "headless" | ternary .Values.service.headless $isSts -}}
-  {{- if $headlessSvcEnabled -}}
-    {{- printf "%s-headless" (include "common.helpers.names.fullname" .) -}}
-  {{- else -}}
-    {{- include "common.helpers.names.fullname" . -}}
+{{- define "common.helpers.names.stsServiceName" -}}
+  {{- $fullName := include "common.helpers.names.fullname" . -}}
+  {{- $stsServiceName := "" -}}
+  {{- range $name, $service := .Values.service -}}
+    {{- $serviceName := $service.name | default $name -}}
+    {{- if and (eq "" $stsServiceName) $service.isStsService -}}
+      {{- $stsServiceName = $serviceName -}}
+    {{- end -}}
+  {{- end -}}
+  {{- /* try defaulting to main service, if stsService boolean is undefined for any service */ -}}
+  {{- if and (eq "" $stsServiceName) (.Values.service).main -}}
+    {{- $serviceName := (.Values.service.main).name | default "main" -}}
+  {{- end -}}
+  {{- if ne "" $stsServiceName -}}
+    {{- printf "%s-%s" $fullName $stsServiceName -}}
   {{- end -}}
 {{- end }}
 

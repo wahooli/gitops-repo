@@ -22,3 +22,6 @@ stringData:
   external_dns_app_secret_name: external-dns-secret
   wahooli_extenal_dns_provider: inmemory
   repository_webhook_host: webhook.example.com
+  services_subnet: 172.16.0.0/24
+  services_gateway: 172.16.0.1
+  lan_subnet: 192.168.0.0/24

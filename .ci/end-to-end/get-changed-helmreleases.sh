@@ -62,12 +62,12 @@ function find_helmrelease_name() {
                 error=$(flux build kustomization $kustomization --kustomization-file $kustomization_file --path $current_dir --dry-run 2>&1 >/dev/null)
                 [ -n "$error" ] && error+="\n[ command: flux build kustomization $kustomization --kustomization-file $kustomization_file --path $current_dir --dry-run ]"
             fi
-        elif [ -f $current_dir ]; then
-            kustomization_build=$(yq -r "${selector}" $current_dir)
-            if [ ! -n "$kustomization_build" ]; then
-                error=$(yq -r "${selector}" $current_dir 2>&1 >/dev/null)
-                [ -n "$error" ] && error+="\n[ command: yq -r \"${selector}\" $current_dir ]"
-            fi
+        # elif [ -f $current_dir ]; then
+        #     kustomization_build=$(yq -r "${selector}" $current_dir)
+        #     if [ ! -n "$kustomization_build" ]; then
+        #         error=$(yq -r "${selector}" $current_dir 2>&1 >/dev/null)
+        #         [ -n "$error" ] && error+="\n[ command: yq -r \"${selector}\" $current_dir ]"
+        #     fi
         fi
         debug "current_dir: $current_dir"
         # if yq selector finds non empty string result, break loop and echo result

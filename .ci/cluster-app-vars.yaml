@@ -28,3 +28,6 @@ stringData:
   radarr_nfs_server: nfs_share
   radarr_nfs_movies_path: /export
   radarr_nfs_downloads_path: /export
+  enable_netbootxyz_asset_download: "false"
+  # netboot_xyz_interface: bridge
+  pxe_ip: 172.16.0.20

@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+configMapGenerator:
+- files:
+  - values.yaml=values.yaml
+  name: netbootxyz-values
+  namespace: flux-system
+- name: netbootxyz-config
+  namespace: flux-system
+  options:
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
+  files:
+  - archlinux.ipxe=config/archlinux.ipxe
+  - boot.cfg=config/boot.cfg
+configurations:
+- ../../base/kustomize-config/valuesFrom.yaml
+- kustomizeconfig.yaml
+kind: Kustomization
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-netbootxyz
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: default--netbootxyz
+  target:
+    kind: HelmRelease
+    name: base-netbootxyz
+resources:
+- ../../base/netbootxyz

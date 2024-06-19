@@ -15,3 +15,4 @@ resources:
 - wahooli-staging-credentials.yaml
 - external-dns-secret.yaml
 - discord-webhook.yaml
+- cni-plugins

@@ -1,0 +1,8 @@
+{{- $ctx := deepCopy . -}}
+{{- if (.Values.netbootxyz).assetDownload -}}
+  {{- $tmp := deepCopy $ctx -}}
+  {{- $_ := include "netbootxyz.assetDownloaderScriptVolume" . | fromYaml | merge $tmp.Values -}}
+  {{- $_ = include "netbootxyz.assetDownloaderInitContainer" $tmp | fromYaml | merge $ctx.Values -}}
+  {{- $_ = include "netbootxyz.assetDownloaderScriptVolumeWithoutMount" $ctx | fromYaml | merge $ctx.Values -}}
+{{- end -}}
+{{ include "common.workload" $ctx }}

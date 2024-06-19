@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: install-cni-plugins
+  namespace: default
+  labels:
+    name: cni-plugins
+spec:
+  selector:
+    matchLabels:
+      name: cni-plugins
+  template:
+    metadata:
+      labels:
+        name: cni-plugins
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: install-cni-plugins
+        image: alpine
+        command: ["/bin/sh", "/scripts/install_cni.sh"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "50Mi"
+          limits:
+            cpu: "100m"
+            memory: "100Mi"
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: cni-bin
+          mountPath: /host/opt/cni/bin
+        - name: scripts
+          mountPath: /scripts
+      volumes:
+      - name: cni-bin
+        hostPath:
+          path: /opt/cni/bin
+      - name: scripts
+        configMap:
+          name: cni-install-sh
+          items:
+          - key: install_cni.sh
+            path: install_cni.sh
+          defaultMode: 0777

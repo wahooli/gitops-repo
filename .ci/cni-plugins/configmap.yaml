@@ -1,0 +1,13 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cni-install-sh
+  namespace: default
+data:
+  install_cni.sh: |
+    cd /tmp
+    wget https://github.com/containernetworking/plugins/releases/download/v1.5.1/cni-plugins-linux-amd64-v1.5.1.tgz
+    cd /host/opt/cni/bin
+    tar xvfzp /tmp/cni-plugins-linux-amd64-v1.5.1.tgz
+    echo "done, sleeping"
+    sleep infinity

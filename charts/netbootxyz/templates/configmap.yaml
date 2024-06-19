@@ -1,0 +1,82 @@
+{{- if (.Values.netbootxyz).assetDownload -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "netbootxyz.configMapName" . }}
+  labels:
+    {{- include "common.helpers.labels" . | nindent 4 }}
+data:
+  download-assets.sh: |-
+    #!/usr/bin/env bash
+
+    ASSETS_DIR=${ASSETS_DIR:-/assets}
+    ASSETS_DIR=${ASSETS_DIR%/}
+    ASSETS_CHOWN_USER=${ASSETS_CHOWN_USER:-nbxyz}
+    ASSETS_CHOWN_GROUP=${ASSETS_CHOWN_GROUP:-nbxyz}
+
+    CONFIG_FORCE_COPY=${CONFIG_FORCE_COPY:-false}
+    CONFIG_SOURCE_DIR=${CONFIG_SOURCE_DIR:-/sourceconfig}
+    CONFIG_LOCAL_DEST_DIR=${CONFIG_DEST_DIR:-/config/menus/local}
+    CONFIG_DEST_DIR=${CONFIG_DEST_DIR:-/config/menus}
+    mkdir -p $ASSETS_DIR
+
+    function download_asset() {
+      local source=$1
+      local dest="${ASSETS_DIR}/${2#/}"
+      if [ -f $dest ]; then
+          echo "$dest already exists"
+          return 0
+      fi
+      local dest_dir=$(dirname $dest)
+      mkdir -p $dest_dir
+      echo "Downloading $(basename $dest)"
+      wget -nv $source -O $dest || rm -f $dest
+    }
+
+    function copy_file() {
+      local source=$1
+      local dest=$2
+      local forceCopy=${3,,}
+      local destfile="$dest"
+      if [[ -d $dest ]]; then
+        mkdir -p $dest
+        chown $ASSETS_CHOWN_USER:$ASSETS_CHOWN_GROUP $dest
+        destfile="${dest%/}/$(basename $source)"
+      fi
+      if [[ -L "$source" ]]; then
+        source=$(readlink -f $source)
+      fi
+      local copyResult=""
+      if [[ "${forceCopy}" != "false" ]]; then
+        copyResult=$(cp -v "$source" "$dest")
+      else
+        copyResult=$(cp -vn "$source" "$dest")
+      fi
+
+      chown $ASSETS_CHOWN_USER:$ASSETS_CHOWN_GROUP $destfile
+
+      if [ -z "${copyResult}" ]; then
+        echo "${destfile} already exists"
+        return 1
+      else
+        echo $copyResult
+        return 0
+      fi
+    }
+
+  {{ range (.Values.netbootxyz).assets }}
+    download_asset {{ required ".Values.netbootxyz.assets items need 'source' key" .source }} {{ required ".Values.netbootxyz.assets items need 'dest' key" .dest }}
+  {{- end }}
+
+    chown -R $ASSETS_CHOWN_USER:$ASSETS_CHOWN_GROUP $ASSETS_DIR
+    for filename in $CONFIG_SOURCE_DIR/*; do
+      [ -e "$filename" ] || continue
+      if [ ! -d $filename ]; then
+        copy_file $filename $CONFIG_LOCAL_DEST_DIR $CONFIG_FORCE_COPY && copy_file $filename $CONFIG_DEST_DIR "true"
+      fi
+    done
+    exit 0
+
+---
+{{- end }}
+{{ include "common.configMap" . }}

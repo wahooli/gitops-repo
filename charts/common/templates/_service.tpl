@@ -1,41 +1,70 @@
 {{- /* Creates service definition. By default StatefulSet workload also creates service, which can be disabled with .Values.service.headless: false */ -}}
 {{- define "common.service" }}
-  {{- $createService := true -}}
-  {{- if hasKey .Values.service "create" -}}
-    {{- $createService = .Values.service.create -}}
-  {{- else if not (hasKey .Values.service "ports") -}}
-    {{- $createService = false -}}
-  {{- end -}}
-  {{- if $createService -}}
+  {{- if .Values.service -}}
+    {{- $fullName := include "common.helpers.names.fullname" . -}}
+    {{- $commonLabels := (include "common.helpers.labels" .) | fromYaml -}}
+    {{- $selectorLabels := (include "common.helpers.labels.selectorLabels" .) | fromYaml -}}
     {{- $isSts := eq "StatefulSet" (include "common.helpers.names.workloadType" .) -}}
-    {{- $headlessSvcEnabled := hasKey .Values.service "headless" | ternary .Values.service.headless $isSts -}}
+
+    {{- range $name, $service := .Values.service -}}
+      {{- $createService := true -}}
+      {{- if hasKey $service "enabled" -}}
+        {{- $createService = $service.enabled -}}
+      {{- else if not (hasKey $service "ports") -}}
+        {{- $createService = false -}}
+      {{- end -}}
+
+      {{- /* Creates headless service copy if is only "main" named service  */ -}}
+      {{- $createHeadlessCopy := hasKey $service "createHeadless" | ternary $service.createHeadless (and $isSts (eq "main" $name)) -}}
+
+      {{- $serviceSpec := omit $service "createHeadless" "annotations" "name" "labels" "ports" "enabled" "isStsService" -}}
+      {{- $servicePorts := $service.ports -}}
+      {{- if not (hasKey $serviceSpec "type") -}}
+        {{- $serviceSpec = merge (dict "type" "ClusterIP") $serviceSpec -}}
+      {{- end -}}
+
+      {{- $serviceLabels := merge $commonLabels ($service.labels | default dict) -}}
+
+      {{- $serviceSpec = merge (dict "selector" $selectorLabels) $serviceSpec -}}
+      {{- $headlessSpec := omit $serviceSpec "type" "clusterIP" -}}
+      {{- $serviceName := printf "%s-%s" $fullName ($service.name | default $name) -}}
+      {{- if and (not $service.name) (eq "main" $name) -}}
+        {{- $serviceName = $fullName -}}
+      {{- end -}}
+      {{- if $createService }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "common.helpers.names.fullname" . }}
+  name: {{ $serviceName }}
+  {{- with $service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
-    {{- include "common.helpers.labels" . | nindent 4 }}
+    {{- toYaml $serviceLabels | nindent 4 }}
 spec:
-  type: {{ .Values.service.type | default "ClusterIP" }}
-  {{- include "common.tpl.ports.service" . | nindent 2 }}
-  selector:
-    {{- include "common.helpers.labels.selectorLabels" . | nindent 4 }}
-  {{- if $headlessSvcEnabled }}
+  {{- include "common.tpl.ports.service" $service.ports | nindent 2 }}
+  {{- toYaml $serviceSpec | nindent 2 }}
+        {{- if $createHeadlessCopy }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "common.helpers.names.fullname" . }}-headless
+  name: {{ $serviceName }}-headless
+  {{- with $service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
-    {{- include "common.helpers.labels" . | nindent 4 }}
-    app.kubernetes.io/component: headless
+    {{- toYaml $serviceLabels | nindent 4 }}
 spec:
   type: ClusterIP
   clusterIP: None
-  {{- include "common.tpl.ports.service" . | nindent 2 }}
-  selector:
-    {{- include "common.helpers.labels.selectorLabels" . | nindent 4 }}
-  {{- end -}}
-{{- end }}
+  {{- include "common.tpl.ports.service" $service.ports | nindent 2 }}
+  {{- toYaml $headlessSpec | nindent 2 }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}

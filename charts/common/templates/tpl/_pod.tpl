@@ -22,6 +22,9 @@ spec:
   {{- with .Values.hostname }}
   hostname: {{ toYaml . }}
   {{- end }}
+  {{- with .Values.hostNetwork }}
+  hostNetwork: {{ toYaml . }}
+  {{- end }}
   {{- with .Values.subdomain }}
   subdomain: {{ toYaml . }}
   {{- end }}

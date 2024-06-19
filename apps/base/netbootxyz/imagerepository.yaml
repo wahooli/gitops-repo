@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: netbootxyz
+  namespace: flux-system
+spec:
+  image: ghcr.io/netbootxyz/netbootxyz
+  interval: 24h

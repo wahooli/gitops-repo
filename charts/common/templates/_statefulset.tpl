@@ -12,7 +12,7 @@ spec:
   replicas: {{ .Values.replicaCount | default 1 }}
   {{- end }}
   {{- include "common.tpl.strategy" . | nindent 2 }}
-  serviceName: {{ include "common.helpers.names.serviceName" . }}
+  serviceName: {{ include "common.helpers.names.stsServiceName" . }}
   selector:
     matchLabels:
       {{- include "common.helpers.labels.selectorLabels" . | nindent 6 }}
