@@ -57,5 +57,5 @@ configMapGenerator:
   - policies-shared.yaml=blueprints/policies-shared.yaml
   - users.yaml=blueprints/users.yaml
 configurations:
-- ../../base/kustomize-config/valuesFrom.yaml
+- ../../.config/valuesFrom.yaml
 - kustomizeconfig.yaml

@@ -28,7 +28,7 @@ configMapGenerator:
   - postfix-sasl-password.cf=config/postfix-sasl-password.cf
   - user-patches.sh=config/user-patches.sh
 configurations:
-- ../../base/kustomize-config/valuesFrom.yaml
+- ../../.config/valuesFrom.yaml
 - kustomizeconfig.yaml
 kind: Kustomization
 patches:

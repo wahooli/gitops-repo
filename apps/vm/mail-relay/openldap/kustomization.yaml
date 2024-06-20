@@ -43,4 +43,4 @@ configMapGenerator:
   - postfix-book.ldif=config/postfix-book.ldif
 configurations:
 - ../kustomizeconfig.yaml
-- ../../../base/kustomize-config/valuesFrom.yaml
+- ../../../.config/valuesFrom.yaml

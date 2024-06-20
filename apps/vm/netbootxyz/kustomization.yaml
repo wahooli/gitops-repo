@@ -16,7 +16,7 @@ configMapGenerator:
   - archlinux.ipxe=config/archlinux.ipxe
   - boot.cfg=config/boot.cfg
 configurations:
-- ../../base/kustomize-config/valuesFrom.yaml
+- ../../.config/valuesFrom.yaml
 - kustomizeconfig.yaml
 kind: Kustomization
 patches:

@@ -5,7 +5,7 @@ configMapGenerator:
   name: tautulli-values
   namespace: flux-system
 configurations:
-- ../../base/kustomize-config/valuesFrom.yaml
+- ../../.config/valuesFrom.yaml
 kind: Kustomization
 patches:
 - path: helmrelease.yaml

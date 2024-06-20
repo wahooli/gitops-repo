@@ -35,4 +35,4 @@ configMapGenerator:
   - database.json=config/database.json
 configurations:
 - kustomizeconfig.yaml
-- ../../base/kustomize-config/valuesFrom.yaml
+- ../../.config/valuesFrom.yaml

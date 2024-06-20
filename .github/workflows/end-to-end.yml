@@ -60,6 +60,7 @@ jobs:
         files_ignore: |
           *.md
           **/ci-excluded/**
+          apps/.config/*
           clusters/**/flux-system/*
     - name: Get changed helmreleases
       if: github.event_name != 'workflow_dispatch'

@@ -21,4 +21,4 @@ configMapGenerator:
   - values-base.yaml=../../../base/mariadb/values-base.yaml
   - values.yaml=values.yaml
 configurations:
-- ../../../base/kustomize-config/valuesFrom.yaml
+- ../../../.config/valuesFrom.yaml

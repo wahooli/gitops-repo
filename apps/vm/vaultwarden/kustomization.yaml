@@ -20,7 +20,7 @@ configMapGenerator:
   - .env
   namespace: flux-system
 configurations:
-- ../../base/kustomize-config/valuesFrom.yaml
+- ../../.config/valuesFrom.yaml
 - kustomizeconfig.yaml
 kind: Kustomization
 patches:
