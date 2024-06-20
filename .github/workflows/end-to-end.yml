@@ -124,20 +124,23 @@ jobs:
       run: flux install --components-extra="image-reflector-controller,image-automation-controller"
     - name: Setup cluster reconciliation in tenant ${{ matrix.test.tenant }}
       run: |
-        [ "$EVENT_TYPE" == "pull_request" ] && flux create source git flux-system \
-        --url=${{ github.event.repository.html_url }} \
-        --branch=${GITHUB_HEAD_REF} \
-        --username=${GITHUB_ACTOR} \
-        --password=${{ secrets.GITHUB_TOKEN }} \
-        --ignore-paths="clusters/**/flux-system/,inventory/,**/ci-excluded"
-
-        [ "$EVENT_TYPE" != "pull_request" ] && flux create source git flux-system \
-        --url=${{ github.event.repository.html_url }} \
-        --branch=${GITHUB_REF#refs/heads/} \
-        --username=${GITHUB_ACTOR} \
-        --commit=${GITHUB_SHA} \
-        --password=${{ secrets.GITHUB_TOKEN }} \
-        --ignore-paths="clusters/**/flux-system/,inventory/,**/ci-excluded"
+        # this variable is defined only in pull requests
+        if [ -z "${GITHUB_HEAD_REF}" ]; then
+          flux create source git flux-system \
+          --url=${{ github.event.repository.html_url }} \
+          --branch=${GITHUB_REF#refs/heads/} \
+          --username=${GITHUB_ACTOR} \
+          --commit=${GITHUB_SHA} \
+          --password=${{ secrets.GITHUB_TOKEN }} \
+          --ignore-paths="clusters/**/flux-system/,inventory/,**/ci-excluded"
+        else
+          flux create source git flux-system \
+          --url=${{ github.event.repository.html_url }} \
+          --branch=${GITHUB_HEAD_REF} \
+          --username=${GITHUB_ACTOR} \
+          --password=${{ secrets.GITHUB_TOKEN }} \
+          --ignore-paths="clusters/**/flux-system/,inventory/,**/ci-excluded"
+        fi
 
         kubectl apply -k .ci/
 
@@ -149,7 +152,6 @@ jobs:
     - name: Verify cluster reconciliation
       env:
         TENANT: "${{ matrix.test.tenant }}"
-        EVENT_TYPE: "${{ github.event_name }}"
       run: .ci/end-to-end/verify-cluster.sh
     - name: Verify helmrelease reconciliation
       id: helmrelease-verify
