@@ -1,0 +1,103 @@
+name: FluxCD Auto-Update
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "0 * * * *"
+
+env:
+  BRANCH_NAME: flux-system-update
+
+jobs:
+  pull-request:
+    name: Update FluxCD and create pull request
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install github cli, git, curl and wget
+      if: runner.environment == 'self-hosted'
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qqy wget curl git
+        sudo mkdir -p -m 755 /etc/apt/keyrings
+        wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+        sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+        sudo apt-get update -qq
+        sudo apt-get install -qqy gh
+
+    - name: Setup Flux
+      uses: fluxcd/flux2/action@main
+      with:
+        version: 'latest'
+
+    - uses: actions/checkout@v4
+      name: Try clone ${{ env.BRANCH_NAME }} branch
+      continue-on-error: true
+      id: flux-update-checkout
+      with:
+        fetch-depth: 0
+        ref: "${{ env.BRANCH_NAME }}"
+
+    - uses: actions/checkout@v4
+      name: Clone ${{ github.event.repository.default_branch }} branch
+      if: steps.flux-update-checkout.outcome == 'failure'
+      with:
+        fetch-depth: 0
+        ref: "${{ github.event.repository.default_branch }}"
+
+    - name: Check for updates and create pull request
+      id: flux-update
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        for cluster in clusters/*; do
+          if [ -d "${cluster}/flux-system" ]; then
+            [ -f "${cluster}/flux-system/gotk-components.yaml" ] && flux install \
+            --export > "${cluster}/flux-system/gotk-components.yaml"
+          fi
+        done
+
+        VERSION="$(flux -v)"
+
+        if [ "${{ steps.flux-update-checkout.outcome }}" == "failure" ]; then
+          git checkout -b ${{ env.BRANCH_NAME }}
+        fi
+
+        git branch
+
+        if ! git diff --quiet; then
+          git config --global user.name "${{ github.actor }}[bot]"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}[bot]@users.noreply.github.com"
+
+          git remote set-url --push origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}
+
+          git add -u
+          git commit -m "Update FluxCD to version: $VERSION"
+
+          git push --set-upstream origin ${{ env.BRANCH_NAME }}
+
+        fi
+
+        TITLE="${VERSION^} update"
+        HEAD_BRANCH="${{ github.event.repository.default_branch }}"
+        SOURCE_BRANCH="${{ env.BRANCH_NAME }}"
+        BODY_FILE=$(mktemp)
+
+        echo "# Update clusters to $VERSION" >> $BODY_FILE
+        echo "## Affected Clusters" >> $BODY_FILE
+        for FILE in $(git diff --name-only origin/${{ github.event.repository.default_branch }} | grep clusters | grep flux-system); do
+          CLUSTER="${FILE#clusters/}"
+          CLUSTER="${CLUSTER%%/*}"
+          echo "- ${CLUSTER}" >> $BODY_FILE
+          echo ""  >> $BODY_FILE
+        done
+
+        echo "## Changed files" >> $BODY_FILE
+        for FILE in $(git diff --name-only origin/${{ github.event.repository.default_branch }}); do
+          echo "- ${FILE}"  >> $BODY_FILE
+          echo ""  >> $BODY_FILE
+        done
+        gh pr create --title "${TITLE}" --reviewer ${{ github.repository_owner }} --base ${HEAD_BRANCH} --head ${SOURCE_BRANCH} -l FluxCD -l Update --body-file $BODY_FILE || gh pr edit ${SOURCE_BRANCH} --add-label FluxCD --add-label Update --title "${TITLE}" --body-file $BODY_FILE
+        rm -f $BODY_FILE
+
+        echo "flux_version=$VERSION" >> $GITHUB_OUTPUT
