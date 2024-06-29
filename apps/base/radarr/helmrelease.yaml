@@ -9,12 +9,13 @@ spec:
   releaseName: base-radarr
   chart:
     spec:
-      reconcileStrategy: Revision
-      chart: ./charts/radarr
+      chart: radarr
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: wahooli
         namespace: flux-system
+      version: ">=0.1.0"
+      interval: 24h
   install:
     remediation:
       retries: -1

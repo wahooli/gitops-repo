@@ -8,11 +8,13 @@ metadata:
 spec:
   chart:
     spec:
-      chart: ./charts/openldap
+      chart: openldap
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: wahooli
         namespace: flux-system
+      version: ">=0.1.0"
+      interval: 24h
   interval: 5m0s
   releaseName: base-openldap
   valuesFrom:

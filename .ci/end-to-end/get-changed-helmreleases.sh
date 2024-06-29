@@ -33,14 +33,43 @@ function debug() {
     fi
 }
 
+function longest_common_prefix()
+{
+    declare -a names
+    declare -a parts
+    declare i=0
+
+    names=("$@")
+    name="$1"
+    while x=$(dirname "$name"); [ "$x" != "/" ]
+    do
+        parts[$i]="$x"
+        i=$(($i + 1))
+        name="$x"
+    done
+
+    for prefix in "${parts[@]}" /
+    do
+        for name in "${names[@]}"
+        do
+            if [ "${name#$prefix/}" = "${name}" ]
+            then continue 2
+            fi
+        done
+        echo "$prefix"
+        break
+    done
+}
+
 function find_helmrelease_name() {
     local file=$1
     local kustomization=$2
     local kustomization_file=$3
     local selector=$4
     local debug=$5
-    local max_depth=$(yq -r ".spec.path" $kustomization_file)
-    current_dir=$file
+    local max_depth=$(realpath $(yq -r ".spec.path" $kustomization_file))
+    current_dir=$(realpath $file)
+    local common_max_depth=$(longest_common_prefix $max_depth $current_dir)
     local previous_debug=$DEBUG
     if [ "$debug" = true ]; then
         DEBUG=$debug
@@ -49,7 +78,8 @@ function find_helmrelease_name() {
         "kustomization: $kustomization" \
         "kustomization_file: $kustomization_file" \
         "selector: $selector" \
-        "max_depth: $max_depth"
+        "max_depth: $max_depth" \
+        "common_max_depth: $common_max_depth"
     
     local error=""
     # this function iterates directories relative to repository root
@@ -80,6 +110,8 @@ function find_helmrelease_name() {
             current_dir=$(dirname "$current_dir")
             # break if current dir equals to path defined in kustomization
             [[ $current_dir -ef $max_depth ]] && break
+            [[ $current_dir -ef $common_max_depth ]] && break
+            (! [[ $common_max_depth -ef $max_depth ]]) && [[ $(dirname $current_dir) -ef $common_max_depth ]] && break
         fi
     done
     DEBUG=$previous_debug
@@ -160,7 +192,7 @@ for file in $FILES; do
     msg "::group::File $file"
     if [[ "base" = "$tenant" ]]; then
         # this overrides tenant variable if modifications were done in base overlay
-        for tenant in $(find $kustomization -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) -printf '%f '); do
+        for tenant in $(find $kustomization -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) \( ! -name '.config' \) -printf '%f '); do
             kustomization_file=$(find_kustomization_file $tenant $kustomization)
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
@@ -172,7 +204,7 @@ for file in $FILES; do
             base_helmrelease=$(find_helmrelease_name $file $kustomization $kustomization_file 'select(.kind == "HelmRelease") | .metadata.annotations."homelab.wahoo.li/base-helmrelease"')
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
-                echo "We have error - finding helmreleases failed!"
+                echo "We have error - finding base helmreleases failed for tenant \"$tenant\"!"
                 exit "${exit_status}"
             fi
             if [ ! -n "$base_helmrelease" ] || [ "null" = "$base_helmrelease" ] ; then
@@ -184,7 +216,7 @@ for file in $FILES; do
             helmreleases=$(find_helmrelease_name $tenant_kustomization_path $kustomization $kustomization_file 'select(.kind == "HelmRelease" and .metadata.annotations."homelab.wahoo.li/base-helmrelease" == "'$base_helmrelease'") | .metadata.name')
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
-                echo "We have error - finding helmreleases failed!"
+                echo "We have error - finding tenant helmreleases failed for tenant \"$tenant\"!"
                 exit "${exit_status}"
             fi
             helmreleases=("${helmreleases[@]/---}")
@@ -202,7 +234,7 @@ for file in $FILES; do
             helmreleases=($(find_helmrelease_name "$file" "$kustomization" "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.name'))
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
-                echo "We have error - finding helmreleases failed!"
+                echo "We have error - finding tenant helmreleases failed for tenant \"$tenant\"!"
                 exit "${exit_status}"
             fi
             helmreleases=( "${helmreleases[@]/---}" )

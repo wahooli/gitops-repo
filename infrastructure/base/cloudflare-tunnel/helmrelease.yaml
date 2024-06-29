@@ -8,12 +8,13 @@ metadata:
 spec:
   chart:
     spec:
-      reconcileStrategy: Revision
-      chart: ./charts/cloudflare-tunnel
+      chart: cloudflare-tunnel
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: wahooli
         namespace: flux-system
+      version: ">=0.1.0"
+      interval: 24h
   interval: 5m0s
   releaseName: base-cloudflare-tunnel
   targetNamespace: cloudflare-tunnel

@@ -9,12 +9,13 @@ spec:
   releaseName: base-avahi
   chart:
     spec:
-      reconcileStrategy: Revision
-      chart: ./charts/avahi
+      chart: avahi
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: wahooli
         namespace: flux-system
+      version: ">=0.1.1"
+      interval: 24h
   valuesFrom:
   - kind: ConfigMap
     name: avahi-values

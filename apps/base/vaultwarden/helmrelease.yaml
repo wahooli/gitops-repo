@@ -9,12 +9,13 @@ spec:
   releaseName: base-vaultwarden
   chart:
     spec:
-      reconcileStrategy: Revision
-      chart: ./charts/vaultwarden
+      chart: vaultwarden
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: wahooli
         namespace: flux-system
+      version: ">=0.1.0"
+      interval: 24h
   install:
     remediation:
       retries: -1
