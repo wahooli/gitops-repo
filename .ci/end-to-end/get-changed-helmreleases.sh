@@ -87,10 +87,10 @@ function find_helmrelease_name() {
     while [ "$current_dir" != "/" ] && [ "$current_dir" != "." ] && [[ $current_dir == *"/"* ]]; do
         local kustomization_build=""
         if [ -d $current_dir ]; then
-            kustomization_build=$(flux build kustomization $kustomization --kustomization-file $kustomization_file --path $current_dir --dry-run 2>/dev/null | yq -r "${selector}")
+            kustomization_build=$(flux build kustomization $kustomization --ignore-paths "**/ci-excluded/**" --kustomization-file $kustomization_file --path $current_dir --dry-run 2>/dev/null | yq -Nr "${selector}")
             if [ ! -n "$kustomization_build" ]; then
-                error=$(flux build kustomization $kustomization --kustomization-file $kustomization_file --path $current_dir --dry-run 2>&1 >/dev/null)
-                [ -n "$error" ] && error+="\n[ command: flux build kustomization $kustomization --kustomization-file $kustomization_file --path $current_dir --dry-run ]"
+                error=$(flux build kustomization $kustomization --ignore-paths "**/ci-excluded/**" --kustomization-file $kustomization_file --path $current_dir --dry-run 2>&1 >/dev/null)
+                [ -n "$error" ] && error+="\n[ command: flux build kustomization $kustomization --ignore-paths \"**/ci-excluded/**\" --kustomization-file $kustomization_file --path $current_dir --dry-run ]"
             fi
         # elif [ -f $current_dir ]; then
         #     kustomization_build=$(yq -r "${selector}" $current_dir)
@@ -190,7 +190,16 @@ for file in $FILES; do
     base_helmrelease=""
     helmreleases=""
     msg "::group::File $file"
-    if [[ "base" = "$tenant" ]]; then
+    if [[ "$file" =~ ^clusters\/.*?\/flux-system\/.*?\.yaml$ ]]; then
+        for kustomization in "infrastructure" "crds" "apps"; do
+            kustomization_file=$(find_kustomization_file "$tenant" $kustomization)
+            helmreleases=($(find_helmrelease_name "$kustomization/$tenant/" $kustomization "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.name'))
+            if [ -n "${helmreleases[*]}" ]; then
+                add_helmreleases_for_tenant $tenant "${helmreleases[*]}"
+                msg "Kustomization: $kustomization, Tenant: $tenant, Added helmreleases: ${helmreleases[*]}"
+            fi
+        done
+    elif [[ "base" = "$tenant" ]]; then
         # this overrides tenant variable if modifications were done in base overlay
         for tenant in $(find $kustomization -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) \( ! -name '.config' \) -printf '%f '); do
             kustomization_file=$(find_kustomization_file $tenant $kustomization)
@@ -200,7 +209,7 @@ for file in $FILES; do
                 exit "${exit_status}"
             fi
             # continue loop if empty value is returned
-            [ ! -f $kustomization_file ] && continue
+            [[ ! -f $kustomization_file ]] && continue
             base_helmrelease=$(find_helmrelease_name $file $kustomization $kustomization_file 'select(.kind == "HelmRelease") | .metadata.annotations."homelab.wahoo.li/base-helmrelease"')
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
@@ -230,7 +239,7 @@ for file in $FILES; do
         done
     else
         kustomization_file=$(find_kustomization_file "$tenant" "$kustomization")
-        if [ -f $kustomization_file ]; then
+        if [[ -f $kustomization_file ]]; then
             helmreleases=($(find_helmrelease_name "$file" "$kustomization" "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.name'))
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then

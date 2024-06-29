@@ -16,6 +16,7 @@ on:
     branches:
     - '*'
     - '!flux-image-updates'
+    - '!flux-system-update'
     tags-ignore:
     - '*'
     paths-ignore:
@@ -61,7 +62,6 @@ jobs:
           *.md
           **/ci-excluded/**
           apps/.config/*
-          clusters/**/flux-system/*
     - name: Get changed helmreleases
       if: github.event_name != 'workflow_dispatch'
       id: helmreleases
