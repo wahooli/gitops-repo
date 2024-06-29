@@ -1,4 +1,4 @@
-apiVersion: image.toolkit.fluxcd.io/v1beta1
+apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageUpdateAutomation
 metadata:
   name: apps
@@ -22,17 +22,17 @@ spec:
         Automation name: {{ .AutomationObject }}
 
         Files:
-        {{ range $filename, $_ := .Updated.Files -}}
+        {{ range $filename, $_ := .Changed.Files -}}
         - {{ $filename }}
         {{ end -}}
 
         Objects:
-        {{ range $resource, $_ := .Updated.Objects -}}
+        {{ range $resource, $_ := .Changed.Objects -}}
         - {{ $resource.Kind }} {{ $resource.Name }}
         {{ end -}}
 
         Images:
-        {{ range .Updated.Images -}}
+        {{ range .Changed.Images -}}
         - {{.}}
         {{ end -}}
     push:
