@@ -53,6 +53,7 @@ jobs:
         for cluster in clusters/*; do
           if [ -d "${cluster}/flux-system" ]; then
             [ -f "${cluster}/flux-system/gotk-components.yaml" ] && flux install \
+            --components-extra="image-reflector-controller,image-automation-controller" \
             --export > "${cluster}/flux-system/gotk-components.yaml"
           fi
         done
