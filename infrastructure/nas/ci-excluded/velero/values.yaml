@@ -1,0 +1,118 @@
+initContainers:
+# - name: velero-plugin-for-csi
+#   image: velero/velero-plugin-for-csi:v0.7.1
+#   imagePullPolicy: IfNotPresent
+#   volumeMounts:
+#   - mountPath: /target
+#     name: plugins
+- name: velero-plugin-for-aws
+  image: velero/velero-plugin-for-aws:v1.10.0
+  imagePullPolicy: IfNotPresent
+  volumeMounts:
+  - mountPath: /target
+    name: plugins
+credentials:
+  existingSecret:
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=${velero_access_key_id}
+      aws_secret_access_key=${velero_access_key}
+
+dnsPolicy: ClusterFirstWithHostNet
+snapshotsEnabled: false
+
+schedules:
+  weekly:
+    disabled: false
+    labels:
+      schedule: weekly
+    schedule: "5 2 */7 * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: "720h"  # month retain
+      labelSelector:
+        matchLabels:
+          backupWeekly: "true"
+      storageLocation: seaweedfs-backups
+      excludedResources:
+      - storageclasses.storage.k8s.io
+      - certificaterequests.cert-manager.io
+      - certificates.cert-manager.io
+      - orders.acme.cert-manager.io
+      - networkpolicy
+      # - ingress
+      excludedNamespaces:
+      - kube-public
+      - kube-node-lease
+      # - flux-system  # required for configmapgenerator envs
+      - calico-apiserver
+      - calico-system
+      - cert-manager
+      - ingress-nginx
+      - kube-system
+      - metallb-system
+      - tigera-operator
+      - topolvm-system
+      - velero
+  daily:
+    disabled: false
+    labels:
+      schedule: daily
+    schedule: "5 1 * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: "168h"  # week retain
+      labelSelector:
+        matchLabels:
+          backupDaily: "true"
+      storageLocation: seaweedfs-backups
+      excludedResources:
+      - storageclasses.storage.k8s.io
+      - certificaterequests.cert-manager.io
+      - certificates.cert-manager.io
+      - orders.acme.cert-manager.io
+      - networkpolicy
+      # - ingress
+      excludedNamespaces:
+      - kube-public
+      - kube-node-lease
+      # - flux-system  # required for configmapgenerator envs
+      - calico-apiserver
+      - calico-system
+      - cert-manager
+      - ingress-nginx
+      - kube-system
+      - metallb-system
+      - tigera-operator
+      - topolvm-system
+      - velero
+
+
+configuration:
+  defaultBackupStorageLocation: seaweedfs-backups
+  defaultBackupTTL: 72h
+  backupStorageLocation:
+  - name: seaweedfs-backups
+    provider: aws
+    bucket: ${velero_backup_bucket}
+    # accessMode: ReadOnly
+    accessMode: ReadWrite
+    default: true
+    config:
+      region: ${velero_backup_bucket_region}
+      s3ForcePathStyle: true
+      s3Url: ${velero_backup_bucket_url}
+
+  # volumeSnapshotLocation:
+  # - name: seaweedfs-backups
+  #   provider: aws
+  #   bucket: ${velero_snapshot_bucket}
+  #   accessMode: ReadWrite
+  #   config:
+  #     region: ${velero_snapshot_bucket_region}
+  #     s3ForcePathStyle: true
+  #     s3Url: ${velero_snapshot_bucket_url}
+
+# nodeAgent:
+#   podVolumePath: /mnt/k3s_data/kubelet/pods

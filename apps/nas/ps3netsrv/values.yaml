@@ -1,0 +1,18 @@
+image:
+  tag: "v1.10.0" # {"$imagepolicy": "flux-system:ps3netsrv:tag"}
+
+global:
+  labels:
+    app.kubernetes.io/part-of: ps3netsrv
+
+hostNetwork: true
+
+persistence:
+  games:
+    enabled: true
+    mount:
+    - path: /games
+    spec:
+      hostPath:
+        path: ${ps3netsrv_games_host_path}
+        type: Directory

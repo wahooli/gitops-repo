@@ -1,0 +1,14 @@
+profile: ambient
+global:
+  meshID: mesh1
+  multiCluster:
+    enabled: true
+    clusterName: nasse
+  network: network1
+meshConfig:
+  accessLogFile: /dev/stdout
+  ingressService: istio-ingress
+  ingressSelector: ingress
+pilot:
+  env:
+    K8S_INGRESS_NS: istio-ingress

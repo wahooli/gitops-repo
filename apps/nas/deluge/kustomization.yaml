@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+configMapGenerator:
+- files:
+  - values.yaml=values.yaml
+  name: deluge-values
+  namespace: flux-system
+- name: deluge-env
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
+  envs:
+  - .env
+configurations:
+- ../../.config/valuesFrom.yaml
+- ../../.config/envFrom.yaml
+kind: Kustomization
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-deluge
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: default--deluge
+  target:
+    kind: HelmRelease
+    name: base-deluge
+resources:
+- ../../base/deluge

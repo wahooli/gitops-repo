@@ -15,4 +15,6 @@ resources:
 - wahooli-staging-credentials.yaml
 - external-dns-secret.yaml
 - discord-webhook.yaml
+- seaweedfs-s3-secret.yaml
 - cni-plugins
+- helmrelease-value-overrides

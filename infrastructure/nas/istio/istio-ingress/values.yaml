@@ -1,0 +1,4 @@
+service:
+  type: ${istio_ingress_service_type:=LoadBalancer}
+  annotations:
+    lbipam.cilium.io/ips: ${istio_ingress_ip}

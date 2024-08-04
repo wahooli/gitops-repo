@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--plex
+  namespace: flux-system
+spec:
+  releaseName: plex
+  interval: 5m
+  targetNamespace: default
+  values:
+    envFrom:
+      envs:
+        name: plex-env
+  valuesFrom:
+  - kind: ConfigMap
+    name: plex-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: plex-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml

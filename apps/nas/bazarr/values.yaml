@@ -1,0 +1,69 @@
+image:
+  tag: "1.4.3" # {"$imagepolicy": "flux-system:bazarr:tag"}
+
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: bazarr
+
+# resources:
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /config
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "1Gi"
+  movies:
+    enabled: true
+    mount:
+    - path: /movies
+    spec:
+      hostPath:
+        path: ${bazarr_movies_host_path}
+        type: Directory
+  tv:
+    enabled: true
+    mount:
+    - path: /tv
+    spec:
+      hostPath:
+        path: ${bazarr_tv_host_path}
+        type: Directory
+
+ingress:
+  main:
+    enabled: true
+    className: istio
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+    hosts:
+    - host: bazarr.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    - host: bazarr.test.absolutist.it
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    tls:
+    - secretName: tls-bazarr-ingress
+      hosts:
+      - bazarr.wahoo.li
+      - bazarr.test.absolutist.it

@@ -1,0 +1,138 @@
+image:
+  tag: "1.40.4" # {"$imagepolicy": "flux-system:plex:tag"}
+
+hostname: nasse
+runtimeClassName: nvidia
+hostNetwork: true
+
+envFrom:
+  envs:
+    type: configMap
+    useFromChart: false
+    name: plex-env
+
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: plex
+
+configMaps:
+- name: library-import-initscript
+  data:
+    import-config.sh: |
+      #!/bin/sh
+      echo "waiting for pre-existing pms database to uploaded..."
+
+      if [ "$PLEX_SKIP_INIT_WAIT" == "1" ]; then
+        mkdir -p /config/Library
+        chown -R 2000:2000 /config
+      fi
+
+      if [ -d "/config/Library" ]; then
+        echo "PMS library already exists, exiting."
+        exit 0
+      fi
+
+      # wait for the database archive to be manually copied to the server
+      while [ ! -f /pms.tgz ]; do sleep 2; done;
+
+      tar -xvzf /pms.tgz -C /config
+      chown -R 2000:2000 /config
+      rm -rf /config/Library/Application\ Support/Plex\ Media\ Server/Codecs/*
+      rm pms.tgz
+
+      echo "Done."
+
+initContainers:
+  import-configuration:
+    image: alpine:3.18.0
+    imagePullPolicy: IfNotPresent
+    command: ["/import-config.sh"]
+    env:
+    - name: PLEX_SKIP_INIT_WAIT
+      value: "${plex_skip_init_wait:=0}"
+    volumeMounts:
+    - mountPath: /config
+      name: config
+    - mountPath: /import-config.sh
+      name: initcontainer-entrypoint
+      subPath: import-config.sh
+
+# resources:
+#   limits:
+#     nvidia.com/gpu: 1
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  initcontainer-entrypoint:
+    enabled: true
+    spec:
+      useFromChart: true
+      configMap:
+        name: library-import-initscript
+        defaultMode: 0777
+  config:
+    enabled: true
+    mount:
+    - path: /config
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "50Gi"
+  movies:
+    enabled: true
+    mount:
+    - path: /data/Movies
+    spec:
+      hostPath:
+        path: ${plex_movies_host_path}
+        type: Directory
+  tv:
+    enabled: true
+    mount:
+    - path: /data/Series
+    spec:
+      hostPath:
+        path: ${plex_tv_host_path}
+        type: Directory
+  transcode:
+    enabled: true
+    mount:
+    - path: /transcode
+    spec:
+      emptyDir:
+        sizeLimit: 20Gi
+        medium: Memory
+
+ingress:
+  main:
+    enabled: true
+    className: istio
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+    hosts:
+    - host: plex.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    - host: plex.absolutist.it
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    tls:
+    - secretName: tls-plex-ingress
+      hosts:
+      - plex.wahoo.li
+      - plex.absolutist.it

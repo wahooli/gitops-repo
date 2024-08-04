@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--prowlarr
+  namespace: flux-system
+spec:
+  releaseName: prowlarr
+  interval: 5m
+  targetNamespace: default
+  values:
+    envFrom:
+      envs:
+        name: prowlarr-env
+  valuesFrom:
+  - kind: ConfigMap
+    name: prowlarr-values
+    valuesKey: values.yaml

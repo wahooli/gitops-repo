@@ -1,0 +1,3 @@
+multiCluster:
+  enabled: true
+  clusterName: nasse

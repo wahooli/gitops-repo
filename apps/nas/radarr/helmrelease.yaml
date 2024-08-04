@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--radarr
+  namespace: flux-system
+spec:
+  releaseName: radarr
+  interval: 5m
+  targetNamespace: default
+  values:
+    envFrom:
+      envs:
+        name: radarr-env
+  valuesFrom:
+  - kind: ConfigMap
+    name: radarr-values
+    valuesKey: values.yaml

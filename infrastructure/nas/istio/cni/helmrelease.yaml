@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-system--istio-cni
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: istio-system--istio-base
+    namespace: flux-system
+  interval: 10m
+  releaseName: istio-cni
+  chart:
+    spec:
+      version: "1.22.3"
+  valuesFrom:
+  - kind: ConfigMap
+    name: istio-cni-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: istio-cni-values
+    valuesKey: values.yaml
