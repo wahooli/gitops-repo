@@ -6,9 +6,9 @@ metadata:
     blueprints.goauthentik.io/system: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Groups
   attrs:
-    identifiers:
-      name: Init - Groups
     required: true
 - model: authentik_core.user
   identifiers:

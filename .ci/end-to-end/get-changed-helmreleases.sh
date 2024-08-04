@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+IGNORE_FILE="${IGNORE_FILE:-.e2eignore}"
+ignores=()
+function read_ignores() {
+    local -
+    shopt -s globstar nullglob extglob;
+    local file=$1
+    ignores=($(grep -v '^#' $IGNORE_FILE | grep '[^[:blank:]]' | sed 's/#.*//' | awk '{$1=$1};1' ))
+}
+
+read_ignores $IGNORE_FILE
+
 OUTPUT_MODE=${OUTPUT_MODE:-github_json}
 ORIG_IFS=$IFS
 HEAD_BRANCH=main
@@ -20,17 +31,46 @@ function msg() {
 }
 
 function debug() {
-    local messages="${*@Q}"
     if [ "$DEBUG" = true ]; then
         local prev_ifs=$IFS
         echo "--DEBUG--" >> /dev/stderr
         IFS=$ORIG_IFS
-        for msg in $messages; do
+        for msg in "${@}"; do
             echo ${msg//\'/} >> /dev/stderr
         done
         IFS=$prev_ifs
         echo -e "--DEBUG--\n" >> /dev/stderr
     fi
+}
+
+function get_find_ignore_args() {
+    local path=$1
+    for ignore in "${ignores[@]}"; do
+        if [[ -d $ignore && $ignore == "$path"* ]]; then
+            ignore_path=${ignore#"$path"}
+            case "$ignore_path" in
+                */*)
+                    echo "( ! -wholename '${ignore_path#/}' )"
+                    ;;
+                *)
+                    echo "( ! -name '${ignore_path#/}' )"
+                    ;;
+            esac
+        fi
+    done
+}
+
+function get_kustomize_ignore_args() {
+    grep -v '^#' $IGNORE_FILE | sed 's/#.*//' | awk '{$1=$1};1' | grep '[^[:blank:]]' | paste -sd ','
+}
+
+function populate_ignore_realpath_dirs() {
+    for ignore in "${ignores[@]}"; do
+        if [[ -d $ignore ]]; then
+            # echo $ignore
+            IGNORE_DIRS+=("$(realpath $ignore)")
+        fi
+    done
 }
 
 function longest_common_prefix()
@@ -67,6 +107,7 @@ function find_helmrelease_name() {
     local kustomization_file=$3
     local selector=$4
     local debug=$5
+    [ -z "$kustomization_file" ] && return
     local max_depth=$(realpath $(yq -r ".spec.path" $kustomization_file))
     current_dir=$(realpath $file)
     local common_max_depth=$(longest_common_prefix $max_depth $current_dir)
@@ -82,22 +123,17 @@ function find_helmrelease_name() {
         "common_max_depth: $common_max_depth"
     
     local error=""
+    local ignore_paths="$(get_kustomize_ignore_args)"
     # this function iterates directories relative to repository root
     # if there's no slashes in current_dir or somehow this while has iterated into repo root or system root, this should break
     while [ "$current_dir" != "/" ] && [ "$current_dir" != "." ] && [[ $current_dir == *"/"* ]]; do
         local kustomization_build=""
-        if [ -d $current_dir ]; then
-            kustomization_build=$(flux build kustomization $kustomization --ignore-paths "**/ci-excluded/**" --kustomization-file $kustomization_file --path $current_dir --dry-run 2>/dev/null | yq -Nr "${selector}")
+        if [[ ! " ${IGNORE_DIRS[*]} " =~ [[:space:]]${current_dir}[[:space:]] && -d $current_dir ]]; then
+            kustomization_build=$(flux build kustomization $kustomization --ignore-paths "${ignore_paths}" --kustomization-file $kustomization_file --path $current_dir --dry-run 2>/dev/null | yq -Nr "${selector}")
             if [ ! -n "$kustomization_build" ]; then
-                error=$(flux build kustomization $kustomization --ignore-paths "**/ci-excluded/**" --kustomization-file $kustomization_file --path $current_dir --dry-run 2>&1 >/dev/null)
-                [ -n "$error" ] && error+="\n[ command: flux build kustomization $kustomization --ignore-paths \"**/ci-excluded/**\" --kustomization-file $kustomization_file --path $current_dir --dry-run ]"
+                error=$(flux build kustomization $kustomization --ignore-paths "${ignore_paths}" --kustomization-file $kustomization_file --path $current_dir --dry-run 2>&1 >/dev/null)
+                [ -n "$error" ] && error+="\n[ command: flux build kustomization $kustomization --ignore-paths \"${ignore_paths}\" --kustomization-file $kustomization_file --path $current_dir --dry-run ]"
             fi
-        # elif [ -f $current_dir ]; then
-        #     kustomization_build=$(yq -r "${selector}" $current_dir)
-        #     if [ ! -n "$kustomization_build" ]; then
-        #         error=$(yq -r "${selector}" $current_dir 2>&1 >/dev/null)
-        #         [ -n "$error" ] && error+="\n[ command: yq -r \"${selector}\" $current_dir ]"
-        #     fi
         fi
         debug "current_dir: $current_dir"
         # if yq selector finds non empty string result, break loop and echo result
@@ -122,7 +158,7 @@ function find_helmrelease_name() {
 }
 
 function get_cluster_flux_version() {
-    local $tenant=$1
+    local tenant=$1
     if [[ ! -v FLUX_VERSIONS[$tenant] ]]; then
         local filename="${CLUSTERS_PATH}${tenant}/flux-system/gotk-components.yaml"
         # Defaults to "latest" version
@@ -173,9 +209,11 @@ function add_helmreleases_for_tenant() {
     fi
 }
 
+IGNORE_DIRS=()
 declare -A HELM_RELEASES
 declare -A FLUX_VERSIONS
 declare -A KUSTOMIZATION_FILES
+populate_ignore_realpath_dirs
 IFS=$'\n '
 for file in $FILES; do
     tenant=$file
@@ -201,7 +239,10 @@ for file in $FILES; do
         done
     elif [[ "base" = "$tenant" ]]; then
         # this overrides tenant variable if modifications were done in base overlay
-        for tenant in $(find $kustomization -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) \( ! -name '.config' \) -printf '%f '); do
+        # readarray -t find_args <<< "$(get_find_ignore_args $kustomization)"
+        find_args=($(get_find_ignore_args $kustomization))
+        debug "find $kustomization -mindepth 1 -maxdepth 1 -type d ( ! -name 'base' ) "${find_args[@]}" -printf '%f '"
+        for tenant in $(find $kustomization -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) "${find_args[@]}" -printf '%f '); do
             kustomization_file=$(find_kustomization_file $tenant $kustomization)
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then

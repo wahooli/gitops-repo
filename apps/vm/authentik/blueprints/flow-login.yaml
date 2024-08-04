@@ -6,24 +6,24 @@ metadata:
   #   blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Shared policies
   attrs:
-    identifiers:
-      name: Init - Shared policies
     required: false
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Plex source
   attrs:
-    identifiers:
-      name: Init - Plex source
     required: false
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Recovery with email verification
   attrs:
-    identifiers:
-      name: Init - Recovery with email verification
     required: false
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Registration with invitation token
   attrs:
-    identifiers:
-      name: Init - Registration with invitation token
     required: false
 - attrs:
     designation: authentication

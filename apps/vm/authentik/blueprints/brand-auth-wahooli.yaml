@@ -7,23 +7,23 @@ version: 1
 entries:
 - model: authentik_blueprints.metaapplyblueprint
   attrs:
-    identifiers:
-      name: Init - Authentication flow
+    required: false
+  identifiers:
+    name: Init - Authentication flow
+- model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Recovery with email verification
+  attrs:
     required: false
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Default - Invalidation flow
   attrs:
-    identifiers:
-      name: Init - Recovery with email verification
     required: false
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Default - User settings flow
   attrs:
-    identifiers:
-      name: Default - Invalidation flow
-    required: false
-- model: authentik_blueprints.metaapplyblueprint
-  attrs:
-    identifiers:
-      name: Default - User settings flow
     required: false
 - attrs:
     flow_authentication:

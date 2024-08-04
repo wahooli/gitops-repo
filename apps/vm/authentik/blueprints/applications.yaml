@@ -6,19 +6,19 @@ metadata:
   #   blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Groups
   attrs:
-    identifiers:
-      name: Init - Groups
     required: false
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Authentication flow
   attrs:
-    identifiers:
-      name: Init - Authentication flow
     required: false
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - LDAP Authentication flow
   attrs:
-    identifiers:
-      name: Init - LDAP Authentication flow
     required: false
 
 - model: authentik_providers_proxy.proxyprovider
