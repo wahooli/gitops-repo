@@ -9,6 +9,12 @@ global:
     backupDaily: "true"
     app.kubernetes.io/part-of: sonarr
 
+envFrom:
+  envs:
+    type: configMap
+    useFromChart: false
+    name: sonarr-env
+
 # resources:
 #   requests:
 #     memory: "256Mi"

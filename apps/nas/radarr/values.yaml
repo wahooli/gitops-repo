@@ -9,6 +9,12 @@ global:
     backupDaily: "true"
     app.kubernetes.io/part-of: radarr
 
+envFrom:
+  envs:
+    type: configMap
+    useFromChart: false
+    name: radarr-env
+
 # resources:
 #   requests:
 #     memory: "256Mi"
