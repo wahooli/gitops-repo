@@ -56,6 +56,9 @@ filer:
     className: nginx
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
     tls:
     - secretName: tls-seaweedfs-ingress
       hosts:
@@ -68,6 +71,9 @@ s3:
     className: nginx
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
     tls:
     - secretName: tls-seaweedfs-ingress
       hosts:
