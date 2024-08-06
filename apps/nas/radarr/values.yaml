@@ -36,25 +36,29 @@ persistence:
       hostPath:
         path: ${radarr_data_host_path}
         type: Directory
+
+service:
+  main:
+    labels:
+      mirror.linkerd.io/exported: "true"
+
 ingress:
   main:
     enabled: true
-    className: istio
+    className: nginx
     labels:
       velero.io/exclude-from-backup: "true"
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-staging
     hosts:
     - host: radarr.wahoo.li
       paths:
       - path: "/"
         pathType: "Prefix"
-    - host: radarr.test.absolutist.it
+    - host: radarr.absolutist.it
       paths:
       - path: "/"
         pathType: "Prefix"
     tls:
     - secretName: tls-radarr-ingress
       hosts:
+      - radarr.absolutist.it
       - radarr.wahoo.li
-      - radarr.test.absolutist.it

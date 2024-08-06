@@ -26,4 +26,4 @@ stringData:
   services_gateway: 172.16.0.1
   lan_subnet: 192.168.0.0/24
   istio_ingress_ip: 192.168.0.1
-  istio_ingress_service_type: None
+  ingress_service_type: None

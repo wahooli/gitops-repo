@@ -31,4 +31,6 @@ patches:
     kind: HelmRelease
     name: base-deluge
 resources:
+- certificate.yaml
 - ../../base/deluge
+- imagepolicy.yaml

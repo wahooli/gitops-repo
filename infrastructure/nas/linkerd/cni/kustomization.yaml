@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/linkerd/cni
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+- target:
+    kind: HelmRelease
+    name: base-linkerd-cni
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: linkerd-cni--linkerd2-cni
+configMapGenerator:
+- name: linkerd-cni-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values.yaml=values.yaml
+configurations:
+- ../../../.config/valuesFrom.yaml

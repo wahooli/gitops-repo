@@ -21,4 +21,5 @@ patches:
     kind: HelmRelease
     name: base-seaweedfs
 resources:
+- certificate.yaml
 - ../../base/seaweedfs

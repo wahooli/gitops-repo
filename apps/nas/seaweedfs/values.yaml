@@ -12,8 +12,13 @@ master:
   ingress:
     enabled: true
     host: master.seaweedfs.absolutist.it
-    className: istio
-    annotations: {}
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    tls:
+    - secretName: tls-seaweedfs-ingress
+      hosts:
+      - master.seaweedfs.absolutist.it
 
 volume:
   enabled: true
@@ -48,11 +53,22 @@ filer:
   ingress:
     enabled: true
     host: seaweedfs.absolutist.it
-    className: istio
-    annotations: {}
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    tls:
+    - secretName: tls-seaweedfs-ingress
+      hosts:
+      - seaweedfs.absolutist.it
+
 s3:
   ingress:
     enabled: true
-    host: s3.seaweedfs.absolutist.it
-    className: istio
-    annotations: {}
+    host: s3.absolutist.it
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    tls:
+    - secretName: tls-seaweedfs-ingress
+      hosts:
+      - s3.absolutist.it

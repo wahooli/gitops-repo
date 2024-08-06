@@ -1,0 +1,27 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: prowlarr-ingress
+  namespace: default
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: prowlarr
+spec:
+  secretName: tls-prowlarr-ingress
+  secretTemplate:
+    labels:
+      backupWeekly: "true"
+      backupDaily: "true"
+      app.kubernetes.io/part-of: prowlarr
+    # annotations:
+    #   reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+    #   reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "istio-ingress"
+    #   reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+    #   reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "istio-ingress"
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  dnsNames:
+  - prowlarr.wahoo.li
+  - prowlarr.absolutist.it

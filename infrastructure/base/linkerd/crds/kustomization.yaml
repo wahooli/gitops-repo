@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- helmrepository.yaml
+- helmrepository-edge.yaml
+- namespace.yaml
+- helmrelease.yaml
+configMapGenerator:
+- name: linkerd-crds-values
+  namespace: flux-system
+  files:
+  - values-base.yaml=values-base.yaml

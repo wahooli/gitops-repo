@@ -1,0 +1,31 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-linkerd-control-plane
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: linkerd-control-plane
+spec:
+  dependsOn:
+  - name: base-linkerd-crds
+    namespace: flux-system
+  - name: base-linkerd-cni
+    namespace: flux-system
+  releaseName: base-linkerd-control-plane
+  targetNamespace: linkerd
+  chart:
+    spec:
+      chart: linkerd-control-plane
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd-edge
+        namespace: flux-system
+      interval: 24h
+  install:
+    timeout: 5m
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: linkerd-control-plane-values
+    valuesKey: values-base.yaml

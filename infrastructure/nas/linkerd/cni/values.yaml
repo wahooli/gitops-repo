@@ -1,0 +1,2 @@
+iptablesMode: nft
+logLevel: warn

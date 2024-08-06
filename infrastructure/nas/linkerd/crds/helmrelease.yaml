@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: linkerd--linkerd-crds
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: linkerd-crds
+  chart:
+    spec:
+      version: "2024.8.2"
+  valuesFrom:
+  - kind: ConfigMap
+    name: linkerd-crds-values
+    valuesKey: values-base.yaml

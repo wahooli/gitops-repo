@@ -31,4 +31,6 @@ patches:
     kind: HelmRelease
     name: base-prowlarr
 resources:
+- certificate.yaml
 - ../../base/prowlarr
+- imagepolicy.yaml

@@ -16,5 +16,6 @@ resources:
 - external-dns-secret.yaml
 - discord-webhook.yaml
 - seaweedfs-s3-secret.yaml
+- linkerd-certificates.yaml
 - cni-plugins
 - helmrelease-value-overrides

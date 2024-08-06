@@ -37,26 +37,28 @@ persistence:
         path: ${sonarr_data_host_path}
         type: Directory
 
+service:
+  main:
+    labels:
+      mirror.linkerd.io/exported: "true"
 
 ingress:
   main:
     enabled: true
-    className: istio
+    className: nginx
     labels:
       velero.io/exclude-from-backup: "true"
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-staging
     hosts:
     - host: sonarr.wahoo.li
       paths:
       - path: "/"
         pathType: "Prefix"
-    - host: sonarr.test.absolutist.it
+    - host: sonarr.absolutist.it
       paths:
       - path: "/"
         pathType: "Prefix"
     tls:
     - secretName: tls-sonarr-ingress
       hosts:
+      - sonarr.absolutist.it
       - sonarr.wahoo.li
-      - sonarr.test.absolutist.it

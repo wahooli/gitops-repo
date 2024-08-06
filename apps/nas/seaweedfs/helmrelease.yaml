@@ -21,9 +21,46 @@ spec:
   - kustomize:
       patches:
       - target:
+          kind: Service
+          labelSelector: "app.kubernetes.io/component=filer"
+        patch: |
+          - op: add
+            path: /metadata/labels/mirror.linkerd.io~1exported
+            value: "true"
+      - target:
+          kind: Service
+          labelSelector: "app.kubernetes.io/component=s3"
+        patch: |
+          - op: add
+            path: /metadata/labels/mirror.linkerd.io~1exported
+            value: "true"
+      - target:
+          kind: Service
+          labelSelector: "app.kubernetes.io/component=master"
+        patch: |
+          - op: add
+            path: /metadata/labels/mirror.linkerd.io~1exported
+            value: "true"
+      - target:
           kind: Ingress
           labelSelector: "app.kubernetes.io/component=filer"
         patch: |
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1use-regex
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-secret
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-type
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-realm
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1configuration-snippet
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1enable-rewrite-log
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1rewrite-target
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1backend-protocol
           - op: add
             path: /spec/rules/0/http/paths/-
             value:
@@ -38,6 +75,20 @@ spec:
           kind: Ingress
           labelSelector: "app.kubernetes.io/component=master"
         patch: |
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1use-regex
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-secret
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-type
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-realm
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1configuration-snippet
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1enable-rewrite-log
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1rewrite-target
           - op: add
             path: /spec/rules/0/http/paths/-
             value:

@@ -39,17 +39,17 @@ persistence:
         path: ${deluge_downloads_host_path}
         type: Directory # DirectoryOrCreate
 
+service:
+  main:
+    labels:
+      mirror.linkerd.io/exported: "true"
 
 ingress:
   main:
     enabled: true
-    className: istio
+    className: nginx
     labels:
       velero.io/exclude-from-backup: "true"
-    annotations:
-    #   nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      # nginx.ingress.kubernetes.io/proxy-body-size: 25m
-      cert-manager.io/cluster-issuer: letsencrypt-staging
     hosts:
     - host: deluge.wahoo.li
       paths:

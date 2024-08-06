@@ -29,14 +29,17 @@ persistence:
         requests:
           storage: "1Gi"
 
+service:
+  main:
+    labels:
+      mirror.linkerd.io/exported: "true"
+
 ingress:
   main:
     enabled: true
-    className: istio
+    className: nginx
     labels:
       velero.io/exclude-from-backup: "true"
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-staging
     hosts:
     - host: prowlarr.wahoo.li
       paths:
@@ -49,5 +52,5 @@ ingress:
     tls:
     - secretName: tls-prowlarr-ingress
       hosts:
-      - prowlarr.wahoo.li
       - prowlarr.absolutist.it
+      - prowlarr.wahoo.li

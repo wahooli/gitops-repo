@@ -31,4 +31,6 @@ patches:
     kind: HelmRelease
     name: base-plex
 resources:
+- certificate.yaml
 - ../../base/plex
+- imagepolicy.yaml

@@ -31,4 +31,6 @@ patches:
     kind: HelmRelease
     name: base-bazarr
 resources:
+- certificate.yaml
 - ../../base/bazarr
+- imagepolicy.yaml

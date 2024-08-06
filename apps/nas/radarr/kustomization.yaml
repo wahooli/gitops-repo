@@ -31,4 +31,6 @@ patches:
     kind: HelmRelease
     name: base-radarr
 resources:
+- certificate.yaml
 - ../../base/radarr
+- imagepolicy.yaml
