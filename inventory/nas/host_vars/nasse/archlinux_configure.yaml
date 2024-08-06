@@ -1,0 +1,5 @@
+archlinux_configure_nvidia_patch_install: true
+archlinux_configure_install_pkg:
+- nvidia-container-toolkit
+- iptables-nft
+- python-packaging

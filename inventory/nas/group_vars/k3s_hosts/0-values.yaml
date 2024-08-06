@@ -1,0 +1,5 @@
+k3s_release_channel: v1.30
+k3s_kubelet_config:
+  maxPods: 250
+  shutdownGracePeriod: 30s
+  shutdownGracePeriodCriticalPods: 30s

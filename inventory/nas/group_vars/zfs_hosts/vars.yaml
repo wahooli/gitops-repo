@@ -1,0 +1,14 @@
+zfs_zpool_import_default_args:
+- -d
+- /dev/disk/by-id
+
+# for enabling reflink copies
+zfs_module_params:
+- zfs_bclone_enabled=1
+zfs_zed_enable: true
+zfs_smartd_enable: true
+
+smartd_env:
+  SMARTD_ARGS: "-i 10800" # Check status every 10800 seconds (3 hours)
+  EMAIL_ACCOUNT: "gmail"
+  "export MAILRC": "/root/.mailrc"

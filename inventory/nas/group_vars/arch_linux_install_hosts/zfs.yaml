@@ -1,0 +1,68 @@
+archlinux_install_zfs_root_volume: zroot/ROOT/default
+zfs_zpools:
+- name: zroot
+  enable_trim: true
+  scrub: monthly
+  mountpoint: /mnt
+  properties:
+    ashift: 12
+    autotrim: "off"
+    autoreplace: "off"
+    compatibility: grub2
+    autoexpand: "on"
+    cachefile: /etc/zfs/zpool.cache
+  fs_properties:
+    acltype: posix
+    dedup: "off"
+    utf8only: "on"
+    relatime: "on"
+    xattr: sa
+    casesensitivity: sensitive
+    # dnodesize: auto # not supported with grub2 compatibility
+    dnodesize: legacy
+    aclinherit: passthrough
+    compression: lz4
+    normalization: formD
+    sharenfs: "off"
+    sharesmb: "off"
+    mountpoint: "none"
+    canmount: "off"
+    devices: "off"
+  datasets:
+  - name: ROOT
+    properties:
+      mountpoint: none
+  - name: ROOT/default
+    properties:
+      mountpoint: /
+      canmount: noauto
+  - name: data
+    properties:
+      mountpoint: none
+  - name: data/home
+    properties:
+      mountpoint: /home
+  - name: data/home/root
+    properties:
+      mountpoint: /root
+  - name: data/kubernetes
+    properties:
+      mountpoint: none
+  - name: data/kubernetes/openebs
+    properties:
+      mountpoint: none
+  - name: var
+    properties:
+      mountpoint: /var
+      canmount: "off"
+  - name: var/log
+    properties:
+      mountpoint: /var
+      canmount: "off"
+  - name: var/log/journal
+    properties:
+      acltype: posix
+  - name: var/lib
+    properties:
+      mountpoint: /var/lib
+      canmount: "off"

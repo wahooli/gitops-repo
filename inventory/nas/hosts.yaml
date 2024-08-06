@@ -1,0 +1,30 @@
+all:
+  hosts:
+    nasse:
+arch_linux_install_hosts:
+  hosts:
+    nasse-archiso:
+arch_linux_hosts:
+  hosts:
+    nasse:
+nas_hosts:
+  hosts:
+    nasse:
+zfs_hosts:
+  hosts:
+    nasse:
+cilium_hosts:
+  hosts:
+    nasse:
+k3s_hosts:
+  hosts:
+    nasse:
+k3s_servers:
+  hosts:
+    nasse:
+fluxcd_hosts:
+  hosts:
+    nasse:
+kubectl_hosts:
+  hosts:
+    nasse:

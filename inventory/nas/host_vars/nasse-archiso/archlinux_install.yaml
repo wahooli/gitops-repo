@@ -1,0 +1,8 @@
+archlinux_install_drive: /dev/sda
+archlinux_install_boot_partition: /dev/sda1
+archlinux_install_boot_partition_size: 512MB
+archlinux_install_root_partition: /dev/sda2
+archlinux_install_root_fstype: zfs
+archlinux_install_hostname: nasse
+archlinux_install_swap_size: 16GiB
+archlinux_install_swap_partition: true

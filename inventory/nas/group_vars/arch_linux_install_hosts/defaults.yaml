@@ -1,0 +1,46 @@
+archlinux_install_vconsole_keymap: fi
+archlinux_install_grub_cmdline: "loglevel=3 quiet nvme_core.default_ps_max_latency_us=0"
+archlinux_install_gen_locales:
+- en_US.UTF-8
+- fi_FI.UTF-8
+archlinux_install_locale_conf: |
+  LANG=en_US.UTF-8
+  LC_TIME=fi_FI.UTF-8
+archlinux_install_timezone: Europe/Helsinki
+archlinux_install_enable_cachyos_repositories: true
+archlinux_install_kernel: linux-cachyos-server-lto
+archlinux_install_blacklist_modules:
+- nouveau
+archlinux_install_uefi: true
+archlinux_install_additional_packages:
+- base-devel
+- linux-cachyos-server-lto-headers
+- linux-cachyos-server-lto-nvidia
+- linux-cachyos-server-lto-zfs
+- zsh
+- grub
+- sudo
+- efibootmgr
+- man-db
+- openssh
+- networkmanager
+- pacman-contrib
+- vim
+- python
+- iptables-nft
+archlinux_install_rankmirrors: true
+archlinux_install_rankmirros_ip_version:
+- 4
+archlinux_install_rankmirrors_protocols:
+- https
+archlinux_install_rankmirrors_count: 10
+archlinux_install_rankmirrors_countries:
+- SE
+- DE
+- FI
+- EE
+- US
+- BE
+- "NO"
+ansible_ssh_common_args: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+ansible_ssh_extra_args: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null

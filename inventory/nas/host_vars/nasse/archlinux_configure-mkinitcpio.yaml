@@ -1,0 +1,15 @@
+archlinux_configure_mkinitcpio: true
+mkinitcpio_hooks:
+- base
+- udev
+- autodetect
+- microcode
+- modconf
+- keyboard
+- keymap
+- consolefont
+- block
+- zfs
+- filesystems
+mkinitcpio_modules:
+- zfs

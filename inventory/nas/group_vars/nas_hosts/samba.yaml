@@ -1,0 +1,18 @@
+archlinux_configure_samba: true
+
+samba_enable_wsdd2_discovery: true
+samba_enable_avahi_discovery: true
+
+samba_netbios_name: "nasse"
+samba_enable_presets: true
+samba_preset:
+  enable_guest_access: true
+  # follow_symlinks: false
+  macos_server_side_copy: true
+  enable_usershares: false
+  # disable_printer_sharing: false
+  min_protocol: SMB3_11
+  # https://wiki.archlinux.org/title/samba#Improve_throughput
+  improve_throughput: true
+  # enable_access_for_old_clients: false
+  transport_encryption: enabled # enabled, off, desired, required

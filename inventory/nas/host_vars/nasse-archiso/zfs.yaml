@@ -1,0 +1,3 @@
+# for enabling reflink copies
+zfs_module_params:
+- zfs_bclone_enabled=1

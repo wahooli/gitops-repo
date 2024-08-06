@@ -1,0 +1,28 @@
+k3s_allow_swap: true
+k3s_config:
+  write-kubeconfig-mode: 644
+  flannel-backend: none
+  snapshotter: zfs
+  cluster-domain: cluster.local
+  disable-kube-proxy: true
+  disable-network-policy: true
+  disable-helm-controller: true
+  disable-cloud-controller: true
+  disable:
+  - servicelb
+  - local-storage
+  - traefik
+  kube-controller-manager-arg:
+  - bind-address=0.0.0.0
+  - terminated-pod-gc-threshold=10
+  kube-proxy-arg:
+  - metrics-bind-address=0.0.0.0
+  kube-scheduler-arg:
+  - bind-address=0.0.0.0
+k3s_containerd_use_crun: true
+
+k3s_systemd_service_dependencies: # list of dependencies for systemd service template
+- zfs.target
+- zfs-import.target
+k3s_systemd_service_wants:
+- var-lib-rancher-k3s-agent-containerd-io.containerd.snapshotter.v1.zfs.mount

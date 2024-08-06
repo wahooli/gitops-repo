@@ -1,0 +1,2 @@
+archlinux_configure_superfans_install: true
+superfans_default_args: "set 30" # or "preset optimal"

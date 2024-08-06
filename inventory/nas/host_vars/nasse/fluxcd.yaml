@@ -1,0 +1,2 @@
+fluxcd_bootstrap_git_path: clusters/nas
+fluxcd_bootstrap_key_name: fluxcd_nasse

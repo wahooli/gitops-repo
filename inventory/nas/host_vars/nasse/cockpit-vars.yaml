@@ -1,0 +1,8 @@
+cockpit_addons:
+- storage
+- packagekit
+- networkmanager
+- files
+- zfs-manager
+- file-sharing
+# - machines
