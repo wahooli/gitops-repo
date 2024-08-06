@@ -8,9 +8,9 @@ context:
   group_name: Invite Users
 entries:
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Shared policies
   attrs:
-    identifiers:
-      name: Init - Shared policies
     required: false
 - model: authentik_core.group
   state: present

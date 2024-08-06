@@ -1,5 +1,6 @@
 *
 !.gitignore
+!.e2eignore
 !.gitconfig
 !/LICENSE
 !README.md
@@ -21,3 +22,4 @@ _*
 # ignore yaml files starting with underscore
 _*.yaml
 _*.yml
+inventory/certs

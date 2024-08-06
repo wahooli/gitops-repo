@@ -1,0 +1,56 @@
+image:
+  tag: "1.21.2" # {"$imagepolicy": "flux-system:prowlarr:tag"}
+
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: prowlarr
+
+# resources:
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /config
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "1Gi"
+
+service:
+  main:
+    labels:
+      mirror.linkerd.io/exported: "true"
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    hosts:
+    - host: prowlarr.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    - host: prowlarr.absolutist.it
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    tls:
+    - secretName: tls-prowlarr-ingress
+      hosts:
+      - prowlarr.absolutist.it
+      - prowlarr.wahoo.li

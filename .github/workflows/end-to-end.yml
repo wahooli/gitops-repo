@@ -149,6 +149,7 @@ jobs:
         flux create kustomization flux-system \
         --source=flux-system \
         --path=./clusters/${{ matrix.test.tenant }}
+
     - name: Verify cluster reconciliation
       env:
         TENANT: "${{ matrix.test.tenant }}"

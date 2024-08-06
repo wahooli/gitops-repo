@@ -1,0 +1,64 @@
+image:
+  tag: "4.0.8" # {"$imagepolicy": "flux-system:sonarr:tag"}
+
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: sonarr
+
+# resources:
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /config
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "2Gi"
+  data:
+    enabled: true
+    mount:
+    - path: /data/
+    spec:
+      hostPath:
+        path: ${sonarr_data_host_path}
+        type: Directory
+
+service:
+  main:
+    labels:
+      mirror.linkerd.io/exported: "true"
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    hosts:
+    - host: sonarr.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    - host: sonarr.absolutist.it
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    tls:
+    - secretName: tls-sonarr-ingress
+      hosts:
+      - sonarr.absolutist.it
+      - sonarr.wahoo.li

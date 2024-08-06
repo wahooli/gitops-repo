@@ -6,9 +6,9 @@ metadata:
   #   blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Plex registration
   attrs:
-    identifiers:
-      name: Init - Plex registration
     required: false
 - model: authentik_blueprints.metaapplyblueprint
   attrs:

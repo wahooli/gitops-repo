@@ -1,0 +1,33 @@
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: 01-bgp-peering-policy
+spec:
+  nodeSelector:
+    matchExpressions:
+    - {key: exclude-from-peering, operator: NotIn, values: ['true']}
+  virtualRouters:
+  - localASN: ${cluster_bgp_as_number}
+    exportPodCIDR: false
+    serviceSelector:
+      matchExpressions:
+      - {key: disable-advertisement, operator: NotIn, values: ['true']}
+    neighbors:
+    - peerAddress: '${breakout_bgp_peer_ip}/32'
+      peerASN: ${breakout_bgp_peer_as}
+      eBGPMultihopTTL: 10
+      connectRetryTimeSeconds: 120
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
+      gracefulRestart:
+        enabled: true
+        restartTimeSeconds: 120
+    - peerAddress: '${quantum_bgp_peer_ip}/32'
+      peerASN: ${quantum_bgp_peer_as}
+      eBGPMultihopTTL: 10
+      connectRetryTimeSeconds: 120
+      holdTimeSeconds: 90
+      keepAliveTimeSeconds: 30
+      gracefulRestart:
+        enabled: true
+        restartTimeSeconds: 120

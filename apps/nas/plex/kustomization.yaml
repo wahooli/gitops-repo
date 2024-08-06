@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+configMapGenerator:
+- files:
+  - values.yaml=values.yaml
+  name: plex-values
+  namespace: flux-system
+- name: plex-env
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
+  envs:
+  - .env
+configurations:
+- ../../.config/valuesFrom.yaml
+- ../../.config/envFrom.yaml
+kind: Kustomization
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-plex
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: default--plex
+  target:
+    kind: HelmRelease
+    name: base-plex
+resources:
+- certificate.yaml
+- ../../base/plex
+- imagepolicy.yaml

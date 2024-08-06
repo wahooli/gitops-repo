@@ -17,7 +17,7 @@ spec:
         namespace: flux-system
       interval: 24h
   install:
-    timeout: 10m
+    timeout: 5m
     remediation:
       retries: -1
   upgrade:

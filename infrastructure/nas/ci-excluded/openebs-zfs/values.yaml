@@ -1,0 +1,41 @@
+release:
+  version: "4.1.0"
+
+lvm-localpv:
+  enabled: false
+  crds:
+    lvmLocalPv:
+      enabled: false
+mayastor:
+  enabled: false
+  csi:
+    node:
+      initContainers:
+        enabled: false
+engines:
+  local:
+    lvm:
+      enabled: false
+    zfs:
+      enabled: true
+  replicated:
+    mayastor:
+      enabled: false
+localpv-provisioner:
+  rbac:
+    create: false
+  localpv:
+    enabled: false
+  hostpathClass:
+    enabled: false
+
+zfs-localpv:
+  enabled: true
+  crds:
+    zfsLocalPv:
+      enabled: true
+    csi:
+      volumeSnapshots:
+        enabled: false
+  zfsNode:
+    kubeletDir: "/var/lib/kubelet/"

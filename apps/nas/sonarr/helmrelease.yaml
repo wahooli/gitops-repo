@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--sonarr
+  namespace: flux-system
+spec:
+  releaseName: sonarr
+  interval: 5m
+  targetNamespace: default
+  values:
+    envFrom:
+      envs:
+        name: sonarr-env
+  valuesFrom:
+  - kind: ConfigMap
+    name: sonarr-values
+    valuesKey: values.yaml

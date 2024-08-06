@@ -34,8 +34,8 @@ function reconcile() {
             IFS=","
             echo "Reconciling $helmrelease"
             echo "test_matrix=$helmreleases_out" >> "$GITHUB_OUTPUT"
-            flux reconcile helmrelease $helmrelease --timeout=15m || fail "$helmrelease" "Failed reconciling helmrelease: $helmrelease";
-            kubectl -n flux-system wait helmrelease/$helmrelease --for=condition=ready --timeout=15m || fail "$helmrelease" "Failed ready condition for helmrelease: $helmrelease";
+            flux reconcile helmrelease $helmrelease --timeout=10m || fail "$helmrelease" "Failed reconciling helmrelease: $helmrelease";
+            kubectl -n flux-system wait helmrelease/$helmrelease --for=condition=ready --timeout=5m || fail "$helmrelease" "Failed ready condition for helmrelease: $helmrelease";
             RECONCILED+=($helmrelease)
         fi
         IFS=","

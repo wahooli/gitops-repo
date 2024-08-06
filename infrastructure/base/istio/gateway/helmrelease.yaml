@@ -1,0 +1,31 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-istio-ingress
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: istio-ingress
+spec:
+  dependsOn:
+  - name: base-istio-base
+    namespace: flux-system
+  - name: base-istiod
+    namespace: flux-system
+  releaseName: base-istio-ingress
+  targetNamespace: istio-system
+  chart:
+    spec:
+      chart: gateway
+      sourceRef:
+        kind: HelmRepository
+        name: istio
+        namespace: flux-system
+      interval: 24h
+  install:
+    timeout: 10m
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: istio-ingress-values
+    valuesKey: values-base.yaml

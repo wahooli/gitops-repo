@@ -1,0 +1,21 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: true
+  dependsOn:
+  - name: crds
+  suspend: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/nas
+  wait: false
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-app-vars
+      optional: false

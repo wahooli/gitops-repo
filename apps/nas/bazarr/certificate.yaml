@@ -1,0 +1,27 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bazarr-ingress
+  namespace: default
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: bazarr
+spec:
+  secretName: tls-bazarr-ingress
+  secretTemplate:
+    labels:
+      backupWeekly: "true"
+      backupDaily: "true"
+      app.kubernetes.io/part-of: bazarr
+    # annotations:
+    #   reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+    #   reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "istio-ingress"
+    #   reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+    #   reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "istio-ingress"
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  dnsNames:
+  - bazarr.wahoo.li
+  - bazarr.absolutist.it

@@ -1,0 +1,74 @@
+affinity: "" # runs master/volume/filer on same host
+
+master:
+  enabled: true
+  data:
+    type: "hostPath"
+    storageClass: ""
+    hostPathPrefix: ${seaweedfs_hostpath_prefix}
+  logs:
+    type: "persistentVolumeClaim"
+    size: "4Gi"
+  ingress:
+    enabled: true
+    host: master.seaweedfs.absolutist.it
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    tls:
+    - secretName: tls-seaweedfs-ingress
+      hosts:
+      - master.seaweedfs.absolutist.it
+
+volume:
+  enabled: true
+  dataDirs:
+  - name: data1
+    type: "hostPath"
+    hostPathPrefix: ${seaweedfs_hostpath_prefix}
+    maxVolumes: 0
+filer:
+  enabled: true
+  s3:
+    enabled: true
+    enableAuth: true
+    existingConfigSecret: seaweedfs-s3-secret
+    createBuckets:
+    - name: nasse-backups
+      anonymousRead: false
+    - name: turingpi-backups
+      anonymousRead: false
+    - name: vm-backups
+      anonymousRead: false
+    - name: scratch
+      anonymousRead: false
+  data:
+    type: "hostPath"
+    size: ""
+    storageClass: ""
+    hostPathPrefix: ${seaweedfs_hostpath_prefix}
+  logs:
+    type: "persistentVolumeClaim"
+    size: "4Gi"
+  ingress:
+    enabled: true
+    host: seaweedfs.absolutist.it
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    tls:
+    - secretName: tls-seaweedfs-ingress
+      hosts:
+      - seaweedfs.absolutist.it
+
+s3:
+  ingress:
+    enabled: true
+    host: s3.absolutist.it
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    tls:
+    - secretName: tls-seaweedfs-ingress
+      hosts:
+      - s3.absolutist.it

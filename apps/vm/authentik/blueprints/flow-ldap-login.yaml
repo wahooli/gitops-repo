@@ -6,9 +6,9 @@ metadata:
     blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Authentication flow
   attrs:
-    identifiers:
-      name: Init - Authentication flow
     required: false
 - attrs:
     authentication: require_outpost

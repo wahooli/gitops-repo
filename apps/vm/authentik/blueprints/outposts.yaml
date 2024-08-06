@@ -6,9 +6,9 @@ metadata:
     blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Applications
   attrs:
-    identifiers:
-      name: Init - Applications
     required: false
 - model: authentik_outposts.kubernetesserviceconnection
   identifiers:

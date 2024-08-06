@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: linkerd-certificates
+  namespace: flux-system
+type: Opaque
+stringData:
+  values.yaml: |
+    identity:
+      issuer:
+        tls:
+          crtPEM: |
+            -----BEGIN CERTIFICATE-----
+            MIIBtDCCAVqgAwIBAgIQA+fl7d2rcfH7Fp3gFzG5VTAKBggqhkjOPQQDAjAlMSMw
+            IQYDVQQDExpyb290LmxpbmtlcmQuY2x1c3Rlci5sb2NhbDAgFw0yNDA4MDYwNTEx
+            MDlaGA8yMTI0MDcxMzA1MTEwOVowKTEnMCUGA1UEAxMeaWRlbnRpdHkubGlua2Vy
+            ZC5jbHVzdGVyLmxvY2FsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvSZ5ZW9M
+            FQZHokjsLwmBM0igMpY1FocLYmJlOVaucjoNNQqMF/plH2YpExMJRxjXvuf3b6fK
+            BZaB30ASWCmnjKNmMGQwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8C
+            AQAwHQYDVR0OBBYEFD4CkoQNzfQCi/8km8Fg9OHYMImsMB8GA1UdIwQYMBaAFLlb
+            wFW1RqeA3nuhvfdsgFhYOSVlMAoGCCqGSM49BAMCA0gAMEUCIQDXmtF+M66mB9n+
+            SA3bMskV9rTeZCGYdaCbBkiCQocXGwIgPAgoQ5cC1fP17VsUSOS2DJ9sBSFYS+dN
+            qEArGX1iBTs=
+            -----END CERTIFICATE-----
+          keyPEM: |
+            -----BEGIN EC PRIVATE KEY-----
+            MHcCAQEEIOlD8DhbTARldiTPvFHfj2/cuYxy+Exs/VBy9owydzbSoAoGCCqGSM49
+            AwEHoUQDQgAEvSZ5ZW9MFQZHokjsLwmBM0igMpY1FocLYmJlOVaucjoNNQqMF/pl
+            H2YpExMJRxjXvuf3b6fKBZaB30ASWCmnjA==
+            -----END EC PRIVATE KEY-----
+    identityTrustAnchorsPEM: |
+      -----BEGIN CERTIFICATE-----
+      MIIBjjCCATWgAwIBAgIQIRK0Tg4zhKBg0PpN9X9k0jAKBggqhkjOPQQDAjAlMSMw
+      IQYDVQQDExpyb290LmxpbmtlcmQuY2x1c3Rlci5sb2NhbDAgFw0yNDA4MDYwNTEw
+      NDBaGA8yMTI0MDcxMzA1MTA0MFowJTEjMCEGA1UEAxMacm9vdC5saW5rZXJkLmNs
+      dXN0ZXIubG9jYWwwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARqM94L8rIaR/to
+      Y2oEMRVC0jtlbrSw5mlXZNWrIveXwQJgRq5XYMusl2ukTLI/1lf7MJnBHpKT5CMP
+      hwbcREPFo0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAd
+      BgNVHQ4EFgQUuVvAVbVGp4Dee6G992yAWFg5JWUwCgYIKoZIzj0EAwIDRwAwRAIg
+      QSOzJwjpkaouxtww7/v8YRx7QkWmFpQifUhWgpdvGXUCIGJA25uako6deyM3jgsa
+      3jZyZgGzLy80c6oLuMXCnFHf
+      -----END CERTIFICATE-----
