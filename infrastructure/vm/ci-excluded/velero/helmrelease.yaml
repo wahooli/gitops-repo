@@ -8,7 +8,7 @@ spec:
   releaseName: velero
   chart:
     spec:
-      version: "6.0.0"
+      version: "7.1.4"
   valuesFrom:
   - kind: ConfigMap
     name: velero-values
