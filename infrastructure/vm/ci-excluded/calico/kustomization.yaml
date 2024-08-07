@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - ../../../base/calico-namespace
 - ../../../base/calico-bgp
+- felixconfiguration.yaml
 patches:
 - target:
     kind: Namespace

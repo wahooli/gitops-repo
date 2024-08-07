@@ -1,0 +1,22 @@
+apiVersion: projectcalico.org/v3
+kind: FelixConfiguration
+metadata:
+  name: default
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+    kustomize.toolkit.fluxcd.io/ssa: merge
+spec:
+  bpfConnectTimeLoadBalancing: Disabled
+  bpfEnabled: true
+  bpfExternalServiceMode: DSR
+  bpfHostNetworkedNATWithoutCTLB: Enabled
+  bpfLogLevel: ""
+  floatingIPs: Disabled
+  healthPort: 9099
+  iptablesBackend: NFT
+  ipv6Support: false
+  logFilePath: none
+  logSeverityScreen: Info
+  reportingInterval: 0s
+  sidecarAccelerationEnabled: true
+  vxlanVNI: 4096
