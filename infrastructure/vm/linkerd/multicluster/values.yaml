@@ -1,0 +1,3 @@
+gateway:
+  serviceAnnotations:
+    metallb.universe.tf/loadBalancerIP: ${linkerd_gateway_ip}

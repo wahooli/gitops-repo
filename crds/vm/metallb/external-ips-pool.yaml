@@ -6,3 +6,4 @@ metadata:
 spec:
   addresses:
   - ${cluster_bgp_loadbalaner_ip}/32
+  - ${linkerd_gateway_ip}/32
