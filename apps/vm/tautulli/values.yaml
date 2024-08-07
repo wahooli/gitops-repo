@@ -3,6 +3,7 @@ image:
 env:
   TZ: Europe/Helsinki
 podAnnotations:
+  linkerd.io/inject: enabled
   backup.velero.io/backup-volumes: config
 global:
   labels:

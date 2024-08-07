@@ -1,6 +1,9 @@
 image:
   tag: "4.43.5" # {"$imagepolicy": "flux-system:ombi:tag"}
 
+podAnnotations:
+  linkerd.io/inject: enabled
+
 initContainers:
   copy-configuration:
     image: wahooli/envsubst:latest
