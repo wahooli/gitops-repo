@@ -7,11 +7,15 @@ spec:
   releaseName: jellyfin
   interval: 5m
   targetNamespace: default
-  # values:
-  #   envFrom:
-  #     envs:
-  #       name: jellyfin-env
+  values:
+    envFrom:
+      envs:
+        name: jellyfin-env
   valuesFrom:
   - kind: ConfigMap
     name: jellyfin-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: jellyfin-helmrelease-overrides
+    optional: true
     valuesKey: values.yaml

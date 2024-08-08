@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  name: jellyfin
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: jellyfin.wahoo.li
+    http:
+      paths:
+      - backend:
+          service:
+            name: jellyfin-nas
+            port:
+              number: 8096
+        path: /
+        pathType: Prefix
+  - host: jellyfin.absolutist.it
+    http:
+      paths:
+      - backend:
+          service:
+            name: jellyfin-nas
+            port:
+              number: 8096
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - jellyfin.wahoo.li
+    - jellyfin.absolutist.it
+    secretName: tls-jellyfin-ingress

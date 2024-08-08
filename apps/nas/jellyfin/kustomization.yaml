@@ -4,8 +4,19 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: jellyfin-values
   namespace: flux-system
+- name: jellyfin-env
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
+  envs:
+  - .env
 configurations:
 - ../../.config/valuesFrom.yaml
+- ../../.config/envFrom.yaml
 kind: Kustomization
 patches:
 - path: helmrelease.yaml
@@ -21,3 +32,4 @@ patches:
     name: base-jellyfin
 resources:
 - ../../base/jellyfin
+- imagepolicy.yaml

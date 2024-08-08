@@ -4,3 +4,4 @@ resources:
 - nas-plex.yaml
 - ingress-nginx.yaml
 - linkerd-multicluster.yaml
+- nas-jellyfin.yaml

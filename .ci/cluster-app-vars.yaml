@@ -34,6 +34,8 @@ stringData:
   seaweedfs_hostpath_prefix: /tmp
   plex_movies_host_path: /tmp
   plex_tv_host_path: /tmp
+  jellyfin_movies_host_path: /tmp
+  jellyfin_tv_host_path: /tmp
   deluge_downloads_host_path: /tmp
   radarr_data_host_path: /tmp
   sonarr_data_host_path: /tmp
