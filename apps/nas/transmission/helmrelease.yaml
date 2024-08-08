@@ -1,10 +1,10 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: default--deluge
+  name: default--transmission
   namespace: flux-system
 spec:
-  releaseName: deluge
+  releaseName: transmission
   interval: 5m
   targetNamespace: default
   values:
@@ -12,8 +12,8 @@ spec:
       envs:
         type: configMap
         useFromChart: false
-        name: deluge-env
+        name: transmission-env
   valuesFrom:
   - kind: ConfigMap
-    name: deluge-values
+    name: transmission-values
     valuesKey: values.yaml

@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-transmission
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: transmission
+spec:
+  releaseName: base-transmission
+  chart:
+    spec:
+      chart: transmission
+      sourceRef:
+        kind: HelmRepository
+        name: wahooli
+        namespace: flux-system
+      version: ">=0.1.0-0"
+      interval: 24h
+  install:
+    remediation:
+      retries: -1

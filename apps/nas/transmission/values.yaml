@@ -1,0 +1,68 @@
+image:
+  tag: "4.0.6" # {"$imagepolicy": "flux-system:transmission:tag"}
+
+hostNetwork: false
+
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: transmission
+
+wireguard:
+  enabled: true
+  image:
+    tag: "1.0.20210914" # {"$imagepolicy": "flux-system:wireguard:tag"}
+  config:
+    existingConfigMap: transmission-wireguard-config
+
+# resources:
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /config
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "1Gi"
+  downloads:
+    enabled: true
+    mount:
+    - path: /downloads
+    spec:
+      hostPath:
+        path: ${transmission_downloads_host_path}
+        type: Directory # DirectoryOrCreate
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    hosts:
+    - host: transmission.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    - host: transmission.absolutist.it
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+    tls:
+    - secretName: tls-transmission-ingress
+      hosts:
+      - transmission.wahoo.li
+      - transmission.absolutist.it

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: transmission-wireguard-config
+  namespace: default
+data:
+  wg0.conf: hello world
+  wg1.conf: another_file

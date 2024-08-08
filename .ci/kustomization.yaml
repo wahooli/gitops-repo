@@ -17,5 +17,6 @@ resources:
 - discord-webhook.yaml
 - seaweedfs-s3-secret.yaml
 - linkerd-certificates.yaml
+- transmission-wireguard-config.yaml
 - cni-plugins
 - helmrelease-value-overrides

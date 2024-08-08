@@ -70,6 +70,10 @@ ingress:
       velero.io/exclude-from-backup: "true"
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
       # nginx.ingress.kubernetes.io/proxy-body-size: 25m
       cert-manager.io/cluster-issuer: letsencrypt-production
     hosts:
