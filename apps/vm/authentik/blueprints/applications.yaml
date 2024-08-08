@@ -33,6 +33,7 @@ entries:
     mode: forward_single
     name: ombi-proxy
     refresh_token_validity: days=30
+    skip_path_regex: /api/.*
   id: ombi-provider
   identifiers:
     name: ombi-proxy

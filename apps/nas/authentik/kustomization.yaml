@@ -1,4 +1,18 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+- ../../base/authentik/helmrepository.yaml
 - ../../base/authentik/namespace.yaml
+- ../../base/authentik/helmrelease-remote-cluster.yaml
+patches:
+- path: helmrelease-remote-cluster.yaml
+  target:
+    kind: HelmRelease
+    name: base-authentik-remote-cluster
+- target:
+    kind: HelmRelease
+    name: base-authentik-remote-cluster
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: default--authentik-remote-cluster

@@ -44,6 +44,10 @@ entries:
         - op: add
           path: /spec/template/spec/dnsPolicy
           value: ClusterFirstWithHostNet
+        service:
+        - op: add
+          path: /metadata/labels/mirror.linkerd.io~1exported
+          value: "true"
       kubernetes_namespace: default
       kubernetes_replicas: 1
       kubernetes_service_type: ClusterIP
@@ -72,6 +76,10 @@ entries:
         - op: add
           path: /spec/template/spec/dnsPolicy
           value: ClusterFirstWithHostNet
+        service:
+        - op: add
+          path: /metadata/labels/mirror.linkerd.io~1exported
+          value: "true"
       authentik_host_browser: ''
       authentik_host_insecure: true
       container_image: null

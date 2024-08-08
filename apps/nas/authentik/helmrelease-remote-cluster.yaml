@@ -1,0 +1,9 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--authentik-remote-cluster
+  namespace: flux-system
+spec:
+  releaseName: authentik-remote-cluster-default
+  interval: 5m
+  targetNamespace: default
