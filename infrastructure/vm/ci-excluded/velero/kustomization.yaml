@@ -20,6 +20,9 @@ patches:
     - op: add
       path: /metadata/labels/topolvm.io~1webhook
       value: "ignore"
+    - op: add
+      path: /metadata/labels/linkerd.io~1inject
+      value: "enabled"
 configMapGenerator:
 - name: velero-values
   namespace: flux-system
