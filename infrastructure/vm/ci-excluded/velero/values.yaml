@@ -121,9 +121,11 @@ configuration:
     accessMode: ReadWrite
     default: true
     config:
+      checksumAlgorithm: ""
       region: ${velero_backup_bucket_region}
       s3ForcePathStyle: true
       s3Url: ${velero_backup_bucket_url}
+      publicUrl: ${velero_backup_bucket_url}
 
   # volumeSnapshotLocation:
   # - name: minio
