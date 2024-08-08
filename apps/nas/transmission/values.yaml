@@ -1,8 +1,6 @@
 image:
-  tag: "4.0.6" # {"$imagepolicy": "flux-system:transmission:tag"}
-
+  tag: "2021.11.18" # {"$imagepolicy": "flux-system:transmission:tag"}
 hostNetwork: false
-
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
@@ -10,14 +8,12 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: transmission
-
 wireguard:
   enabled: true
   image:
     tag: "1.0.20210914" # {"$imagepolicy": "flux-system:wireguard:tag"}
   config:
     existingConfigMap: transmission-wireguard-config
-
 # resources:
 #   requests:
 #     memory: "256Mi"
@@ -45,7 +41,6 @@ persistence:
       hostPath:
         path: ${transmission_downloads_host_path}
         type: Directory # DirectoryOrCreate
-
 ingress:
   main:
     enabled: true
