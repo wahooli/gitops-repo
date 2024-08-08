@@ -37,5 +37,5 @@ spec:
     push:
       branch: flux-image-updates
   update:
-    path: ./apps/vm
+    path: ./apps/nas
     strategy: Setters
