@@ -1,12 +1,10 @@
 image:
-  tag: "1.30.5" # {"$imagepolicy": "flux-system:vaultwarden:tag"}
-
+  tag: "1.31.0" # {"$imagepolicy": "flux-system:vaultwarden:tag"}
 envFrom:
   envs:
     type: configMap
     useFromChart: false
     name: vaultwarden-env
-
 initContainers:
   wait-for-psql:
     image: wahooli/wait-for-it:latest
@@ -14,7 +12,7 @@ initContainers:
     args:
     - vaultwarden-postgresql:5432
     - -t
-    - "300"  # wait for 5 minutes
+    - "300" # wait for 5 minutes
 env:
   SMTP_PASSWORD:
     valueFrom:
@@ -41,8 +39,6 @@ env:
       secretKeyRef:
         name: ${vaultwarden_app_secret_name}
         key: installation_key
-
-
 # controller:
 #   type: statefulset
 podAnnotations:
@@ -52,7 +48,6 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: vaultwarden
-
 resources:
   requests:
     memory: "256Mi"
@@ -78,8 +73,6 @@ persistence:
   #   - path: /config
   #   spec:
   #     emptyDir: {}
-
-
 ingress:
   main:
     enabled: true
