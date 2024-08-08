@@ -54,7 +54,14 @@ persistence:
       hostPath:
         path: ${jellyfin_tv_host_path}
         type: Directory
-
+  transcode:
+    enabled: true
+    mount:
+    - path: /transcode
+    spec:
+      emptyDir:
+        sizeLimit: 20Gi
+        medium: Memory
 ingress:
   main:
     enabled: true
