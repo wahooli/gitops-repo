@@ -18,5 +18,6 @@ resources:
 - seaweedfs-s3-secret.yaml
 - linkerd-certificates.yaml
 - transmission-wireguard-config.yaml
+- jellyplex-watched-tokens.yaml
 - cni-plugins
 - helmrelease-value-overrides

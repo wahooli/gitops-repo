@@ -1,11 +1,11 @@
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
 metadata:
-  name: transmission
+  name: jellyplex-watched
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: transmission
+    name: jellyplex-watched
   policy:
     semver:
-      range: '<999.999.999'
+      range: x.x.x

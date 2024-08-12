@@ -1,6 +1,9 @@
 image:
   tag: "v1.10.0" # {"$imagepolicy": "flux-system:ps3netsrv:tag"}
 
+strategy:
+  type: Recreate # needed for hostnetwork deployment
+
 global:
   labels:
     app.kubernetes.io/part-of: ps3netsrv

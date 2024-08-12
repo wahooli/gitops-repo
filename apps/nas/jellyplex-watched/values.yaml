@@ -1,0 +1,18 @@
+image:
+  tag: "6.0.1" # {"$imagepolicy": "flux-system:jellyplex-watched:tag"}
+
+global:
+  labels:
+    app.kubernetes.io/part-of: jellyplex-watched
+
+hostname: jellyplex-watched
+
+envFrom:
+  envs:
+    type: configMap
+    useFromChart: false
+    name: jellyplex-watched-env
+  tokens:
+    type: secret
+    useFromChart: false
+    name: jellyplex-watched-tokens

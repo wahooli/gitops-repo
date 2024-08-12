@@ -1,19 +1,17 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: default--ps3netsrv
+  name: default--jellyplex-watched
   namespace: flux-system
 spec:
-  releaseName: ps3netsrv
+  releaseName: jellyplex-watched
   interval: 5m
   targetNamespace: default
   values:
     envFrom:
       envs:
-        type: configMap
-        useFromChart: false
-        name: ps3netsrv-env
+        name: jellyplex-watched-env
   valuesFrom:
   - kind: ConfigMap
-    name: ps3netsrv-values
+    name: jellyplex-watched-values
     valuesKey: values.yaml
