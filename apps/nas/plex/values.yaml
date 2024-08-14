@@ -1,16 +1,13 @@
 image:
-  tag: "1.40.4" # {"$imagepolicy": "flux-system:plex:tag"}
-
+  tag: "1.40.5" # {"$imagepolicy": "flux-system:plex:tag"}
 hostname: nasse
 runtimeClassName: nvidia
 hostNetwork: true
-
 envFrom:
   envs:
     type: configMap
     useFromChart: false
     name: plex-env
-
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
@@ -18,7 +15,6 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: plex
-
 configMaps:
 - name: library-import-initscript
   data:
@@ -45,7 +41,6 @@ configMaps:
       rm pms.tgz
 
       echo "Done."
-
 initContainers:
   import-configuration:
     image: alpine:3.18.0
@@ -60,7 +55,6 @@ initContainers:
     - mountPath: /import-config.sh
       name: initcontainer-entrypoint
       subPath: import-config.sh
-
 # resources:
 #   limits:
 #     nvidia.com/gpu: 1
@@ -113,12 +107,10 @@ persistence:
       emptyDir:
         sizeLimit: 20Gi
         medium: Memory
-
 service:
   main:
     labels:
       mirror.linkerd.io/exported: "true"
-
 ingress:
   main:
     enabled: true
