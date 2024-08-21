@@ -1,6 +1,5 @@
 image:
-  tag: "5.8.3" # {"$imagepolicy": "flux-system:radarr:tag"}
-
+  tag: "5.9.1" # {"$imagepolicy": "flux-system:radarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
@@ -8,13 +7,11 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: radarr
-
 envFrom:
   envs:
     type: configMap
     useFromChart: false
     name: radarr-env
-
 # resources:
 #   requests:
 #     memory: "256Mi"
@@ -42,12 +39,10 @@ persistence:
       hostPath:
         path: ${radarr_data_host_path}
         type: Directory
-
 service:
   main:
     labels:
       mirror.linkerd.io/exported: "true"
-
 ingress:
   main:
     enabled: true
