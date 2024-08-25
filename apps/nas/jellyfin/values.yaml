@@ -4,11 +4,9 @@ envFrom:
     useFromChart: false
     name: jellyfin-env
 image:
-  tag: "10.9.9" # {"$imagepolicy": "flux-system:jellyfin:tag"}
-
+  tag: "10.9.10" # {"$imagepolicy": "flux-system:jellyfin:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: data
-
 runtimeClassName: nvidia
 # hostNetwork: true
 
@@ -17,12 +15,10 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: jellyfin
-
 service:
   main:
     labels:
       mirror.linkerd.io/exported: "true"
-
 persistence:
   data:
     enabled: true
