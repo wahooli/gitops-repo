@@ -1,6 +1,5 @@
 image:
-  tag: "4.0.8" # {"$imagepolicy": "flux-system:sonarr:tag"}
-
+  tag: "4.0.9" # {"$imagepolicy": "flux-system:sonarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
@@ -8,13 +7,11 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: sonarr
-
 envFrom:
   envs:
     type: configMap
     useFromChart: false
     name: sonarr-env
-
 # resources:
 #   requests:
 #     memory: "256Mi"
@@ -42,12 +39,10 @@ persistence:
       hostPath:
         path: ${sonarr_data_host_path}
         type: Directory
-
 service:
   main:
     labels:
       mirror.linkerd.io/exported: "true"
-
 ingress:
   main:
     enabled: true
