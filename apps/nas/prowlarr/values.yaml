@@ -1,6 +1,5 @@
 image:
-  tag: "1.21.2" # {"$imagepolicy": "flux-system:prowlarr:tag"}
-
+  tag: "1.23.1" # {"$imagepolicy": "flux-system:prowlarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
@@ -8,7 +7,6 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: prowlarr
-
 # resources:
 #   requests:
 #     memory: "256Mi"
@@ -28,12 +26,10 @@ persistence:
       resources:
         requests:
           storage: "1Gi"
-
 service:
   main:
     labels:
       mirror.linkerd.io/exported: "true"
-
 ingress:
   main:
     enabled: true
