@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-reloader
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: reloader
+spec:
+  releaseName: base-reloader
+  targetNamespace: default
+  chart:
+    spec:
+      chart: reloader
+      sourceRef:
+        kind: HelmRepository
+        name: stakater
+        namespace: flux-system
+      interval: 24h
+  install:
+    timeout: 5m
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: reloader-values
+    valuesKey: values-base.yaml

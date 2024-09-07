@@ -1,0 +1,9 @@
+reloader:
+  ignoreNamespaces: "flux-system,kube-system,kube-node-leade,kube-public,kube-system,openebs,velero,reflector"
+resources:
+  limits:
+    cpu: 150m
+    memory: 512Mi
+  requests:
+    cpu: 10m
+    memory: 128Mi
