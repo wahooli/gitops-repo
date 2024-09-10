@@ -8,7 +8,7 @@ spec:
   releaseName: cert-manager
   chart:
     spec:
-      version: "v1.13.0"
+      version: "v1.15.3"
   valuesFrom:
   - kind: ConfigMap
     name: cert-manager-values

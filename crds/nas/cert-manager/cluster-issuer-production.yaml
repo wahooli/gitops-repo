@@ -9,6 +9,7 @@ spec:
     email: "${cloudflare_email}"
     privateKeySecretRef:
       name: letsencrypt-production
+    # disableAccountKeyGeneration: true
     solvers:
     - dns01:
         cloudflare:
@@ -16,3 +17,7 @@ spec:
           apiTokenSecretRef:
             name: cloudflare-api-token-secret
             key: api-token
+      selector:
+        dnsZones:
+        - absolutist.it
+        - wahoo.li
