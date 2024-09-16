@@ -1,6 +1,5 @@
 image:
-  tag: "1.4.3" # {"$imagepolicy": "flux-system:bazarr:tag"}
-
+  tag: "1.4.4" # {"$imagepolicy": "flux-system:bazarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
@@ -8,13 +7,11 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: bazarr
-
 envFrom:
   envs:
     type: configMap
     useFromChart: false
     name: bazarr-env
-
 # resources:
 #   requests:
 #     memory: "256Mi"
@@ -50,12 +47,10 @@ persistence:
       hostPath:
         path: ${bazarr_tv_host_path}
         type: Directory
-
 service:
   main:
     labels:
       mirror.linkerd.io/exported: "true"
-
 ingress:
   main:
     enabled: true
