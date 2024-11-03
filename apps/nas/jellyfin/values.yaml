@@ -4,7 +4,7 @@ envFrom:
     useFromChart: false
     name: jellyfin-env
 image:
-  tag: "10.10.0" # {"$imagepolicy": "flux-system:jellyfin:tag"}
+  tag: "10.10.1" # {"$imagepolicy": "flux-system:jellyfin:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: data
 runtimeClassName: nvidia
