@@ -16,5 +16,6 @@ controller:
     externalTrafficPolicy: Local
     type: LoadBalancer
     annotations:
+      external-dns.alpha.kubernetes.io/hostname: vm-nginx.absolutist.it,vm-nginx.wahoo.li
       metallb.universe.tf/loadBalancerIPs: ${cluster_bgp_loadbalaner_ip}
       # external-dns.alpha.kubernetes.io/hostname: "nginx.absolutist.it."

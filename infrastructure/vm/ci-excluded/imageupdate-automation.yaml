@@ -22,18 +22,17 @@ spec:
         Automation name: {{ .AutomationObject }}
 
         Files:
-        {{ range $filename, $_ := .Changed.Files -}}
+        {{ range $filename, $_ := .Changed.FileChanges -}}
         - {{ $filename }}
         {{ end -}}
 
         Objects:
-        {{ range $resource, $_ := .Changed.Objects -}}
+        {{ range $resource, $changes := .Changed.Objects -}}
         - {{ $resource.Kind }} {{ $resource.Name }}
+          Changes:
+        {{- range $_, $change := $changes }}
+            - {{ $change.OldValue }} -> {{ $change.NewValue }}
         {{ end -}}
-
-        Images:
-        {{ range .Changed.Images -}}
-        - {{.}}
         {{ end -}}
     push:
       branch: flux-image-updates

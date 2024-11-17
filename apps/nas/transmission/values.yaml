@@ -1,5 +1,5 @@
 image:
-  tag: "4.0.6" # {"$imagepolicy": "flux-system:transmission:tag"}
+  tag: "4.0.6" # {"$imagepolicy": "flux-system:transmission-release:tag"}
 
 hostNetwork: false
 
@@ -14,7 +14,7 @@ global:
 wireguard:
   enabled: true
   image:
-    tag: "1.0.20210914" # {"$imagepolicy": "flux-system:wireguard:tag"}
+    tag: "1.0.20210914" # {"$imagepolicy": "flux-system:wireguard-release:tag"}
   config:
     existingConfigMap: transmission-wireguard-config
 
@@ -52,6 +52,8 @@ ingress:
     className: nginx
     labels:
       velero.io/exclude-from-backup: "true"
+    annotations:
+      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     hosts:
     - host: transmission.wahoo.li
       paths:

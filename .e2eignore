@@ -5,4 +5,5 @@ infrastructure/.config
 infrastructure/.config/* # files specifically being ignored just skips finding helmrelease for the file itself
 apps/vm/authentik/blueprints
 infrastructure/nas/internal-dns/blocky/config
+infrastructure/vm/internal-dns/blocky/config
 # test

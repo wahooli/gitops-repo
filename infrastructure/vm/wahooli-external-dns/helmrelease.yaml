@@ -1,18 +1,18 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: kube-system--external-dns
+  name: kube-system--cloudflare-external-dns
   namespace: flux-system
 spec:
   interval: 10m
-  releaseName: wahooli-external-dns
+  releaseName: cloudflare-external-dns
   chart:
     spec:
-      version: "1.14.4"
+      version: "1.15.0"
   valuesFrom:
   - kind: ConfigMap
-    name: external-dns-values
+    name: cloudflare-external-dns-values
     valuesKey: values-base.yaml
   - kind: ConfigMap
-    name: external-dns-values
+    name: cloudflare-external-dns-values
     valuesKey: values.yaml

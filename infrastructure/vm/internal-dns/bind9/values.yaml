@@ -1,0 +1,36 @@
+image:
+  tag: "9.20"
+
+# tolerations:
+# - key: "CriticalAddonsOnly"
+#   operator: "Equal"
+#   value: "true"
+#   effect: "NoSchedule"
+
+service:
+  main:
+    labels:
+      mirror.linkerd.io/exported: "true"
+    externalTrafficPolicy: Local
+    type: "${dns_svc_type:=LoadBalancer}"
+    annotations:
+      lbipam.cilium.io/ips: "${dns_ip_addr_3}"
+
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /etc/bind/named.d
+    spec:
+      useFromChart: false
+      configMap:
+        name: bind9-config
+  zones:
+    enabled: true
+    mount:
+    - path: /etc/bind/zones
+    spec:
+      useFromChart: false
+      configMap:
+        defaultMode: 0644
+        name: bind9-zones

@@ -46,6 +46,8 @@ service:
 
 ingress:
   main:
+    annotations:
+      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     enabled: true
     className: nginx
     labels:

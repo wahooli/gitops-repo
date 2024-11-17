@@ -14,18 +14,12 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-    name: base-cloudflare-tunnel
-- target:
-    kind: HelmRelease
-    name: base-cloudflare-tunnel
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: cloudflare-tunnel--wahooli-staging
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: cloudflare-tunnel-values
   namespace: flux-system
   files:
   - values.yaml=values.yaml
 configurations:
-- kustomizeconfig.yaml
+- ../../.config/valuesFrom.yaml

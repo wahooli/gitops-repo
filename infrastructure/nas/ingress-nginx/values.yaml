@@ -16,4 +16,5 @@ controller:
     externalTrafficPolicy: Local
     type: LoadBalancer
     annotations:
+      external-dns.alpha.kubernetes.io/hostname: nas-nginx.absolutist.it,nas-nginx.wahoo.li
       lbipam.cilium.io/ips: ${cluster_bgp_loadbalaner_ip}

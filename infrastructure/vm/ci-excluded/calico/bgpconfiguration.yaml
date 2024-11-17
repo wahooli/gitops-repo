@@ -9,4 +9,9 @@ spec:
   serviceExternalIPs:
   - cidr: ${cluster_bgp_loadbalaner_ip}/32
   - cidr: ${linkerd_gateway_ip}/32
+  - cidr: ${dns_ip_addr_1}/32
+  - cidr: ${dns_ip_addr_2}/32
+  - cidr: ${dns_ip_addr_3}/32
+  - cidr: 8.8.8.8
+  - cidr: 8.8.4.4
   bindMode: NodeIP

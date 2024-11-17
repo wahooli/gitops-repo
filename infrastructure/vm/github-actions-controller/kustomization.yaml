@@ -13,15 +13,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-    name: base-arc
-- target:
-    kind: HelmRelease
-    name: base-arc
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: arc-systems--arc
-
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: gha-arc-values
   namespace: flux-system
@@ -29,4 +22,4 @@ configMapGenerator:
   files:
   - values.yaml=values.yaml
 configurations:
-- kustomizeconfig.yaml
+- ../../.config/valuesFrom.yaml

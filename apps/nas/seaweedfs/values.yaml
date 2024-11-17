@@ -14,6 +14,7 @@ master:
     host: master.seaweedfs.absolutist.it
     className: nginx
     annotations:
+      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.iti
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     tls:
     - secretName: tls-seaweedfs-ingress
@@ -55,6 +56,7 @@ filer:
     host: seaweedfs.absolutist.it
     className: nginx
     annotations:
+      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
@@ -70,6 +72,7 @@ s3:
     host: s3.absolutist.it
     className: nginx
     annotations:
+      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
