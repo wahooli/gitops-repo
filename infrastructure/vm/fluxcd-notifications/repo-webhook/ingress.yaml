@@ -8,6 +8,8 @@ metadata:
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  labels:
+    ingress: cloudflare
 spec:
   rules:
   - host: ${repository_webhook_host}

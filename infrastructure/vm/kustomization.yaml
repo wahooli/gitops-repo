@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - cert-manager
 - cloudflare-tunnel
+- cloudflare-external-dns
 - docker-registry
 - external-snapshotter
 - github-actions-controller
@@ -12,6 +13,5 @@ resources:
 - reflector
 - reloader
 - sources
-- wahooli-external-dns
 - ci-excluded.yaml
 - fluxcd-notifications.yaml

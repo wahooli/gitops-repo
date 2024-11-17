@@ -8,6 +8,7 @@ provider:
 extraArgs:
 - --cloudflare-proxied
 - --cloudflare-dns-records-per-page=5000
+- --label-filter=ingress=cloudflare
 env:
 - name: CF_API_TOKEN
   valueFrom:
