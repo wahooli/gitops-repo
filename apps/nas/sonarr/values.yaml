@@ -50,6 +50,7 @@ ingress:
     annotations:
       external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     labels:
+      ingress: internal
       velero.io/exclude-from-backup: "true"
     hosts:
     - host: sonarr.absolutist.it
@@ -64,6 +65,7 @@ ingress:
     enabled: true
     className: nginx
     labels:
+      ingress: internal
       velero.io/exclude-from-backup: "true"
     annotations:
       external-dns.alpha.kubernetes.io/target: nas-nginx.wahoo.li

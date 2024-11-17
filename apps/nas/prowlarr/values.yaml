@@ -35,6 +35,7 @@ ingress:
     enabled: true
     className: nginx
     labels:
+      ingress: internal
       velero.io/exclude-from-backup: "true"
     annotations:
       external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it

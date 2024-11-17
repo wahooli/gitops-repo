@@ -13,6 +13,8 @@ master:
     enabled: true
     host: master.seaweedfs.absolutist.it
     className: nginx
+    labels:
+      ingress: internal
     annotations:
       external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.iti
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
@@ -55,6 +57,8 @@ filer:
     enabled: true
     host: seaweedfs.absolutist.it
     className: nginx
+    labels:
+      ingress: internal
     annotations:
       external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
@@ -71,6 +75,8 @@ s3:
     enabled: true
     host: s3.absolutist.it
     className: nginx
+    labels:
+      ingress: internal
     annotations:
       external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"

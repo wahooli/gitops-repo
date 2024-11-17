@@ -51,6 +51,7 @@ ingress:
     enabled: true
     className: nginx
     labels:
+      ingress: internal
       velero.io/exclude-from-backup: "true"
     hosts:
     - host: deluge.wahoo.li
