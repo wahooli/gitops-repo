@@ -47,6 +47,8 @@ ingress:
   main:
     enabled: true
     className: nginx
+    annotations:
+      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     labels:
       velero.io/exclude-from-backup: "true"
     hosts:
@@ -64,6 +66,7 @@ ingress:
     labels:
       velero.io/exclude-from-backup: "true"
     annotations:
+      external-dns.alpha.kubernetes.io/target: nas-nginx.wahoo.li
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       # This should be the in-cluster DNS name for the authentik outpost service
       # as when the external URL is specified here, nginx will overwrite some crucial headers

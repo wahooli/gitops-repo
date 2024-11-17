@@ -1,0 +1,4 @@
+key "externaldns-key" {
+    algorithm hmac-sha256;
+    secret "${local_external_dns_key}";
+};

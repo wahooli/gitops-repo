@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-bind9
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: bind9
+spec:
+  releaseName: base-bind9
+  chart:
+    spec:
+      chart: bind9
+      sourceRef:
+        kind: HelmRepository
+        name: wahooli
+        namespace: flux-system
+      version: ">=0.1.0-0"
+      interval: 24h
+  install:
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: bind9-values
+    valuesKey: values-base.yaml

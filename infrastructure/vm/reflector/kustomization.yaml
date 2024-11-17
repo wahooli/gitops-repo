@@ -6,13 +6,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-reflector
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: reflector--reflector
+  options:
+    allowNameChange: true
 - target:
     kind: Namespace
     name: reflector
@@ -21,4 +16,4 @@ patches:
       path: /metadata/labels/topolvm.io~1webhook
       value: "ignore"
 configurations:
-- kustomizeconfig.yaml
+- ../../.config/valuesFrom.yaml

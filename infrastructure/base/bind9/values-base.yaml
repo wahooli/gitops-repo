@@ -1,0 +1,17 @@
+image:
+  tag: "9.20"
+
+hostname: bind9
+
+args:
+- -g
+- '-4'
+- -c
+- /etc/bind/named.conf
+
+bind9:
+  namedConfGenerator:
+    enabled: true
+  zoneCopy:
+    enabled: true
+    overwrite: false

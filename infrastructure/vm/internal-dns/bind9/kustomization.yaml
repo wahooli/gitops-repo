@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+- ../../../base/bind9
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: bind9-config
+  behavior: merge
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "internal-dns"
+  files:
+  - named.conf.options=config/named.conf.vm-rev-zone
+- name: bind9-zones
+  behavior: merge
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "internal-dns"
+  files:
+  - nas.rev.zone=config/nas.rev.zone
+- name: bind9-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values.yaml=values.yaml
+configurations:
+- ../../../.config/valuesFrom.yaml
+- ../kustomizeconfig.yaml

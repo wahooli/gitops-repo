@@ -36,6 +36,8 @@ ingress:
     className: nginx
     labels:
       velero.io/exclude-from-backup: "true"
+    annotations:
+      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     hosts:
     - host: prowlarr.wahoo.li
       paths:

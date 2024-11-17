@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
+DEBUG_LOGS="${DEBUG_LOGS:-false}"
+DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default}"
+DESCRIBE_PODS_NAMESPACES="${DESCRIBE_PODS_NAMESPACES:-default}"
+
 echo "::group::flux-system GitRepository definition"
 kubectl get gitrepository -n flux-system flux-system -o yaml
 echo "::endgroup::"
@@ -29,9 +33,24 @@ echo "::group::Pods in all namespaces"
 kubectl get pods --all-namespaces
 echo "::endgroup::"
 
-echo "::group::Describe pods in default namespace"
-kubectl describe pods -n default
-echo "::endgroup::"
+for namespace in "${DESCRIBE_PODS_NAMESPACES}"; do
+    echo "::group::Describe pods in ${namespace} namespace"
+    kubectl describe pods -n ${namespace}
+    echo "::endgroup::"
+done
+
+if [ "$DEBUG_LOGS" = true ]; then
+    for namespace in "${DEBUG_LOGS_NAMESPACES}"; do
+        echo "::group::Logs for pods in ${namespace} namespace"
+        pods=$(kubectl get pods -n $namespace -o jsonpath='{.items[*].metadata.name}')
+        for pod in $pods; do
+            echo "::group::Logs for pod $pod"
+            kubectl logs -n $namespace $pod
+            echo "::endgroup::"
+        done
+        echo "::endgroup::"
+    done
+fi
 
 if [ "$DEBUG_STORAGE" = true ]; then
     echo "::group::All PVCs"

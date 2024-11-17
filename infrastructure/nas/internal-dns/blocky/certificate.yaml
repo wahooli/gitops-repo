@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: blocky-doh
+  namespace: internal-dns
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: blocky
+spec:
+  secretName: tls-blocky
+  secretTemplate:
+    labels:
+      backupWeekly: "true"
+      backupDaily: "true"
+      app.kubernetes.io/part-of: blocky
+  issuerRef:
+    name: ${certificate_cluster_issuer:=letsencrypt-production}
+    kind: ClusterIssuer
+  dnsNames:
+  - ns1.wahoo.li
+  - ns2.absolutist.it
+  - ns.wahoo.li
+  - ns.absolutist.it
+  - dns.wahoo.li
+  - dns.absolutist.it

@@ -6,13 +6,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-metallb
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: metallb-system--metallb
+  options:
+    allowNameChange: true
 - target:
     kind: Namespace
     name: metallb-system
@@ -27,4 +22,4 @@ configMapGenerator:
   files:
   - values.yaml=values.yaml
 configurations:
-- kustomizeconfig.yaml
+- ../../.config/valuesFrom.yaml

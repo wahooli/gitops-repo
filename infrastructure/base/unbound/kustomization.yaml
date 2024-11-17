@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+- helmrelease.yaml
+configMapGenerator:
+- name: unbound-values
+  namespace: flux-system
+  files:
+  - values-base.yaml=values-base.yaml
+- name: unbound-config
+  namespace: flux-system
+  files:
+  - access-control.conf=config/access-control.conf
+  - interfaces.conf=config/interfaces.conf
+  - logging.conf=config/logging.conf
+  # - performance.conf=config/performance.conf
+  - remote-control.conf=config/remote-control.conf
+  - security.conf=config/security.conf
+  - trust-anchor.conf=config/trust-anchor.conf
+- name: unbound-zones
+  namespace: flux-system
+  files:
+  - local-zone.conf=config/local-zone.conf
+configurations:
+- kustomizeconfig.yaml

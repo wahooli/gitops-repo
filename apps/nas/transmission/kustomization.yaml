@@ -35,4 +35,8 @@ resources:
 - ../../base/transmission
 - ../../base/wireguard
 - imagepolicy.yaml
+- imagepolicy-build.yaml
+- imagepolicy-release.yaml
 - imagepolicy-wireguard.yaml
+- imagepolicy-wireguard-build.yaml
+- imagepolicy-wireguard-release.yaml

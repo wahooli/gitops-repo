@@ -3,6 +3,7 @@ HELM_RELEASES="${HELM_RELEASES:-$1}"
 RECONCILED=()
 ORIG_IFS=$IFS
 IFS=","
+HELMRELEASE_TIMEOUT="${HELMRELEASE_TIMEOUT:-6m}"
 
 function fail() {
     local helmrelease=$1
@@ -34,8 +35,8 @@ function reconcile() {
             IFS=","
             echo "Reconciling $helmrelease"
             echo "test_matrix=$helmreleases_out" >> "$GITHUB_OUTPUT"
-            flux reconcile helmrelease $helmrelease --timeout=10m || fail "$helmrelease" "Failed reconciling helmrelease: $helmrelease";
-            kubectl -n flux-system wait helmrelease/$helmrelease --for=condition=ready --timeout=5m || fail "$helmrelease" "Failed ready condition for helmrelease: $helmrelease";
+            flux reconcile helmrelease $helmrelease --timeout=${HELMRELEASE_TIMEOUT} --force || fail "$helmrelease" "Failed reconciling helmrelease: $helmrelease";
+            kubectl -n flux-system wait helmrelease/$helmrelease --for=condition=ready --timeout=${HELMRELEASE_TIMEOUT} || fail "$helmrelease" "Failed ready condition for helmrelease: $helmrelease";
             RECONCILED+=($helmrelease)
         fi
         IFS=","

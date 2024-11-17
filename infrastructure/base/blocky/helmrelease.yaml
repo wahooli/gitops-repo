@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-blocky
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: blocky
+spec:
+  releaseName: base-blocky
+  chart:
+    spec:
+      chart: blocky
+      sourceRef:
+        kind: HelmRepository
+        name: wahooli
+        namespace: flux-system
+      version: ">=0.1.0-0"
+      interval: 24h
+  install:
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: blocky-values
+    valuesKey: values-base.yaml

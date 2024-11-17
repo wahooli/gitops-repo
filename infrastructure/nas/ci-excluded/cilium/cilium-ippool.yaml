@@ -3,5 +3,6 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: "lb-pool"
 spec:
+  allowFirstLastIPs: 'No'
   blocks:
   - cidr: "${cluster_bgp_lb_pool}"

@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- helmrelease.yaml
+configMapGenerator:
+- name: bind9-values
+  namespace: flux-system
+  files:
+  - values-base.yaml=values-base.yaml
+- name: bind9-config
+  namespace: flux-system
+  files:
+  - named.conf.options=config/named.d/named.conf.options
+  - named.conf.keys=config/named.d/named.conf.keys
+  - named.conf.zones=config/named.d/named.conf.zones
+  - named.conf.logging=config/named.d/named.conf.logging
+- name: bind9-zones
+  namespace: flux-system
+  files:
+  - wahooli.zone=config/zones/wahooli.zone
+  - absolutistit.zone=config/zones/absolutistit.zone
+  - local.rev.zone=config/zones/rev.zone

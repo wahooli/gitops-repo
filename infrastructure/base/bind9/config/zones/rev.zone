@@ -1,0 +1,10 @@
+$TTL 3600 ; 1 hour
+$ORIGIN ${local_ip_reverse}. ; base domain-name
+@           IN  SOA  kubedns.absolutist.it. hostmaster.absolutist.it. (
+                                16         ; serial
+                                60         ; refresh (1 minute)
+                                60         ; retry (1 minute)
+                                60         ; expire (1 minute)
+                                60         ; minimum (1 minute)
+                                )
+                IN  NS      kubedns.absolutist.it.

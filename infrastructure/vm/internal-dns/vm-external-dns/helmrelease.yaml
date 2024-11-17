@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: internal-dns--vm-external-dns
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: internal-dns--bind9
+  interval: 10m
+  releaseName: vm-external-dns
+  targetNamespace: internal-dns
+  chart:
+    spec:
+      version: "1.15.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: vm-external-dns-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: vm-external-dns-values
+    valuesKey: values.yaml

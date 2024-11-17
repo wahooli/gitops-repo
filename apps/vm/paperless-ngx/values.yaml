@@ -116,6 +116,7 @@ ingress:
     labels:
       velero.io/exclude-from-backup: "true"
     annotations:
+      external-dns.alpha.kubernetes.io/target: vm-nginx.absolutist.it
       # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: 25m
       cert-manager.io/cluster-issuer: letsencrypt-production

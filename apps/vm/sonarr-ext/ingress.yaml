@@ -10,6 +10,10 @@ metadata:
       proxy_set_header X-Forwarded-Host $http_host;
     nginx.ingress.kubernetes.io/auth-url: http://ak-outpost-proxy-default.default.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    external-dns.alpha.kubernetes.io/target: 7e8d8e06-b9e2-4dc6-a8fa-bb811e8e972b.cfargotunnel.com
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+  labels:
+    ingress: cloudflare
   name: sonarr-external
   namespace: default
 spec:

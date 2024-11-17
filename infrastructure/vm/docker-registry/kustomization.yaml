@@ -7,13 +7,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-docker-registry
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: registry--docker-registry-mirror
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: docker-registry-values
   namespace: flux-system
@@ -21,4 +16,4 @@ configMapGenerator:
   files:
   - values.yaml=values.yaml
 configurations:
-- kustomizeconfig.yaml
+- ../../.config/valuesFrom.yaml
