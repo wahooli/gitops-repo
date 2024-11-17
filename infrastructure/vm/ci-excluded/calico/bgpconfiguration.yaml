@@ -12,6 +12,6 @@ spec:
   - cidr: ${dns_ip_addr_1}/32
   - cidr: ${dns_ip_addr_2}/32
   - cidr: ${dns_ip_addr_3}/32
-  - cidr: 8.8.8.8
-  - cidr: 8.8.4.4
+  - cidr: 8.8.8.8/32
+  - cidr: 8.8.4.4/32
   bindMode: NodeIP

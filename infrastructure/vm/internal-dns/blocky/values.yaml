@@ -3,8 +3,25 @@ service:
     externalTrafficPolicy: Local
     type: "${dns_svc_type:=LoadBalancer}"
     annotations:
-      lbipam.cilium.io/ips: ${dns_ip_addr_1},${dns_ip_addr_2},8.8.8.8,8.8.4.4
-
+      metallb.universe.tf/loadBalancerIPs: ${dns_ip_addr_1}
+  main1:
+    externalTrafficPolicy: Local
+    type: "${dns_svc_type:=LoadBalancer}"
+    annotations:
+      metallb.universe.tf/loadBalancerIPs: ${dns_ip_addr_2}
+    portsFrom: main
+  main2:
+    externalTrafficPolicy: Local
+    type: "${dns_svc_type:=LoadBalancer}"
+    annotations:
+      metallb.universe.tf/loadBalancerIPs: 8.8.8.8
+    portsFrom: main
+  main3:
+    externalTrafficPolicy: Local
+    type: "${dns_svc_type:=LoadBalancer}"
+    annotations:
+      metallb.universe.tf/loadBalancerIPs: 8.8.4.4
+    portsFrom: main
 persistence:
   config:
     enabled: true

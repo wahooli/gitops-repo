@@ -14,7 +14,7 @@ service:
     externalTrafficPolicy: Local
     type: "${dns_svc_type:=LoadBalancer}"
     annotations:
-      lbipam.cilium.io/ips: "${dns_ip_addr_3}"
+      metallb.universe.tf/loadBalancerIPs: "${dns_ip_addr_3}"
 
 persistence:
   config:
