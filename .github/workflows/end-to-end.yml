@@ -163,5 +163,7 @@ jobs:
     - name: Debug failure
       if: failure()
       env:
+        DEBUG_LOGS: "true"
+        DESCRIBE_PODS_NAMESPACES: internal-dns
         HELM_RELEASES: "${{ steps.helmrelease-verify.outputs.failing_helmrelease || join(matrix.test.helmreleases, ',') }}"
       run: .ci/end-to-end/debug-failure.sh

@@ -1,0 +1,24 @@
+$TTL 60 ; 1 minute
+$ORIGIN absolutist.it. ; base domain-name
+@           IN  SOA  kubedns.absolutist.it. hostmaster.absolutist.it. (
+                                16         ; serial
+                                60         ; refresh (1 minute)
+                                60         ; retry (1 minute)
+                                60         ; expire (1 minute)
+                                60         ; minimum (1 minute)
+                                )
+; name server RR for the domain
+                IN  NS      kubedns.absolutist.it.
+kubedns         IN  A       ${dns_ip_addr_3}
+ns1             IN  A       ${dns_ip_addr_1}
+ns2             IN  A       ${dns_ip_addr_2}
+ns              IN  A       ${dns_ip_addr_1}
+ns              IN  A       ${dns_ip_addr_2}
+dns             IN  A       ${dns_ip_addr_1}
+dns             IN  A       ${dns_ip_addr_2}
+ha              IN  A       ${homeassistant_ip}
+vpn             IN  A       ${vpn_ip}
+nasse           IN  A       ${nas_ip}
+nas             IN  A       ${nas_ip}
+purola          IN  A       ${purola_ip}
+adguard-origin  IN  A       ${adguard_ip}

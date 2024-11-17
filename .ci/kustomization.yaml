@@ -21,3 +21,4 @@ resources:
 - jellyplex-watched-tokens.yaml
 - cni-plugins
 - helmrelease-value-overrides
+- dns-vars.yaml

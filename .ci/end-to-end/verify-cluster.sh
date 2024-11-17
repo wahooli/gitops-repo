@@ -1,6 +1,7 @@
 #!/bin/bash
 TENANT="${TENANT:-$1}"
 KUSTOMIZATIONS="${KUSTOMIZATIONS:-$1}"
+KUSTOMIZATION_TIMEOUT="${KUSTOMIZATION_TIMEOUT:-3m}"
 
 function validate_kustomization() {
     local kustomization_file="$1"
@@ -25,10 +26,10 @@ function validate_kustomization() {
         flux build kustomization $kustomization -n $namespace --kustomization-file $kustomization_file --path $path > /dev/null && echo ": success!" || (echo ": failure!" && exit 1)
         
         echo "flux reconcile"
-        flux reconcile kustomization $kustomization -n $namespace --timeout=10m || exit 1
+        flux reconcile kustomization $kustomization -n $namespace --timeout=${KUSTOMIZATION_TIMEOUT} || exit 1
 
         echo "kubectl wait"
-        kubectl -n $namespace wait kustomization/$kustomization  --for=condition=ready --timeout=10m || exit 1
+        kubectl -n $namespace wait kustomization/$kustomization  --for=condition=ready --timeout=${KUSTOMIZATION_TIMEOUT} || exit 1
 
         echo "::endgroup::"
     fi

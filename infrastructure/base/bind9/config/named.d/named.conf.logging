@@ -1,0 +1,13 @@
+logging {
+    channel stdout {
+        stderr;
+        severity info;
+        print-category no;
+        print-severity no;
+        print-time yes;
+    };
+    category security { stdout; };
+    category dnssec   { stdout; };
+    category default  { stdout; };
+    category queries  { stdout; };
+};

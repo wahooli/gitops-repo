@@ -1,0 +1,17 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: linkerd
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./infrastructure/nas/linkerd
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-infrastructure-vars
+      optional: false

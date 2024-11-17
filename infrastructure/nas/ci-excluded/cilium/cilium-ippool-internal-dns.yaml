@@ -1,0 +1,10 @@
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "internal-dns-ip-pool"
+spec:
+  blocks:
+  - start: "${dns_ip_addr_3}"
+  serviceSelector:
+    matchLabels:
+      "io.kubernetes.service.namespace": "internal-dns"

@@ -1,0 +1,13 @@
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "dns-ip-pool"
+spec:
+  blocks:
+  - start: "${dns_ip_addr_1}"
+  - start: "${dns_ip_addr_2}"
+  - start: 8.8.8.8
+  - start: 8.8.4.4
+  serviceSelector:
+    matchLabels:
+      "io.kubernetes.service.name": "blocky"

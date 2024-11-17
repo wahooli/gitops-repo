@@ -1,0 +1,32 @@
+zone "absolutist.it" {
+    type master;
+    file "/var/cache/bind/absolutistit.zone";
+    allow-transfer {
+        key "externaldns-key";
+    };
+    update-policy {
+        grant externaldns-key zonesub ANY;
+    };
+};
+
+zone "wahoo.li" {
+    type master;
+    file "/var/cache/bind/wahooli.zone";
+    allow-transfer {
+        key "externaldns-key";
+    };
+    update-policy {
+        grant externaldns-key zonesub ANY;
+    };
+};
+
+zone "${local_ip_reverse}" {
+    type master;
+    file "/var/cache/bind/local.rev.zone";
+    allow-transfer {
+        key "externaldns-key";
+    };
+    update-policy {
+        grant externaldns-key zonesub ANY;
+    };
+};
