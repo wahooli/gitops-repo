@@ -51,6 +51,8 @@ conditional:
     mgmt: ${router_ip}
     ${cluster_pod_cidr_reverse}: tcp+udp:kube-dns.kube-system.svc.cluster.local
     ${cluster_service_cidr_reverse}: tcp+udp:kube-dns.kube-system.svc.cluster.local
+    ${nas_ip_reverse}: tcp+udp:bind9.internal-dns.svc.cluster.local
+    ${vm_ip_reverse}: tcp+udp:bind9.internal-dns.svc.cluster.local
     wahoo.li: tcp+udp:bind9.internal-dns.svc.cluster.local
     absolutist.it: tcp+udp:bind9.internal-dns.svc.cluster.local
     ${router_ip_reverse_1}: ${router_ip}
