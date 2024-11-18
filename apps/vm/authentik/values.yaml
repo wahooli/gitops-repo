@@ -32,6 +32,8 @@ server:
   ingress:
     enabled: true
     ingressClassName: nginx
+    labels:
+      ingress: internal
     annotations:
       external-dns.alpha.kubernetes.io/target: vm-nginx.absolutist.it
       # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
