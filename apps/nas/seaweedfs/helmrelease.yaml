@@ -106,3 +106,12 @@ spec:
           - op: replace
             path: /spec/rules/0/http/paths/0/pathType
             value: Prefix
+      - target:
+          kind: Ingress
+        patch: |
+          - op: add
+            path: /metadata/annotations/external-dns.alpha.kubernetes.io~1target
+            value: nas-nginx.absolutist.it
+          - op: add
+            path: /metadata/labels/ingress
+            value: internal
