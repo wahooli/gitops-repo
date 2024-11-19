@@ -17,6 +17,7 @@ dns             IN  A       ${dns_ip_addr_2}
 ns              IN  A       ${dns_ip_addr_1}
 ns              IN  A       ${dns_ip_addr_2}
 ha              IN  A       ${homeassistant_ip}
+homeassistant   IN  A       ${homeassistant_ip}
 vpn             IN  A       ${vpn_ip}
 nasse           IN  A       ${nas_ip}
 nas             IN  A       ${nas_ip}
