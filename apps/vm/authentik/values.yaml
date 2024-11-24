@@ -35,7 +35,7 @@ server:
     labels:
       ingress: internal
     annotations:
-      external-dns.alpha.kubernetes.io/target: vm-nginx.absolutist.it
+      external-dns.alpha.kubernetes.io/target: vm-nginx.wahoo.li
       # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       cert-manager.io/cluster-issuer: letsencrypt-production
     hosts:
