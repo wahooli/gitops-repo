@@ -1,5 +1,5 @@
 image:
-  tag: "1.26.1" # {"$imagepolicy": "flux-system:prowlarr:tag"}
+  tag: "1.27.0" # {"$imagepolicy": "flux-system:prowlarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
