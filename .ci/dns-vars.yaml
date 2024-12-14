@@ -5,6 +5,9 @@ metadata:
   namespace: flux-system
 type: Opaque
 stringData:
+  cluster_dns_ip: 10.96.0.10
+  unbound_cluster_ip: 10.96.0.20
+  bind9_cluster_ip: 10.96.0.21
   dns_ip_addr_1: 192.168.0.1
   dns_ip_addr_2: 192.168.0.2
   dns_ip_addr_3: 192.168.0.3

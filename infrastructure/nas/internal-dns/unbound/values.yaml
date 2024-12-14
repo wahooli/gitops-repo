@@ -11,3 +11,8 @@ unbound:
     existingConfigMap: unbound-config
 redis:
   enabled: true
+
+service:
+  main:
+    type: ClusterIP
+    clusterIP: ${unbound_cluster_ip}
