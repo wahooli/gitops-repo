@@ -2,7 +2,7 @@
 HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 DEBUG_LOGS="${DEBUG_LOGS:-false}"
-DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default}"
+DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default internal-dns}"
 DESCRIBE_PODS_NAMESPACES="${DESCRIBE_PODS_NAMESPACES:-default}"
 
 echo "::group::flux-system GitRepository definition"
@@ -40,7 +40,7 @@ for namespace in "${DESCRIBE_PODS_NAMESPACES}"; do
 done
 
 if [ "$DEBUG_LOGS" = true ]; then
-    for namespace in "${DEBUG_LOGS_NAMESPACES}"; do
+    for namespace in ${DEBUG_LOGS_NAMESPACES}; do
         echo "::group::Logs for pods in ${namespace} namespace"
         pods=$(kubectl get pods -n $namespace -o jsonpath='{.items[*].metadata.name}')
         for pod in $pods; do
