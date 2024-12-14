@@ -5,6 +5,9 @@ metadata:
   namespace: flux-system
 type: Opaque
 stringData:
+  cluster_dns_ip: 10.96.0.10
+  unbound_cluster_ip: 10.96.0.20
+  bind9_cluster_ip: 10.96.0.21
   dns_ip_addr_1: 192.168.0.1
   dns_ip_addr_2: 192.168.0.2
   dns_ip_addr_3: 192.168.0.3
@@ -21,7 +24,7 @@ stringData:
   local_ip_reverse: "0.168.192.in-addr.arpa"
   nas_ip_reverse: "1.168.192.in-addr.arpa"
   vm_ip_reverse: "2.168.192.in-addr.arpa"
-  purola_cidr_reverse: "1.168.192.in-addr.arpa"
+  purola_cidr_reverse: "6.168.192.in-addr.arpa"
   cluster_pod_cidr_reverse: "5.16.172.in-addr.arpa"
   cluster_service_cidr_reverse: "6.16.172.in-addr.arpa"
   router_ip_reverse_1: "10.in-addr.arpa"

@@ -6,7 +6,7 @@ upstreams:
     strategy: failOnError
   groups:
     default:
-    - tcp+udp:unbound.internal-dns.svc.cluster.local:${dns_svc_port:=53}
+    - tcp+udp:${unbound_cluster_ip}:${dns_svc_port:=53}
   strategy: strict
   # optional: timeout to query the upstream resolver. Default: 2s
   timeout: 2s
@@ -49,12 +49,12 @@ conditional:
     iot: ${router_ip}
     not: ${router_ip}
     mgmt: ${router_ip}
-    ${cluster_pod_cidr_reverse}: tcp+udp:kube-dns.kube-system.svc.cluster.local
-    ${cluster_service_cidr_reverse}: tcp+udp:kube-dns.kube-system.svc.cluster.local
-    wahoo.li: tcp+udp:bind9.internal-dns.svc.cluster.local
-    absolutist.it: tcp+udp:bind9.internal-dns.svc.cluster.local
-    ${nas_ip_reverse}: tcp+udp:bind9.internal-dns.svc.cluster.local
-    ${vm_ip_reverse}: tcp+udp:bind9.internal-dns.svc.cluster.local
+    ${cluster_pod_cidr_reverse}: tcp+udp:${cluster_dns_ip}
+    ${cluster_service_cidr_reverse}: tcp+udp:${cluster_dns_ip}
+    wahoo.li: tcp+udp:${bind9_cluster_ip}
+    absolutist.it: tcp+udp:${bind9_cluster_ip}
+    ${nas_ip_reverse}: tcp+udp:${bind9_cluster_ip}
+    ${vm_ip_reverse}: tcp+udp:${bind9_cluster_ip}
     ${router_ip_reverse_1}: ${router_ip}
     ${router_ip_reverse_2}: ${router_ip}
     ${router_ip_reverse_3}: ${router_ip}

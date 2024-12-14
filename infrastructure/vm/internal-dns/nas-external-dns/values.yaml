@@ -9,6 +9,7 @@ domainFilters:
 sources:
 - ingress
 - service
+- crd
 provider:
   name: rfc2136
 txtOwnerId: vm

@@ -9,12 +9,16 @@ image:
 
 service:
   main:
+    clusterIP: ${bind9_cluster_ip}
     labels:
       mirror.linkerd.io/exported: "true"
     externalTrafficPolicy: Local
     type: "${dns_svc_type:=LoadBalancer}"
     annotations:
       lbipam.cilium.io/ips: "${dns_ip_addr_3}"
+  nas:
+    type: ClusterIP
+    portsFrom: main
 
 persistence:
   config:
