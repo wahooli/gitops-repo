@@ -1,3 +1,6 @@
+image:
+  tag: "v0.24" # {"$imagepolicy": "flux-system:blocky:tag"}
+
 service:
   main:
     externalTrafficPolicy: Local
