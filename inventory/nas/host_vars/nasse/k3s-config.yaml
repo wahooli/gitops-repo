@@ -2,7 +2,7 @@ k3s_allow_swap: true
 k3s_config:
   write-kubeconfig-mode: 644
   flannel-backend: none
-  snapshotter: zfs
+  # snapshotter: zfs
   cluster-domain: cluster.local
   disable-kube-proxy: true
   disable-network-policy: true
