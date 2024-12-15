@@ -41,14 +41,14 @@ persistence:
 
 service:
   main:
+    annotations:
+      service.cilium.io/global: "true"
     labels:
       mirror.linkerd.io/exported: "true"
 
 ingress:
   main:
-    annotations:
-      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
-    enabled: true
+    enabled: false
     className: nginx
     labels:
       ingress: internal
@@ -58,12 +58,7 @@ ingress:
       paths:
       - path: "/"
         pathType: "Prefix"
-    - host: deluge.absolutist.it
-      paths:
-      - path: "/"
-        pathType: "Prefix"
     tls:
     - secretName: tls-deluge-ingress
       hosts:
       - deluge.wahoo.li
-      - deluge.absolutist.it

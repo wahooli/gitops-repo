@@ -6,13 +6,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-linkerd-multicluster
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: linkerd-multicluster--linkerd-multicluster
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: linkerd-multicluster-values
   namespace: flux-system

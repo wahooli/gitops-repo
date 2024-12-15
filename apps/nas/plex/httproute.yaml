@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: plex
+  namespace: default
+  annotations:
+    external-dns.alpha.kubernetes.io/target: gw.nas.absolutist.it
+spec:
+  parentRefs:
+  - name: internal-gw
+    namespace: infrastructure
+  hostnames:
+  - "plex.absolutist.it"
+  - "plex.wahoo.li"
+  rules:
+  - backendRefs:
+    - name: plex
+      port: 32400

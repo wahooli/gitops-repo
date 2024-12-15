@@ -6,12 +6,7 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-linkerd-crds
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: linkerd--linkerd-crds
+  options:
+    allowNameChange: true
 configurations:
 - ../../../.config/valuesFrom.yaml

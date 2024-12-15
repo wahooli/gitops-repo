@@ -41,34 +41,17 @@ persistence:
         type: Directory
 service:
   main:
+    annotations:
+      service.cilium.io/global: "true"
     labels:
       mirror.linkerd.io/exported: "true"
 ingress:
   main:
     enabled: true
     className: nginx
-    annotations:
-      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     labels:
-      ingress: internal
-      velero.io/exclude-from-backup: "true"
-    hosts:
-    - host: radarr.absolutist.it
-      paths:
-      - path: "/"
-        pathType: "Prefix"
-    tls:
-    - secretName: tls-radarr-ingress
-      hosts:
-      - radarr.absolutist.it
-  public:
-    enabled: true
-    className: nginx
-    labels:
-      ingress: internal
       velero.io/exclude-from-backup: "true"
     annotations:
-      external-dns.alpha.kubernetes.io/target: nas-nginx.wahoo.li
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       # This should be the in-cluster DNS name for the authentik outpost service
       # as when the external URL is specified here, nginx will overwrite some crucial headers

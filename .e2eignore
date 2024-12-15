@@ -6,4 +6,6 @@ infrastructure/.config/* # files specifically being ignored just skips finding h
 apps/vm/authentik/blueprints
 infrastructure/nas/internal-dns/blocky/config
 infrastructure/vm/internal-dns/blocky/config
+infrastructure/nas/gateway-api
+infrastructure/base/gateway-api
 # test

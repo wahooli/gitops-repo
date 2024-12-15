@@ -1,4 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/ps3netsrv
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
 configMapGenerator:
 - files:
   - values.yaml=values.yaml
@@ -17,18 +26,3 @@ configMapGenerator:
 configurations:
 - ../../.config/valuesFrom.yaml
 - ../../.config/envFrom.yaml
-kind: Kustomization
-patches:
-- path: helmrelease.yaml
-  target:
-    kind: HelmRelease
-    name: base-ps3netsrv
-- patch: |-
-    - op: replace
-      path: /metadata/name
-      value: default--ps3netsrv
-  target:
-    kind: HelmRelease
-    name: base-ps3netsrv
-resources:
-- ../../base/ps3netsrv

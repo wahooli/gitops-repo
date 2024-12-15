@@ -7,13 +7,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-velero
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: velero--velero
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: velero-values
   namespace: flux-system

@@ -1,7 +1,7 @@
 controller:
   replicaCount: 1
   allowSnippetAnnotations: true  # authentik forward auth
-  terminationGracePeriodSeconds: 30
+  terminationGracePeriodSeconds: 15
   podAnnotations:
     linkerd.io/inject: enabled
     config.linkerd.io/skip-inbound-ports: 80,443
@@ -9,14 +9,14 @@ controller:
     use-forwarded-headers: true
     # forwarded-for-header: "CF-Connecting-IP"
     enable-real-ip: "true"
-    proxy-real-ip-cidr: "${cluster_pod_cidr},${cluster_service_cidr},173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22,2400:cb00::/32,2606:4700::/32,2803:f800::/32,2405:b500::/32,2405:8100::/32,2a06:98c0::/29,2c0f:f248::/32"
+    proxy-real-ip-cidr: "${cluster_native_cidr},173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22,2400:cb00::/32,2606:4700::/32,2803:f800::/32,2405:b500::/32,2405:8100::/32,2a06:98c0::/29,2c0f:f248::/32"
   metrics:
     enabled: false
   service:
     externalTrafficPolicy: Local
+    # loadBalancerClass: io.cilium/bgp-control-plane
+    # loadBalancerClass: kube-vip.io/kube-vip-class
     type: LoadBalancer
-    labels:
-      ingress: internal
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: nas-nginx.absolutist.it,nas-nginx.wahoo.li
-      lbipam.cilium.io/ips: ${cluster_bgp_loadbalaner_ip}
+      external-dns.alpha.kubernetes.io/hostname: nginx.nas.absolutist.it,nginx.nas.wahoo.li
+      lbipam.cilium.io/ips: ${nginx_lb_ip}

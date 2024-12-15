@@ -7,7 +7,8 @@ spec:
   interval: 5m0s
   prune: true
   dependsOn:
-  - name: crds
+  - name: infrastructure-depends
+  - name: internal-dns
   suspend: false
   sourceRef:
     kind: GitRepository

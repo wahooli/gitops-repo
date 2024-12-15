@@ -8,11 +8,10 @@ patches:
 - path: helmrelease-remote-cluster.yaml
   target:
     kind: HelmRelease
-    name: base-authentik-remote-cluster
-- target:
-    kind: HelmRelease
-    name: base-authentik-remote-cluster
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: default--authentik-remote-cluster
+  options:
+    allowNameChange: true
+- path: namespace.yaml
+  target:
+    kind: Namespace
+  options:
+    allowNameChange: true

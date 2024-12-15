@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumLocalRedirectPolicy
 metadata:
-  name: "dns1-addr"
+  name: "dns2-addr"
   namespace: internal-dns
 spec:
   redirectFrontend:

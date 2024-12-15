@@ -17,6 +17,8 @@ service:
     annotations:
       lbipam.cilium.io/ips: "${dns_ip_addr_3}"
   nas:
+    annotations:
+      service.cilium.io/global: "true"
     type: ClusterIP
     portsFrom: main
 

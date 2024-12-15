@@ -109,23 +109,18 @@ persistence:
         medium: Memory
 service:
   main:
+    annotations:
+      service.cilium.io/global: "true"
     labels:
       mirror.linkerd.io/exported: "true"
 ingress:
   main:
     enabled: true
     className: nginx
-    annotations:
-      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     labels:
-      ingress: internal
       velero.io/exclude-from-backup: "true"
     hosts:
     - host: plex.wahoo.li
-      paths:
-      - path: "/"
-        pathType: "Prefix"
-    - host: plex.absolutist.it
       paths:
       - path: "/"
         pathType: "Prefix"
@@ -133,4 +128,3 @@ ingress:
     - secretName: tls-plex-ingress
       hosts:
       - plex.wahoo.li
-      - plex.absolutist.it

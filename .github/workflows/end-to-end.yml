@@ -112,15 +112,66 @@ jobs:
       with:
         version: '${{ matrix.test.flux_version }}'
     - name: Setup Kubernetes
-      uses: helm/kind-action@v1.9.0
+      uses: helm/kind-action@v1.10.0
       with:
         cluster_name: flux
         config: .ci/end-to-end/kind-config.yaml
+    # - name: Setup k3d
+    #   uses: rinx/setup-k3d@v0.0.4
+    #   with:
+    #     version: v5.7.5
+    #     skipClusterCreation: 'true'
+    #     # options: >-
+    #     #   --image docker.io/rancher/k3s:v1.31.3-k3s1
+    #     #   --agents 3
+    #     #   --no-lb
+    #     #   --timeout 30s
+    #     #   --k3s-arg '--disable=traefik,servicelb@server:*'
+    #     #   --k3s-arg '--disable-cloud-controller@server:*'
+    #     #   --k3s-arg '--disable-network-policy@server:*'
+    #     #   --k3s-arg '--flannel-backend=none@server:*'
+    #     #   --k3s-arg '--cluster-cidr=10.244.0.0/16@server:*'
+    #     # name: "flux-e2e"
+    # - name: create cluster
+    #   env:
+    #     clustername: flux-e2e
+    #   run: |
+    #     k3d cluster create "${clustername}" \
+    #       --image docker.io/rancher/k3s:v1.31.3-k3s1 \
+    #       --agents 3 \
+    #       --no-lb \
+    #       --timeout 30s \
+    #       --k3s-arg '--disable-network-policy@server:*' \
+    #       --k3s-arg '--disable-cloud-controller@server:*' \
+    #       --k3s-arg '--cluster-cidr=10.244.0.0/16@server:*' \
+    #       --k3s-arg '--disable=traefik,servicelb@server:*'
+    #     k3d kubeconfig get "${clustername}" > k3d.yaml
+    #     echo "KUBECONFIG=$(pwd)/k3d.yaml" >> $GITHUB_ENV
+    # - name: Deploy nfs container within k3d network
+    #   env:
+    #     IMAGE: nimbix/unfs3:20190318-1
+    #   run: docker run -itd --name nfs_share --network k3d-flux-e2e $IMAGE
     - name: Deploy nfs container within kind network
       env:
         IMAGE: nimbix/unfs3:20190318-1
       run: docker run -itd --name nfs_share --network kind $IMAGE
-    - name: Install Flux in Kubernetes Kind
+    # - name: Setup cilium in ${{ matrix.test.tenant }}
+    #   run: |
+    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml
+    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml
+    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml
+    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml
+    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml
+    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml
+
+    #     helm repo add cilium https://helm.cilium.io/
+    #     helm install cilium cilium/cilium --version 1.17.0-pre.3 --wait \
+    #       --namespace kube-system \
+    #       --set ipam.mode=kubernetes \
+    #       --set cni.exclusive=false \
+    #       --set gatewayAPI.enabled=true \
+    #       --set operator.replicas=1
+    - name: Install Flux in Kubernetes
       run: flux install --components-extra="image-reflector-controller,image-automation-controller"
     - name: Setup cluster reconciliation in tenant ${{ matrix.test.tenant }}
       run: |

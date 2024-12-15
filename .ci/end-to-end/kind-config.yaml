@@ -3,12 +3,17 @@ apiVersion: kind.x-k8s.io/v1alpha4
 networking:
   apiServerAddress: "127.0.0.1"
   apiServerPort: 6443
-  # disableDefaultCNI: true  # this could help with calico testing
+  # disableDefaultCNI: true
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"
 # containerdConfigPatches:
 # - |-
 #   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
 #     endpoint = ["http://registry-mirror.registry.svc.cluster.local:5000"]
 nodes:
 - role: control-plane
+  image: kindest/node:v1.31.2@sha256:18fbefc20a7113353c7b75b5c869d7145a6abd6269154825872dc59c1329912e
 - role: worker
+  image: kindest/node:v1.31.2@sha256:18fbefc20a7113353c7b75b5c869d7145a6abd6269154825872dc59c1329912e
 - role: worker
+  image: kindest/node:v1.31.2@sha256:18fbefc20a7113353c7b75b5c869d7145a6abd6269154825872dc59c1329912e

@@ -4,8 +4,8 @@ metadata:
   name: internal-dns--vm-external-dns
   namespace: flux-system
 spec:
-  dependsOn:
-  - name: linkerd-multicluster--linkerd-multicluster
+  # dependsOn:
+  # - name: linkerd-multicluster--linkerd-multicluster
   interval: 10m
   releaseName: vm-external-dns
   targetNamespace: internal-dns
