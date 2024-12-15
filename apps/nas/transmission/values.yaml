@@ -21,13 +21,13 @@ wireguard:
 #   limits:
 #     memory: "3072Mi"
 #     cpu: "1000m"
-probe:
-  liveness:
-    enabled: false
-  readiness:
-    enabled: false
-  startup:
-    enabled: false
+# probe:
+#   liveness:
+#     enabled: false
+#   readiness:
+#     enabled: false
+#   startup:
+#     enabled: false
 
 persistence:
   config:
