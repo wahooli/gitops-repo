@@ -1,0 +1,13 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: gateway-api
+  namespace: flux-system
+spec:
+  interval: 48h
+  url: https://github.com/kubernetes-sigs/gateway-api.git
+  ignore: |
+    # exclude all
+    /*
+    # include crds
+    !/config/crd

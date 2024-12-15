@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: transmission
+  namespace: default
+  annotations:
+    external-dns.alpha.kubernetes.io/target: gw.nas.absolutist.it
+spec:
+  parentRefs:
+  - name: internal-gw
+    namespace: infrastructure
+  hostnames:
+  - "transmission.absolutist.it"
+  - "transmission.wahoo.li"
+  rules:
+  - backendRefs:
+    - name: transmission
+      port: 9091

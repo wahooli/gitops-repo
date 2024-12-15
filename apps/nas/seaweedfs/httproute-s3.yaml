@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: seaweedfs-s3
+  namespace: default
+spec:
+  parentRefs:
+  - name: internal-gw
+    namespace: infrastructure
+  hostnames:
+  - "s3.wahoo.li"
+  - "s3.absolutist.it"
+  rules:
+  - backendRefs:
+    - name: seaweedfs-s3
+      port: 8333

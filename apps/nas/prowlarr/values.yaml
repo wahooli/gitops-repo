@@ -28,6 +28,8 @@ persistence:
           storage: "1Gi"
 service:
   main:
+    annotations:
+      service.cilium.io/global: "true"
     labels:
       mirror.linkerd.io/exported: "true"
 ingress:
@@ -35,21 +37,13 @@ ingress:
     enabled: true
     className: nginx
     labels:
-      ingress: internal
       velero.io/exclude-from-backup: "true"
-    annotations:
-      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     hosts:
     - host: prowlarr.wahoo.li
-      paths:
-      - path: "/"
-        pathType: "Prefix"
-    - host: prowlarr.absolutist.it
       paths:
       - path: "/"
         pathType: "Prefix"
     tls:
     - secretName: tls-prowlarr-ingress
       hosts:
-      - prowlarr.absolutist.it
       - prowlarr.wahoo.li

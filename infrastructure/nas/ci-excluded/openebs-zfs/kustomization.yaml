@@ -8,13 +8,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-openebs
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: openebs--openebs-zfs
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: openebs-values
   namespace: flux-system

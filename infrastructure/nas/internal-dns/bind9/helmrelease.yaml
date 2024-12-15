@@ -4,9 +4,9 @@ metadata:
   name: internal-dns--bind9
   namespace: flux-system
 spec:
-  dependsOn:
-  - name: linkerd--linkerd-control-plane
-    namespace: flux-system
+  # dependsOn:
+  # - name: linkerd--linkerd-control-plane
+  #   namespace: flux-system
   releaseName: bind9
   interval: 5m
   targetNamespace: internal-dns

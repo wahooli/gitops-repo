@@ -9,7 +9,8 @@ spec:
   chart:
     spec:
       version: "2024.8.2"
-  valuesFrom:
-  - kind: ConfigMap
-    name: linkerd-crds-values
-    valuesKey: values-base.yaml
+  values:
+    enableHttpRoutes: false
+    enableTlsRoutes: false
+    enableTcpRoutes: false
+  valuesFrom: []

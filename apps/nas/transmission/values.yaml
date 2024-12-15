@@ -43,19 +43,12 @@ persistence:
         type: Directory # DirectoryOrCreate
 ingress:
   main:
-    enabled: true
+    enabled: false
     className: nginx
     labels:
-      ingress: internal
       velero.io/exclude-from-backup: "true"
-    annotations:
-      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
     hosts:
     - host: transmission.wahoo.li
-      paths:
-      - path: "/"
-        pathType: "Prefix"
-    - host: transmission.absolutist.it
       paths:
       - path: "/"
         pathType: "Prefix"
@@ -63,4 +56,3 @@ ingress:
     - secretName: tls-transmission-ingress
       hosts:
       - transmission.wahoo.li
-      - transmission.absolutist.it

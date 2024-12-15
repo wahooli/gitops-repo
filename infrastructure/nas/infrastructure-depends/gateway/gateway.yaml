@@ -1,0 +1,61 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal-gw
+  namespace: infrastructure
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/hostname: gw.nas.absolutist.it,gw.nas.wahoo.li
+spec:
+  gatewayClassName: cilium
+  infrastructure:
+    annotations:
+      service.cilium.io/type: LoadBalancer
+      service.cilium.io/forwarding-mode: dsr
+      # kube-vip.io/ignore: "true"
+      lbipam.cilium.io/ips: "${internal_gw_lb_ip}"
+  listeners:
+  - name: internal-wahooli-http
+    protocol: HTTP
+    port: 80
+    hostname: "*.wahoo.li"
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            internal-services: "true"
+  - name: internal-wahooli-https
+    protocol: HTTPS
+    port: 443
+    hostname: "*.wahoo.li"
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: wahooli-wildcard-tls
+        kind: Secret
+  - name: internal-absolutistit-http
+    protocol: HTTP
+    port: 80
+    hostname: "*.absolutist.it"
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            internal-services: "true"
+  - name: internal-absolutistit-https
+    protocol: HTTPS
+    port: 443
+    hostname: "*.absolutist.it"
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: absolutistit-wildcard-tls
+        kind: Secret
+    allowedRoutes:
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            internal-services: "true"

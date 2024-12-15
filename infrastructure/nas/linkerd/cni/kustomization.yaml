@@ -6,13 +6,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-linkerd-cni
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: linkerd-cni--linkerd2-cni
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: linkerd-cni-values
   namespace: flux-system

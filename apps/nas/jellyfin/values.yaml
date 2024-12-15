@@ -17,6 +17,8 @@ global:
     app.kubernetes.io/part-of: jellyfin
 service:
   main:
+    annotations:
+      service.cilium.io/global: "true"
     labels:
       mirror.linkerd.io/exported: "true"
 persistence:
@@ -63,10 +65,8 @@ ingress:
     enabled: true
     className: nginx
     labels:
-      ingress: internal
       velero.io/exclude-from-backup: "true"
     annotations:
-      external-dns.alpha.kubernetes.io/target: nas-nginx.absolutist.it
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "20m"
       nginx.ingress.kubernetes.io/proxy-buffering: "off"
@@ -79,12 +79,7 @@ ingress:
       paths:
       - path: "/"
         pathType: "Prefix"
-    - host: jellyfin.absolutist.it
-      paths:
-      - path: "/"
-        pathType: "Prefix"
     tls:
     - secretName: tls-jellyfin-ingress
       hosts:
       - jellyfin.wahoo.li
-      - jellyfin.absolutist.it

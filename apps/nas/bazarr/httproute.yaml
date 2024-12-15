@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bazarr
+  namespace: default
+  annotations:
+    external-dns.alpha.kubernetes.io/target: gw.nas.absolutist.it
+spec:
+  parentRefs:
+  - name: internal-gw
+    namespace: infrastructure
+  hostnames:
+  - "bazarr.absolutist.it"
+  rules:
+  - backendRefs:
+    - name: bazarr
+      port: 6767

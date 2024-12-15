@@ -1,0 +1,12 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: prowlarr-wahooli
+  namespace: default
+spec:
+  endpoints:
+  - dnsName: prowlarr.wahoo.li
+    recordTTL: 180
+    recordType: CNAME
+    targets:
+    - nginx.nas.wahoo.li

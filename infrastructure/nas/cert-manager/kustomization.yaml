@@ -7,13 +7,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-cert-manager
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: cert-manager--cert-manager
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: cert-manager-values
   namespace: flux-system

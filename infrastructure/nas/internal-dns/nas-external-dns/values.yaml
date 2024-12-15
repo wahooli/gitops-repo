@@ -5,15 +5,18 @@ domainFilters:
 - ${local_ip_reverse}
 - ${vm_ip_reverse}
 sources:
-- ingress
 - service
 - crd
+- gateway-httproute
+- gateway-tlsroute
+- gateway-tcproute
+- gateway-udproute
 provider:
   name: rfc2136
 txtOwnerId: nas
 txtPrefix: internal-dns-
 extraArgs:
-- --label-filter=ingress in (internal)
+- --annotation-filter=external-dns.alpha.kubernetes.io/exclude notin (true)
 - --rfc2136-port=53
 - --rfc2136-host=bind9.internal-dns.svc.cluster.local.
 - --rfc2136-zone=wahoo.li

@@ -6,13 +6,8 @@ patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-- target:
-    kind: HelmRelease
-    name: base-ingress-nginx
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: ingress-nginx--ingress-nginx
+  options:
+    allowNameChange: true
 configMapGenerator:
 - name: ingress-nginx-values
   namespace: flux-system

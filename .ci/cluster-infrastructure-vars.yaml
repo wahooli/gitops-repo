@@ -6,8 +6,10 @@ metadata:
 type: Opaque
 stringData:
   cluster_bgp_loadbalaner_ip: "192.168.0.254"
+  nginx_lb_ip: "192.168.0.254"
   linkerd_gateway_ip: "192.168.0.253"
   cluster_service_cidr: "192.168.0.1/32"
+  cluster_native_cidr: "192.168.0.1/32"
   lvm_volumegroup: abc
   lvm_thinpool_name: cde
   kubelet_workdir: /var/lib/kubelet
@@ -29,3 +31,4 @@ stringData:
   lan_subnet: 192.168.0.0/24
   istio_ingress_ip: 192.168.0.1
   ingress_service_type: None
+  internal_gw_lb_ip: "192.168.0.252"
