@@ -9,7 +9,7 @@ spec:
   targetNamespace: authentik
   chart:
     spec:
-      version: "2024.10.5" # {"$imagepolicy": "flux-system:authentik:tag"}
+      version: "2024.12.0" # {"$imagepolicy": "flux-system:authentik:tag"}
   values:
     blueprints:
       configMaps:
