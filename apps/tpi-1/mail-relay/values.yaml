@@ -3,6 +3,9 @@ image:
 fullnameOverride: mail-relay
 strategy:
   type: RollingUpdate
+probe:
+  liveness:
+    enabled: false
 resources:
   limits:
     cpu: 500m
