@@ -12,8 +12,8 @@ wireguard:
   enabled: true
   image:
     tag: "version-1.0.20210914-r4" # {"$imagepolicy": "flux-system:wireguard-release:tag"}
-  config:
-    existingConfigMap: transmission-wireguard-config
+#   config:
+#     existingConfigMap: transmission-wireguard-config
 # resources:
 #   requests:
 #     memory: "256Mi"
