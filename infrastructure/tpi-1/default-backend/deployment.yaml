@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: default-nginx-backend
+  namespace: infrastructure
+  labels:
+    app.kubernetes.io/name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nginx
+    spec:
+      initContainers:
+      - name: webcontent-copy
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - find /src -type f -exec cp -L "{}" /dest \; ; find /dest -type f -exec chmod 0644 "{}" \;
+        volumeMounts:
+        - name: nginx-html
+          mountPath: /src
+        - name: html
+          mountPath: /dest
+      containers:
+      - name: nginx
+        image: nginx:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "250m"
+          requests:
+            memory: "32Mi"
+            cpu: "64m"
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+        - name: nginx-confd
+          mountPath: /etc/nginx/conf.d
+        readinessProbe:
+          failureThreshold: 10
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: http
+          timeoutSeconds: 1
+        livenessProbe:
+          failureThreshold: 10
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: http
+          timeoutSeconds: 1
+      volumes:
+      - name: nginx-html
+        configMap:
+          name: nginx-html
+      - name: nginx-confd
+        configMap:
+          name: nginx-config
+      - name: html
+        emptyDir: {}

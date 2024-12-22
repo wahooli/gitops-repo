@@ -3,6 +3,7 @@ resources:
 - namespace.yaml
 - bind9
 - nas-external-dns
-- vm-external-dns
+- tpi-1-external-dns
 - unbound
 - blocky
+- bind9-tpi-1.svc.yaml

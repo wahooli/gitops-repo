@@ -1,0 +1,10 @@
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Provider
+metadata:
+  name: github-status
+  namespace: flux-system
+spec:
+  type: github
+  address: https://github.com/wahooli/gitops-repo
+  secretRef:
+    name: github-status-token

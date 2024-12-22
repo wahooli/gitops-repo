@@ -1,0 +1,12 @@
+k3s_release_channel: v1.31
+k3s_allow_swap: true
+helm_diff_install: true
+k3s_kubelet_config:
+  maxPods: 500
+  shutdownGracePeriod: 30s
+  shutdownGracePeriodCriticalPods: 10s
+  failSwapOn: false
+  featureGates:
+    NodeSwap: true
+  memorySwap:
+    swapBehavior: LimitedSwap

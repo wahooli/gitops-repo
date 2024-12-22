@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mail-relay-ldap-certificate
+  namespace: default
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  secretName: tls-mail-relay-openldap
+  commonName: mail-relay-openldap
+  issuerRef:
+    name: selfsigned-ca
+    kind: ClusterIssuer
+  dnsNames:
+  - mail-relay-openldap
+  - mail-relay-openldap.default
+  - mail-relay-openldap.default.svc.cluster.local

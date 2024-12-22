@@ -1,0 +1,138 @@
+workloadType: Deployment
+initContainers:
+  wait-for-redis:
+    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    imagePullPolicy: IfNotPresent
+    args:
+    - paperless-ngx-redis-master:6379
+    - -t
+    - "300" # wait for 5 minutes
+  wait-for-psql:
+    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    imagePullPolicy: IfNotPresent
+    args:
+    - paperless-ngx-postgresql:5432
+    - -t
+    - "300" # wait for 5 minutes
+env:
+  PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+  PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
+    {
+      "openid_connect": {
+        "APPS": [
+          {
+            "provider_id": "authentik",
+            "name": "auth.wahoo.li",
+            "client_id": "${authentik_paperless_client_id}",
+            "secret": "${authentik_paperless_client_secret}",
+            "settings": {
+              "server_url": "https://auth.wahoo.li/application/o/paperless-ngx/.well-known/openid-configuration"
+            }
+          }
+        ],
+        "OAUTH_PKCE_ENABLED": "True"
+      }
+    }
+
+  PAPERLESS_DBUSER:
+    valueFrom:
+      secretKeyRef:
+        name: ${paperless_app_secret_name}
+        key: paperless_database_user
+  PAPERLESS_DBPASS:
+    valueFrom:
+      secretKeyRef:
+        name: ${paperless_app_secret_name}
+        key: paperless_database_password
+  PAPERLESS_SECRET_KEY:
+    valueFrom:
+      secretKeyRef:
+        name: ${paperless_app_secret_name}
+        key: paperless_secret_key
+  PAPERLESS_ADMIN_USER:
+    valueFrom:
+      secretKeyRef:
+        name: ${paperless_app_secret_name}
+        key: paperless_admin_user
+  PAPERLESS_ADMIN_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: ${paperless_app_secret_name}
+        key: paperless_admin_password
+# controller:
+#   type: statefulset
+podAnnotations:
+  backup.velero.io/backup-volumes: data
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: paperless-ngx
+resources:
+  requests:
+    memory: "2048Mi"
+    cpu: "600m"
+  limits:
+    memory: "6144Mi"
+    # cpu: "2000m"
+persistence:
+  data:
+    enabled: true
+    mount:
+    - path: /usr/src/paperless/data
+      subPath: data
+    - path: /usr/src/paperless/media
+      subPath: media
+    # labels:
+    #   asdf: yeet
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "10Gi"
+  consume:
+    name: consume
+    enabled: true
+    mount:
+    - path: /usr/src/paperless/consume
+    spec:
+      nfs:
+        path: ${paperless_nfs_consume_path}
+        server: ${paperless_nfs_server}
+  export:
+    enabled: true
+    mount:
+    - path: /usr/src/paperless/export
+    spec:
+      nfs:
+        path: ${paperless_nfs_export_path}
+        server: ${paperless_nfs_server}
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: 25m
+      external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    labels:
+      velero.io/exclude-from-backup: "true"
+    hosts:
+    - host: paperless.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+      # - path: /admin
+      #   pathType: Prefix
+      #   service:
+      #     name: default-backend
+      #     port:
+      #       number: 80
+    tls:
+    - hosts:
+      - paperless.wahoo.li

@@ -23,3 +23,6 @@ spec:
     - kind: Secret
       name: wireguard-tunnel-credentials
       optional: true
+    - kind: Secret
+      name: cluster-vars
+      optional: true

@@ -1,0 +1,68 @@
+image:
+  tag: "2.14.6" # {"$imagepolicy": "flux-system:tautulli:tag"}
+env:
+  TZ: Europe/Helsinki
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: tautulli
+# resources:
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /config
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "2Gi"
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      # This should be the in-cluster DNS name for the authentik outpost service
+      # as when the external URL is specified here, nginx will overwrite some crucial headers
+      nginx.ingress.kubernetes.io/auth-url: |-
+        http://ak-outpost-proxy-default.default.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+      # If you're using domain-level auth, use the authentication URL instead of the application URL
+      nginx.ingress.kubernetes.io/auth-signin: |-
+        https://tautulli.wahoo.li/outpost.goauthentik.io/start?rd=$escaped_request_uri
+      nginx.ingress.kubernetes.io/auth-response-headers: |-
+        Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        proxy_set_header X-Forwarded-Host $http_host;
+      external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    hosts:
+    - host: tautulli.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+      - path: /outpost.goauthentik.io
+        pathType: Prefix
+        service:
+          name: ak-outpost-proxy-default
+          port:
+            number: 9000
+    tls:
+    - secretName: tls-tautulli-ingress
+      hosts:
+      - tautulli.wahoo.li

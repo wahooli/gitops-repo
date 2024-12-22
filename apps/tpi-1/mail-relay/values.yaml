@@ -1,0 +1,81 @@
+image:
+  tag: "14.0.0" # {"$imagepolicy": "flux-system:docker-mailserver:tag"}
+fullnameOverride: mail-relay
+strategy:
+  type: RollingUpdate
+resources:
+  limits:
+    cpu: 500m
+    ephemeral-storage: 2048Mi
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    ephemeral-storage: 200Mi
+    memory: 256Mi
+env:
+  LDAP_BIND_PW:
+    valueFrom:
+      secretKeyRef:
+        name: ${mail_relay_app_secret_name}
+        key: ldap_bind_password
+  SASLAUTHD_LDAP_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: ${mail_relay_app_secret_name}
+        key: ldap_bind_password
+envFrom:
+  envs:
+    type: configMap
+    useFromChart: false
+    name: mail-relay-env
+initContainers:
+  copy-configuration:
+    image: ghcr.io/wahooli/docker/envsubst:latest
+    imagePullPolicy: IfNotPresent
+    envFrom:
+    - secretRef:
+        name: ${mail_relay_app_secret_name}
+    volumeMounts:
+    - mountPath: /dest
+      name: data
+      subPath: config
+    - mountPath: /src
+      name: mail-relay-config
+persistence:
+  data:
+    name: data
+    enabled: true
+    mount:
+    - path: /tmp/docker-mailserver
+      subPath: config
+    - path: /var/log/mail
+      subPath: logs
+    - path: /var/mail-state
+      subPath: state
+    - path: /tmp/docker-mailserver/rspamd/dkim
+      subPath: hack
+    spec:
+      emptyDir: {}
+  config:
+    name: mail-relay-config
+    enabled: true
+    # mount:
+    # - path: /tmp/docker-mailserver/postfix-relaymap.cf
+    #   subPath: postfix-relaymap.cf
+    # - path: /tmp/docker-mailserver/postfix-sasl-password.cf
+    #   subPath: postfix-sasl-password.cf
+    # - path: /tmp/docker-mailserver/user-patches.sh
+    #   subPath: user-patches.sh
+    spec:
+      useFromChart: false
+      configMap:
+        name: mail-relay-config
+  certs:
+    name: selfsigned-certs
+    mount:
+    - path: /secrets
+    enabled: true
+    spec:
+      useFromChart: false
+      secret:
+        name: tls-mail-relay

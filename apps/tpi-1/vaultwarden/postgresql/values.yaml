@@ -1,0 +1,43 @@
+image:
+  tag: 16.2.0-debian-12-r8
+metrics:
+  enabled: false
+commonLabels:
+  backupWeekly: "true"
+  backupDaily: "true"
+  app.kubernetes.io/part-of: vaultwarden
+primary:
+  extraVolumes:
+  - name: backup
+    emptyDir: {}
+  extraVolumeMounts:
+  - name: backup
+    mountPath: /dbdump
+  podAnnotations:
+    backup.velero.io/backup-volumes: backup
+    pre.hook.backup.velero.io/timeout: 5m
+    pre.hook.restore.velero.io/timeout: 5m
+    # post.hook.restore.velero.io/timeout: 5m
+    pre.hook.backup.velero.io/container: postgresql
+    post.hook.restore.velero.io/container: postgresql
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "PGPASSWORD=$POSTGRES_PASSWORD pg_dump -U $POSTGRES_USER -d $POSTGRES_DATABASE -F c --clean --if-exists -f /dbdump/backup.psql"]'
+    post.hook.restore.velero.io/wait-for-ready: "true"
+    post.hook.restore.velero.io/exec-timeout: 5m
+    post.hook.restore.velero.io/command: '["/bin/bash", "-ec", "[ -f \"/dbdump/backup.psql\" ] && PGPASSWORD=$POSTGRES_PASSWORD pg_restore -U $POSTGRES_USER -d $POSTGRES_DATABASE --clean --if-exists < /dbdump/backup.psql && rm -f /dbdump/backup.psql;"]'
+    # post.hook.restore.velero.io/command: |-
+    # ["/bin/bash", "-ec", "[ -f '/dbdump/backup.psql' ] && \
+    # while true; do pg_isready -U '$POSTGRES_USER' -d 'dbname=$POSTGRES_DATABASE' -h 127.0.0.1 -p 5432 > /dev/null && break; done && sleep 15 && \
+    # PGPASSWORD=$POSTGRES_PASSWORD pg_restore -U $POSTGRES_USER -d $POSTGRES_DATABASE --clean --if-exists < /dbdump/backup.psql && rm -f /dbdump/backup.psql;"]
+  persistence:
+    enabled: true
+    size: 2Gi
+auth:
+  enablePostgresUser: true
+  database: vaultwarden
+  username: vaultwarden
+  existingSecret: "${vaultwarden_app_secret_name}"
+  secretKeys:
+    adminPasswordKey: postgres_password
+    userPasswordKey: database_password
+    replicationPasswordKey: database_replication_password
+  usePasswordFiles: false  # would break velero hooks

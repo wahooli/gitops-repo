@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webhook-receiver
+  namespace: flux-system
+  annotations:
+    external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+spec:
+  rules:
+  - host: ${repository_webhook_host}
+    http:
+      paths:
+      - pathType: Prefix
+        path: /hook/
+        backend:
+          service:
+            name: notification-controller
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - ${repository_webhook_host}

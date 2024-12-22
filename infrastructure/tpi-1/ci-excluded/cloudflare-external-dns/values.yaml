@@ -1,0 +1,19 @@
+# logFormat: json
+domainFilters:
+- wahoo.li
+sources:
+- ingress
+provider:
+  name: ${wahooli_extenal_dns_provider:=cloudflare}
+extraArgs:
+- --txt-encrypt-enabled
+- --txt-encrypt-aes-key=${external_dns_encryption_key}
+- --annotation-filter=external-dns.alpha.kubernetes.io/exclude notin (true)
+- --cloudflare-proxied
+- --cloudflare-dns-records-per-page=5000
+env:
+- name: CF_API_TOKEN
+  valueFrom:
+    secretKeyRef:
+      key: cloudflare_api_token
+      name: ${external_dns_app_secret_name}

@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--overseerr
+  namespace: flux-system
+spec:
+  releaseName: overseerr
+  interval: 5m
+  targetNamespace: default
+  # values:
+  #   envFrom:
+  #     envs:
+  #       name: overseerr-env
+  valuesFrom:
+  - kind: ConfigMap
+    name: overseerr-values
+    valuesKey: values.yaml

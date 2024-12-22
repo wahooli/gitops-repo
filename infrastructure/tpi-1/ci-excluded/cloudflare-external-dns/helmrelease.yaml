@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cloudflare-tunnel--cloudflare-external-dns
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: cloudflare-tunnel--wahooli
+    namespace: flux-system
+  interval: 10m
+  releaseName: cloudflare-external-dns
+  targetNamespace: cloudflare-tunnel
+  chart:
+    spec:
+      version: "1.15.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: cloudflare-external-dns-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: cloudflare-external-dns-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: external-dns-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml

@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- infrastructure-namespace.yaml
+- default-namespace.yaml
+- kube-system-namespace.yaml
+- default-backend
+- gateway-api
+- cert-manager
+- fluxcd-notifications.yaml
+- ingress-nginx
+- reloader
+- reflector
+- sources
+- ci-excluded.yaml

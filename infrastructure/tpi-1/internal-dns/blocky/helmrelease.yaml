@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: internal-dns--blocky
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: cert-manager--cert-manager
+  - name: internal-dns--bind9
+  - name: internal-dns--unbound
+  releaseName: blocky
+  interval: 5m
+  targetNamespace: internal-dns
+  valuesFrom:
+  - kind: ConfigMap
+    name: blocky-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: blocky-values
+    valuesKey: values.yaml
+  values:
+    persistence:
+      config:
+        spec:
+          configMap:
+            name: blocky-config

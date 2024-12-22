@@ -24,4 +24,3 @@ spec:
     kind: ClusterIssuer
   dnsNames:
   - sonarr.wahoo.li
-  - sonarr.absolutist.it

@@ -24,4 +24,3 @@ spec:
     kind: ClusterIssuer
   dnsNames:
   - prowlarr.wahoo.li
-  - prowlarr.absolutist.it

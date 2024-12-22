@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Outposts
+  labels:
+    blueprints.goauthentik.io/instantiate: "true"
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Applications
+  attrs:
+    required: false
+- model: authentik_outposts.kubernetesserviceconnection
+  identifiers:
+    name: local-kube
+  state: present
+  attrs:
+    kubeconfig: {}
+    local: true
+    name: local-kube
+    verify_ssl: false
+  id: local-kube-connection
+
+- model: authentik_outposts.outpost
+  identifiers:
+    name: Proxy default
+  state: present
+  attrs:
+    config:
+      authentik_host: https://auth.wahoo.li/
+      authentik_host_browser: ''
+      authentik_host_insecure: true
+      container_image: null
+      docker_labels: null
+      docker_map_ports: true
+      docker_network: null
+      kubernetes_disabled_components: []
+      kubernetes_image_pull_secrets: []
+      kubernetes_ingress_annotations: {}
+      kubernetes_ingress_class_name: null
+      kubernetes_ingress_secret_name: authentik-outpost-tls
+      kubernetes_json_patches:
+        deployment:
+        - op: add
+          path: /spec/template/spec/dnsPolicy
+          value: ClusterFirstWithHostNet
+      kubernetes_namespace: default
+      kubernetes_replicas: 1
+      kubernetes_service_type: ClusterIP
+      log_level: warn
+      object_naming_template: ak-outpost-%(name)s
+    name: Proxy default
+    providers:
+    - !Find [authentik_providers_proxy.proxyprovider, [name, ombi-proxy]]
+    - !Find [authentik_providers_proxy.proxyprovider, [name, sonarr-proxy]]
+    - !Find [authentik_providers_proxy.proxyprovider, [name, radarr-proxy]]
+    - !Find [authentik_providers_proxy.proxyprovider, [name, bazarr-proxy]]
+    - !Find [authentik_providers_proxy.proxyprovider, [name, tautulli-proxy]]
+    service_connection: !KeyOf local-kube-connection
+    type: proxy
+  id: authentik-embedded-outpost
+
+- model: authentik_outposts.outpost
+  identifiers:
+    name: authentik LDAP Outpost
+  state: present
+  attrs:
+    config:
+      authentik_host: https://auth.wahoo.li/
+      kubernetes_json_patches:
+        deployment:
+        - op: add
+          path: /spec/template/spec/dnsPolicy
+          value: ClusterFirstWithHostNet
+      authentik_host_browser: ''
+      authentik_host_insecure: true
+      container_image: null
+      docker_labels: null
+      docker_map_ports: true
+      docker_network: null
+      kubernetes_disabled_components: []
+      kubernetes_image_pull_secrets: []
+      kubernetes_ingress_annotations: {}
+      kubernetes_ingress_class_name: null
+      kubernetes_ingress_secret_name: authentik-outpost-tls
+      kubernetes_namespace: authentik
+      kubernetes_replicas: 1
+      kubernetes_service_type: ClusterIP
+      log_level: warn
+      object_naming_template: ak-outpost-%(name)s
+    managed: null
+    name: authentik LDAP Outpost
+    providers:
+    - !Find [authentik_providers_ldap.ldapprovider, [name, jellyfin-ldap-provider]]
+    service_connection: !KeyOf local-kube-connection
+    type: ldap
+  id: authentik-ldap-outpost

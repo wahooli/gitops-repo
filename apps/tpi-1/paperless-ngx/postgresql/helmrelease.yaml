@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--paperless-ngx-postgresql
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      version: "14.3.3"
+  releaseName: paperless-ngx-postgresql
+  interval: 5m
+  targetNamespace: default
+  valuesFrom:
+  - kind: ConfigMap
+    name: paperless-ngx-postgresql-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: paperless-ngx-postgresql-values
+    valuesKey: values.yaml

@@ -1,0 +1,50 @@
+image:
+  tag: "2024.12.1" # {"$imagepolicy": "flux-system:cloudflare-tunnel:tag"}
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /home/nonroot/config.yaml
+      subPath: config.yaml
+    spec:
+      configMap:
+        name: config
+  creds:
+    enabled: true
+    mount:
+    - path: /home/nonroot/.cloudflared
+    spec:
+      secret:
+        name: wahooli-credentials
+args:
+- ${cloudflare_tunnel_id}
+config:
+  tunnel: ${cloudflare_tunnel_id}
+  metrics: 0.0.0.0:2000
+  credentials-file: /home/nonroot/.cloudflared/credentials.json
+  warp-routing:
+    enabled: false
+  originRequest:
+    noTLSVerify: true
+  ingress:
+  - service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local.:443
+resources:
+  limits:
+    cpu: 1000m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+replicaCount: 4
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 10
+      podAffinityTerm:
+        topologyKey: kubernetes.io/hostname
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/instance
+            operator: In
+            values:
+            - cloudflare-tunnel-wahooli

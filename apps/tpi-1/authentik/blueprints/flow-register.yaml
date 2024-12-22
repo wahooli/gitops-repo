@@ -1,0 +1,224 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Registration with invitation token
+  # labels:
+  #   blueprints.goauthentik.io/instantiate: "true"
+context:
+  group_name: Invite Users
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Shared policies
+  attrs:
+    required: false
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: !Context group_name
+  id: invite-users-group
+- identifiers:
+    slug: register
+  id: flow
+  model: authentik_flows.flow
+  attrs:
+    name: Registration Flow
+    title: Welcome to auth.wahoo.li
+    designation: enrollment
+    authentication: require_unauthenticated
+- model: authentik_policies_expression.expressionpolicy
+  id: register-check-token-in-url
+  identifiers:
+    name: register-check-token-in-url
+  attrs:
+    expression: |
+      from django.http import QueryDict
+      q = QueryDict(request.http_request.GET.get('query'))
+      # Prompts for token if itoken is not in get parameters
+      return q.get('itoken', '') == ''
+- model: authentik_stages_invitation.invitationstage
+  id: register-invitation
+  attrs:
+    name: register-invitation
+  identifiers:
+    name: register-invitation
+- identifiers:
+    name: register-field-username
+  id: prompt-field-username
+  model: authentik_stages_prompt.prompt
+  attrs:
+    field_key: username
+    label: Username
+    type: username
+    required: true
+    placeholder: Username
+    placeholder_expression: false
+    order: 0
+- identifiers:
+    name: register-field-password
+  id: prompt-field-password
+  model: authentik_stages_prompt.prompt
+  attrs:
+    field_key: password
+    label: Password
+    type: password
+    required: true
+    placeholder: Password
+    placeholder_expression: false
+    order: 1
+- identifiers:
+    name: register-field-password-repeat
+  id: prompt-field-password-repeat
+  model: authentik_stages_prompt.prompt
+  attrs:
+    field_key: password_repeat
+    label: Password (repeat)
+    type: password
+    required: true
+    placeholder: Password (repeat)
+    placeholder_expression: false
+    order: 2
+- identifiers:
+    name: register-field-token
+  id: prompt-field-token
+  model: authentik_stages_prompt.prompt
+  attrs:
+    field_key: token
+    label: Invitation token
+    type: text
+    required: true
+    placeholder_expression: false
+    order: 0
+- identifiers:
+    name: register-field-name
+  id: prompt-field-name
+  model: authentik_stages_prompt.prompt
+  attrs:
+    field_key: name
+    label: Name
+    type: text
+    required: true
+    placeholder: Name
+    placeholder_expression: false
+    order: 0
+- identifiers:
+    name: register-field-name
+  id: prompt-field-name
+  model: authentik_stages_prompt.prompt
+  attrs:
+    field_key: name
+    label: Name
+    type: text
+    required: true
+    placeholder: Name
+    placeholder_expression: false
+    order: 0
+- identifiers:
+    name: register-field-email
+  id: prompt-field-email
+  model: authentik_stages_prompt.prompt
+  attrs:
+    field_key: email
+    label: Email
+    type: email
+    required: true
+    placeholder: Email
+    placeholder_expression: false
+    order: 1
+- identifiers:
+    name: register-email-verification
+  id: register-email-verification
+  model: authentik_stages_email.emailstage
+  attrs:
+    token_expiry: 60
+    use_global_settings: true
+    template: email/account_confirmation.html
+    activate_user_on_success: true
+- identifiers:
+    name: register-prompt-second
+  id: register-prompt-second
+  model: authentik_stages_prompt.promptstage
+  attrs:
+    fields:
+    - !KeyOf prompt-field-name
+    - !KeyOf prompt-field-email
+- identifiers:
+    name: register-prompt-first
+  id: register-prompt-first
+  model: authentik_stages_prompt.promptstage
+  attrs:
+    fields:
+    - !KeyOf prompt-field-username
+    - !KeyOf prompt-field-password
+    - !KeyOf prompt-field-password-repeat
+- identifiers:
+    name: register-prompt-token
+  id: register-invitation-token
+  model: authentik_stages_prompt.promptstage
+  attrs:
+    fields:
+    - !KeyOf prompt-field-token
+- identifiers:
+    name: register-user-login
+  id: register-user-login
+  model: authentik_stages_user_login.userloginstage
+- identifiers:
+    name: register-user-write
+  id: register-user-write
+  model: authentik_stages_user_write.userwritestage
+  attrs:
+    create_users_as_inactive: true
+    create_users_group: !KeyOf invite-users-group
+    user_creation_mode: always_create
+    user_type: external
+- identifiers:
+    target: !KeyOf flow
+    stage: !KeyOf register-invitation-token
+    order: 0
+  id: register-prompt-for-token
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    target: !KeyOf flow
+    stage: !KeyOf register-invitation
+    order: 20
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    target: !KeyOf flow
+    stage: !KeyOf register-prompt-first
+    order: 30
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    target: !KeyOf flow
+    stage: !KeyOf register-prompt-second
+    order: 31
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    target: !KeyOf flow
+    stage: !KeyOf register-user-write
+    order: 40
+  model: authentik_flows.flowstagebinding
+  id: register-user-write-stage
+- identifiers:
+    target: !KeyOf flow
+    stage: !KeyOf register-email-verification
+    order: 50
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    target: !KeyOf flow
+    stage: !KeyOf register-user-login
+    order: 200
+  model: authentik_flows.flowstagebinding
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    order: 0
+    target: !KeyOf register-prompt-for-token
+    policy: !KeyOf register-check-token-in-url
+- model: authentik_policies.policybinding
+  attrs:
+    enabled: true
+  identifiers:
+    order: 0
+    target: !KeyOf register-user-write-stage
+    policy: !Find [authentik_policies_expression.expressionpolicy, [name, add-user-to-jellyfin-group]]

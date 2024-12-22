@@ -32,3 +32,4 @@ stringData:
   istio_ingress_ip: 192.168.0.1
   ingress_service_type: None
   internal_gw_lb_ip: "192.168.0.252"
+  external_dns_encryption_key: "iRu5k_H-jr7-oTgcWRlxrVNnIS9YA0w0"

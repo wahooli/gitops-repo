@@ -22,3 +22,5 @@ resources:
 - cni-plugins
 - helmrelease-value-overrides
 - dns-vars.yaml
+- wahooli-credentials.yaml
+- cluster-vars.yaml

@@ -1,0 +1,28 @@
+image:
+  tag: 7.2.4-debian-12-r9
+metrics:
+  enabled: false
+commonLabels:
+  backupWeekly: "true"
+  backupDaily: "true"
+  app.kubernetes.io/part-of: paperless-ngx
+master:
+  persistence:
+    enabled: true
+    size: 1Gi
+  extraVolumes:
+  - name: dummydata
+    emptyDir: {}
+  extraVolumeMounts:
+  - name: dummydata
+    mountPath: /dummy
+  podAnnotations:
+    backup.velero.io/backup-volumes: dummydata  # backups essentially empty volume, so always new instance is initialized
+    pre.hook.backup.velero.io/timeout: 5m
+    pre.hook.restore.velero.io/timeout: 5m
+    post.hook.restore.velero.io/timeout: 5m
+    pre.hook.backup.velero.io/container: redis
+    post.hook.restore.velero.io/container: redis
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "rm -rf /dummy/*"]'
+auth:
+  enabled: false

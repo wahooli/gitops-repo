@@ -1,0 +1,18 @@
+unbound:
+  port: ${dns_svc_port:=53}
+  zones:
+    volumeName: unbound-zones
+    include_default: false
+    existingConfigMap: unbound-zones
+  unboundConf:
+    volumeName: unbound-conf
+  config:
+    volumeName: unbound-config
+    existingConfigMap: unbound-config
+redis:
+  enabled: true
+
+service:
+  main:
+    type: ClusterIP
+    clusterIP: ${unbound_cluster_ip}

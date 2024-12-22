@@ -1,0 +1,4 @@
+k3s_role: agent
+k3s_config:
+  kube-proxy-arg:
+  - metrics-bind-address=0.0.0.0

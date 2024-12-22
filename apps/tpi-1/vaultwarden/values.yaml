@@ -1,0 +1,102 @@
+image:
+  tag: "1.32.6" # {"$imagepolicy": "flux-system:vaultwarden:tag"}
+envFrom:
+  envs:
+    type: configMap
+    useFromChart: false
+    name: vaultwarden-env
+initContainers:
+  wait-for-psql:
+    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    imagePullPolicy: IfNotPresent
+    args:
+    - vaultwarden-postgresql:5432
+    - -t
+    - "300" # wait for 5 minutes
+env:
+  SMTP_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: ${mail_relay_app_secret_name}
+        key: vaultwarden_mail_password
+  SMTP_FROM:
+    valueFrom:
+      secretKeyRef:
+        name: ${mail_relay_app_secret_name}
+        key: vaultwarden_mail_address_1
+  ADMIN_TOKEN:
+    valueFrom:
+      secretKeyRef:
+        name: ${vaultwarden_app_secret_name}
+        key: admin_token
+  PUSH_INSTALLATION_ID:
+    valueFrom:
+      secretKeyRef:
+        name: ${vaultwarden_app_secret_name}
+        key: installation_id
+  PUSH_INSTALLATION_KEY:
+    valueFrom:
+      secretKeyRef:
+        name: ${vaultwarden_app_secret_name}
+        key: installation_key
+# controller:
+#   type: statefulset
+podAnnotations:
+  backup.velero.io/backup-volumes: data
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: vaultwarden
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "600m"
+  limits:
+    memory: "3072Mi"
+    # cpu: "1000m"
+persistence:
+  data:
+    enabled: true
+    mount:
+    - path: /data
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "10Gi"
+          # config:
+          #   enabled: true
+          #   mount:
+          #   - path: /config
+          #   spec:
+          #     emptyDir: {}
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    labels:
+      velero.io/exclude-from-backup: "true"
+    hosts:
+    - host: vault.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+      # - path: /admin
+      #   pathType: Prefix
+      #   service:
+      #     name: default-backend
+      #     port:
+      #       number: 80
+    tls:
+    - hosts:
+      - vault.wahoo.li

@@ -1,0 +1,16 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: internal-dns--unbound
+  namespace: flux-system
+spec:
+  releaseName: unbound
+  interval: 5m
+  targetNamespace: internal-dns
+  valuesFrom:
+  - kind: ConfigMap
+    name: unbound-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: unbound-values
+    valuesKey: values.yaml

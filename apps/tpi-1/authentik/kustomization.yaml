@@ -1,0 +1,57 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/authentik
+- ../../base/authentik/helmrelease-remote-cluster.yaml
+- imagepolicy.yaml
+- httproute.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-authentik
+  options:
+    allowNameChange: true
+- path: namespace.yaml
+  target:
+    kind: Namespace
+  options:
+    allowNameChange: true
+- path: helmrelease-remote-cluster.yaml
+  target:
+    kind: HelmRelease
+    name: base-authentik-remote-cluster
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: authentik-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values.yaml=values.yaml
+- name: authentik-blueprints
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "authentik"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "authentik"
+  files:
+  - applications.yaml=blueprints/applications.yaml
+  - brand-auth-wahooli.yaml=blueprints/brand-auth-wahooli.yaml
+  - flow-ldap-login.yaml=blueprints/flow-ldap-login.yaml
+  - flow-login.yaml=blueprints/flow-login.yaml
+  - flow-password-reset.yaml=blueprints/flow-password-reset.yaml
+  - flow-plex-registration.yaml=blueprints/flow-plex-registration.yaml
+  - flow-register.yaml=blueprints/flow-register.yaml
+  - flow-sso-login.yaml=blueprints/flow-sso-login.yaml
+  - flow-sso-registration.yaml=blueprints/flow-sso-registration.yaml
+  - groups.yaml=blueprints/groups.yaml
+  - outposts.yaml=blueprints/outposts.yaml
+  - plex-source.yaml=blueprints/plex-source.yaml
+  - policies-shared.yaml=blueprints/policies-shared.yaml
+  - users.yaml=blueprints/users.yaml
+configurations:
+- ../../.config/valuesFrom.yaml
+- kustomizeconfig.yaml
