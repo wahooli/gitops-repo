@@ -8,6 +8,9 @@ spec:
   interval: 5m
   targetNamespace: default
   values:
+    wireguard:
+      config:
+        existingConfigMap: transmission-wireguard-config
     envFrom:
       envs:
         type: configMap
@@ -16,4 +19,8 @@ spec:
   valuesFrom:
   - kind: ConfigMap
     name: transmission-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: transmission-helmrelease-overrides
+    optional: true
     valuesKey: values.yaml

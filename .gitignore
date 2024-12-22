@@ -1,26 +1,17 @@
 *
-!.gitignore
-!.e2eignore
-!.gitconfig
+!/.ci
+!/.githooks
+!/.github
+!/apps
+!/clusters
+!/crds
+!/infrastructure
+!/inventory
+!/.e2eignore
+!/.gitconfig
+!/.sourceignore
+!/.yamllint
 !/LICENSE
+# allow globally these files
+!.gitignore
 !README.md
-!*/
-# ignore directories starting with underscore
-_*
-!.github/*
-!.githooks/*
-!.sourceignore
-!.yamllint
-# allow anything in charts directory at the moment. the idea is to move them into own repo later
-!charts/**/*
-# allow anything under config directory within apps
-!apps/**/config/**
-!infrastructure/**/config/**
-!apps/**/.env
-!*.yaml
-!*.yml
-!.ci/**/*.sh
-# ignore yaml files starting with underscore
-_*.yaml
-_*.yml
-inventory/certs
