@@ -1,0 +1,45 @@
+all:
+  hosts:
+    rk1-node-04:
+    rk1-node-03:
+    rk1-node-02:
+    rk1-node-01:
+k3s_hosts:
+  children:
+    k3s_servers:
+    k3s_agents:
+k3s_servers:
+  hosts:
+    rk1-node-04:
+k3s_agents:
+  hosts:
+    rk1-node-03:
+    rk1-node-02:
+    rk1-node-01:
+storage_nodes:
+  hosts:
+    rk1-node-04:
+    rk1-node-03:
+    rk1-node-02:
+    rk1-node-01:
+bootstrap_hosts:
+  hosts:
+    rk1-node-04:
+helm_hosts:
+  children:
+    bootstrap_hosts:
+fluxcd_hosts:
+  children:
+    bootstrap_hosts:
+kubectl_hosts:
+  children:
+    bootstrap_hosts:
+cilium_hosts:
+  children:
+    bootstrap_hosts:
+swap_nodes:
+  children:
+    k3s_hosts:
+lvm_hosts:
+  children:
+    storage_nodes:

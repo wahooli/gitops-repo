@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - Plex source
+  # labels:
+  #   blueprints.goauthentik.io/instantiate: "true"
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Plex registration
+  attrs:
+    required: false
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - SSO Authentication flow
+    required: false
+- model: authentik_sources_plex.plexsource
+  state: present
+  identifiers:
+    slug: plex
+  attrs:
+    allowed_servers:
+    - ${authentik_plex_allowed_server}
+    authentication_flow: !Find [authentik_flows.flow, [slug, sso-login]]
+    client_id: ${authentik_plex_client_id}
+    enabled: true
+    allow_friends: false
+    enrollment_flow: !Find [authentik_flows.flow, [slug, plex-registration]]
+    name: Sign in with Plex
+    plex_token: ${authentik_plex_token}
+    policy_engine_mode: any
+    slug: plex
+    user_matching_mode: username_link
+    user_path_template: goauthentik.io/sources/%(slug)s

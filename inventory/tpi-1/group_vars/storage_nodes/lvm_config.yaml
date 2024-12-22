@@ -1,0 +1,13 @@
+lvm_enable_fstrim: true
+lvm_vgs:
+- name: vg.data
+  pvs:
+  - /dev/nvme0n1p3
+  lvols:
+  - thinpool: thindata
+    size: +100%FREE
+lvm_lvols:
+- name: swap
+  vg: vg.data
+  thinpool: thindata
+  size: 16G

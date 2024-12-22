@@ -1,0 +1,61 @@
+image:
+  tag: 11.2.3-debian-12-r4
+metrics:
+  enabled: false
+commonLabels:
+  backupWeekly: "true"
+  backupDaily: "true"
+  app.kubernetes.io/part-of: ombi
+primary:
+  extraEnvVars:
+  - name: TZ
+    value: Europe/Helsinki
+  - name: MARIADB_CHARACTER_SET
+    value: utf8mb4
+  - name: MARIADB_COLLATE
+    value: utf8mb4_unicode_ci
+  resourcesPreset: "micro"
+  extraVolumes:
+  - name: backup
+    emptyDir: {}
+  extraVolumeMounts:
+  - name: backup
+    mountPath: /dbdump
+  podAnnotations:
+    backup.velero.io/backup-volumes: backup
+    pre.hook.backup.velero.io/timeout: 5m
+    pre.hook.restore.velero.io/timeout: 5m
+    # post.hook.restore.velero.io/timeout: 5m
+    pre.hook.backup.velero.io/container: mariadb
+    post.hook.restore.velero.io/container: mariadb
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "MYSQL_PWD=$MARIADB_ROOT_PASSWORD mariadb-dump -u root --add-drop-database -B $MARIADB_DATABASE > /dbdump/backup.sql"]'
+    post.hook.restore.velero.io/wait-for-ready: "true"
+    post.hook.restore.velero.io/exec-timeout: 5m
+    post.hook.restore.velero.io/command: '["/bin/bash", "-ec", "[ -f \"/dbdump/backup.sql\" ] && export MYSQL_PWD=$MARIADB_ROOT_PASSWORD && mariadb -u root < /dbdump/backup.sql && rm -f /dbdump/backup.sql;"]'
+    # post.hook.restore.velero.io/command: >-
+    #     ["/bin/bash", "-ec", "[ -f '/dbdump/backup.sql' ] && export MYSQL_PWD=$MARIADB_ROOT_PASSWORD && \
+    #     while true; do mariadb-admin status -u root 2> /dev/null && break; done && sleep 15 && \
+    #     mariadb -u root < /dbdump/backup.sql && rm -f /dbdump/backup.sql;"]
+  customStartupProbe:
+    exec:
+      command:
+      - /bin/bash
+      - -ec
+      - |
+        MYSQL_PWD=$MARIADB_ROOT_PASSWORD mariadb-admin -u root status
+  customReadinessProbe:
+    exec:
+      command:
+      - /bin/bash
+      - -ec
+      - |
+        MYSQL_PWD=$MARIADB_ROOT_PASSWORD mariadb-admin -u root status
+  readinessProbe:
+    enabled: false
+  persistence:
+    enabled: true
+    size: 4Gi
+auth:
+  database: Ombi
+  existingSecret: ${ombi_app_secret_name}
+  username: ${ombi_database_user}

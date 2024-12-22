@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - SSO registration
+entries:
+- attrs:
+    designation: enrollment
+    name: SSO registration Flow
+    title: Welcome to auth.wahoo.li
+    authentication: none
+  identifiers:
+    slug: sso-registration
+  model: authentik_flows.flow
+  id: flow
+- attrs:
+    order: 100
+    placeholder: Username
+    placeholder_expression: false
+    required: true
+    type: text
+    field_key: username
+    label: Username
+  identifiers:
+    name: sso-registration-field-username
+  id: prompt-field-username
+  model: authentik_stages_prompt.prompt
+- attrs:
+    expression: |
+      # Check if we''ve not been given a username by the external IdP
+      # and trigger the enrollment flow
+      return 'username' not in context.get('prompt_data', {})
+  identifiers:
+    name: sso-registration-if-username
+  id: sso-registration-if-username
+  model: authentik_policies_expression.expressionpolicy
+- attrs:
+    expression: |
+      # This policy ensures that this flow can only be used when the user
+      # is in a SSO Flow (meaning they come from an external IdP)
+      return ak_is_sso_flow
+  identifiers:
+    name: sso-registration-if-sso
+  id: sso-registration-if-sso
+  model: authentik_policies_expression.expressionpolicy
+- identifiers:
+    name: sso-registration-login
+  id: sso-registration-login
+  model: authentik_stages_user_login.userloginstage
+- attrs:
+    fields:
+    - !KeyOf prompt-field-username
+  identifiers:
+    name: sso-registration-prompt
+  id: sso-registration-prompt
+  model: authentik_stages_prompt.promptstage
+- identifiers:
+    name: sso-registration-write
+  id: sso-registration-write
+  model: authentik_stages_user_write.userwritestage
+  attrs:
+    user_creation_mode: always_create
+- attrs:
+    re_evaluate_policies: true
+  identifiers:
+    order: 0
+    stage: !KeyOf sso-registration-prompt
+    target: !KeyOf flow
+  id: prompt-binding
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 1
+    stage: !KeyOf sso-registration-write
+    target: !KeyOf flow
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 2
+    stage: !KeyOf sso-registration-login
+    target: !KeyOf flow
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 0
+    policy: !KeyOf sso-registration-if-sso
+    target: !KeyOf flow
+  model: authentik_policies.policybinding
+- identifiers:
+    order: 0
+    policy: !KeyOf sso-registration-if-username
+    target: !KeyOf prompt-binding
+  model: authentik_policies.policybinding

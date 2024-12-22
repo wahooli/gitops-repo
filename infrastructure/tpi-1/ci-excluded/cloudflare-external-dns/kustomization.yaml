@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/external-dns/helmrelease.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: cloudflare-external-dns-values
+  namespace: flux-system
+  files:
+  - values-base.yaml=../../../base/external-dns/values-base.yaml
+  - values.yaml=values.yaml
+configurations:
+- ../../../.config/valuesFrom.yaml

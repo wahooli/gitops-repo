@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - SSO Authentication flow
+  labels:
+    blueprints.goauthentik.io/instantiate: "true"
+entries:
+- model: authentik_blueprints.metaapplyblueprint
+  identifiers:
+    name: Init - Shared policies
+  attrs:
+    required: false
+- attrs:
+    designation: authentication
+    name: Welcome to auth.wahoo.li
+    title: SSO Login
+    authentication: require_unauthenticated
+  identifiers:
+    slug: sso-login
+  model: authentik_flows.flow
+  id: flow
+- identifiers:
+    name: default-source-authentication-login
+  id: default-source-authentication-login
+  model: authentik_stages_user_login.userloginstage
+- identifiers:
+    order: 10
+    stage: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, login-mfa-validation]]
+    target: !KeyOf flow
+  id: login-mfa-validation
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 20
+    stage: !KeyOf default-source-authentication-login
+    target: !KeyOf flow
+  model: authentik_flows.flowstagebinding
+- identifiers:
+    order: 0
+    policy: !Find [authentik_policies_expression.expressionpolicy, [name, default-source-authentication-if-sso]]
+    target: !KeyOf flow
+  model: authentik_policies.policybinding
+- model: authentik_policies.policybinding
+  attrs:
+    negate: true
+    enabled: true
+    timeout: 30
+  identifiers:
+    order: 10
+    target: !KeyOf login-mfa-validation
+    policy: !Find [authentik_policies_expression.expressionpolicy, [name, check-ip-in-private-net]]

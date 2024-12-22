@@ -24,4 +24,3 @@ spec:
     kind: ClusterIssuer
   dnsNames:
   - bazarr.wahoo.li
-  - bazarr.absolutist.it

@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: https-redirect-filter
+  namespace: infrastructure
+spec:
+  parentRefs:
+  - name: internal-gw
+    sectionName: internal-wahooli-http
+  - name: internal-gw
+    sectionName: internal-absolutistit-http
+  hostnames:
+  - "*.absolutist.it"
+  - "*.wahoo.li"
+  rules:
+  - filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: https
+        statusCode: 301

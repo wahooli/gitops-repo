@@ -10,8 +10,6 @@ image:
 service:
   main:
     clusterIP: ${bind9_cluster_ip}
-    labels:
-      mirror.linkerd.io/exported: "true"
     externalTrafficPolicy: Local
     type: "${dns_svc_type:=LoadBalancer}"
     annotations:

@@ -4,8 +4,10 @@ apps/.config/* #separate line for adding files within directory also as ignores
 infrastructure/.config
 infrastructure/.config/* # files specifically being ignored just skips finding helmrelease for the file itself
 apps/vm/authentik/blueprints
+apps/tpi-1/authentik/blueprints
 infrastructure/nas/internal-dns/blocky/config
 infrastructure/vm/internal-dns/blocky/config
+infrastructure/tpi-1/internal-dns/blocky/config
 infrastructure/nas/gateway-api
+infrastructure/tpi-1/gateway-api
 infrastructure/base/gateway-api
-# test

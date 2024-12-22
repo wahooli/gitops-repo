@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik--authentik
+  namespace: flux-system
+spec:
+  releaseName: authentik
+  interval: 5m
+  targetNamespace: authentik
+  chart:
+    spec:
+      version: "2024.12.0" # {"$imagepolicy": "flux-system:authentik:tag"}
+  values:
+    blueprints:
+      configMaps:
+      - authentik-blueprints
+  valuesFrom:
+  - kind: ConfigMap
+    name: authentik-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: authentik-values
+    valuesKey: values.yaml

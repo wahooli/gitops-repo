@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin
+  namespace: default
+  annotations:
+    service.cilium.io/global: "true"
+spec:
+  internalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    port: 8096
+    protocol: TCP
+    targetPort: http
+  type: ClusterIP

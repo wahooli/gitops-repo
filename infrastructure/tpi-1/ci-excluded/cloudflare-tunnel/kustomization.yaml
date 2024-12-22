@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/cloudflare-tunnel
+- imagepolicy.yaml
+patches:
+- target:
+    kind: Namespace
+    name: cloudflare-tunnel
+  patch: |-
+    - op: add
+      path: /metadata/labels/topolvm.io~1webhook
+      value: "ignore"
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: cloudflare-tunnel-values
+  namespace: flux-system
+  files:
+  - values.yaml=values.yaml
+configurations:
+- ../../../.config/valuesFrom.yaml

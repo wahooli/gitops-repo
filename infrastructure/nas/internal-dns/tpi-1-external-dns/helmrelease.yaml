@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: internal-dns--tpi-1-external-dns
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: tpi-1-external-dns
+  targetNamespace: internal-dns
+  chart:
+    spec:
+      version: "1.15.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: tpi-1-external-dns-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: tpi-1-external-dns-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: external-dns-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml

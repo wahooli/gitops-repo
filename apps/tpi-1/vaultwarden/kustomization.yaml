@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/vaultwarden
+- imagepolicy.yaml
+- httproute.yaml
+- postgresql
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-vaultwarden
+  options:
+    allowNameChange: true
+configMapGenerator:
+- behavior: merge
+  files:
+  - values.yaml=values.yaml
+  name: vaultwarden-values
+  namespace: flux-system
+- name: vaultwarden-env
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
+    labels:
+      backupWeekly: "true"
+      backupDaily: "true"
+      app.kubernetes.io/part-of: vaultwarden
+  envs:
+  - .env
+  namespace: flux-system
+configurations:
+- ../../.config/valuesFrom.yaml
+- ../../.config/envFrom.yaml

@@ -1,0 +1,119 @@
+authentik:
+  secret_key: "${authentik_secret_key}"
+  log_level: warn
+  # This sends anonymous usage-data, stack traces on errors and
+  # performance data to authentik.error-reporting.a7k.io, and is fully opt-in
+  error_reporting:
+    enabled: false
+  postgresql:
+    password: "${authentik_database_password}"
+  email:
+    host: "mail-relay.default"
+    port: 25
+    username: "authentik"
+    from: "auth.wahoo.li <${authentik_email_from}>"
+    # from: "${authentik_email_from}"
+    password: "${authentik_email_password}"
+    use_ssl: false
+    use_tls: false
+    timeout: 30
+# global:
+#   additionalLabels:
+#     backupWeekly: "true"
+#     backupDaily: "true"
+#     appStack: authentik
+# global:
+#   env:
+#   - name: AUTHENTIK_BOOTSTRAP_EMAIL
+#     value: email@email.com
+#   - name: AUTHENTIK_BOOTSTRAP_PASSWORD
+#     value: password
+server:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/service-upstream: "true"
+      external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    hosts:
+    - auth.wahoo.li
+    - auth.absolutist.it
+    tls:
+    - hosts:
+      - auth.wahoo.li
+      - auth.absolutist.it
+
+postgresql:
+  enabled: true
+  auth:
+    database: authentik
+    username: authentik
+    password: "${authentik_database_password}"
+    usePasswordFiles: false
+  metrics:
+    enabled: false
+  commonLabels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    appStack: authentik
+  primary:
+    extendedConfiguration: |
+      max_connections = 500
+    extraVolumes:
+    - name: backup
+      emptyDir: {}
+    extraVolumeMounts:
+    - name: backup
+      mountPath: /dbdump
+    podAnnotations:
+      backup.velero.io/backup-volumes: backup
+      pre.hook.backup.velero.io/timeout: 5m
+      pre.hook.restore.velero.io/timeout: 5m
+      post.hook.restore.velero.io/timeout: 5m
+      pre.hook.backup.velero.io/container: postgresql
+      post.hook.restore.velero.io/container: postgresql
+      pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "PGPASSWORD=$POSTGRES_PASSWORD pg_dump -U $POSTGRES_USER -d $POSTGRES_DATABASE -F c --clean --if-exists -f /dbdump/backup.psql"]'
+      post.hook.restore.velero.io/wait-for-ready: "true"
+      post.hook.restore.velero.io/exec-timeout: 5m
+      post.hook.restore.velero.io/command: '["/bin/bash", "-ec", "[ -f \"/dbdump/backup.psql\" ] && PGPASSWORD=$POSTGRES_PASSWORD pg_restore -U $POSTGRES_USER -d $POSTGRES_DATABASE --clean --if-exists < /dbdump/backup.psql && rm -f /dbdump/backup.psql;"]'
+      # post.hook.restore.velero.io/command: |-
+      # ["/bin/bash", "-ec", "[ -f '/dbdump/backup.psql' ] && \
+      # while true; do pg_isready -U '$POSTGRES_USER' -d 'dbname=$POSTGRES_DATABASE' -h 127.0.0.1 -p 5432 > /dev/null && break; done && sleep 15 && \
+      # PGPASSWORD=$POSTGRES_PASSWORD pg_restore -U $POSTGRES_USER -d $POSTGRES_DATABASE --clean --if-exists < /dbdump/backup.psql && rm -f /dbdump/backup.psql;"]
+    persistence:
+      enabled: true
+      size: 2Gi
+redis:
+  enabled: true
+  metrics:
+    enabled: false
+  # commonLabels:
+  #   backupWeekly: "true"
+  #   backupDaily: "true"
+  #   appStack: authentik
+  master:
+    persistence:
+      enabled: false
+      size: 1Gi
+    extraVolumes:
+    - name: dummydata
+      emptyDir: {}
+    # extraVolumeMounts:
+    # - name: dummydata
+    #   mountPath: /dummy
+    # podAnnotations:
+    #   backup.velero.io/backup-volumes: dummydata  # backups essentially empty volume, so always new instance is initialized
+    #   pre.hook.backup.velero.io/timeout: 5m
+    #   pre.hook.restore.velero.io/timeout: 5m
+    #   post.hook.restore.velero.io/timeout: 5m
+    #   pre.hook.backup.velero.io/container: redis
+    #   post.hook.restore.velero.io/container: redis
+    #   pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "rm -rf /dummy/*"]'
+  auth:
+    enabled: false

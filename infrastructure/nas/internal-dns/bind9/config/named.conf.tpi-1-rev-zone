@@ -1,0 +1,10 @@
+zone "${tpi_1_ip_reverse}" {
+    type master;
+    file "/var/cache/bind/tpi-1.rev.zone";
+    allow-transfer {
+        key "externaldns-key";
+    };
+    update-policy {
+        grant externaldns-key zonesub ANY;
+    };
+};

@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--authentik-remote-cluster
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: authentik--authentik
+    namespace: flux-system
+  releaseName: authentik-remote-cluster-default
+  interval: 5m
+  targetNamespace: default
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          version: v1
+          kind: RoleBinding
+          name: authentik
+        patch: |
+          - op: replace
+            path: /subjects/0/namespace
+            value: authentik

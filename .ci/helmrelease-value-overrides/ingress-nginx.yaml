@@ -6,6 +6,8 @@ metadata:
 data:
   values.yaml: |
     controller:
+      admissionWebhooks:
+        enabled: false
       service:
         externalTrafficPolicy: ""
         type: ClusterIP

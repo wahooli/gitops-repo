@@ -1,0 +1,70 @@
+# envFrom:
+#   envs:
+#     type: configMap
+#     useFromChart: false
+#     name: overseerr-env
+
+env:
+  LOG_LEVEL: warn
+  TZ: Europe/Helsinki
+
+image:
+  repository: ghcr.io/lenaxia/overseerr-oidc
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "oidc-support"
+
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: overseerr
+
+# resources:
+#   requests:
+#     memory: "256Mi"
+#     cpu: "400m"
+#   limits:
+#     memory: "3072Mi"
+#     cpu: "1000m"
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /app/config
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "2Gi"
+
+ingress:
+  main:
+    enabled: true
+    className: nginx
+    labels:
+      velero.io/exclude-from-backup: "true"
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    hosts:
+    - host: overseerr.wahoo.li
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+      # - path: /setup
+      #   pathType: Prefix
+      #   service:
+      #     name: default-backend
+      #     port:
+      #       number: 80
+    tls:
+    - hosts:
+      - overseerr.wahoo.li

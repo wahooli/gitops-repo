@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-vars
+  namespace: flux-system
+type: Opaque
+stringData:
+  cluster_dns_ip: 10.96.0.10
+  nas_dns_ip: 10.96.0.11
+  tpi_dns_ip: 10.96.0.12
+  nas_cluster_domain: nas.local
+  tpi1_cluster_domain: tpi1.local
+  cloudflare_tunnel_id: 7e8d8e06-b9e2-4dc6-a8fa-bb811e8e972b

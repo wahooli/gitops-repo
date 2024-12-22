@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--paperless-ngx
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: default--paperless-ngx-postgresql
+    namespace: flux-system
+  - name: default--paperless-ngx-redis
+    namespace: flux-system
+  releaseName: paperless-ngx
+  interval: 5m
+  targetNamespace: default
+  values:
+    envFrom:
+      envs:
+        type: configMap
+        useFromChart: false
+        name: paperless-ngx-env
+  valuesFrom:
+  - kind: ConfigMap
+    name: paperless-ngx-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: paperless-ngx-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: paperless-ngx-values
+    valuesKey: imagetag.yaml

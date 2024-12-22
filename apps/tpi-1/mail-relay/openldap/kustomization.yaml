@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/openldap
+- certificate.yaml
+- imagepolicy.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-openldap
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: openldap-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values.yaml=values.yaml
+- name: mail-relay-ldap-ldifs
+  namespace: flux-system
+  options:
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
+  files:
+  - users.ldif=config/export.ldif
+- name: mail-relay-ldap-schemas
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
+  files:
+  - postfix-book.ldif=config/postfix-book.ldif
+configurations:
+- ../kustomizeconfig.yaml
+- ../../../.config/valuesFrom.yaml

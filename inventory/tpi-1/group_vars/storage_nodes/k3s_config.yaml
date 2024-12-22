@@ -1,0 +1,5 @@
+k3s_node_labels:
+- node_type=storage
+# k3s_systemd_service_dependencies:
+# - var-lib-kubelet.mount
+# - var-lib-rancher.mount

@@ -1,0 +1,69 @@
+image:
+  tag: "2.6.8" # {"$imagepolicy": "flux-system:openldap:tag"}
+env:
+  LDAP_ADMIN_USERNAME:
+    valueFrom:
+      secretKeyRef:
+        name: ${mail_relay_app_secret_name}
+        key: ldap_admin_username
+  LDAP_ADMIN_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: ${mail_relay_app_secret_name}
+        key: ldap_admin_password
+  LDAP_ROOT: dc=wahooli,dc=homelab
+  LDAP_SKIP_DEFAULT_TREE: "yes"
+  LDAP_CUSTOM_LDIF_DIR: /ldifs
+  # LDAP_LOGLEVEL: 256
+  # BITNAMI_DEBUG: "true"
+  LDAP_REQUIRE_TLS: "yes"
+  LDAP_ALLOW_ANON_BINDING: "no"
+  LDAP_ENABLE_TLS: "yes"
+  LDAP_TLS_CERT_FILE: /certs/tls.crt
+  LDAP_TLS_KEY_FILE: /certs/tls.key
+  LDAP_TLS_CA_FILE: /certs/ca.crt
+  LDAP_EXTRA_SCHEMAS: cosine,inetorgperson
+initContainers:
+  copy-configuration:
+    image: ghcr.io/wahooli/docker/envsubst:latest
+    imagePullPolicy: IfNotPresent
+    envFrom:
+    - secretRef:
+        name: ${mail_relay_app_secret_name}
+    volumeMounts:
+    - mountPath: /dest
+      name: ldifs
+    - mountPath: /src
+      name: custom-ldif
+persistence:
+  ldif:
+    name: custom-ldif
+    enabled: true
+    spec:
+      useFromChart: false
+      configMap:
+        name: mail-relay-ldap-ldifs
+  ldifs:
+    enabled: true
+    mount:
+    - path: /ldifs
+    spec:
+      emptyDir: {}
+  schemas:
+    name: custom-schemas
+    mount:
+    - path: /schemas
+    enabled: true
+    spec:
+      useFromChart: false
+      configMap:
+        name: mail-relay-ldap-schemas
+  cert:
+    name: selfsigned-certs
+    mount:
+    - path: /certs
+    enabled: true
+    spec:
+      useFromChart: false
+      secret:
+        name: tls-mail-relay-openldap

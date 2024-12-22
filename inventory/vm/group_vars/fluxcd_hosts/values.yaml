@@ -4,8 +4,8 @@ fluxcd_bootstrap_git_branch: add-pipeline
 fluxcd_bootstrap_git_path: clusters/vm
 fluxcd_bootstrap_key_name: fluxcd_vm-k3s
 fluxcd_bootstrap_allow: true
-fluxcd_bootstrap_git_url: ssh://git@github.com/wahooli/gitops-repo.git
-fluxcd_version: 2.2.3
+fluxcd_bootstrap_git_url: git@github.com:wahooli/gitops-repo.git
+fluxcd_version: 2.4.0
 fluxcd_bootstrap_components_extra:
 - image-reflector-controller
 - image-automation-controller

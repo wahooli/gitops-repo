@@ -1,0 +1,28 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: true
+  dependsOn:
+  - name: infrastructure-depends
+  - name: internal-dns
+  suspend: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/tpi-1
+  wait: false
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-app-vars
+      optional: false
+    - kind: Secret
+      name: wireguard-tunnel-credentials
+      optional: true
+    - kind: Secret
+      name: cluster-vars
+      optional: true

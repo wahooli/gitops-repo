@@ -1,0 +1,12 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cloudflare-tunnel--wahooli
+  namespace: flux-system
+spec:
+  releaseName: cloudflare-tunnel-wahooli
+  interval: 10m
+  valuesFrom:
+  - kind: ConfigMap
+    name: cloudflare-tunnel-values
+    valuesKey: values.yaml
