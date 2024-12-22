@@ -12,8 +12,6 @@ podAnnotations:
 
 global:
   labels:
-    # backupWeekly: "true"
-    # backupDaily: "true"
     velero.io/exclude-from-backup: "true"
     app.kubernetes.io/part-of: netbootxyz
 
@@ -89,8 +87,8 @@ ingress:
   main:
     enabled: true
     className: nginx
-    labels:
-      velero.io/exclude-from-backup: "true"
+    # labels:
+    #   velero.io/exclude-from-backup: "true"
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       cert-manager.io/cluster-issuer: letsencrypt-production
@@ -112,8 +110,8 @@ ingress:
     className: nginx
     targetSelector:
       main: assets
-    labels:
-      velero.io/exclude-from-backup: "true"
+    # labels:
+    #   velero.io/exclude-from-backup: "true"
     annotations:
       # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       cert-manager.io/cluster-issuer: letsencrypt-production
