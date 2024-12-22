@@ -6,6 +6,7 @@ resources:
 - kube-system-namespace.yaml
 - default-backend
 - gateway-api
+- node-local-dns
 - cert-manager
 - fluxcd-notifications.yaml
 - ingress-nginx
