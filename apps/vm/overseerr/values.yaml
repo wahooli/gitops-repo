@@ -15,8 +15,8 @@ image:
   tag: "oidc-support"
 
 podAnnotations:
-  linkerd.io/inject: enabled
   backup.velero.io/backup-volumes: config
+  # linkerd.io/inject: enabled
 global:
   labels:
     backupWeekly: "true"

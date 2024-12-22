@@ -30,7 +30,7 @@ envFrom:
     name: mail-relay-env
 initContainers:
   copy-configuration:
-    image: wahooli/envsubst:latest
+    image: ghcr.io/wahooli/docker/envsubst:latest
     imagePullPolicy: IfNotPresent
     envFrom:
     - secretRef:

@@ -12,8 +12,9 @@ podAnnotations:
 
 global:
   labels:
-    backupWeekly: "true"
-    backupDaily: "true"
+    # backupWeekly: "true"
+    # backupDaily: "true"
+    velero.io/exclude-from-backup: "true"
     app.kubernetes.io/part-of: netbootxyz
 
 netbootxyz:

@@ -46,9 +46,9 @@ server:
       hosts:
       - auth.wahoo.li
       - auth.absolutist.it
-  service:
-    labels:
-      mirror.linkerd.io/exported: "true"
+  # service:
+  #   labels:
+  #     mirror.linkerd.io/exported: "true"
 postgresql:
   enabled: true
   auth:

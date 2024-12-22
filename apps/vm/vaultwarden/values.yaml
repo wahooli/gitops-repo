@@ -7,7 +7,7 @@ envFrom:
     name: vaultwarden-env
 initContainers:
   wait-for-psql:
-    image: wahooli/wait-for-it:latest
+    image: ghcr.io/wahooli/docker/wait-for-it:latest
     imagePullPolicy: IfNotPresent
     args:
     - vaultwarden-postgresql:5432
