@@ -89,14 +89,14 @@ ingress:
     hosts:
     - host: vault.wahoo.li
       paths:
-      - path: "/"
-        pathType: "Prefix"
-      # - path: /admin
-      #   pathType: Prefix
-      #   service:
-      #     name: default-backend
-      #     port:
-      #       number: 80
+      - path: /admin
+        pathType: Prefix
+        service:
+          name: default-backend
+          port:
+            number: 80
+      - path: /
+        pathType: Prefix
     tls:
     - hosts:
       - vault.wahoo.li
