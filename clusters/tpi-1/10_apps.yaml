@@ -21,6 +21,9 @@ spec:
       name: cluster-app-vars
       optional: false
     - kind: Secret
+      name: authentik-app-vars
+      optional: true
+    - kind: Secret
       name: wireguard-tunnel-credentials
       optional: true
     - kind: Secret
