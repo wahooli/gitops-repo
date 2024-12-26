@@ -1,0 +1,10 @@
+reloader:
+  ignoreNamespaces: "flux-system,cilium-secrets,kube-system,kube-node-lease,kube-public,kube-system,openebs,velero,reflector"
+resources:
+  limits:
+    cpu: 150m
+    memory: 512Mi
+  requests:
+    cpu: 10m
+    memory: 128Mi
+fullnameOverride: reloader
