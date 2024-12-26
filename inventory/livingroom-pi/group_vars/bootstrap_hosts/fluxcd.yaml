@@ -1,0 +1,11 @@
+fluxcd_bootstrap_github_deploy_key_create: true
+fluxcd_bootstrap_github_deploy_key_repo_name: gitops-repo
+fluxcd_bootstrap_git_branch: main
+fluxcd_bootstrap_git_path: clusters/livingroom-pi
+fluxcd_bootstrap_key_name: fluxcd_livingroom-pi
+fluxcd_bootstrap_allow: true
+fluxcd_bootstrap_git_url: git@github.com:wahooli/gitops-repo.git
+fluxcd_version: 2.4.0
+fluxcd_bootstrap_components_extra:
+- image-reflector-controller
+- image-automation-controller

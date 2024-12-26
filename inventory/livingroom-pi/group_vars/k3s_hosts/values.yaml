@@ -1,0 +1,8 @@
+k3s_release_channel: v1.31
+k3s_allow_swap: false
+helm_diff_install: true
+k3s_kubelet_config:
+  maxPods: 250
+  shutdownGracePeriod: 30s
+  shutdownGracePeriodCriticalPods: 10s
+  failSwapOn: true

@@ -1,0 +1,14 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: multus-git
+  namespace: flux-system
+spec:
+  ref:
+    # commit: 4d69fed8ad412aa4c01dfd7ea3a5a50b99df6f40
+    tag: v4.1.4
+  ignore: |
+    # exclude all
+    /*
+    # include thin daemonset
+    !/deployments/multus-daemonset.yml

@@ -1,0 +1,24 @@
+all:
+  hosts:
+    livingroom-pi:
+k3s_hosts:
+  children:
+    k3s_servers:
+k3s_servers:
+  hosts:
+    livingroom-pi:
+bootstrap_hosts:
+  hosts:
+    livingroom-pi:
+helm_hosts:
+  children:
+    bootstrap_hosts:
+fluxcd_hosts:
+  children:
+    bootstrap_hosts:
+kubectl_hosts:
+  children:
+    bootstrap_hosts:
+cilium_hosts:
+  children:
+    bootstrap_hosts:

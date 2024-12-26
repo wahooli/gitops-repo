@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2alpha1
+kind: CiliumBGPClusterConfig
+metadata:
+  name: cilium-bgp
+spec:
+  nodeSelector:
+    matchExpressions:
+    - {key: exclude-from-peering, operator: NotIn, values: ['true']}
+  bgpInstances:
+  - name: "cluster-instance"
+    localASN: ${cluster_bgp_as_number}
+    peers:
+    - name: "breakout"
+      peerASN: ${breakout_bgp_peer_as}
+      peerAddress: ${breakout_bgp_peer_ip}
+      peerConfigRef:
+        name: "tor-peer"
+    - name: "quantum"
+      peerASN: ${quantum_bgp_peer_as}
+      peerAddress: ${quantum_bgp_peer_ip}
+      peerConfigRef:
+        name: "tor-peer"

@@ -1,0 +1,18 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: velero--velero
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: velero
+  chart:
+    spec:
+      version: "8.1.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: velero-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: velero-values
+    valuesKey: values.yaml

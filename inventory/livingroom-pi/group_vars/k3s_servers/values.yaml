@@ -1,0 +1,19 @@
+k3s_role: server
+k3s_config:
+  write-kubeconfig-mode: 644
+  flannel-backend: none
+  cluster-domain: cluster.local
+  disable-kube-proxy: true
+  disable-network-policy: true
+  disable-helm-controller: true
+  disable-cloud-controller: true
+  disable:
+  - servicelb
+  - traefik
+  kube-controller-manager-arg:
+  - bind-address=0.0.0.0
+  - terminated-pod-gc-threshold=10
+  kube-proxy-arg:
+  - metrics-bind-address=0.0.0.0
+  kube-scheduler-arg:
+  - bind-address=0.0.0.0
