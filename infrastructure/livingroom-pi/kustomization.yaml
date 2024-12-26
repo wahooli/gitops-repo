@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
 - infrastructure-namespace.yaml
 - default-namespace.yaml
-- gateway-api
 - multus
 - node-local-dns
 - reflector

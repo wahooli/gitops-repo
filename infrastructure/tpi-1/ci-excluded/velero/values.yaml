@@ -127,12 +127,13 @@ configuration:
       region: ${velero_backup_bucket_region}
       s3ForcePathStyle: true
       s3Url: ${velero_backup_bucket_url}
-  - name: seaweedfs-vm
-    provider: aws
-    bucket: ${velero_vm_backup_bucket}
-    accessMode: ReadOnly
-    default: true
-    config:
-      region: ${velero_vm_backup_bucket_region}
-      s3ForcePathStyle: true
-      s3Url: ${velero_vm_backup_bucket_url}
+      publicUrl: ${velero_backup_bucket_public_url}
+  # - name: seaweedfs-vm
+  #   provider: aws
+  #   bucket: ${velero_vm_backup_bucket}
+  #   accessMode: ReadOnly
+  #   default: true
+  #   config:
+  #     region: ${velero_vm_backup_bucket_region}
+  #     s3ForcePathStyle: true
+  #     s3Url: ${velero_vm_backup_bucket_url}

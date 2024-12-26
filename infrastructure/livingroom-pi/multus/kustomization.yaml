@@ -6,10 +6,9 @@ patches:
 - path: gitrepository.yaml
   target:
     kind: GitRepository
-- target:
+- path: multus.yaml
+  target:
     kind: Kustomization
     name: base-multus
-  patch: |-
-    - op: replace
-      path: /metadata/name
-      value: multus
+  options:
+    allowNameChange: true
