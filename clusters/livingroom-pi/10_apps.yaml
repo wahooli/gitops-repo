@@ -19,7 +19,7 @@ spec:
     substituteFrom:
     - kind: Secret
       name: cluster-app-vars
-      optional: false
+      optional: true
     - kind: Secret
       name: cluster-vars
       optional: true

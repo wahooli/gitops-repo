@@ -1,6 +1,6 @@
 fluxcd_bootstrap_github_deploy_key_create: true
 fluxcd_bootstrap_github_deploy_key_repo_name: gitops-repo
-fluxcd_bootstrap_git_branch: add-livingroom-pi
+fluxcd_bootstrap_git_branch: main
 fluxcd_bootstrap_git_path: clusters/livingroom-pi
 fluxcd_bootstrap_key_name: fluxcd_livingroom-pi
 fluxcd_bootstrap_allow: true
