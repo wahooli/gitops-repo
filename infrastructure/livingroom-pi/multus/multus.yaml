@@ -3,3 +3,5 @@ kind: Kustomization
 metadata:
   name: multus
   namespace: flux-system
+spec:
+  wait: true
