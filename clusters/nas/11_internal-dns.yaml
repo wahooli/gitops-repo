@@ -8,7 +8,6 @@ spec:
   prune: true
   dependsOn:
   - name: infrastructure
-  - name: linkerd
   - name: infrastructure-depends
   sourceRef:
     kind: GitRepository

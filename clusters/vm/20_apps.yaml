@@ -6,8 +6,6 @@ metadata:
 spec:
   interval: 5m0s
   prune: true
-  dependsOn:
-  - name: crds
   suspend: false
   sourceRef:
     kind: GitRepository

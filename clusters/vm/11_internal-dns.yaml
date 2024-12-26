@@ -9,7 +9,6 @@ spec:
   dependsOn:
   - name: infrastructure
   - name: linkerd
-  - name: crds
   sourceRef:
     kind: GitRepository
     name: flux-system
