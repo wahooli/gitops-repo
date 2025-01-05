@@ -1,5 +1,5 @@
 image:
-  tag: "5.16.3" # {"$imagepolicy": "flux-system:radarr:tag"}
+  tag: "5.17.2" # {"$imagepolicy": "flux-system:radarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
@@ -43,7 +43,6 @@ service:
   main:
     annotations:
       service.cilium.io/global: "true"
-
 ingress:
   main:
     enabled: true
