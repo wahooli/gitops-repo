@@ -1,0 +1,10 @@
+admissionWebhooks:
+  enabled: true
+  # what to do in case, when operator not available to validate request.
+  certManager:
+    # enables cert creation and injection by cert-manager
+    enabled: true
+crds:
+  enabled: true
+  cleanup:
+    enabled: true

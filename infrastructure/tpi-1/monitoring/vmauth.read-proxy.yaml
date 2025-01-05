@@ -1,0 +1,18 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: read-proxy
+  namespace: monitoring
+spec:
+  port: "8427"
+  unauthorizedUserAccessSpec:
+    url_map:
+    - src_paths:
+      - "/select/.+"
+      load_balancing_policy: first_available
+      retry_status_codes:
+      - 503
+      url_prefix:
+      - http://vmclusterlb-short-term-tpi-1.monitoring.svc.cluster.local.:8427
+      - http://vmselect-short-term-nas-0.vmselect-short-term-nas.monitoring.svc.cluster.local.:8481
+      - http://vmselect-short-term-nas-1.vmselect-short-term-nas.monitoring.svc.cluster.local.:8481

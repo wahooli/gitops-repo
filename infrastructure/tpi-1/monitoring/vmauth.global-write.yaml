@@ -1,0 +1,18 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: global-write
+  namespace: monitoring
+spec:
+  port: "8427"
+  unauthorizedUserAccessSpec:
+    url_map:
+    - src_paths:
+      - "/api/v1/write"
+      - "/prometheus/api/v1/write"
+      - "/write"
+      - "/api/v1/import"
+      - "/api/v1/import/.+"
+      url_prefix:
+      - http://vmagent-tpi-1.monitoring.svc.cluster.local.:8429
+      - http://vmagent-nas.monitoring.svc.cluster.local.:8429

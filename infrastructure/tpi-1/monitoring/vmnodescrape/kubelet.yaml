@@ -1,0 +1,43 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMNodeScrape
+metadata:
+  name: kubelet
+  namespace: monitoring
+spec:
+  bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  honorLabels: true
+  honorTimestamps: false
+  interval: 30s
+  metricRelabelConfigs:
+  - action: labeldrop
+    regex: (uid)
+  - action: labeldrop
+    regex: (id|name)
+  - action: labeldrop
+    regex: (git.*)
+  - action: labeldrop
+    regex: (le|migrated|image_size_in_bytes|long_running|server_type|decision|metric_source|method|compiler|go_version|volume_mode|usage|manager|deprecated_version|version|platform|minor|major|build_date)
+  - action: drop
+    regex: (rest_client_.*|apiserver_.*|etcd_.*|scheduler_.*|go_godebug_.*|go_gc_.*|workqueue_.*|cronjob_.*|aggregator_.*|ttl_.*|ttl_.*|taint_.*|serviceaccount_.*|replicaset_.*|csi_.*|auth.*|lasso_.*|apiextensions_.*|watch_cache_.*|field_.*|grpc_.*|job_.*|node_.*|endpoint_slice_.*|go_c.*|go_mem.*|go_s.*)
+    source_labels:
+    - __name__
+  - action: drop
+    regex: (storage_.*|pod_security_.*|plugin_.*)
+    source_labels:
+    - __name__
+  relabelConfigs:
+  - action: labelmap
+    regex: __meta_kubernetes_node_label_(.+)
+  - sourceLabels:
+    - __metrics_path__
+    targetLabel: metrics_path
+  - replacement: kubelet
+    targetLabel: job
+  - replacement: 1m
+    targetLabel: retention_period
+  scheme: https
+  scrapeTimeout: 5s
+  selector: {}
+  tlsConfig:
+    caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    insecureSkipVerify: true

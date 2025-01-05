@@ -1,0 +1,63 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMCluster
+metadata:
+  name: long-term
+  namespace: monitoring
+spec:
+  retentionPeriod: "12" # 12 months
+  replicationFactor: 1
+  paused: false
+  vmstorage:
+    replicaCount: 1
+    extraArgs:
+      storageDataPath: /storage
+      dedup.minScrapeInterval: 30s
+    serviceSpec:
+      useAsDefault: true
+      spec:
+        type: ClusterIP
+      metadata:
+        annotations:
+          service.cilium.io/global: "true"
+          service.cilium.io/global-sync-endpoint-slices: "true"
+    volumeMounts:
+    - name: vmstorage-volume
+      mountPath: /storage
+    volumes:
+    - name: vmstorage-volume
+      hostPath:
+        path: /mnt/vmstorage
+        type: DirectoryOrCreate
+  vmselect:
+    replicaCount: 1
+    image:
+      repository: victoriametrics/vmselect
+      tag: v1.108.1-cluster
+      pullPolicy: IfNotPresent
+    storage:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 2Gi
+    serviceSpec:
+      useAsDefault: true
+      spec:
+        type: ClusterIP
+      metadata:
+        annotations:
+          service.cilium.io/global: "true"
+          service.cilium.io/global-sync-endpoint-slices: "true"
+  vminsert:
+    replicaCount: 1
+    image:
+      repository: victoriametrics/vminsert
+      tag: v1.108.1-cluster
+      pullPolicy: IfNotPresent
+    serviceSpec:
+      useAsDefault: true
+      spec:
+        type: ClusterIP
+      metadata:
+        annotations:
+          service.cilium.io/global: "true"

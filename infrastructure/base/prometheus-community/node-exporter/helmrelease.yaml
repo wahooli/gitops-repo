@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-node-exporter
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: node-exporter
+spec:
+  releaseName: base-node-exporter
+  targetNamespace: kube-system
+  chart:
+    spec:
+      chart: prometheus-node-exporter
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      interval: 24h
+  install:
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: node-exporter-values
+    valuesKey: values-base.yaml

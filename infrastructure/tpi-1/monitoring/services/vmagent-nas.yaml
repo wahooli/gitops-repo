@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.cilium.io/global: "true"
+  name: vmagent-nas
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 8429
+    protocol: TCP
+    targetPort: 8429
+  type: ClusterIP

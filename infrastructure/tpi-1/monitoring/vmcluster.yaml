@@ -1,0 +1,164 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMCluster
+metadata:
+  name: short-term-tpi-1
+  namespace: monitoring
+spec:
+  retentionPeriod: 1d # for testing
+  # retentionPeriod: "6"
+  replicationFactor: 2
+  paused: false
+  requestsLoadBalancer:
+    enabled: true
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: Exists
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                  - short-term-tpi-1
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - vmclusterlb-vmauth-balancer
+              topologyKey: kubernetes.io/hostname
+            weight: 10
+      replicaCount: 3
+      serviceSpec:
+        useAsDefault: true
+        spec:
+          type: ClusterIP
+        metadata:
+          annotations:
+            service.cilium.io/global: "true"
+  vmstorage:
+    image:
+      repository: victoriametrics/vmstorage
+      tag: v1.108.1-cluster
+      pullPolicy: IfNotPresent
+    replicaCount: 3
+    extraArgs:
+      dedup.minScrapeInterval: 30s
+    serviceSpec:
+      useAsDefault: true
+      spec:
+        type: ClusterIP
+      metadata:
+        annotations:
+          service.cilium.io/global: "true"
+          service.cilium.io/global-sync-endpoint-slices: "true"
+    storage:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 35Gi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: DoesNotExist
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                - short-term-tpi-1
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - vmstorage
+            topologyKey: kubernetes.io/hostname
+          weight: 10
+    # resources:
+    #   limits:
+    #     cpu: "2"
+    #     memory: 2048Mi
+  vmselect:
+    image:
+      repository: victoriametrics/vmselect
+      tag: v1.108.1-cluster
+      pullPolicy: IfNotPresent
+    replicaCount: 3
+    extraArgs:
+      dedup.minScrapeInterval: 30s
+      storageNode: vmstorage-short-term-tpi-1-0.vmstorage-short-term-tpi-1.monitoring:8401,vmstorage-short-term-tpi-1-1.vmstorage-short-term-tpi-1.monitoring:8401,vmstorage-short-term-tpi-1-2.vmstorage-short-term-tpi-1.monitoring:8401,vmstorage-short-term-tpi-1-server-0.vmstorage-short-term-tpi-1-server.monitoring:8401,vmstorage-long-term-0.vmstorage-long-term.monitoring:8401,vmstorage-short-term-nas-0.vmstorage-short-term-nas.monitoring:8401
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          preference:
+            matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: DoesNotExist
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                - short-term-tpi-1
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - vmselect
+            topologyKey: kubernetes.io/hostname
+          weight: 10
+    storage:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 2Gi
+    # resources:
+    #   limits:
+    #     cpu: "1"
+    #     memory: "500Mi"
+  vminsert:
+    replicaCount: 2
+    image:
+      repository: victoriametrics/vminsert
+      tag: v1.108.1-cluster
+      pullPolicy: IfNotPresent
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: DoesNotExist
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                - short-term-tpi-1
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - vminsert
+            topologyKey: kubernetes.io/hostname
+          weight: 10

@@ -3,6 +3,7 @@ resources:
 - ../../../base/blocky
 - imagepolicy.yaml
 - certificate.yaml
+- vmpodscrape.yaml
 patches:
 - path: helmrelease.yaml
   target:

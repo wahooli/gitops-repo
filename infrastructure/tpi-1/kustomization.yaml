@@ -4,10 +4,14 @@ resources:
 - infrastructure-namespace.yaml
 - default-namespace.yaml
 - kube-system-namespace.yaml
+- prometheus-operator-crds
 - default-backend
 - gateway-api
 - node-local-dns
 - cert-manager
+- victoria-metrics-operator
+- node-exporter
+- kube-state-metrics
 - fluxcd-notifications.yaml
 - ingress-nginx
 - reloader

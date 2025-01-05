@@ -1,0 +1,46 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMNodeScrape
+metadata:
+  name: cadvisor
+  namespace: monitoring
+spec:
+  bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  honorLabels: true
+  honorTimestamps: false
+  interval: 30s
+  metricRelabelConfigs:
+  - action: labeldrop
+    regex: (beta_kubernetes_.*|kubernetes_io_.*)
+  - action: labeldrop
+    regex: (topology_topolvm_io_.*|openebs_io_.*)
+  - if: '{image=~".+rancher/mirrored-pause.+"}'
+    action: labeldrop
+  - action: labeldrop
+    regex: (node_role_.*)
+  - action: labeldrop
+    regex: (interface)
+  - action: labeldrop
+    regex: (device|boot_id|system_uuid|machine_id)
+  - action: labeldrop
+    regex: (uid)
+  - action: labeldrop
+    regex: (id|name)
+  - action: drop
+    regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
+    source_labels:
+    - __name__
+  path: /metrics/cadvisor
+  relabelConfigs:
+  - action: labelmap
+    regex: __meta_kubernetes_node_label_(.+)
+  - sourceLabels:
+    - __metrics_path__
+    targetLabel: metrics_path
+  - replacement: kubelet
+    targetLabel: job
+  scheme: https
+  scrapeTimeout: 5s
+  selector: {}
+  tlsConfig:
+    caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    insecureSkipVerify: true
