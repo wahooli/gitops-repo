@@ -2,9 +2,6 @@ controller:
   replicaCount: 1
   allowSnippetAnnotations: true  # authentik forward auth
   terminationGracePeriodSeconds: 15
-  podAnnotations:
-    linkerd.io/inject: enabled
-    config.linkerd.io/skip-inbound-ports: 80,443
   config:
     use-forwarded-headers: true
     # forwarded-for-header: "CF-Connecting-IP"
