@@ -1,0 +1,16 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: vlogs-short-term-tpi-1
+  namespace: logging
+spec:
+  endpoints:
+  - path: /metrics
+    port: http
+  namespaceSelector:
+    matchNames:
+    - logging
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: victoria-logs-short-term
+      app: server

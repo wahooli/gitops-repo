@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/victoria-metrics/victoria-logs-single.helmrelease.yaml
+- vmservicescrape.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-victoria-logs-single
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: victoria-logs-short-term-values
+  namespace: flux-system
+  files:
+  - values.yaml=values.yaml
+configurations:
+- ../../../.config/valuesFrom.yaml
