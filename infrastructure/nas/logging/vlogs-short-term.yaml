@@ -1,0 +1,23 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VLogs
+metadata:
+  name: short-term-nas
+  namespace: logging
+spec:
+  retentionPeriod: "100y" # overridden by extraArg retention.maxDiskSpaceUsageBytes
+  removePvcAfterDelete: true
+  extraArgs:
+    retention.maxDiskSpaceUsageBytes: 14848MiB
+  serviceSpec:
+    useAsDefault: true
+    spec:
+      type: ClusterIP
+    metadata:
+      annotations:
+        service.cilium.io/global: "true"
+  storage:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 15Gi

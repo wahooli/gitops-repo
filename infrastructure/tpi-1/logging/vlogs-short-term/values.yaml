@@ -1,0 +1,43 @@
+printNotes: false
+server:
+  fullnameOverride: vlogs-short-term-tpi-1
+  replicaCount: 2
+  retentionPeriod: 100y
+  statefulSet:
+    enabled: true
+  enabled: true
+  extraArgs:
+    retention.maxDiskSpaceUsageBytes: 14848MiB
+  image:
+    repository: victoriametrics/victoria-logs
+    tag: "v1.3.2-victorialogs"
+    pullPolicy: IfNotPresent
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/control-plane
+            operator: DoesNotExist
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+              - short-term-tpi-1
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - vmstorage
+          topologyKey: kubernetes.io/hostname
+        weight: 10
+  persistentVolume:
+    enabled: true
+    size: 15Gi
+  service:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/global-sync-endpoint-slices: "true"

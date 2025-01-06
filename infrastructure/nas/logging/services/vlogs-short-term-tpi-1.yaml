@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.cilium.io/global: "true"
+    service.cilium.io/global-sync-endpoint-slices: "true"
+  name: vlogs-short-term-tpi-1
+  namespace: logging
+spec:
+  clusterIP: None
+  ports:
+  - name: http
+    port: 9428
+    protocol: TCP
+  type: ClusterIP

@@ -1,0 +1,26 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VLogs
+metadata:
+  name: long-term-nas
+  namespace: logging
+spec:
+  retentionPeriod: "100y" # overridden by extraArg retention.maxDiskSpaceUsageBytes
+  removePvcAfterDelete: true
+  extraArgs:
+    retention.maxDiskSpaceUsageBytes: 100GiB
+    storageDataPath: /storage
+  serviceSpec:
+    useAsDefault: true
+    spec:
+      type: ClusterIP
+    metadata:
+      annotations:
+        service.cilium.io/global: "true"
+  volumeMounts:
+  - name: vlogsstorage-volume
+    mountPath: /storage
+  volumes:
+  - name: vlogsstorage-volume
+    hostPath:
+      path: "${long_term_logs_cluster_directory_path}"
+      type: "${long_term_logs_cluster_directory_type:=Directory}"
