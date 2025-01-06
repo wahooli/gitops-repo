@@ -18,6 +18,10 @@ extraSecretMounts:
   mountPath: /etc/secrets/auth_generic_oauth
   readOnly: true
 grafana.ini:
+  log:
+    mode: console
+  log.console:
+    format: json
   server:
     domain: grafana.wahoo.li
     root_url: "https://grafana.wahoo.li/"

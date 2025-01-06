@@ -272,9 +272,9 @@ ports:
 # optional: logging configuration
 log:
   # optional: Log level (one from debug, info, warn, error). Default: info
-  level: warn
+  level: info
   # optional: Log format (text or json). Default: text
-  format: text
+  format: json
   # optional: log timestamps. Default: true
   timestamp: true
   # optional: obfuscate log output (replace all alphanumeric characters with *) for user sensitive data like request domains or responses to increase privacy. Default: false
