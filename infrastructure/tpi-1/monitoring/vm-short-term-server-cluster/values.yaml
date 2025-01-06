@@ -6,8 +6,8 @@ fullnameOverride: victoria-metrics-server-short-term
 vmstorage:
   fullnameOverride: vmstorage-short-term-tpi-1-server
   replicaCount: 1
-  # retentionPeriod: 1 # one month
-  retentionPeriod: 1d
+  retentionPeriod: "1" # one month
+  replicationFactor: 1
   tolerations:
   - key: node-role.kubernetes.io/control-plane
     operator: "Exists"

@@ -4,8 +4,7 @@ metadata:
   name: short-term-tpi-1
   namespace: monitoring
 spec:
-  retentionPeriod: 1d # for testing
-  # retentionPeriod: "6"
+  retentionPeriod: "6" # 6 months
   replicationFactor: 2
   paused: false
   requestsLoadBalancer:
