@@ -1,0 +1,170 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- namespace.yaml
+- ../grafana
+- vmservicescrape.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: grafana-values
+  namespace: flux-system
+  files:
+  - values.yaml=values.yaml
+- name: victoria-metrics-datasource
+  namespace: grafana
+  files:
+  - datasource.yaml=datasources.yaml
+  options:
+    labels:
+      grafana_datasource: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: kube-dns-dashboard
+  namespace: grafana
+  files:
+  - kube-dns-dashboard.json=dashboards/kubernetes/coredns.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+- name: node-exporter-dashboard
+  namespace: grafana
+  files:
+  - node-exporter.json=dashboards/node-exporter.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: kubelet-dashboard
+  namespace: grafana
+  files:
+  - kubelet-dashboard.json=dashboards/kubernetes/kubelet.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: fluxcd-control-plane-dashboard
+  namespace: grafana
+  files:
+  - fluxcd-control-plane.json=dashboards/fluxcd/control-plane.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: fluxcd-cluster-dashboard
+  namespace: grafana
+  files:
+  - fluxcd-cluster.json=dashboards/fluxcd/cluster.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: fluxcd-logs-dashboard
+  namespace: grafana
+  files:
+  - fluxcd-logs.json=dashboards/fluxcd/logs.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: victoria-metrics-operator-dashboard
+  namespace: grafana
+  files:
+  - victoria-metrics-operator.json=dashboards/victoria-metrics/operator.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: victoria-metrics-vmagent-dashboard
+  namespace: grafana
+  files:
+  - victoria-metrics-vmagent.json=dashboards/victoria-metrics/vmagent.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: victoria-metrics-vmalert-dashboard
+  namespace: grafana
+  files:
+  - victoria-metrics-vmalert.json=dashboards/victoria-metrics/vmalert.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: kubernetes-views-global-dashboard
+  namespace: grafana
+  files:
+  - kubernetes-views-global.json=dashboards/kubernetes-views/global.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: kubernetes-views-nodes-dashboard
+  namespace: grafana
+  files:
+  - kubernetes-views-nodes.json=dashboards/kubernetes-views/nodes.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: kubernetes-views-pods-dashboard
+  namespace: grafana
+  files:
+  - kubernetes-views-pods.json=dashboards/kubernetes-views/pods.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: kubernetes-views-namespaces-dashboard
+  namespace: grafana
+  files:
+  - kubernetes-views-namespaces.json=dashboards/kubernetes-views/namespaces.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: authentik-dashboard
+  namespace: grafana
+  files:
+  - authentik.json=dashboards/authentik.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: vector-dashboard
+  namespace: grafana
+  files:
+  - vector.json=dashboards/vector.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: victoria-logs-dashboard
+  namespace: grafana
+  files:
+  - victorialogs.json=dashboards/victoria-logs.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+configurations:
+- ../../.config/valuesFrom.yaml

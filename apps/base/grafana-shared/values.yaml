@@ -1,0 +1,51 @@
+sidecar:
+  datasources:
+    enabled: true
+    initDatasources: true
+    label: grafana_datasource
+  dashboards:
+    provider:
+      name: default
+      orgid: 1
+    folder: /var/lib/grafana/dashboards
+    defaultFolderName: default
+    enabled: true
+    multicluster: false
+extraSecretMounts:
+- name: auth-generic-oauth-secret-mount
+  secretName: grafana-oauth-data
+  defaultMode: 0440
+  mountPath: /etc/secrets/auth_generic_oauth
+  readOnly: true
+grafana.ini:
+  server:
+    domain: grafana.wahoo.li
+    root_url: "https://grafana.wahoo.li/"
+    serve_from_sub_path: false
+  users:
+    auto_assign_org: true
+    auto_assign_org_id: 1
+    default_theme: dark
+  auth:
+    disable_login_form: true
+    signout_redirect_url: "https://auth.wahoo.li/application/o/grafana/end-session/"
+    oauth_auto_login: true
+  auth.generic_oauth:
+    name: authentik
+    enabled: true
+    auto_login: true
+    client_id: $__file{/etc/secrets/auth_generic_oauth/client_id}
+    client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
+    scopes: "openid profile email"
+    auth_url: "https://auth.wahoo.li/application/o/authorize/"
+    token_url: "https://auth.wahoo.li/application/o/token/"
+    api_url: "https://auth.wahoo.li/application/o/userinfo/"
+    # Optionally map user groups to Grafana roles
+    role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
+  plugins:
+    allow_loading_unsigned_plugins: victoriametrics-datasource,victoriametrics-logs-datasource
+  panels:
+    disable_sanitize_html: true
+plugins:
+- https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.10.3/victoriametrics-datasource-v0.10.3.zip;victoriametrics-datasource
+- https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/v0.13.1/victoriametrics-logs-datasource-v0.13.1.zip;victoriametrics-logs-datasource

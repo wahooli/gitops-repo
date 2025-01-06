@@ -29,6 +29,9 @@ authentik:
 #   - name: AUTHENTIK_BOOTSTRAP_PASSWORD
 #     value: password
 server:
+  podLabels:
+    scrape-job-name: authentik
+    app: authentik-server
   ingress:
     enabled: true
     ingressClassName: nginx

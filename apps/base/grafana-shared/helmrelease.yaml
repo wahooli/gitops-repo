@@ -1,0 +1,16 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: grafana--grafana
+  namespace: flux-system
+spec:
+  releaseName: grafana
+  interval: 5m
+  targetNamespace: grafana
+  chart:
+    spec:
+      version: "8.8.2"
+  valuesFrom:
+  - kind: ConfigMap
+    name: grafana-values
+    valuesKey: values.yaml
