@@ -3,6 +3,10 @@ kind: Kustomization
 resources:
 - infrastructure-namespace.yaml
 - default-namespace.yaml
+- prometheus-operator-crds
+- cert-manager
+- victoria-metrics-operator
+- node-exporter
 - multus
 - node-local-dns
 - reflector

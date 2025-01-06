@@ -1,0 +1,16 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: victoria-metrics--victoria-metrics-operator
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
+  - name: prometheus-operator--prometheus-operator-crds
+    namespace: flux-system
+  releaseName: victoria-metrics-operator
+  interval: 10m
+  chart:
+    spec:
+      version: "0.40.2"
