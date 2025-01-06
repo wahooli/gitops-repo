@@ -1,4 +1,8 @@
 controller:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "3"
   replicaCount: 1
   allowSnippetAnnotations: true  # authentik forward auth
   terminationGracePeriodSeconds: 15

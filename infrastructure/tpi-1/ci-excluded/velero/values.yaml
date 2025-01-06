@@ -113,9 +113,19 @@ schedules:
       - topolvm-system
       - velero
 
+nodeAgent:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "4"
+dnsConfig:
+  options:
+  - name: ndots
+    value: "4"
 configuration:
   defaultBackupStorageLocation: minio
   defaultBackupTTL: 72h
+  logFormat: json
   backupStorageLocation:
   - name: seaweedfs
     provider: aws

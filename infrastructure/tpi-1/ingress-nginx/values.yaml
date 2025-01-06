@@ -1,4 +1,8 @@
 controller:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "3"
   extraArgs:
     default-backend-service: infrastructure/default-backend
   replicaCount: 1

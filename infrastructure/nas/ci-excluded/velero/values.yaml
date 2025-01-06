@@ -88,8 +88,17 @@ schedules:
       - topolvm-system
       - velero
 
-
+nodeAgent:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "4"
+dnsConfig:
+  options:
+  - name: ndots
+    value: "4"
 configuration:
+  logFormat: json
   defaultBackupStorageLocation: seaweedfs-backups
   defaultBackupTTL: 72h
   backupStorageLocation:

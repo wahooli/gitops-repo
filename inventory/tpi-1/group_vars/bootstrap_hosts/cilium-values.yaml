@@ -31,6 +31,7 @@ cilium_helm_values:
   #  hostNetwork:
   #    enabled: true
   clustermesh:
+    enableEndpointSliceSynchronization: true
     apiserver:
       tolerations:
       - key: node.kubernetes.io/not-ready
