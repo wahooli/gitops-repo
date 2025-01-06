@@ -17,3 +17,7 @@ spec:
   - kind: ConfigMap
     name: victoria-metrics-server-short-term-values
     valuesKey: values.yaml
+  - kind: ConfigMap
+    name: victoria-metrics-cluster-values-overrides
+    optional: true
+    valuesKey: values.yaml

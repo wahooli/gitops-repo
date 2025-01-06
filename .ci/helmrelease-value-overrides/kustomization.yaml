@@ -7,3 +7,4 @@ resources:
 - linkerd-multicluster.yaml
 - nas-jellyfin.yaml
 - nas-transmission.yaml
+- victoria-metrics-cluster.yaml
