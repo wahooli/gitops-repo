@@ -43,8 +43,6 @@ service:
   main:
     annotations:
       service.cilium.io/global: "true"
-    labels:
-      mirror.linkerd.io/exported: "true"
 
 ingress:
   main:

@@ -3,8 +3,12 @@ kind: Kustomization
 resources:
 - default-namespace.yaml
 - infrastructure-namespace.yaml
+- prometheus-operator-crds
 - gateway-api
 - cert-manager
+- victoria-metrics-operator
+- node-exporter
+- kube-state-metrics
 - ingress-nginx
 - reflector
 - reloader

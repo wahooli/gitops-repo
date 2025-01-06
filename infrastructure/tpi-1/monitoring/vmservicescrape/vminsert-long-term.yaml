@@ -1,0 +1,17 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: vminsert-short-term-tpi-1-server
+  namespace: monitoring
+spec:
+  endpoints:
+  - attach_metadata: {}
+    path: /metrics
+    port: http
+  namespaceSelector:
+    matchNames:
+    - monitoring
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: victoria-metrics-server-short-term
+      app: vminsert

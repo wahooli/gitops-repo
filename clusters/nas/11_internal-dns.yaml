@@ -9,6 +9,7 @@ spec:
   dependsOn:
   - name: infrastructure
   - name: infrastructure-depends
+  - name: monitoring
   sourceRef:
     kind: GitRepository
     name: flux-system

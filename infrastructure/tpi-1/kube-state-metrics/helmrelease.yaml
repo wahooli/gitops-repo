@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-system--kube-state-metrics
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: prometheus-operator--prometheus-operator-crds
+    namespace: flux-system
+  releaseName: kube-state-metrics
+  interval: 10m
+  chart:
+    spec:
+      version: "5.28.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: kube-state-metrics-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: kube-state-metrics-values
+    valuesKey: values.yaml

@@ -15,6 +15,14 @@ spec:
     kind: Kustomization
     name: multus
     namespace: flux-system
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: cert-manager
+    namespace: cert-manager
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: victoria-metrics-operator
+    namespace: victoria-metrics
   postBuild:
     substituteFrom:
     - kind: Secret

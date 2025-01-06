@@ -1,3 +1,0 @@
-gateway:
-  serviceAnnotations:
-    lbipam.cilium.io/ips: ${linkerd_gateway_ip}

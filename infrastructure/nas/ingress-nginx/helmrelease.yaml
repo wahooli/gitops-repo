@@ -4,9 +4,6 @@ metadata:
   name: ingress-nginx--ingress-nginx
   namespace: flux-system
 spec:
-  dependsOn:
-  - name: linkerd--linkerd-control-plane
-    namespace: flux-system
   releaseName: ingress-nginx
   interval: 10m
   chart:

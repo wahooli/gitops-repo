@@ -33,3 +33,5 @@ stringData:
   ingress_service_type: None
   internal_gw_lb_ip: "192.168.0.252"
   external_dns_encryption_key: "iRu5k_H-jr7-oTgcWRlxrVNnIS9YA0w0"
+  long_term_metrics_cluster_directory_path: /mnt/vmstorage
+  long_term_metrics_cluster_directory_type: DirectoryOrCreate

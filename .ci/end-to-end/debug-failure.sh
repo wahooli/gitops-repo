@@ -2,8 +2,12 @@
 HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 DEBUG_LOGS="${DEBUG_LOGS:-false}"
-DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default internal-dns}"
-DESCRIBE_PODS_NAMESPACES="${DESCRIBE_PODS_NAMESPACES:-default}"
+DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns}"
+DESCRIBE_PODS_NAMESPACES="${DESCRIBE_PODS_NAMESPACES:-default cert-manager monitoring}"
+
+echo "::group::Describe all cluster nodes"
+kubectl describe nodes -A
+echo "::endgroup::"
 
 echo "::group::flux-system GitRepository definition"
 kubectl get gitrepository -n flux-system flux-system -o yaml
@@ -33,7 +37,7 @@ echo "::group::Pods in all namespaces"
 kubectl get pods --all-namespaces
 echo "::endgroup::"
 
-for namespace in "${DESCRIBE_PODS_NAMESPACES}"; do
+for namespace in ${DESCRIBE_PODS_NAMESPACES}; do
     echo "::group::Describe pods in ${namespace} namespace"
     kubectl describe pods -n ${namespace}
     echo "::endgroup::"

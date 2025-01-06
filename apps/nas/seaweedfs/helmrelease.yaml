@@ -25,9 +25,6 @@ spec:
           labelSelector: "app.kubernetes.io/component=filer"
         patch: |
           - op: add
-            path: /metadata/labels/mirror.linkerd.io~1exported
-            value: "true"
-          - op: add
             path: /metadata/annotations/service.cilium.io~1global
             value: "true"
       - target:
@@ -35,18 +32,12 @@ spec:
           labelSelector: "app.kubernetes.io/component=s3"
         patch: |
           - op: add
-            path: /metadata/labels/mirror.linkerd.io~1exported
-            value: "true"
-          - op: add
             path: /metadata/annotations/service.cilium.io~1global
             value: "true"
       - target:
           kind: Service
           labelSelector: "app.kubernetes.io/component=master"
         patch: |
-          - op: add
-            path: /metadata/labels/mirror.linkerd.io~1exported
-            value: "true"
           - op: add
             path: /metadata/annotations/service.cilium.io~1global
             value: "true"

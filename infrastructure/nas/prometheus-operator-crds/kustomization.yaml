@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/prometheus-community/prometheus-operator-crds
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-prometheus-operator-crds
+  options:
+    allowNameChange: true
+- target:
+    kind: Namespace
+    name: prometheus-operator
+  patch: |-
+    - op: add
+      path: /metadata/labels/topolvm.io~1webhook
+      value: "ignore"
+configurations:
+- ../../.config/valuesFrom.yaml

@@ -3,3 +3,10 @@ kind: Kustomization
 resources:
 - gotk-components.yaml
 - gotk-sync.yaml
+patches:
+- patch: |
+    - op: add
+      path: /spec/template/metadata/labels/scrape-job-name
+      value: fluxcd
+  target:
+    kind: Deployment

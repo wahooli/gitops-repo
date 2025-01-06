@@ -1,0 +1,13 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: topolvm
+  namespace: topolvm-system
+spec:
+  jobLabel: app.kubernetes.io/instance
+  namespaceSelector:
+    matchNames:
+    - topolvm-system
+  podMetricsEndpoints:
+  - port: metrics
+    scheme: http

@@ -1,0 +1,45 @@
+vmauth:
+  enabled: false
+vmselect:
+  enabled: false
+fullnameOverride: victoria-metrics-server-short-term
+vmstorage:
+  fullnameOverride: vmstorage-short-term-tpi-1-server
+  replicaCount: 1
+  retentionPeriod: "1" # one month
+  replicationFactor: 1
+  tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: "Exists"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+  service:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/global-sync-endpoint-slices: "true"
+  extraArgs:
+    dedup.minScrapeInterval: 30s
+  persistentVolume:
+    enabled: true
+    size: 6Gi
+vminsert:
+  replicaCount: 1
+  fullnameOverride: vminsert-short-term-tpi-1-server
+  service:
+    annotations:
+      service.cilium.io/global: "true"
+  tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: "Exists"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists

@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-victoria-logs-single
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: victoria-logs-single
+spec:
+  releaseName: base-victoria-logs-single
+  targetNamespace: victoria-metrics
+  chart:
+    spec:
+      chart: victoria-logs-single
+      sourceRef:
+        kind: HelmRepository
+        name: victoria-metrics
+        namespace: flux-system
+      interval: 24h
+  install:
+    remediation:
+      retries: -1
