@@ -1,4 +1,4 @@
-# logFormat: json
+logFormat: json
 domainFilters:
 - wahoo.li
 - absolutist.it

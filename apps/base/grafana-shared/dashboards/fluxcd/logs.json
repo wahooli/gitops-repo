@@ -1,0 +1,344 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_VICTORIALOGS",
+      "label": "VictoriaLogs",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "victoriametrics-logs-datasource",
+      "pluginName": "VictoriaLogs"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "red",
+        "name": "flux events",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [
+            "flux"
+          ],
+          "type": "tags"
+        }
+      }
+    ]
+  },
+  "description": "Flux logs collected from Kubernetes, stored in Loki",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 16,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "${DS_VICTORIALOGS}",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": "${DS_VICTORIALOGS}",
+          "editorMode": "code",
+          "expr": "* | clustername: $clustername | kubernetes.pod_namespace: $namespace | kubernetes.pod_labels.app: $controller | log.level: $level | stats count() | sum()\n",
+          "instant": false,
+          "legendFormat": "Log count",
+          "queryType": "statsRange",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${DS_VICTORIALOGS}",
+      "description": "Logs from services running in Kubernetes",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 25,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 2,
+      "options": {
+        "dedupStrategy": "numbers",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": "${DS_VICTORIALOGS}",
+          "editorMode": "code",
+          "expr": "* | clustername: $clustername | kubernetes.pod_namespace: $namespace | kubernetes.pod_labels.app: $controller | log.level: $level | $query | format \"[<kubernetes.pod_labels.app>] <_msg>\" as _msg skip_empty_results",
+          "legendFormat": "",
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "logs"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 40,
+  "tags": [
+    "flux"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "*",
+          "value": "*"
+        },
+        "description": "String to search for",
+        "label": "Search Query",
+        "name": "query",
+        "options": [
+          {
+            "selected": true,
+            "text": "*",
+            "value": "*"
+          }
+        ],
+        "query": "*",
+        "type": "textbox"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "includeAll": true,
+        "name": "level",
+        "options": [
+          {
+            "selected": false,
+            "text": "info",
+            "value": "info"
+          },
+          {
+            "selected": false,
+            "text": "error",
+            "value": "error"
+          }
+        ],
+        "query": "info,error",
+        "type": "custom"
+      },
+      {
+        "allValue": "*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "${DS_VICTORIALOGS}",
+        "definition": "clustername: $clustername | kubernetes.pod_namespace: $namespace",
+        "includeAll": true,
+        "name": "controller",
+        "options": [],
+        "query": {
+          "field": "kubernetes.pod_labels.app",
+          "limit": 50,
+          "query": "clustername: $clustername | kubernetes.pod_namespace: $namespace",
+          "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
+          "type": "fieldValue"
+        },
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "datasource": "${DS_VICTORIALOGS}",
+        "definition": "",
+        "includeAll": true,
+        "label": "Cluster",
+        "name": "clustername",
+        "options": [],
+        "query": {
+          "field": "clustername",
+          "limit": 10,
+          "query": "",
+          "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "datasource": "${DS_VICTORIALOGS}",
+        "definition": "clustername: $clustername | kubernetes.pod_labels.scrape-job-name: fluxcd",
+        "includeAll": false,
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "field": "kubernetes.pod_namespace",
+          "limit": 50,
+          "query": "clustername: $clustername | kubernetes.pod_labels.scrape-job-name: fluxcd",
+          "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "*",
+        "current": {},
+        "datasource": "${DS_VICTORIALOGS}",
+        "definition": "clustername: $clustername | kubernetes.pod_namespace: $namespace | kubernetes.pod_labels.app: $controller",
+        "includeAll": true,
+        "name": "stream",
+        "options": [],
+        "query": {
+          "field": "stream",
+          "limit": 50,
+          "query": "clustername: $clustername | kubernetes.pod_namespace: $namespace | kubernetes.pod_labels.app: $controller",
+          "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
+          "type": "fieldValue"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {},
+        "includeAll": false,
+        "label": "Datasource",
+        "name": "DS_VICTORIALOGS",
+        "options": [],
+        "query": "victoriametrics-logs-datasource",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "baseFilters": [],
+        "datasource": "${DS_VICTORIALOGS}",
+        "filters": [],
+        "name": "Filters",
+        "type": "adhoc"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Europe/Helsinki",
+  "title": "Flux Logs",
+  "uid": "flux-logs",
+  "version": 1,
+  "weekStart": "monday"
+}

@@ -1,5 +1,6 @@
 reloader:
   ignoreNamespaces: "flux-system,cilium-secrets,kube-system,kube-node-lease,kube-public,kube-system,openebs,velero,reflector"
+  logFormat: json
 resources:
   limits:
     cpu: 150m

@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: logging--victoria-logs-short-term
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: victoria-metrics--victoria-metrics-operator
+    namespace: flux-system
+  releaseName: victoria-logs-short-term
+  targetNamespace: logging
+  interval: 10m
+  chart:
+    spec:
+      version: "0.8.11"
+  valuesFrom:
+  - kind: ConfigMap
+    name: victoria-logs-short-term-values
+    valuesKey: values.yaml

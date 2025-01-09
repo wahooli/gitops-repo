@@ -1,0 +1,37 @@
+apiVersion: 1
+datasources:
+- name: VictoriaMetrics-prometheus
+  type: prometheus
+  url: http://vmauth-read-proxy.monitoring.svc.cluster.local.:8427/select/0/prometheus/
+  access: proxy
+  isDefault: true
+  jsonData: {}
+- name: VictoriaMetrics - read-proxy
+  type: victoriametrics-datasource
+  url: http://vmauth-read-proxy.monitoring.svc.cluster.local.:8427/select/0/prometheus/
+  access: proxy
+  isDefault: false
+- name: VictoriaLogs - distributed
+  # <string, required> Sets the data source type.
+  type: victoriametrics-logs-datasource
+  # <string, required> Sets the access mode, either
+  # proxy or direct (Server or Browser in the UI).
+  access: proxy
+  # <string> Sets URL for sending queries to VictoriaLogs server.
+  # see https://docs.victoriametrics.com/victorialogs/querying/
+  url: http://vmauth-read-proxy.logging.svc.cluster.local.:9428
+  # <string> Sets the pre-selected datasource for new panels.
+  # You can set only one default data source per organization.
+  isDefault: false
+- name: VictoriaLogs - long term
+  # <string, required> Sets the data source type.
+  type: victoriametrics-logs-datasource
+  # <string, required> Sets the access mode, either
+  # proxy or direct (Server or Browser in the UI).
+  access: proxy
+  # <string> Sets URL for sending queries to VictoriaLogs server.
+  # see https://docs.victoriametrics.com/victorialogs/querying/
+  url: http://vlogs-long-term-nas.logging.svc.cluster.local.:9428
+  # <string> Sets the pre-selected datasource for new panels.
+  # You can set only one default data source per organization.
+  isDefault: false

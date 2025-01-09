@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - cloudflare-tunnel-namespace.yaml
+- grafana-namespace.yaml
 - cluster-infrastructure-vars.yaml
 - cluster-app-vars.yaml
 - mail-relay-secret.yaml
@@ -23,4 +24,5 @@ resources:
 - helmrelease-value-overrides
 - dns-vars.yaml
 - wahooli-credentials.yaml
+- grafana-oauth-data.yaml
 - cluster-vars.yaml

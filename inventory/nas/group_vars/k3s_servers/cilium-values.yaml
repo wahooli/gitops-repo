@@ -28,6 +28,7 @@ cilium_helm_values:
   #  hostNetwork:
   #    enabled: true
   clustermesh:
+    enableEndpointSliceSynchronization: true
     apiserver:
       tolerations:
       - key: node-role.kubernetes.io/control-plane

@@ -1,0 +1,77 @@
+data_dir: /vector-data-dir
+api:
+  enabled: false
+  address: 0.0.0.0:8686
+  playground: true
+sources:
+  k8s:
+    type: kubernetes_logs
+  internal_metrics:
+    type: internal_metrics
+transforms:
+  parser:
+    type: remap
+    inputs: [k8s]
+    source: |
+      .clustername = "nas"
+      .log = parse_json(.message) ?? .message
+      del(.message)
+      # try parsing timestamp out from logline
+      if exists(.log.ts) {
+        .timestamp = .log.ts
+      }
+      if exists(.kubernetes.pod_labels."app.kubernetes.io/name") && contains(string!(.kubernetes.pod_labels."app.kubernetes.io/name"), "authentik") {
+        .log.msg = .log.event
+      }
+      if exists(.kubernetes.pod_labels."checksum/configMaps") {
+        del(.kubernetes.pod_labels."checksum/configMaps")
+      }
+      if exists(.pod_labels."controller-revision-hash") {
+        del(.pod_labels."controller-revision-hash")
+      }
+      if exists(.pod_labels."pod-template-hash") {
+        del(.pod_labels."pod-template-hash")
+      }
+      del(.kubernetes.pod_uid)
+      del(.kubernetes.pod_ips)
+      del(.kubernetes.node_labels)
+      del(.kubernetes.container_image_id)
+      del(.kubernetes.namespace_labels)
+  backslash_multiline:
+    type: reduce
+    inputs: [k8s]
+    group_by: [file, stream]
+    merge_strategies:
+      message: concat_newline
+    ends_when: |
+      matched, err = match(.message, r'[^\\]$');
+      if err != null {
+        false;
+      } else {
+        matched;
+      }
+sinks:
+  exporter:
+    type: prometheus_exporter
+    address: 0.0.0.0:9090
+    inputs: [internal_metrics]
+  vlogs:
+    type: elasticsearch
+    inputs: [parser]
+    endpoints:
+    - http://vlogs-short-term-nas.logging.svc.cluster.local.:9428/insert/elasticsearch
+    - http://vlogs-short-term-tpi-1-0.vlogs-short-term-tpi-1.logging.svc.cluster.local.:9428/insert/elasticsearch
+    - http://vlogs-short-term-tpi-1-1.vlogs-short-term-tpi-1.logging.svc.cluster.local.:9428/insert/elasticsearch
+    - http://vlogs-long-term-nas.logging.svc.cluster.local.:9428/insert/elasticsearch
+    mode: bulk
+    api_version: v8
+    compression: gzip
+    healthcheck:
+      enabled: false
+    request:
+      headers:
+        VL-Time-Field: timestamp
+        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
+        VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
+        AccountID: "0"
+        ProjectID: "0"

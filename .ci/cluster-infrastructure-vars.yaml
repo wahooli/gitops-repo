@@ -35,3 +35,5 @@ stringData:
   external_dns_encryption_key: "iRu5k_H-jr7-oTgcWRlxrVNnIS9YA0w0"
   long_term_metrics_cluster_directory_path: /mnt/vmstorage
   long_term_metrics_cluster_directory_type: DirectoryOrCreate
+  long_term_logs_cluster_directory_path: /mnt/vlogs
+  long_term_logs_cluster_directory_type: DirectoryOrCreate
