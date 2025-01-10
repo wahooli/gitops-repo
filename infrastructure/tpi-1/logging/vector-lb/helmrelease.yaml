@@ -1,13 +1,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: logging--vector
+  name: logging--vector-lb
   namespace: flux-system
 spec:
   dependsOn:
   - name: victoria-metrics--victoria-metrics-operator
     namespace: flux-system
-  releaseName: vector
+  releaseName: vector-lb
   targetNamespace: logging
   interval: 10m
   chart:
@@ -22,4 +22,4 @@ spec:
     valuesKey: values.yaml
   values:
     existingConfigMaps:
-    - vector-config
+    - vector-lb-config

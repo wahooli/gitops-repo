@@ -3,12 +3,11 @@ kind: Service
 metadata:
   annotations:
     service.cilium.io/global: "true"
-  name: vlogs-long-term-nas
+  name: vector-lb-tpi
   namespace: logging
 spec:
   ports:
-  - name: http
-    port: 9428
+  - name: vector
+    port: 6000
     protocol: TCP
-    targetPort: 9428
   type: ClusterIP

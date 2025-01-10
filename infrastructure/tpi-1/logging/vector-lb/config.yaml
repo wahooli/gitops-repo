@@ -1,0 +1,51 @@
+data_dir: /vector-data-dir
+api:
+  enabled: false
+  address: 0.0.0.0:8686
+  playground: true
+sources:
+  vector:
+    address: 0.0.0.0:6000
+    type: vector
+    version: "2"
+  internal_metrics:
+    type: internal_metrics
+sinks:
+  exporter:
+    type: prometheus_exporter
+    address: 0.0.0.0:9090
+    inputs: [internal_metrics]
+  vlogs1:
+    type: elasticsearch
+    inputs: [vector]
+    endpoints:
+    - http://vlogs-short-term-tpi-1-0.vlogs-short-term-tpi-1.logging.svc.cluster.local.:9428/insert/elasticsearch
+    mode: bulk
+    api_version: v8
+    compression: gzip
+    healthcheck:
+      enabled: false
+    request:
+      headers:
+        VL-Time-Field: timestamp
+        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
+        VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
+        AccountID: "0"
+        ProjectID: "0"
+  vlogs2:
+    type: elasticsearch
+    inputs: [vector]
+    endpoints:
+    - http://vlogs-short-term-tpi-1-0.vlogs-short-term-tpi-1.logging.svc.cluster.local.:9428/insert/elasticsearch
+    mode: bulk
+    api_version: v8
+    compression: gzip
+    healthcheck:
+      enabled: false
+    request:
+      headers:
+        VL-Time-Field: timestamp
+        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
+        VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
+        AccountID: "0"
+        ProjectID: "0"
