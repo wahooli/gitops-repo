@@ -4,6 +4,8 @@ metadata:
   name: nas
   namespace: monitoring
 spec:
+  extraArgs:
+    loggerFormat: json
   externalLabels:
     clustername: nas
   selectAllByDefault: true

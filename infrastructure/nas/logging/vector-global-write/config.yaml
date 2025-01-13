@@ -41,11 +41,11 @@ sinks:
     address: http://vector-lb-tpi.logging.svc.cluster.local.:6000
     compression: true
     healthcheck:
-      enabled: true
+      enabled: ${vector_healthcheck:=true}
   nas:
     type: vector
     inputs: [datadog_agent, fluent, logstash, splunk_hec, statsd, syslog, vector]
     address: http://vector-lb-nas.logging.svc.cluster.local.:6000
     compression: true
     healthcheck:
-      enabled: true
+      enabled: ${vector_healthcheck:=true}

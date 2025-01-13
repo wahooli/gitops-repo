@@ -2,8 +2,8 @@
 HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 DEBUG_LOGS="${DEBUG_LOGS:-false}"
-DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns}"
-DESCRIBE_PODS_NAMESPACES="${DESCRIBE_PODS_NAMESPACES:-default cert-manager monitoring}"
+DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns logging}"
+DESCRIBE_PODS_NAMESPACES="${DESCRIBE_PODS_NAMESPACES:-default cert-manager monitoring logging}"
 
 echo "::group::Describe all cluster nodes"
 kubectl describe nodes -A

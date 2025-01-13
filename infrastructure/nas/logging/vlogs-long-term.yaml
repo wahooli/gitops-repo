@@ -9,6 +9,7 @@ spec:
   extraArgs:
     retention.maxDiskSpaceUsageBytes: 100GiB
     storageDataPath: /storage
+    loggerFormat: json
   serviceSpec:
     useAsDefault: true
     spec:

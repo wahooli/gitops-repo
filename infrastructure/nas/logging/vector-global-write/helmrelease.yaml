@@ -22,6 +22,10 @@ spec:
   - kind: ConfigMap
     name: vector-global-write-values
     valuesKey: values.yaml
+  - kind: ConfigMap
+    name: vector-global-write-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml
   values:
     existingConfigMaps:
     - vector-global-write-config

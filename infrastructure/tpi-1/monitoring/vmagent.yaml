@@ -4,6 +4,8 @@ metadata:
   name: tpi-1
   namespace: monitoring
 spec:
+  extraArgs:
+    loggerFormat: json
   externalLabels:
     clustername: tpi-1
   selectAllByDefault: true

@@ -28,15 +28,15 @@ sinks:
     request:
       headers:
         VL-Time-Field: timestamp
-        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
-        VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
+        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace,unit
+        VL-Msg-Field: message,msg,_msg
         AccountID: "0"
         ProjectID: "0"
   vlogs2:
     type: elasticsearch
     inputs: [vector]
     endpoints:
-    - http://vlogs-short-term-tpi-1-0.vlogs-short-term-tpi-1.logging.svc.cluster.local.:9428/insert/elasticsearch
+    - http://vlogs-short-term-tpi-1-1.vlogs-short-term-tpi-1.logging.svc.cluster.local.:9428/insert/elasticsearch
     mode: bulk
     api_version: v8
     compression: gzip
@@ -45,7 +45,7 @@ sinks:
     request:
       headers:
         VL-Time-Field: timestamp
-        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace
-        VL-Msg-Field: message,msg,_msg,log.msg,log.message,log
+        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace,unit
+        VL-Msg-Field: message,msg,_msg
         AccountID: "0"
         ProjectID: "0"
