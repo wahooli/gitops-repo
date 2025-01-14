@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-blocky
+  namespace: flux-system
+spec:
+  values:
+    persistence:
+      config:
+        spec:
+          configMap:
+            name: blocky-config
+  valuesFrom:
+  - kind: ConfigMap
+    name: blocky-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: blocky-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: blocky-values
+    optional: true
+    valuesKey: values.yaml

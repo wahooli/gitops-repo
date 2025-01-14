@@ -33,16 +33,16 @@ transforms:
       .clustername = "tpi-1"
       if is_object(.kubernetes) && .kubernetes != null {
         .kubernetes = map_keys(object!(.kubernetes), recursive: true) -> |key| {
-          replace(replace(key, ".", "_"), "/", "-")
+          replace(replace(replace(key, ".", "_"), "/", "_"), "-", "_")
         }
         if exists(.kubernetes.pod_labels) && is_object(.kubernetes.pod_labels) {
           .kubernetes.pod_labels = filter(object!(.kubernetes.pod_labels)) -> |key, _| {
             key = downcase(key)
-            key != "checksum-configmaps" &&
-            key != "controller-revision-hash" &&
+            key != "checksum_configmaps" &&
+            key != "controller_revision_hash" &&
             key != "backupdaily" &&
             key != "backupweekly" &&
-            key != "pod-template-hash"
+            key != "pod_template_hash"
           }
         }
         .kubernetes = filter(.kubernetes) -> |key, _| {
@@ -58,12 +58,12 @@ transforms:
       structured, err = parse_json(.message)
       # message is json
       if err != null {
-        if .kubernetes.pod_labels."app_kubernetes_io-name" == "bind9" {
+        if .kubernetes.pod_labels.app_kubernetes_io_name == "bind9" {
           structured = parse_regex(.message, r'(?<ts>\d+-\w+-\d{4}\s\d+:\d+:\d+\.\d+)\s+client\s+(?<client_key>@\S+)\s+(?<client_ip>\S+)#\S+\s(?<client_key_name>\S+)\s(?<message>\((?<domain>\S+)\).+)$') ?? {}
           structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%d-%b-%Y %H:%M:%S%.3f") ?? structured.ts
-        } else if .kubernetes.pod_labels."app_kubernetes_io-part-of" == "cilium" && .kubernetes.pod_labels."app_kubernetes_io-name" != "clustermesh-apiserver" {
+        } else if .kubernetes.pod_labels.app_kubernetes_io_part_of == "cilium" && .kubernetes.pod_labels.app_kubernetes_io_name != "clustermesh-apiserver" {
           structured = parse_key_value(.message, key_value_delimiter: "=") ?? {}
-        } else if .kubernetes.pod_labels."app_kubernetes_io-name" == "clustermesh-apiserver" {
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "clustermesh-apiserver" {
           if .kubernetes.container_name == "kvstoremesh" || .kubernetes.container_name == "apiserver" || .kubernetes.container_name == "etcd-init" {
             structured = parse_key_value(.message, key_value_delimiter: "=") ?? {}
           }
@@ -71,7 +71,7 @@ transforms:
           structured = parse_klog(.message) ?? {}
         }
       }
-      if !exists(structured.msg) && !exists(structured.message) && exists(.kubernetes.pod_labels."app_kubernetes_io-name") && starts_with(string(.kubernetes.pod_labels."app_kubernetes_io-name") ?? "", "authentik") {
+      if !exists(structured.msg) && !exists(structured.message) && exists(.kubernetes.pod_labels.app_kubernetes_io_name) && starts_with(string(.kubernetes.pod_labels.app_kubernetes_io_name) ?? "", "authentik") {
         if exists(structured.error) {
           structured.msg = string!(structured.event) + ", error: " + string!(structured.error)
         } else {
@@ -102,9 +102,9 @@ transforms:
     source: |
       structured = {}
       .syslog_identifier = downcase(string(.SYSLOG_IDENTIFIER) ?? downcase(string(._COMM) ?? ""))
-      .unit = ._SYSTEMD_UNIT || .syslog_identifier
+      .systemd_unit = ._SYSTEMD_UNIT || .syslog_identifier
       if exists(._SYSTEMD_USER_UNIT) {
-        .user_unit = del(._SYSTEMD_USER_UNIT)
+        .systemd_user_unit = del(._SYSTEMD_USER_UNIT)
       }
 
       if .syslog_identifier == "networkmanager" {
@@ -114,7 +114,7 @@ transforms:
           structured.timestamp = parsed_ts
         }
         del(structured.ts)
-      } else if starts_with(string(.unit) ?? "", "k3s", case_sensitive: false) && ends_with(string(.unit) ?? "", ".service", case_sensitive: false) {
+      } else if starts_with(string(.systemd_unit) ?? "", "k3s", case_sensitive: false) && ends_with(string(.systemd_unit) ?? "", ".service", case_sensitive: false) {
         structured, err = parse_klog(.message)
         # failed to parse klog, might contain key value pair log message
         if err != null {
@@ -152,7 +152,7 @@ transforms:
         .JOB_TARGET_UNIT = del(.UNIT)
       }
       if exists(.CONTAINER_NAME) {
-        .unit = .CONTAINER_NAME
+        .systemd_unit = .CONTAINER_NAME
         .syslog_identifier = .CONTAINER_NAME
         .is_container = true
       }
@@ -205,6 +205,7 @@ transforms:
           key != "TID"
       }
 
+      .systemd_host = del(.host)
       if is_object(structured) {
         . = merge(., structured) ?? .
       } else {

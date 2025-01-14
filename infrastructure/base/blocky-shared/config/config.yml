@@ -24,11 +24,11 @@ customDNS:
   mapping:
     # even if these are defined in bind9, these are added here since blocky creates also PTR records for these
     ns1.absolutist.it: ${dns_ip_addr_1}
-    dns.absolutist.it: ${dns_ip_addr_1},${dns_ip_addr_2}
     ns2.absolutist.it: ${dns_ip_addr_2}
     ns1.wahoo.li: ${dns_ip_addr_1}
-    dns.wahoo.li: ${dns_ip_addr_1},${dns_ip_addr_2}
     ns2.wahoo.li: ${dns_ip_addr_2}
+    dns.absolutist.it: ${dns_ip_addr_1},${dns_ip_addr_2}
+    dns.wahoo.li: ${dns_ip_addr_1},${dns_ip_addr_2}
     kubedns.absolutist.it: ${dns_ip_addr_3}
     kubedns.wahoo.li: ${dns_ip_addr_3}
 
@@ -129,23 +129,7 @@ blocking:
       *.not
       *.${not_cidr_reverse}
     ads:
-    - |
-      *.video.twimg.com
-      *.wpc.edgecastcdn.net
-      *.www.t.co
-      *.t.co
-      *.cdn.jwplayer.com
-      *.platform.twitter.com
-      *.syndication.twitter.com
-      *.nsone.net
-      *.edgecastcdn.net
-      *.ecdns.net
-      *.content.invisioncic.com
-      *.minor-api-os.hoyoverse.com
-      *.cloudfront.net
-      *.cdn.jsdelivr.net
-      *.cdn.shortpixel.ai
-      *.stat.fi
+    - /app/ads-whitelist.txt
   # definition: which groups should be applied for which client
   clientGroupsBlock:
     # default will be used, if no special definition for a client name exists
@@ -167,7 +151,8 @@ blocking:
   # zeroIp: 0.0.0.0 will be returned (default)
   # nxDomain: return NXDOMAIN as return code
   # comma separated list of destination IP addresses (for example: 192.100.100.15, 2001:0db8:85a3:08d3:1319:8a2e:0370:7344). Should contain ipv4 and ipv6 to cover all query types. Useful with running web server on this address to display the "blocked" page.
-  blockType: nxDomain
+  # blockType: nxDomain
+  blockType: zeroIp
   # optional: TTL for answers to blocked domains
   # default: 6h
   blockTTL: 30m

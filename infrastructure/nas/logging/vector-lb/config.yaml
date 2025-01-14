@@ -28,7 +28,7 @@ sinks:
     request:
       headers:
         VL-Time-Field: timestamp
-        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace,unit
+        VL-Stream-Fields: stream,source_type,systemd_unit,systemd_host,kubernetes.pod_namespace,kubernetes.pod_labels.app_kubernetes_io_name,kubernetes.pod_labels.app_kubernetes_io_instance,kubernetes.container_name
         VL-Msg-Field: message,msg,_msg
         AccountID: "0"
         ProjectID: "0"
@@ -45,7 +45,7 @@ sinks:
     request:
       headers:
         VL-Time-Field: timestamp
-        VL-Stream-Fields: stream,kubernetes.pod_name,kubernetes.container_name,kubernetes.pod_namespace,unit
+        VL-Stream-Fields: stream,source_type,systemd_unit,systemd_host,kubernetes.pod_namespace,kubernetes.pod_labels.app_kubernetes_io_name,kubernetes.pod_labels.app_kubernetes_io_instance,kubernetes.container_name
         VL-Msg-Field: message,msg,_msg
         AccountID: "0"
         ProjectID: "0"
