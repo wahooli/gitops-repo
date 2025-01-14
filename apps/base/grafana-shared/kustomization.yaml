@@ -166,5 +166,41 @@ configMapGenerator:
       grafana_dashboard: "1"
     annotations:
       kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: blocky-dashboard
+  namespace: grafana
+  files:
+  - blocky.json=dashboards/blocky.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: blocky-queries-dashboard
+  namespace: grafana
+  files:
+  - blocky-queries.json=dashboards/blocky-queries.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: systemd-logs-dashboard
+  namespace: grafana
+  files:
+  - systemd-logs.json=dashboards/systemd-logs.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: gpu-metrics-dashboard
+  namespace: grafana
+  files:
+  - gpu-metrics.json=dashboards/gpu-metrics.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
 configurations:
 - ../../.config/valuesFrom.yaml

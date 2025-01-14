@@ -21,10 +21,10 @@
       }
     ]
   },
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 25,
+  "id": 22,
   "links": [
     {
       "icon": "external link",
@@ -38,8 +38,8 @@
   "panels": [
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "current service state",
       "fieldConfig": {
@@ -107,11 +107,16 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{job=~\"$job\", __name__=\"up\"}",
-          "range": true,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(up{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -121,8 +126,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Is blocking enabled?",
       "fieldConfig": {
@@ -190,11 +195,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"blocky_blocking_enabled\"}",
-          "range": true,
+          "exemplar": false,
+          "expr": "blocky_blocking_enabled",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -231,8 +240,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Blocky [version](https://github.com/0xERR0R/blocky) number",
       "fieldConfig": {
@@ -282,11 +291,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"blocky_build_info\"}",
-          "range": true,
+          "exemplar": false,
+          "expr": "blocky_build_info",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -306,8 +319,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Average query response time for all query types",
       "fieldConfig": {
@@ -369,11 +382,16 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"blocky_blocky_request_duration_seconds\"}",
-          "range": true,
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "(sum(rate(blocky_request_duration_ms_sum[$__rate_interval])) / sum(rate(blocky_request_duration_ms_count[$__rate_interval])) / 1000)",
+          "format": "table",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -383,8 +401,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Number of denylist entries",
       "fieldConfig": {
@@ -442,11 +460,16 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{job=~\"$job\", __name__=\"blocky_denylist_cache_entries\"}",
-          "range": true,
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(blocky_denylist_cache) / sum(up{job=~\"$job\"})",
+          "format": "table",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -456,8 +479,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Time since last list refresh",
       "fieldConfig": {
@@ -505,11 +528,16 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{job=~\"$job\", __name__=\" -blocky_last_list_group_refresh\"}",
-          "range": true,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(time() -blocky_last_list_group_refresh)/ sum(up{job=~\"$job\"})",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -519,8 +547,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Number of all queries. Shows the last value",
       "fieldConfig": {
@@ -578,11 +606,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"blocky_query_total\"}",
-          "range": true,
+          "exemplar": true,
+          "expr": "ceil(sum(increase(blocky_query_total[$__range])))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -592,8 +624,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Percentage of blocked queries",
       "fieldConfig": {
@@ -658,11 +690,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{response_type=\"BLOCKED\", __name__=\"blocky_response_total\"}",
-          "range": true,
+          "exemplar": true,
+          "expr": "sum(rate(blocky_response_total{response_type=\"BLOCKED\"}[$__rate_interval])) / sum(rate(blocky_query_total[$__rate_interval])) ",
+          "format": "table",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -672,8 +708,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Number of entries in the cache. Shows the last value",
       "fieldConfig": {
@@ -719,11 +755,16 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{job=~\"$job\", __name__=\"blocky_cache_entries\"}",
-          "range": true,
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(blocky_cache_entry_count) / sum(up{job=~\"$job\"})",
+          "format": "table",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -733,8 +774,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Cache Hit/Miss ratio. 100 % means, all queries could be answered from the cache, 0% - all queries must be resolved via external DNS",
       "fieldConfig": {
@@ -786,11 +827,16 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"\n  \"}",
-          "range": true,
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(rate(blocky_cache_hit_count[$__rate_interval])) / (sum(rate(blocky_cache_hit_count[$__rate_interval])) + sum(rate(blocky_cache_miss_count[$__rate_interval])))",
+          "format": "table",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -800,8 +846,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Amount of performed DNS queries to prefetch cached queries",
       "fieldConfig": {
@@ -847,11 +893,16 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"blocky_prefetches_total\"}",
-          "range": true,
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "ceil(sum(increase(blocky_prefetch_count[$__range])))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -861,8 +912,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Amount of unique domains in the prefetched cache",
       "fieldConfig": {
@@ -908,11 +959,14 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{job=~\"$job\", __name__=\"blocky_prefetch_domain_name_cache_count\"}",
-          "range": true,
+          "exemplar": true,
+          "expr": "sum(blocky_prefetch_domain_name_cache_count)/ sum(up{job=~\"$job\"})",
+          "format": "table",
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -922,8 +976,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Amount of prefetch queries per minute",
       "fieldConfig": {
@@ -973,11 +1027,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"blocky_prefetchs_total\"}",
-          "range": true,
+          "exemplar": true,
+          "expr": "(sum(rate(blocky_prefetchs_total[$__range])) or sum(rate(blocky_prefetch_count[$__range]))) * 60",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -987,8 +1045,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "How many of cached entries were prefetched automatically",
       "fieldConfig": {
@@ -1040,11 +1098,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"blocky_prefetch_hit_count\"}",
-          "range": true,
+          "exemplar": true,
+          "expr": "sum(increase(blocky_prefetch_hit_count[$__range])) / (sum(increase(blocky_cache_hit_count[$__range])))",
+          "format": "table",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -1054,8 +1116,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "description": "Number of occured errors",
       "fieldConfig": {
@@ -1121,11 +1183,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"blocky_error_total\"}",
-          "range": true,
+          "exemplar": true,
+          "expr": "sum(increase(blocky_error_total[$__range]))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -1135,8 +1201,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1194,11 +1260,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{job=~\"$job\", job=~\"$job\", __name__=\"go_memstats_sys_bytes\"}",
-          "range": true,
+          "exemplar": true,
+          "expr": "sum(go_memstats_sys_bytes{job=~\"$job\"})/sum(up{job=~\"$job\"})",
+          "format": "table",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -1209,7 +1279,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "PB03EEC818B40D27F"
       },
       "fieldConfig": {
         "defaults": {
@@ -1225,7 +1295,7 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 10,
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -1239,8 +1309,8 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
-            "spanNulls": true,
+            "showPoints": "auto",
+            "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -1249,7 +1319,6 @@
               "mode": "off"
             }
           },
-          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1263,18 +1332,17 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 15
       },
-      "id": 10,
+      "id": 59,
       "options": {
         "legend": {
           "calcs": [],
@@ -1282,6 +1350,9 @@
           "placement": "bottom",
           "showLegend": false
         },
+        "timezone": [
+          "browser"
+        ],
         "tooltip": {
           "mode": "single",
           "sort": "none"
@@ -1290,16 +1361,10 @@
       "pluginVersion": "11.4.0",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "exemplar": true,
-          "expr": "sum(rate(blocky_query_total[5m])) * 60",
-          "format": "time_series",
-          "instant": false,
-          "interval": "",
-          "legendFormat": " ",
+          "editorMode": "code",
+          "expr": "sum(rate(blocky_query_total{job=~\"$job\"}[5m])) * 60",
+          "legendFormat": "{{label_name}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1310,7 +1375,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1321,12 +1386,12 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "avg requests / min",
+            "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
-            "drawStyle": "bars",
-            "fillOpacity": 100,
+            "drawStyle": "line",
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -1340,8 +1405,8 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
-            "spanNulls": true,
+            "showPoints": "auto",
+            "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -1350,7 +1415,6 @@
               "mode": "off"
             }
           },
-          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1364,18 +1428,17 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 10,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 23
       },
-      "id": 52,
+      "id": 60,
       "options": {
         "legend": {
           "calcs": [],
@@ -1393,14 +1456,12 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
-          "exemplar": true,
+          "editorMode": "code",
           "expr": "sum by (client) (rate(blocky_query_total[5m])) * 60",
-          "format": "time_series",
-          "instant": false,
-          "interval": "",
-          "legendFormat": " {{client}}",
+          "legendFormat": "{{client}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1410,8 +1471,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1432,7 +1493,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 41
       },
       "id": 22,
       "options": {
@@ -1477,11 +1538,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{response_type=\"RESOLVED\", __name__=\"blocky_request_duration_ms_bucket\"}",
-          "range": true,
+          "exemplar": true,
+          "expr": "sum(increase(blocky_request_duration_ms_bucket{response_type=\"RESOLVED\"}[$__range])) by (le)",
+          "format": "heatmap",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{le}}",
           "refId": "A"
         }
       ],
@@ -1491,8 +1556,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1516,7 +1581,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 38
+        "y": 50
       },
       "id": 2,
       "maxDataPoints": 3,
@@ -1548,11 +1613,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\" \"}",
-          "range": true,
+          "exemplar": false,
+          "expr": " sort_desc(sum by (type) (ceil(increase(blocky_query_total[$__range]))))",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{ type }}",
           "refId": "A"
         }
       ],
@@ -1562,8 +1631,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1587,7 +1656,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 38
+        "y": 50
       },
       "id": 8,
       "maxDataPoints": 3,
@@ -1619,11 +1688,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\"sum \"}",
-          "range": true,
+          "exemplar": false,
+          "expr": "sort_desc(sum by (client) (ceil(increase(blocky_query_total[$__range]))))",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{ client }}",
           "refId": "A"
         }
       ],
@@ -1633,8 +1706,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1658,7 +1731,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 46
+        "y": 58
       },
       "id": 32,
       "maxDataPoints": 3,
@@ -1689,11 +1762,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\" blocky_denylist_cache\"}",
-          "range": true,
+          "exemplar": false,
+          "expr": "topk(1, blocky_denylist_cache) by (group)",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{ group }}",
           "refId": "A"
         }
       ],
@@ -1703,8 +1780,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1728,7 +1805,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 46
+        "y": 58
       },
       "id": 14,
       "maxDataPoints": 3,
@@ -1760,11 +1837,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\" \"}",
-          "range": true,
+          "exemplar": false,
+          "expr": " sort_desc(sum by (reason) (ceil(increase(blocky_response_total[$__range]))))",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{reason}}",
           "refId": "A"
         }
       ],
@@ -1774,8 +1855,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1799,7 +1880,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 54
+        "y": 66
       },
       "id": 38,
       "maxDataPoints": 3,
@@ -1831,11 +1912,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\" \"}",
-          "range": true,
+          "exemplar": false,
+          "expr": " sort_desc(sum by (response_type) (ceil(increase(blocky_response_total[$__range]))))",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{response_type}}",
           "refId": "A"
         }
       ],
@@ -1845,8 +1930,8 @@
     },
     {
       "datasource": {
-        "type": "victoriametrics-datasource",
-        "uid": "P43426240ED93BD1D"
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1870,7 +1955,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 54
+        "y": 66
       },
       "id": 12,
       "maxDataPoints": 3,
@@ -1902,11 +1987,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "victoriametrics-datasource",
-            "uid": "P43426240ED93BD1D"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
-          "expr": "{__name__=\" \"}",
-          "range": true,
+          "exemplar": false,
+          "expr": " sort_desc(sum by (response_code) (ceil(increase(blocky_response_total[$__range]))))",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{response_code}}",
           "refId": "A"
         }
       ],
@@ -1918,20 +2007,21 @@
   "preload": false,
   "refresh": "",
   "schemaVersion": 40,
-  "tags": [],
+  "tags": [
+    "Blocky",
+    "DNS"
+  ],
   "templating": {
     "list": [
       {
-        "current": {
-          "text": "${VAR_BLOCKY_URL}",
-          "value": "${VAR_BLOCKY_URL}"
-        },
-        "hide": 2,
-        "label": "blocky API URL",
-        "name": "blocky_url",
-        "query": "${VAR_BLOCKY_URL}",
-        "skipUrlSync": true,
-        "type": "constant"
+        "current": {},
+        "label": "Datasource",
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
       },
       {
         "current": {
@@ -1955,17 +2045,29 @@
         "regex": "",
         "sort": 1,
         "type": "query"
+      },
+      {
+        "current": {
+          "text": "https://blocky-api.wahoo.li",
+          "value": "https://blocky-api.wahoo.li"
+        },
+        "hide": 2,
+        "label": "blocky API URL",
+        "name": "blocky_url",
+        "query": "https://blocky-api.wahoo.li",
+        "skipUrlSync": true,
+        "type": "constant"
       }
     ]
   },
   "time": {
-    "from": "now-1m",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "browser",
   "title": "blocky",
-  "uid": "JvOqE4gRk",
-  "version": 2,
-  "weekStart": ""
+  "uid": "ce9wr1h0cuu4gd",
+  "version": 1,
+  "weekStart": "monday"
 }

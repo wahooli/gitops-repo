@@ -16,6 +16,7 @@ spec:
     metadata:
       labels:
         k8s-app: node-local-dns
+        app.kubernetes.io/name: node-local-dns
       annotations:
         policy.cilium.io/no-track-port: "53"
         prometheus.io/port: "9253"

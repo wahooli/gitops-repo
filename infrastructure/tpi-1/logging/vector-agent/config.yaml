@@ -54,6 +54,11 @@ transforms:
           key != "namespace_labels"
         }
       }
+      # node-local-dns specific log parsing, contains json after loglevel
+      if exists(.kubernetes.pod_labels.k8s_app) && .kubernetes.pod_labels.k8s_app == "node-local-dns" {
+        structured = parse_regex(.message, r'^\[(?<level>\w+)\]\s(?<message>.+)$') ?? {}
+        . = merge(., structured)
+      }
 
       structured, err = parse_json(.message)
       # message is json

@@ -11,6 +11,10 @@ sidecar:
     defaultFolderName: default
     enabled: true
     multicluster: false
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
 extraSecretMounts:
 - name: auth-generic-oauth-secret-mount
   secretName: grafana-oauth-data
