@@ -5,8 +5,10 @@ service:
   main:
     externalTrafficPolicy: Local
     type: "${dns_svc_type:=LoadBalancer}"
+    clusterIP: ${blocky_cluster_ip}
     annotations:
       lbipam.cilium.io/ips: ${dns_ip_addr_1},${dns_ip_addr_2},8.8.8.8,8.8.4.4
+      service.cilium.io/global: "true"
 
 persistence:
   config:
@@ -18,6 +20,8 @@ persistence:
       subPath: tlds-alpha-by-domain.txt
     - path: /app/ads-whitelist.txt
       subPath: ads-whitelist.txt
+    - path: /app/manual-blocklist.txt
+      subPath: manual-blocklist.txt
     spec:
       useFromChart: false
       configMap:

@@ -15,6 +15,11 @@ resources:
     cpu: 100m
     ephemeral-storage: 200Mi
     memory: 256Mi
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 env:
   LDAP_BIND_PW:
     valueFrom:

@@ -1,0 +1,29 @@
+.:53 {
+    log . "{\"question_type\": \"{type}\", \"rcode\": \"{rcode}\", \"question_class\": \"{class}\", \"question_name\": \"{name}\", \"client_ip\": \"{remote}\", \"msg\": \"query resolved\"}"
+    errors
+    health
+    ready
+    kubernetes cluster.local in-addr.arpa ip6.arpa {
+        pods insecure
+        fallthrough in-addr.arpa ip6.arpa
+    }
+    hosts /etc/coredns/NodeHosts {
+        ttl 60
+        reload 15s
+        fallthrough
+    }
+    prometheus :9153
+    bufsize 4096
+    rewrite edns0 subnet set 32 128
+    template ANY AAAA {
+        rcode NOERROR
+    }
+    forward . ${blocky_cluster_ip:=/etc/resolv.conf}
+    cache {
+        success 9984 30
+        denial 9984 5
+    }
+    loop
+    reload
+    loadbalance
+}

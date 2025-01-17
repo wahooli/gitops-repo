@@ -6,6 +6,11 @@ global:
     app.kubernetes.io/part-of: jellyplex-watched
 
 hostname: jellyplex-watched
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 
 envFrom:
   envs:

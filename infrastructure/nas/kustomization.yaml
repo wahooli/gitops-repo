@@ -8,6 +8,7 @@ resources:
 - cert-manager
 - victoria-metrics-operator
 - node-exporter
+- gpu-exporter
 - kube-state-metrics
 - ingress-nginx
 - reflector

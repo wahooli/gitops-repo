@@ -8,7 +8,9 @@ spec:
   releaseName: velero
   chart:
     spec:
-      version: "8.1.0"
+      version: "8.2.0"
+  upgrade:
+    disableHooks: true
   valuesFrom:
   - kind: ConfigMap
     name: velero-values

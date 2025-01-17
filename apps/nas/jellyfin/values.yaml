@@ -3,13 +3,19 @@ envFrom:
     type: configMap
     useFromChart: false
     name: jellyfin-env
+strategy:
+  type: Recreate
 image:
   tag: "10.10.3" # {"$imagepolicy": "flux-system:jellyfin:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: data
 runtimeClassName: nvidia
 # hostNetwork: true
-
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 global:
   labels:
     backupWeekly: "true"

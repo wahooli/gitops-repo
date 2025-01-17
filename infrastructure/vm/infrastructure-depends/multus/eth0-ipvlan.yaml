@@ -1,0 +1,21 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: eth0-ipvlan
+  namespace: default
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.0",
+      "type": "ipvlan",
+      "master": "eth0",
+      "ipam": {
+        "type": "host-local",
+        "subnet": "${services_subnet}",
+        "routes": [
+          { "dst": "${services_subnet}" },
+          { "dst": "${lan_subnet}" }
+        ],
+        "gateway": "${services_gateway}"
+      }
+    }

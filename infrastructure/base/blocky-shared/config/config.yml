@@ -1,3 +1,5 @@
+bootstrapDns:
+- upstream: tcp+udp:${unbound_cluster_ip}:${dns_svc_port:=53}
 upstreams:
   init:
     # Configure startup behavior.
@@ -101,6 +103,7 @@ blocking:
       *.${not_cidr_reverse}
       *.${purola_cidr_reverse}
     ads:
+    - /app/manual-blocklist.txt
     - https://raw.githubusercontent.com/AlexRabbit/ADios/master/PIHOLE/hosts
     - https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
     - https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
@@ -223,12 +226,13 @@ caching:
 # optional: configuration of client name resolution
 clientLookup:
   # optional: this DNS resolver will be used to perform reverse DNS lookup (typically local router)
-  upstream: ${router_ip}
+  upstream: ${client_lookup_cluster_ip}
   # optional: some routers return multiple names for client (host name and user defined name). Define which single name should be used.
   # Example: take second name if present, if not take first name
   singleNameOrder:
-  - 1
+  - 3
   - 2
+  - 1
 
 # optional: configuration for prometheus metrics endpoint
 prometheus:
@@ -275,4 +279,6 @@ ecs:
   # optional: if the request ecs option with a max sice mask the address will be used as client ip
   useAsClient: true
   # optional: if the request contains a ecs option it will be forwarded to the upstream resolver
-  forward: true
+  forward: false
+  ipv4Mask: 32
+  ipv6Mask: 128

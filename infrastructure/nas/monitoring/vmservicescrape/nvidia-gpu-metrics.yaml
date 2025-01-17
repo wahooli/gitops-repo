@@ -1,0 +1,24 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: nvidia-gpu-metrics
+  namespace: kube-system
+spec:
+  jobLabel: scrape-job-name
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  endpoints:
+  - port: metrics
+    scheme: http
+    path: /metrics
+    metricRelabelConfigs:
+    - action: replace
+      replacement: nasse
+      target_label: instance
+    - action: labeldrop
+      regex: (pod|container_id|image_id|container|service)
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nas-gpu-exporter
+      app.kubernetes.io/name: nvidia-gpu-exporter

@@ -15,6 +15,7 @@ configMapGenerator:
   - config.yml=config/config.yml
   - tlds-alpha-by-domain.txt=config/lists/tlds-alpha-by-domain.txt
   - ads-whitelist.txt=config/lists/ads-whitelist.txt
+  - manual-blocklist.txt=config/lists/manual-blocklist.txt
 - name: blocky-values
   namespace: flux-system
   behavior: merge

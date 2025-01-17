@@ -4,6 +4,11 @@ env:
   TZ: Europe/Helsinki
 podAnnotations:
   backup.velero.io/backup-volumes: config
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 global:
   labels:
     backupWeekly: "true"

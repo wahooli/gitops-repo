@@ -287,7 +287,7 @@
         "name": "host",
         "options": [],
         "query": {
-          "field": "host",
+          "field": "systemd_host",
           "limit": 500,
           "query": "source_type: journald",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
@@ -307,15 +307,15 @@
           "type": "victoriametrics-logs-datasource",
           "uid": "${datasource}"
         },
-        "definition": "source_type:=\"journald\" | host:=$host",
+        "definition": "source_type:=\"journald\" | systemd_host:=$host",
         "includeAll": true,
         "label": "Systemd unit",
         "name": "unit",
         "options": [],
         "query": {
-          "field": "unit",
+          "field": "systemd_unit",
           "limit": 500,
-          "query": "source_type:=\"journald\" | host:=$host",
+          "query": "source_type:=\"journald\" | systemd_host:=$host",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },

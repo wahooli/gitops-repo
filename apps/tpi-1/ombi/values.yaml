@@ -20,6 +20,11 @@ initContainers:
       name: config
     - mountPath: /src
       name: ombi-config
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 persistence:
   config:
     enabled: true

@@ -54,6 +54,11 @@ transforms:
           key != "namespace_labels"
         }
       }
+      # coredns specific log parsing, might contain json after loglevel
+      if exists(.kubernetes.pod_labels.app_kubernetes_io_name) && .kubernetes.pod_labels.app_kubernetes_io_name == "coredns" {
+        structured = parse_regex(.message, r'^\[(?<level>\w+)\]\s(?<message>.+)$') ?? {}
+        . = merge(., structured)
+      }
 
       structured, err = parse_json(.message)
       # message is json

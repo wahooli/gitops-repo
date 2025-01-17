@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: wahooli
         namespace: flux-system
-      version: ">=0.1.0"
+      version: ">=0.1.1-0"
       interval: 24h
   interval: 5m0s
   releaseName: base-openldap

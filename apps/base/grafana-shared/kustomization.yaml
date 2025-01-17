@@ -202,5 +202,23 @@ configMapGenerator:
       grafana_dashboard: "1"
     annotations:
       kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: nginx-ingress-controller-dashboard
+  namespace: grafana
+  files:
+  - nginx-ingress-controller.json=dashboards/nginx-ingress-controller.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: nginx-request-handling-dashboard
+  namespace: grafana
+  files:
+  - nginx-request-handling.json=dashboards/nginx-request-handling.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
 configurations:
 - ../../.config/valuesFrom.yaml

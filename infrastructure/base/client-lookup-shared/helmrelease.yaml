@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-client-lookup
+  namespace: flux-system
+spec:
+  valuesFrom:
+  - kind: ConfigMap
+    name: client-lookup-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: client-lookup-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: client-lookup-values
+    optional: true
+    valuesKey: values.yaml

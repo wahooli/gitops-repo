@@ -2,11 +2,18 @@ image:
   tag: "5.17.2" # {"$imagepolicy": "flux-system:radarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
+strategy:
+  type: Recreate
 global:
   labels:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: radarr
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 envFrom:
   envs:
     type: configMap

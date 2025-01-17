@@ -1,0 +1,36 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAgent
+metadata:
+  name: livingroom-pi
+  namespace: monitoring
+spec:
+  extraArgs:
+    loggerFormat: json
+  externalLabels:
+    clustername: livingroom-pi
+  selectAllByDefault: true
+  port: "8429"
+  scrapeInterval: 30s
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
+  remoteWrite:
+  - url: http://vmauth-global-write.monitoring.svc.cluster.local.:8427/prometheus/api/v1/write
+  image:
+    repository: victoriametrics/vmagent
+    tag: v1.108.1
+    pullPolicy: IfNotPresent
+  nodeScrapeRelabelTemplate:
+  - action: labeldrop
+    regex: (beta_kubernetes_.*|kubernetes_io_hostname|node_role_kubernetes_io_.*|openebs_io_.*|topology_topolvm_.*)
+  - action: labeldrop
+    regex: (kubernetes_io_arch|kubernetes_io_os)
+  # serviceSpec:
+  #   useAsDefault: true
+  #   spec:
+  #     type: ClusterIP
+  #   metadata:
+  #     annotations:
+  #       service.cilium.io/global: "true"

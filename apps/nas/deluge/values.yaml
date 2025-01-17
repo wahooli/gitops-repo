@@ -2,7 +2,13 @@ image:
   tag: "2.1.1" # {"$imagepolicy": "flux-system:deluge:tag"}
 
 hostNetwork: true
-
+strategy:
+  type: Recreate
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:

@@ -28,7 +28,18 @@ authentik:
 #     value: email@email.com
 #   - name: AUTHENTIK_BOOTSTRAP_PASSWORD
 #     value: password
+worker:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
 server:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
   podLabels:
     scrape-job-name: authentik
     app: authentik-server

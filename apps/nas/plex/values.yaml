@@ -3,6 +3,11 @@ image:
 hostname: nasse
 runtimeClassName: nvidia
 hostNetwork: true
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 envFrom:
   envs:
     type: configMap
