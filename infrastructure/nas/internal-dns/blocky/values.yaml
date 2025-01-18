@@ -1,13 +1,11 @@
 image:
-  tag: "v0.24" # {"$imagepolicy": "flux-system:blocky:tag"}
-
+  tag: "v0.25" # {"$imagepolicy": "flux-system:blocky:tag"}
 service:
   main:
     externalTrafficPolicy: Local
     type: "${dns_svc_type:=LoadBalancer}"
     annotations:
       lbipam.cilium.io/ips: ${dns_ip_addr_1},${dns_ip_addr_2},8.8.8.8,8.8.4.4
-
 persistence:
   config:
     enabled: true
@@ -32,5 +30,4 @@ persistence:
 workload:
   annotations:
     secret.reloader.stakater.com/reload: "tls-blocky"
-
 resources: {}
