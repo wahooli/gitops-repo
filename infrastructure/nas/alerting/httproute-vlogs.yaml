@@ -10,7 +10,7 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "logs.vmalert.absolutist.it"
+  - "log-alerts.absolutist.it"
   rules:
   - backendRefs:
     - name: vmalert-vlogs-nas

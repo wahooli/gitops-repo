@@ -10,7 +10,7 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "metrics.vmalert.absolutist.it"
+  - "metrics-alerts.absolutist.it"
   rules:
   - backendRefs:
     - name: vmalert-vmetrics-tpi-1

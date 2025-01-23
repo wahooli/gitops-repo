@@ -223,7 +223,7 @@ configMapGenerator:
 - name: cloudflare-tunnel-dashboard
   namespace: grafana
   files:
-  - cloudflare-tunneljson=dashboards/cloudflare-tunnel.json
+  - cloudflare-tunnel.json=dashboards/cloudflare-tunnel.json
   options:
     labels:
       grafana_dashboard: "1"
