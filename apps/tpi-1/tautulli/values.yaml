@@ -59,6 +59,18 @@ ingress:
     hosts:
     - host: tautulli.wahoo.li
       paths:
+      - path: /robots.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
+      - path: /ads.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
       - path: "/"
         pathType: "Prefix"
       - path: /outpost.goauthentik.io

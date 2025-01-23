@@ -4,3 +4,17 @@ tolerations:
   value: "true"
   effect: "NoSchedule"
 installCRDs: 'true'
+webhook:
+  resources:
+    limits:
+      memory: 64Mi
+      cpu: 175m
+resources:
+  limits:
+    memory: 128Mi
+    cpu: 300m
+cainjector:
+  resources:
+    limits:
+      memory: 100Mi
+      cpu: 220m

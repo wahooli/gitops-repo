@@ -17,6 +17,7 @@ dnsConfig:
     value: "1"
 image:
   base: debian
+  tag: 0.44.0-debian
 extraVolumes:
 - name: machine-id
   hostPath:

@@ -17,13 +17,13 @@ global:
     backupDaily: "true"
     app.kubernetes.io/part-of: deluge
 
-# resources:
-#   requests:
-#     memory: "256Mi"
-#     cpu: "400m"
-#   limits:
-#     memory: "3072Mi"
-#     cpu: "1000m"
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "2048Mi"
+    cpu: "600m"
 persistence:
   config:
     enabled: true

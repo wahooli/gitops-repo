@@ -220,5 +220,14 @@ configMapGenerator:
       grafana_dashboard: "1"
     annotations:
       kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: cloudflare-tunnel-dashboard
+  namespace: grafana
+  files:
+  - cloudflare-tunneljson=dashboards/cloudflare-tunnel.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
 configurations:
 - ../../.config/valuesFrom.yaml

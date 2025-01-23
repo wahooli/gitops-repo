@@ -16,7 +16,7 @@ spec:
   - action: labeldrop
     regex: (git.*)
   - action: labeldrop
-    regex: (le|migrated|image_size_in_bytes|long_running|server_type|decision|metric_source|method|compiler|go_version|volume_mode|usage|manager|deprecated_version|version|platform|minor|major|build_date)
+    regex: (migrated|image_size_in_bytes|long_running|server_type|decision|metric_source|method|compiler|go_version|volume_mode|usage|manager|deprecated_version|version|platform|minor|major|build_date)
   - action: drop
     regex: (rest_client_.*|apiserver_.*|etcd_.*|scheduler_.*|go_godebug_.*|go_gc_.*|workqueue_.*|cronjob_.*|aggregator_.*|ttl_.*|ttl_.*|taint_.*|serviceaccount_.*|replicaset_.*|csi_.*|auth.*|lasso_.*|apiextensions_.*|watch_cache_.*|field_.*|grpc_.*|job_.*|node_.*|endpoint_slice_.*|go_c.*|go_mem.*|go_s.*)
     source_labels:

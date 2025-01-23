@@ -3,11 +3,13 @@ datasources:
 - name: VictoriaMetrics-prometheus
   type: prometheus
   url: http://vmauth-read-proxy.monitoring.svc.cluster.local.:8427/select/0/prometheus/
+  uid: PB03EEC818B40D27F
   access: proxy
   isDefault: true
   jsonData: {}
 - name: VictoriaMetrics - read-proxy
   type: victoriametrics-datasource
+  uid: P43426240ED93BD1D
   url: http://vmauth-read-proxy.monitoring.svc.cluster.local.:8427/select/0/prometheus/
   access: proxy
   isDefault: false
@@ -20,6 +22,7 @@ datasources:
   # <string> Sets URL for sending queries to VictoriaLogs server.
   # see https://docs.victoriametrics.com/victorialogs/querying/
   url: http://vmauth-read-proxy.logging.svc.cluster.local.:9428
+  uid: PC27693B959EA3435
   # <string> Sets the pre-selected datasource for new panels.
   # You can set only one default data source per organization.
   isDefault: false
@@ -28,6 +31,7 @@ datasources:
   type: victoriametrics-logs-datasource
   # <string, required> Sets the access mode, either
   # proxy or direct (Server or Browser in the UI).
+  uid: P03FCEAF9AA2F24E1
   access: proxy
   # <string> Sets URL for sending queries to VictoriaLogs server.
   # see https://docs.victoriametrics.com/victorialogs/querying/

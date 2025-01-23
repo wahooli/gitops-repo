@@ -128,6 +128,18 @@ ingress:
     hosts:
     - host: paperless.wahoo.li
       paths:
+      - path: /robots.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
+      - path: /ads.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
       - path: "/"
         pathType: "Prefix"
       # - path: /admin

@@ -49,7 +49,7 @@ grafana.ini:
     token_url: "https://auth.wahoo.li/application/o/token/"
     api_url: "https://auth.wahoo.li/application/o/userinfo/"
     # Optionally map user groups to Grafana roles
-    role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
+    role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || contains(groups, 'Grafana Viewers') &&  'Viewer'
   plugins:
     allow_loading_unsigned_plugins: victoriametrics-datasource,victoriametrics-logs-datasource
   panels:

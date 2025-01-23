@@ -13,22 +13,90 @@ sources:
   internal_metrics:
     type: internal_metrics
 transforms:
-  backslash_multiline:
+  kube_multiline_reduce:
     type: reduce
-    inputs: [k8s]
-    group_by: [file, stream]
+    inputs:
+    - k8s
+    group_by:
+    - _stream_id
+    - kubernetes.container_name
+    - stream
     merge_strategies:
       message: concat_newline
-    ends_when: |
-      matched, err = match(.message, r'[^\\]$');
-      if err != null {
-        false;
-      } else {
-        matched;
-      }
+    starts_when:
+      type: "vrl"
+      source: |
+        if is_object(.kubernetes) && .kubernetes != null {
+          container_name = string(.kubernetes.container_name) ?? ""
+          stream = string(.stream) ?? ""
+          if container_name == "ombi" {
+            # stack traces start with whitespace
+            matched, err = match(.message, r'^\S+');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "prowlarr" || container_name == "sonarr" || container_name == "radarr"  {
+            # stack traces start with whitespace
+            matched, err = match(.message, r'^\[.*');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "bazarr"  {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\d+-\d{2}-\d+\s\d+:\d+:\d+,\d+');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "paperless-ngx"  {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\[\d+-\d{2}-\d+\s\d+:\d+:\d+,\d+\]');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "deluge"  {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\d+:\d+:\d+');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "jellyfin" {
+            if .stream == "stdout" {
+              # customized log format
+              matched, err = match(.message, r'^\{.*');
+              if err != null {
+                false
+              } else {
+                matched
+              }
+            } else {
+              # just match stderr to start with non whitespace character
+              matched, err = match(.message, r'^\S+');
+              if err != null {
+                false
+              } else {
+                matched
+              }
+            }
+          } else {
+            true
+          }
+        } else {
+          true
+        }
   kube_log_parser:
     type: remap
-    inputs: [k8s]
+    inputs:
+    - kube_multiline_reduce
     source: |
       .clustername = "tpi-1"
       if is_object(.kubernetes) && .kubernetes != null {
@@ -72,6 +140,32 @@ transforms:
           if .kubernetes.container_name == "kvstoremesh" || .kubernetes.container_name == "apiserver" || .kubernetes.container_name == "etcd-init" {
             structured = parse_key_value(.message, key_value_delimiter: "=") ?? {}
           }
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "bazarr" {
+          structured = parse_regex(.message, r'^^(?<ts>\d+-\d{2}-\d+\s\d+:\d+:\d+,\d+)\s+-\s+\S+\s+\(\w+\)\s+:\s+(?<level>\w+)\s\((?<source>[\w:]+)\)\s+-\s(?<message>[\w\W]+)$') ?? {}
+          structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%F %H:%M:%S,%3f", timezone: "Europe/Helsinki") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "jellyfin" {
+          structured = parse_regex(.message, r'^\{(?<level>.+)\}\s\{(?<component>.+)\}\s\{(?<message>.+)\}\s\{(?<exception>(.+)?)\}$') ?? {}
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "tautulli" {
+          structured = parse_regex(.message, r'^(?<time>\d+-\d{2}-\d+\s+\d{2}:\d{2}:\d{2})\s-\s(?<level>\w+)\s::\s[\s\w\-\(\)]+:\s((?<context>.+)\s::\s)?(?<message>[\w\W]+)') ?? {}
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "paperless-ngx" {
+          structured = parse_regex(.message, r'^\[(?<ts>\d+-\d{2}-\d+\s\d+:\d+:\d+,\d+)\]\s+\[(?<level>\w+)\]\s+\[(?<component>[\w.]+)\]\s(?<message>.+)$') ?? {}
+          structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%F %H:%M:%S,%3f", timezone: "Europe/Helsinki") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "vaultwarden" {
+          structured = parse_regex(.message, r'^\[(?<ts>\d+-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}.\d{3})\]\[(?<component>.+)\]\[(?<level>\w+)\]\s(?<message>.+)$') ?? {}
+          structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%F %H:%M:%S%.3f") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "deluge" {
+          structured = parse_regex(.message, r'^\d+:\d+:\d+\s+\[(?<level>\w+)[\s\[\]]+(?<component>\S+)[\s\[\]:\d]+(?<message>.*)$') ?? {}
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "ombi" {
+          structured = parse_regex(.message, r'^(?<level>[a-z]+):\s+(?<message>[\w\W]+)') ?? {}
+          level = string(structured.level) ?? ""
+          if level == "fail" {
+            structured.level = "error"
+          }
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "prowlarr" || .kubernetes.pod_labels.app_kubernetes_io_name == "sonarr" || .kubernetes.pod_labels.app_kubernetes_io_name == "radarr" {
+          structured = parse_regex(.message, r'^\[(?<level>\w+)\]\s+(?<component>\S+):\s(?<message>.*)$') ?? {}
+          if contains(string(.message) ?? "", "exception", case_sensitive: false) {
+            .level = "error"
+          }
         } else {
           structured = parse_klog(.message) ?? {}
         }
@@ -79,7 +173,7 @@ transforms:
       if !exists(structured.msg) && !exists(structured.message) && exists(.kubernetes.pod_labels.app_kubernetes_io_name) && starts_with(string(.kubernetes.pod_labels.app_kubernetes_io_name) ?? "", "authentik") {
         if exists(structured.error) {
           structured.msg = string!(structured.event) + ", error: " + string!(structured.error)
-        } else {
+        } else if exists(structured.event) {
           structured.msg = structured.event
         }
       }

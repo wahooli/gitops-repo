@@ -6,6 +6,7 @@ metadata:
 spec:
   endpoints:
   - port: metrics
+    # scrape_interval: 15s
   jobLabel: app.kubernetes.io/name
   namespaceSelector:
     matchNames:

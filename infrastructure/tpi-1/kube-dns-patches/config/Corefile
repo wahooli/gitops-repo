@@ -1,5 +1,5 @@
 .:53 {
-    log . "{\"question_type\": \"{type}\", \"rcode\": \"{rcode}\", \"question_class\": \"{class}\", \"question_name\": \"{name}\", \"client_ip\": \"{remote}\", \"msg\": \"query resolved\"}"
+#    log . "{\"question_type\": \"{type}\", \"rcode\": \"{rcode}\", \"question_class\": \"{class}\", \"question_name\": \"{name}\", \"client_ip\": \"{remote}\", \"msg\": \"query resolved\"}"
     errors
     health
     ready

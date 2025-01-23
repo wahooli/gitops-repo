@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-smartctl-exporter
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: smartctl-exporter
+spec:
+  releaseName: base-smartctl-exporter
+  targetNamespace: kube-system
+  chart:
+    spec:
+      chart: prometheus-smartctl-exporter
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      interval: 24h
+  install:
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: smartctl-exporter-values
+    valuesKey: values-base.yaml

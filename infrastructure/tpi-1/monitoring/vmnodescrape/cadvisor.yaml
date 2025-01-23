@@ -13,14 +13,14 @@ spec:
     regex: (beta_kubernetes_.*|kubernetes_io_.*)
   - action: labeldrop
     regex: (topology_topolvm_io_.*|openebs_io_.*)
-  - if: '{image=~".+rancher/mirrored-pause.+"}'
-    action: labeldrop
+  # - if: '{image=~".+rancher/mirrored-pause.+"}'
+  #   action: labeldrop
   - action: labeldrop
-    regex: (node_role_.*)
+    regex: (node_role_.*|node_type)
   - action: labeldrop
     regex: (interface)
   - action: labeldrop
-    regex: (device|boot_id|system_uuid|machine_id)
+    regex: (device|boot_id|system_uuid|machine_id|image) # image label causes duplicate series to be created
   - action: labeldrop
     regex: (uid)
   - action: labeldrop
@@ -29,8 +29,48 @@ spec:
     regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
     source_labels:
     - __name__
+  # Drop less useful container CPU metrics.
+  - source_labels: [__name__]
+    action: drop
+    regex: 'container_cpu_(load_average_10s|system_seconds_total|user_seconds_total)'
+  # Drop less useful container / always zero filesystem metrics.
+  - source_labels: [__name__]
+    action: drop
+    regex: 'container_fs_(io_current|io_time_seconds_total|io_time_weighted_seconds_total|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total|write_seconds_total)'
+  # Drop less useful / always zero container memory metrics.
+  - source_labels: [__name__]
+    action: drop
+    regex: 'container_memory_(mapped_file|swap)'
+  # Drop less useful container process metrics.
+  - source_labels: [__name__]
+    action: drop
+    regex: 'container_(file_descriptors|tasks_state|threads_max)'
+  # Drop container_memory_failures_total{scope="hierarchy"} metrics,
+  # we only need the container scope.
+  - source_labels: [__name__, scope]
+    action: drop
+    regex: 'container_memory_failures_total;hierarchy'
+  # Drop container_network_... metrics that match various interfaces that
+  # correspond to CNI and similar interfaces. This avoids capturing network
+  # metrics for host network containers.
+  - source_labels: [__name__, interface]
+    action: drop
+    regex: 'container_network_.*;(cali|cilium|cni|lxc|nodelocaldns|tunl).*'
+  # Drop container spec metrics that overlap with kube-state-metrics.
+  - source_labels: [__name__]
+    action: drop
+    regex: 'container_spec.*'
+  # drop metrics from undefined namespace related to container_n
+  - sourceLabels: [__name__, namespace]
+    action: drop
+    regex: 'container_network_.*;'
+  # # drop metrics which doesn't have container label, mostly duplicates
+  - if: '{container="", __name__!~"^(scrape_.*|cadvisor_.*|up|machine_.*|container_network_.*|container_scrape_.*)"}'
+    action: drop
   path: /metrics/cadvisor
   relabelConfigs:
+  - sourceLabels: [__meta_kubernetes_pod_container_name]
+    targetLabel: container
   - action: labelmap
     regex: __meta_kubernetes_node_label_(.+)
   - sourceLabels:
