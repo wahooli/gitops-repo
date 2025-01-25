@@ -36,6 +36,13 @@ spec:
         pathType: Exact
       - backend:
           service:
+            name: default-backend
+            port:
+              number: 80
+        path: /metrics
+        pathType: Prefix
+      - backend:
+          service:
             name: jellyfin
             port:
               number: 8096

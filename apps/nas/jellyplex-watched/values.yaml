@@ -5,6 +5,46 @@ global:
   labels:
     app.kubernetes.io/part-of: jellyplex-watched
 
+# sidecars:
+#   prometheus-plex-exporter:
+#     image: ghcr.io/jsclayton/prometheus-plex-exporter:main@sha256:18ef1b2197efbcb75bd7276380955760995f10a9fbe55106809a6fcff91c2940
+#     imagePullPolicy: IfNotPresent
+#     env:
+#     - name: PLEX_TOKEN
+#       valueFrom:
+#         secretKeyRef:
+#           key: PLEX_TOKEN
+#           name: jellyplex-watched-tokens
+#     - name: PLEX_SERVER
+#       value: http://plex.default.svc.cluster.local.:32400
+#     ports:
+#     - containerPort: 9000
+#       name: metrics
+#       protocol: TCP
+#     hostname: prometheus-exporter
+#     readinessProbe:
+#       httpGet:
+#         path: /metrics
+#         port: metrics
+#       failureThreshold: 10
+#       initialDelaySeconds: 0
+#       periodSeconds: 5
+#       successThreshold: 1
+#       timeoutSeconds: 1
+#     resources:
+#       limits:
+#         cpu: 100m
+#         memory: 100Mi
+#     livenessProbe:
+#       httpGet:
+#         path: /metrics
+#         port: metrics
+#       failureThreshold: 10
+#       initialDelaySeconds: 0
+#       periodSeconds: 10
+#       successThreshold: 1
+#       timeoutSeconds: 1
+
 hostname: jellyplex-watched
 dnsConfig:
   options:
@@ -21,3 +61,11 @@ envFrom:
     type: secret
     useFromChart: false
     name: jellyplex-watched-tokens
+
+service:
+  main:
+    type: ClusterIP
+    ports:
+    - name: metrics
+      port: 9000
+      protocol: TCP

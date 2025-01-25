@@ -14,6 +14,14 @@ spec:
   additionalPeers:
   - vmalertmanager-tpi-1-0.vmalertmanager-tpi-1.alerting.svc.cluster.local.:9094
   - vmalertmanager-tpi-1-1.vmalertmanager-tpi-1.alerting.svc.cluster.local.:9094
+  initContainers:
+  - name: "init-chmod-data"
+    image: "busybox:1.37.0"
+    command: ["chmod", "a+rwX", "/alertmanager"]
+    volumeMounts:
+    - mountPath: /alertmanager
+      name: vmalertmanager-nas-db
+      subPath: alertmanager-db
   extraArgs:
     cluster.listen-address: '[$(POD_IP)]:9094'
   configRawYaml: |
