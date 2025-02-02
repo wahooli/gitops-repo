@@ -12,7 +12,7 @@ postconf \
     "smtpd_sasl_auth_enable = yes" \
     "smtp_sasl_auth_enable = yes" \
     "relayhost = DUNNO" \
-    "mydestination = localhost" \
+    "virtual_mailbox_base = /dev/null" \
     "smtp_sasl_security_options = noanonymous" \
     "smtp_tls_security_level = encrypt" \
     "smtp_sender_dependent_authentication = yes" \

@@ -17,13 +17,36 @@ global:
     backupDaily: "true"
     app.kubernetes.io/part-of: deluge
 
+probe:
+  liveness:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 10
+    httpGet:
+      path: /
+      port: webui
+  readiness:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 10
+    httpGet:
+      path: /
+      port: webui
+
+
 resources:
   requests:
     memory: "512Mi"
-    cpu: "250m"
+    cpu: "300m"
   limits:
-    memory: "2048Mi"
-    cpu: "600m"
+    memory: "1536Mi"
+    cpu: "700m"
 persistence:
   config:
     enabled: true
