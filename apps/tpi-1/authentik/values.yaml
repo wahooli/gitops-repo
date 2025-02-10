@@ -40,9 +40,18 @@ server:
     - name: ndots
       value: "1"
     - name: edns0
-  podLabels:
-    scrape-job-name: authentik
-    app: authentik-server
+  metrics:
+    enabled: true
+    service:
+      portName: http-metrics
+      labels:
+        goauthentik.io/scrape-metrics: "true"
+        scrape-job-name: authentik
+    serviceMonitor:
+      enabled: false
+  service:
+    annotations:
+      service.cilium.io/global: "true"
   ingress:
     enabled: true
     ingressClassName: nginx

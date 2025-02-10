@@ -30,3 +30,13 @@ spec:
   - port: http-metrics
     scheme: http
     path: /metrics
+    metricRelabelConfigs:
+    - action: labeldrop
+      regex: (pod|container|endpoint|instance|prometheus|endpoint)
+    - action: drop
+      regex: ^(go_.*)$
+      source_labels:
+      - __name__
+    relabelConfigs:
+    - source_labels: [exported_namespace]
+      target_label: "namespace"

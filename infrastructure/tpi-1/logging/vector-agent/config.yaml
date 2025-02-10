@@ -110,7 +110,10 @@ transforms:
             key != "controller_revision_hash" &&
             key != "backupdaily" &&
             key != "backupweekly" &&
-            key != "pod_template_hash"
+            key != "pod_template_hash" &&
+            key != "scrape_job_name" &&
+            key != "helm_sh_chart" &&
+            key != "app_kubernetes_io_version"
           }
         }
         .kubernetes = filter(.kubernetes) -> |key, _| {
@@ -175,6 +178,9 @@ transforms:
           structured.msg = string!(structured.event) + ", error: " + string!(structured.error)
         } else if exists(structured.event) {
           structured.msg = structured.event
+        }
+        if exists(structured.timestamp) {
+          structured.message_timestamp = del(structured.timestamp)
         }
       }
       if is_object(structured) {

@@ -46,7 +46,7 @@ resources:
     cpu: "300m"
   limits:
     memory: "1536Mi"
-    cpu: "700m"
+    cpu: "1000m"
 persistence:
   config:
     enabled: true

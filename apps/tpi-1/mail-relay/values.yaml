@@ -3,6 +3,15 @@ image:
 fullnameOverride: mail-relay
 strategy:
   type: RollingUpdate
+hostname: mail-relay
+serviceMonitor:
+  create: true
+  jobLabel: app.kubernetes.io/name
+  endpoint:
+    relabelConfigs:
+    - action: labelmap
+      regex: "__meta_kubernetes_service_label_app_kubernetes_io_instance"
+      replacement: "instance"
 probe:
   liveness:
     initialDelaySeconds: 10

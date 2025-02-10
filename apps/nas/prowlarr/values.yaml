@@ -2,6 +2,7 @@ image:
   tag: "1.29.2" # {"$imagepolicy": "flux-system:prowlarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
+  vector.dev/exclude-containers: "prowlarr-exporter"
 strategy:
   type: Recreate
 dnsConfig:
@@ -21,6 +22,22 @@ global:
 #   limits:
 #     memory: "3072Mi"
 #     cpu: "1000m"
+metrics:
+  enabled: true
+  resources:
+    limits:
+      cpu: 100m
+      memory: 60Mi
+serviceMonitor:
+  create: true
+  jobLabel: app.kubernetes.io/name
+  endpoint:
+    metricRelabelConfigs:
+    - action: replace
+      replacement: nasse
+      target_label: instance
+    - action: labeldrop
+      regex: (pod|container|image_id|url|endpoint|namespace|prometheus)
 persistence:
   config:
     enabled: true

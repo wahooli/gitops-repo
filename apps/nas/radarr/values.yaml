@@ -2,6 +2,7 @@ image:
   tag: "5.17.2" # {"$imagepolicy": "flux-system:radarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
+  vector.dev/exclude-containers: "radarr-exporter"
 strategy:
   type: Recreate
 global:
@@ -14,6 +15,24 @@ dnsConfig:
   - name: ndots
     value: "1"
   - name: edns0
+metrics:
+  enabled: true
+  resources:
+    limits:
+      cpu: 150m
+      memory: 60Mi
+serviceMonitor:
+  create: true
+  jobLabel: app.kubernetes.io/name
+  endpoint:
+    interval: 300s # not time sensitive data
+    scrapeTimeout: 60s
+    metricRelabelConfigs:
+    - action: replace
+      replacement: nasse
+      target_label: instance
+    - action: labeldrop
+      regex: (pod|container|image_id|url|endpoint|namespace|prometheus)
 envFrom:
   envs:
     type: configMap
@@ -58,17 +77,6 @@ ingress:
       velero.io/exclude-from-backup: "true"
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      # This should be the in-cluster DNS name for the authentik outpost service
-      # as when the external URL is specified here, nginx will overwrite some crucial headers
-      nginx.ingress.kubernetes.io/auth-url: |-
-        http://ak-outpost-nasse-proxy.default.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
-      # If you're using domain-level auth, use the authentication URL instead of the application URL
-      nginx.ingress.kubernetes.io/auth-signin: |-
-        https://radarr.wahoo.li/outpost.goauthentik.io/start?rd=$escaped_request_uri
-      nginx.ingress.kubernetes.io/auth-response-headers: |-
-        Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
-      nginx.ingress.kubernetes.io/auth-snippet: |
-        proxy_set_header X-Forwarded-Host $http_host;
       external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
       external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
@@ -76,9 +84,7 @@ ingress:
     hosts:
     - host: radarr.wahoo.li
       paths:
-      - path: "/"
-        pathType: "Prefix"
-      - path: /outpost.goauthentik.io
+      - path: /
         pathType: Prefix
         service:
           name: ak-outpost-nasse-proxy

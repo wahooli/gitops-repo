@@ -15,6 +15,7 @@ postconf \
     "virtual_mailbox_base = /dev/null" \
     "smtp_sasl_security_options = noanonymous" \
     "smtp_tls_security_level = encrypt" \
+    "mydestination = localhost.\$mydomain, localhost, \$myhostname" \
     "smtp_sender_dependent_authentication = yes" \
     "virtual_mailbox_domains = /etc/postfix/vhost" \
     "virtual_alias_maps = texthash:/etc/postfix/virtual"

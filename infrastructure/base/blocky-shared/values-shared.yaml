@@ -1,6 +1,10 @@
 image:
   tag: "v0.24" # {"$imagepolicy": "flux-system:blocky:tag"}
 
+podMonitor:
+  create: true
+  jobLabel: app.kubernetes.io/name
+
 service:
   main:
     externalTrafficPolicy: Local
