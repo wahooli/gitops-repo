@@ -166,5 +166,95 @@ configMapGenerator:
       grafana_dashboard: "1"
     annotations:
       kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: blocky-dashboard
+  namespace: grafana
+  files:
+  - blocky.json=dashboards/blocky.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: blocky-queries-dashboard
+  namespace: grafana
+  files:
+  - blocky-queries.json=dashboards/blocky-queries.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: systemd-logs-dashboard
+  namespace: grafana
+  files:
+  - systemd-logs.json=dashboards/systemd-logs.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: gpu-metrics-dashboard
+  namespace: grafana
+  files:
+  - gpu-metrics.json=dashboards/gpu-metrics.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: nginx-ingress-controller-dashboard
+  namespace: grafana
+  files:
+  - nginx-ingress-controller.json=dashboards/nginx-ingress-controller.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: nginx-request-handling-dashboard
+  namespace: grafana
+  files:
+  - nginx-request-handling.json=dashboards/nginx-request-handling.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: cloudflare-tunnel-dashboard
+  namespace: grafana
+  files:
+  - cloudflare-tunnel.json=dashboards/cloudflare-tunnel.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: media-stats-dashboard
+  namespace: grafana
+  files:
+  - media-stats.json=dashboards/media-stats.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: cert-manager-dashboard
+  namespace: grafana
+  files:
+  - cert-manager.json=dashboards/cert-manager.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: pod-logs-dashboard
+  namespace: grafana
+  files:
+  - pod-logs.json=dashboards/pod-logs.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
 configurations:
 - ../../.config/valuesFrom.yaml

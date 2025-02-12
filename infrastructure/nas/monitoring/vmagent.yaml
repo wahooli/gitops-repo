@@ -4,11 +4,22 @@ metadata:
   name: nas
   namespace: monitoring
 spec:
+  extraArgs:
+    loggerFormat: json
   externalLabels:
     clustername: nas
   selectAllByDefault: true
   port: "8429"
   scrapeInterval: 30s
+  configReloaderExtraArgs:
+    log-format: json
+  resources:
+    limits:
+      cpu: 350m
+      memory: 350Mi
+    requests:
+      cpu: 200m
+      memory: 200Mi
   remoteWrite:
   - url: http://vminsert-short-term-tpi-1-server.monitoring.svc.cluster.local.:8480/insert/0/prometheus/api/v1/write
     inlineUrlRelabelConfig:

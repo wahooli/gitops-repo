@@ -5,6 +5,15 @@ metadata:
   namespace: monitoring
 spec:
   port: "8427"
+  serviceSpec:
+    useAsDefault: true
+    spec:
+      type: ClusterIP
+    metadata:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/shared: "true"
+        service.cilium.io/affinity: "local"
   unauthorizedUserAccessSpec:
     url_map:
     - src_paths:

@@ -1,0 +1,24 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kube-dns
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: true
+  dependsOn:
+  - name: internal-dns
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./infrastructure/tpi-1/kube-dns-patches
+  postBuild:
+    substitute:
+      coredns_replicas: "4"
+    substituteFrom:
+    - kind: Secret
+      name: dns-vars
+      optional: false
+    - kind: Secret
+      name: cluster-vars
+      optional: true

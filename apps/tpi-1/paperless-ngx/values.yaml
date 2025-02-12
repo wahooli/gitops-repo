@@ -59,8 +59,11 @@ env:
       secretKeyRef:
         name: ${paperless_app_secret_name}
         key: paperless_admin_password
-# controller:
-#   type: statefulset
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 podAnnotations:
   backup.velero.io/backup-volumes: data
 global:
@@ -125,6 +128,18 @@ ingress:
     hosts:
     - host: paperless.wahoo.li
       paths:
+      - path: /robots.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
+      - path: /ads.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
       - path: "/"
         pathType: "Prefix"
       # - path: /admin

@@ -7,7 +7,7 @@ resources:
 - prometheus-operator-crds
 - default-backend
 - gateway-api
-- node-local-dns
+# - node-local-dns
 - cert-manager
 - victoria-metrics-operator
 - node-exporter

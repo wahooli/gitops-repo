@@ -1,0 +1,25 @@
+role: Agent
+dataDir: /vector-data-dir
+resources: {}
+args:
+- -w
+- --config-dir
+- /etc/vector/
+containerPorts:
+- name: prom-exporter
+  containerPort: 9090
+  protocol: TCP
+service:
+  enabled: false
+image:
+  base: debian
+  tag: 0.44.0-debian
+extraVolumes:
+- name: machine-id
+  hostPath:
+    path: /etc/machine-id
+    type: File
+extraVolumeMounts:
+- name: machine-id
+  mountPath: /etc/machine-id
+  readOnly: true

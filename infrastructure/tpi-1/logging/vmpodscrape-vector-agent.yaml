@@ -1,0 +1,20 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: vector-agent
+  namespace: logging
+spec:
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+    - logging
+  podMetricsEndpoints:
+  - port: prom-exporter
+    scheme: http
+    relabelConfigs:
+    - source_labels: [__meta_kubernetes_pod_node_name]
+      target_label: instance
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vector
+      app.kubernetes.io/component: Agent

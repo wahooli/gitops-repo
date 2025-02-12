@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik-server
+  namespace: authentik
+  annotations:
+    service.cilium.io/global: "true"
+spec:
+  internalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 9000
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  type: ClusterIP

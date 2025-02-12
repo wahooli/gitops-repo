@@ -1,5 +1,13 @@
 image:
   tag: "2025.1.0" # {"$imagepolicy": "flux-system:cloudflare-tunnel:tag"}
+podMonitor:
+  create: true
+  jobLabel: app.kubernetes.io/instance
+  endpoint:
+    relabelConfigs:
+    - action: labelmap
+      regex: "__meta_kubernetes_pod_node_name"
+      replacement: "node_name"
 persistence:
   config:
     enabled: true
@@ -35,6 +43,11 @@ resources:
   requests:
     cpu: 100m
     memory: 64Mi
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 replicaCount: 4
 affinity:
   podAntiAffinity:

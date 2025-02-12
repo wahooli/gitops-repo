@@ -1,0 +1,24 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: ingress-nginx-logs
+  namespace: alerting
+  labels:
+    victoriametrics.com/rule-type: vlogs
+spec:
+  groups:
+  - name: nginx-logs
+    params: {}
+    type: vlogs
+    rules:
+    - alert: ServerErrors
+      annotations:
+        description: "Connection from address {{$labels.remote_addr}} has encountered {{$labels.status}} error at {{$labels.vhost}}"
+        summary: "HTTP error {{$labels.status}} has occured"
+      expr: _time:60m method:!"" status:~5.* {source_type="kubernetes_logs", kubernetes.pod_namespace="ingress-nginx"} | stats by (remote_addr, vhost, status) count() as errorLog | filter errorLog:>0
+      for: 10s
+      labels:
+        severity: warning
+        explore_expression: method:!"" status:~5.* {source_type="kubernetes_logs", kubernetes.pod_namespace="ingress-nginx"}
+        timespan: 15m
+        # show_at: dashboard

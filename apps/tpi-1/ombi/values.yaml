@@ -20,6 +20,11 @@ initContainers:
       name: config
     - mountPath: /src
       name: ombi-config
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 persistence:
   config:
     enabled: true
@@ -62,6 +67,18 @@ ingress:
       paths:
       - path: /
         pathType: Prefix
+      - path: /robots.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
+      - path: /ads.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
       - path: /outpost.goauthentik.io
         pathType: Prefix
         service:

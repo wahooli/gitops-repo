@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vector-global-write-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    service:
+      type: ClusterIP

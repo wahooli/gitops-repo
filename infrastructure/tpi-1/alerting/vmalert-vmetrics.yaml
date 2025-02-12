@@ -1,0 +1,64 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlert
+metadata:
+  name: vmetrics-tpi-1
+  namespace: alerting
+spec:
+  replicaCount: 1
+  evaluationInterval: "10s"
+  image:
+    repository: victoriametrics/vmalert
+    tag: v1.108.1
+    pullPolicy: IfNotPresent
+  ruleSelector:
+    matchExpressions:
+    - key: victoriametrics.com/rule-type
+      operator: NotIn
+      values:
+      - vlogs
+  volumeMounts:
+  - name: extra-templates
+    mountPath: /templates
+  volumes:
+  - name: extra-templates
+    configMap:
+      name: vmalert-templates
+      defaultMode: 0444
+  extraArgs:
+    loggerFormat: json
+    external.url: https://grafana.wahoo.li
+    rule.templates: "/templates/*.tpl"
+    external.alert.source: '{{ template "grafana.metricsUrl" (args ($activeAt.Add (parseDurationTime (or $labels.timespan "1h"))).UnixMilli ($activeAt.Add (parseDurationTime (printf "-%s" (or $labels.timespan "1h")))).UnixMilli (.Expr|jsonEscape) $labels) }}'
+  datasource:
+    url: http://vmauth-read-proxy.monitoring.svc.cluster.local.:8427/select/0/prometheus
+  notifiers:
+  - url: http://vmalertmanager-tpi-1-0.vmalertmanager-tpi-1.alerting.svc.cluster.local.:9093
+  - url: http://vmalertmanager-tpi-1-1.vmalertmanager-tpi-1.alerting.svc.cluster.local.:9093
+  - url: http://vmalertmanager-nas-0.vmalertmanager-nas.alerting.svc.cluster.local.:9093
+  remoteWrite:
+    url: http://vmauth-global-write.monitoring.svc.cluster.local.:8427
+  remoteRead:
+    url: http://vmauth-read-proxy.monitoring.svc.cluster.local.:8427/select/0/prometheus
+  affinity:
+    podAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - vmalertmanager
+          topologyKey: kubernetes.io/hostname
+        weight: 10
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - vmalert
+            topologyKey: kubernetes.io/hostname
+          weight: 10

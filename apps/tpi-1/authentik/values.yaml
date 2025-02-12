@@ -28,10 +28,30 @@ authentik:
 #     value: email@email.com
 #   - name: AUTHENTIK_BOOTSTRAP_PASSWORD
 #     value: password
+worker:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
 server:
-  podLabels:
-    scrape-job-name: authentik
-    app: authentik-server
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
+  metrics:
+    enabled: true
+    service:
+      portName: http-metrics
+      labels:
+        goauthentik.io/scrape-metrics: "true"
+        scrape-job-name: authentik
+    serviceMonitor:
+      enabled: false
+  service:
+    annotations:
+      service.cilium.io/global: "true"
   ingress:
     enabled: true
     ingressClassName: nginx

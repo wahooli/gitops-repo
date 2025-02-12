@@ -1,0 +1,25 @@
+fullnameOverride: vector-lb-nas
+role: Stateless-Aggregator
+dataDir: /vector-data-dir
+resources: {}
+args:
+- -w
+- --config-dir
+- /etc/vector/
+service:
+  enabled: true
+  annotations:
+    service.cilium.io/global: "true"
+  ports:
+  - name: vector
+    port: 6000
+    protocol: TCP
+containerPorts:
+- name: vector
+  containerPort: 6000
+  protocol: TCP
+- name: prom-exporter
+  containerPort: 9090
+  protocol: TCP
+serviceHeadless:
+  enabled: false

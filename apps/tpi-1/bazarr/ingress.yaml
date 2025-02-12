@@ -25,6 +25,20 @@ spec:
       paths:
       - backend:
           service:
+            name: default-backend
+            port:
+              number: 80
+        path: /robots.txt
+        pathType: Exact
+      - backend:
+          service:
+            name: default-backend
+            port:
+              number: 80
+        path: /ads.txt
+        pathType: Exact
+      - backend:
+          service:
             name: bazarr
             port:
               number: 6767

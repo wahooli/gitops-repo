@@ -7,7 +7,11 @@
 env:
   LOG_LEVEL: warn
   TZ: Europe/Helsinki
-
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 image:
   repository: ghcr.io/lenaxia/overseerr-oidc
   pullPolicy: IfNotPresent
@@ -57,14 +61,20 @@ ingress:
     hosts:
     - host: overseerr.wahoo.li
       paths:
+      - path: /robots.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
+      - path: /ads.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
       - path: "/"
         pathType: "Prefix"
-      # - path: /setup
-      #   pathType: Prefix
-      #   service:
-      #     name: default-backend
-      #     port:
-      #       number: 80
     tls:
     - hosts:
       - overseerr.wahoo.li

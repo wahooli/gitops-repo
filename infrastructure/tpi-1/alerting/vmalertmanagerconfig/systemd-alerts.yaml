@@ -1,0 +1,24 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanagerConfig
+metadata:
+  name: systemd-alerts
+  namespace: alerting
+spec:
+  route:
+    receiver: discord
+    # routes: child routes
+    matchers:
+    - source_type = journald
+    group_by:
+    - systemd_host
+    - systemd_unit
+    group_wait: 120s
+    group_interval: 15m
+    repeat_interval: 6h
+  receivers:
+  - name: discord
+    discord_configs:
+    - webhook_url_secret:
+        name: discrord-webhook
+        key: url
+      send_resolved: true

@@ -8,5 +8,32 @@ patches:
     - op: add
       path: /spec/template/metadata/labels/scrape-job-name
       value: fluxcd
+    - op: add
+      path: /spec/template/spec/dnsConfig
+      value:
+        options:
+        - name: ndots
+          value: "1"
+        - name: edns0
   target:
     kind: Deployment
+- patch: |
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --interval-jitter-percentage=9
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --concurrent=6
+  target:
+    kind: Deployment
+    name: "(source-controller|kustomize-controller|helm-controller)"
+- patch: |
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --rate-limit-interval=0m10s
+    - op: add
+      path: /spec/template/spec/containers/0/args/-
+      value: --concurrent=6
+  target:
+    kind: Deployment
+    name: "notification-controller"

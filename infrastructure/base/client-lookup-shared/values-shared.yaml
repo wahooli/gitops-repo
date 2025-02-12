@@ -1,0 +1,116 @@
+replicaCount: 1
+resources:
+  limits:
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 70Mi
+
+rollingUpdate:
+  maxUnavailable: 1
+  maxSurge: 25%
+
+terminationGracePeriodSeconds: 10
+
+serviceType: "ClusterIP"
+
+service:
+  clusterIP: "${client_lookup_cluster_ip}"
+
+fullnameOverride: client-lookup
+
+rbac:
+  create: false
+
+isClusterService: false
+
+securityContext:
+  capabilities:
+    add:
+    - NET_BIND_SERVICE
+
+servers:
+- zones:
+  - zone: .
+  port: 53
+  plugins:
+  # - name: log
+  #   parameters: |-
+  #     . "{\"question_type\": \"{type}\", \"rcode\": \"{rcode}\", \"question_class\": \"{class}\", \"question_name\": \"{name}\", \"client_ip\": \"{remote}\", \"msg\": \"query resolved\"}"
+  - name: errors
+  - name: health
+    configBlock: |-
+      lameduck 5s
+  # Serves a /ready endpoint on :8181, required for readinessProbe
+  - name: ready
+  - name: forward
+    parameters: 10.in-addr.arpa ${router_ip}
+    configBlock: |-
+      except ${cluster_pod_cidr_reverse}
+  - name: forward
+    parameters: 168.192.in-addr.arpa ${router_ip}
+    configBlock: |-
+      except ${purola_cidr_reverse}
+  - name: forward
+    parameters: ${purola_cidr_reverse} ${purola_router_ip}
+  - name: forward
+    parameters: 16.172.in-addr.arpa ${router_ip}
+  - name: forward
+    parameters: ${cluster_pod_cidr_reverse} ${nas_dns_ip}
+    configBlock: |-
+      except ${nas_client_ip_lookup_except}
+  - name: rewrite
+    parameters: stop
+    configBlock: |-
+      name regex (${nas_client_ip_lookup_regex}).in-addr.arpa {1}.in-addr.arpa
+      answer name auto
+      answer value ^\S+\.(\S+)\.(\S+)\.svc\.cluster\.local {1}.{2}.nas
+  - name: forward
+    parameters: ${cluster_pod_cidr_reverse} ${tpi_1_dns_ip}
+    configBlock: |-
+      except ${tpi_1_client_ip_lookup_except}
+  - name: rewrite
+    parameters: stop
+    configBlock: |-
+      name suffix .arpa .arpa
+      answer name auto
+      answer value ^\S+\.(\S+)\.(\S+)\.svc\.cluster\.local {1}.{2}.tpi-1
+  - name: forward
+    parameters: example.com ${unbound_cluster_ip}:${dns_svc_port:=53}
+extraConfig: {}
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+# To use the readinessProbe, the ready plugin needs to be enabled in CoreDNS' server config
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+affinity:
+  podAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/instance
+            operator: In
+            values:
+            - blocky
+        topologyKey: kubernetes.io/hostname
+      weight: 10
+
+deployment:
+  enabled: true
+  ## Annotations for the coredns deployment
+  annotations: {}
+  ## Pod selector
+  selector: {}

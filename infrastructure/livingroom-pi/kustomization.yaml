@@ -7,6 +7,7 @@ resources:
 - cert-manager
 - victoria-metrics-operator
 - node-exporter
+- kube-state-metrics
 - multus
 - node-local-dns
 - reflector

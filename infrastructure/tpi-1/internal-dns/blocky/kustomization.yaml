@@ -1,9 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 resources:
-- ../../../base/blocky
-- imagepolicy.yaml
-- certificate.yaml
-- vmpodscrape.yaml
+- ../../../base/blocky-shared
+- blocky-nas.yaml
+- httproute.yaml
 patches:
 - path: helmrelease.yaml
   target:
@@ -13,14 +12,12 @@ patches:
 configMapGenerator:
 - name: blocky-config
   namespace: flux-system
+  behavior: merge
   options:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "internal-dns"
-  files:
-  - config.yml=config/config.yml
-  - tlds-alpha-by-domain.txt=config/tlds-alpha-by-domain.txt
 - name: blocky-values
   namespace: flux-system
   behavior: merge

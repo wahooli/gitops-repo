@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-coredns
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: coredns
+spec:
+  releaseName: base-coredns
+  targetNamespace: kube-system
+  chart:
+    spec:
+      chart: coredns
+      sourceRef:
+        kind: HelmRepository
+        name: coredns
+        namespace: flux-system
+      interval: 24h
+  interval: 5m
+  # timeout: 10m
+  install:
+    timeout: 10m
+    remediation:
+      remediateLastFailure: true
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: coredns-values
+    valuesKey: values-base.yaml

@@ -8,6 +8,7 @@ spec:
   removePvcAfterDelete: true
   extraArgs:
     retention.maxDiskSpaceUsageBytes: 14848MiB
+    loggerFormat: json
   serviceSpec:
     useAsDefault: true
     spec:

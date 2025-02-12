@@ -1,0 +1,26 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: blocky-api
+  namespace: internal-dns
+spec:
+  parentRefs:
+  - name: internal-gw
+    namespace: infrastructure
+  hostnames:
+  - "blocky-api.wahoo.li"
+  - "blocky-api.absolutist.it"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api/
+    backendRefs:
+    - name: blocky-nas
+      port: 4000
+    filters:
+    - type: RequestMirror
+      requestMirror:
+        backendRef:
+          name: blocky-tpi-1
+          port: 4000

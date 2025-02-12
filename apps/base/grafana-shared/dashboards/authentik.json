@@ -22,10 +22,10 @@
     ]
   },
   "description": "Grafana Dashboard for Prometheus metrics exposed by authentik.",
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 14,
+  "id": 24,
   "links": [],
   "panels": [
     {
@@ -44,7 +44,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -103,7 +103,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 12,
         "w": 17,
         "x": 0,
         "y": 1
@@ -125,12 +125,15 @@
       "targets": [
         {
           "datasource": {
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
           "expr": "avg by (flow_slug) (rate(authentik_flows_plan_time_sum{namespace=~\"$namespace\"}[5m]) / rate(authentik_flows_plan_time_count{namespace=~\"$namespace\"}[5m]))",
           "interval": "",
           "legendFormat": "{{ flow_slug }}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -141,7 +144,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -223,10 +226,12 @@
       "targets": [
         {
           "datasource": {
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(authentik_system_tasks{namespace=~\"$namespace\",status=\"TaskResultStatus.ERROR\"})",
+          "expr": "sum(authentik_system_tasks{namespace=~\"$namespace\",status=\"error\"})",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -235,10 +240,12 @@
         },
         {
           "datasource": {
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(authentik_system_tasks{namespace=~\"$namespace\",status=\"TaskResultStatus.SUCCESSFUL\"})",
+          "expr": "sum(authentik_system_tasks{namespace=~\"$namespace\",status=\"successful\"})",
           "hide": false,
           "instant": true,
           "interval": "",
@@ -256,7 +263,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 5,
         "w": 4,
         "x": 20,
         "y": 1
@@ -279,88 +286,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 17,
-        "y": 7
-      },
-      "id": 6,
-      "options": {
-        "displayLabels": [],
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": []
-        },
-        "pieType": "donut",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {},
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.4.0",
-      "targets": [
-        {
-          "datasource": {
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "exemplar": true,
-          "expr": "sum(authentik_policies_cached{namespace=~\"$namespace\"})",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "Cached policies",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "exemplar": true,
-          "expr": "sum(authentik_models{namespace=~\"$namespace\",app=\"authentik_policies\", model_name=\"policy\"}) - authentik_policies_cached",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "Total policies",
-          "refId": "B"
-        }
-      ],
-      "title": "Cached policies",
-      "transparent": true,
-      "type": "piechart"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -393,7 +319,7 @@
         "h": 3,
         "w": 4,
         "x": 20,
-        "y": 7
+        "y": 6
       },
       "id": 4,
       "options": {
@@ -418,12 +344,15 @@
       "targets": [
         {
           "datasource": {
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
           "expr": "max(authentik_admin_workers{namespace=~\"$namespace\"})",
           "interval": "",
           "legendFormat": "",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -434,7 +363,92 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 17,
+        "y": 7
+      },
+      "id": 6,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": []
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(authentik_policies_cached{namespace=~\"$namespace\"})",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Cached policies",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(authentik_models{namespace=~\"$namespace\",app=\"authentik_policies\", model_name=\"policy\"}) - authentik_policies_cached",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Total policies",
+          "refId": "B"
+        }
+      ],
+      "title": "Cached policies",
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -467,7 +481,7 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 10
+        "y": 9
       },
       "id": 16,
       "options": {
@@ -492,7 +506,8 @@
       "targets": [
         {
           "datasource": {
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
           "exemplar": true,
           "expr": "sum(authentik_outposts_connected{namespace=~\"$namespace\"})",
@@ -508,7 +523,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "description": "",
       "fieldConfig": {
@@ -538,7 +553,7 @@
         "h": 16,
         "w": 4,
         "x": 0,
-        "y": 11
+        "y": 13
       },
       "id": 15,
       "options": {
@@ -570,7 +585,8 @@
       "targets": [
         {
           "datasource": {
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
           "exemplar": true,
           "expr": "avg by (task_name) (authentik_system_tasks{namespace=~\"$namespace\"})",
@@ -587,7 +603,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -649,7 +665,7 @@
         "h": 8,
         "w": 20,
         "x": 4,
-        "y": 14
+        "y": 13
       },
       "id": 2,
       "options": {
@@ -668,7 +684,8 @@
       "targets": [
         {
           "datasource": {
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
           "exemplar": true,
           "expr": "topk(5, avg by(binding_target_type) (rate(authentik_policies_execution_time_sum{namespace=~\"$namespace\"}[5m]) / rate(authentik_policies_execution_time_count{namespace=~\"$namespace\"}[5m])))",
@@ -684,7 +701,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -746,7 +763,7 @@
         "h": 8,
         "w": 20,
         "x": 4,
-        "y": 22
+        "y": 21
       },
       "id": 11,
       "options": {
@@ -765,7 +782,8 @@
       "targets": [
         {
           "datasource": {
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus",
+            "uid": "${datasource}"
           },
           "exemplar": true,
           "expr": "topk(5, avg by(object_type) (rate(authentik_policies_execution_time_sum{namespace=~\"$namespace\"}[5m]) / rate(authentik_policies_execution_time_count{namespace=~\"$namespace\"}[5m])))",
@@ -784,7 +802,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 29
       },
       "id": 18,
       "panels": [],
@@ -795,7 +813,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -856,7 +874,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 31
+        "y": 30
       },
       "id": 20,
       "options": {
@@ -876,12 +894,14 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PB03EEC818B40D27F"
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by (host) (rate(authentik_outpost_proxy_requests_sum{namespace=~\"$namespace\", outpost_name=\"$outpost_proxy\"}[5m]))",
+          "expr": "sum by (host) (rate(authentik_outpost_proxy_request_duration_seconds_bucket{namespace=~\"$namespace\", outpost_name=\"$outpost_proxy\"}[5m]))",
           "interval": "",
           "legendFormat": "{{ host }}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -892,7 +912,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "description": "",
       "fieldConfig": {
@@ -954,7 +974,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 31
+        "y": 30
       },
       "id": 21,
       "options": {
@@ -974,12 +994,14 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PB03EEC818B40D27F"
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by (host) (rate(authentik_outpost_proxy_requests_sum{outpost_name=\"$outpost_proxy\", namespace=~\"$namespace\",user=\"\"}[5m]))",
+          "expr": "sum by (host) (rate(authentik_outpost_proxy_request_duration_seconds_bucket{namespace=~\"$namespace\",outpost_name=\"$outpost_proxy\",user=\"\"}[5m]))",
           "interval": "",
           "legendFormat": "{{ host }}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -993,7 +1015,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 56
       },
       "id": 25,
       "panels": [],
@@ -1004,7 +1026,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1065,7 +1087,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 40
+        "y": 57
       },
       "id": 27,
       "options": {
@@ -1085,12 +1107,14 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PB03EEC818B40D27F"
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "avg by (dn) (rate(authentik_outpost_ldap_requests_bucket{namespace=~\"$namespace\", outpost_name=\"$outpost_ldap\"}[5m]))",
+          "expr": "avg by (dn) (rate(authentik_outpost_ldap_request_duration_seconds_bucket{namespace=~\"$namespace\", outpost_name=\"$outpost_ldap\"}[5m]))",
           "interval": "",
           "legendFormat": "{{ dn }}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1101,7 +1125,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1162,7 +1186,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 40
+        "y": 57
       },
       "id": 28,
       "options": {
@@ -1182,7 +1206,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PB03EEC818B40D27F"
+            "uid": "${datasource}"
           },
           "exemplar": true,
           "expr": "avg by (reason) (rate(authentik_outpost_ldap_requests_rejected{namespace=~\"$namespace\", outpost_name=\"$outpost_ldap\"}[5m]))",
@@ -1198,7 +1222,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1259,7 +1283,7 @@
         "h": 8,
         "w": 16,
         "x": 0,
-        "y": 48
+        "y": 65
       },
       "id": 26,
       "options": {
@@ -1279,25 +1303,29 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PB03EEC818B40D27F"
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "avg by (flow) (rate(authentik_outpost_flow_timing_get_bucket{namespace=~\"$namespace\"}[5m]))",
+          "expr": "avg by (flow) (rate(authentik_outpost_flow_timing_get_seconds_bucket{namespace=~\"$namespace\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{ flow }} GET",
+          "range": true,
           "refId": "A"
         },
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PB03EEC818B40D27F"
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "avg by (flow) (rate(authentik_outpost_flow_timing_post_bucket{namespace=~\"$namespace\"}[5m]))",
+          "expr": "avg by (flow) (rate(authentik_outpost_flow_timing_post_seconds_bucket{namespace=~\"$namespace\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{ flow }} POST",
+          "range": true,
           "refId": "B"
         }
       ],
@@ -1308,7 +1336,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1330,7 +1358,7 @@
         "h": 8,
         "w": 4,
         "x": 16,
-        "y": 48
+        "y": 65
       },
       "id": 29,
       "options": {
@@ -1357,13 +1385,15 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PB03EEC818B40D27F"
+            "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "group by (type) (authentik_outpost_ldap_requests_sum)",
+          "expr": "group by (type) (authentik_outpost_ldap_request_duration_seconds_sum)",
           "hide": false,
           "interval": "",
           "legendFormat": "{{ type }}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1374,7 +1404,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PB03EEC818B40D27F"
+        "uid": "${datasource}"
       },
       "description": "",
       "fieldConfig": {
@@ -1397,7 +1427,7 @@
         "h": 8,
         "w": 4,
         "x": 20,
-        "y": 48
+        "y": 65
       },
       "id": 30,
       "options": {
@@ -1424,7 +1454,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PB03EEC818B40D27F"
+            "uid": "${datasource}"
           },
           "exemplar": true,
           "expr": "group by (reason) (authentik_outpost_ldap_requests_rejected)",
@@ -1446,66 +1476,90 @@
   "templating": {
     "list": [
       {
+        "current": {},
+        "label": "Datasource",
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
         "current": {
-          "text": [
-            "All"
-          ],
+          "text": "All",
           "value": [
             "$__all"
           ]
         },
         "datasource": {
-          "type": "victoriametrics-datasource",
-          "uid": "P43426240ED93BD1D"
+          "type": "prometheus",
+          "uid": "${datasource}"
         },
-        "definition": "label_values(authentik_outpost_connection{namespace=~\".*\"},namespace)",
+        "definition": "authentik_outpost_info",
         "includeAll": true,
         "label": "Namespace",
         "multi": true,
         "name": "namespace",
         "options": [],
         "query": {
-          "qryType": 1,
-          "query": "label_values(authentik_outpost_connection{namespace=~\".*\"},namespace)",
-          "refId": "VariableQueryEditor-VariableQuery"
+          "qryType": 4,
+          "query": "authentik_outpost_info",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "regex": "",
+        "regex": "/.*namespace=\"([^\"]*).*/",
         "type": "query"
       },
       {
         "current": {
-          "text": "",
-          "value": ""
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
         },
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
         "definition": "authentik_outpost_info{outpost_type=\"proxy\"}",
-        "hide": 2,
-        "includeAll": false,
+        "description": "",
+        "includeAll": true,
+        "label": "Outpost proxy",
+        "multi": true,
         "name": "outpost_proxy",
         "options": [],
         "query": {
+          "qryType": 4,
           "query": "authentik_outpost_info{outpost_type=\"proxy\"}",
-          "refId": "StandardVariableQuery"
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "/.*outpost_name=\"([^\"]*).*/",
+        "sort": 7,
         "type": "query"
       },
       {
         "current": {
-          "text": "",
-          "value": ""
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
         },
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
         "definition": "authentik_outpost_info{outpost_type=\"ldap\"}",
-        "hide": 2,
-        "includeAll": false,
+        "includeAll": true,
+        "label": "LDAP outpost",
+        "multi": true,
         "name": "outpost_ldap",
         "options": [],
         "query": {
+          "qryType": 4,
           "query": "authentik_outpost_info{outpost_type=\"ldap\"}",
-          "refId": "StandardVariableQuery"
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "regex": "/.*outpost_name=\"([^\"]*).*/",
@@ -1514,12 +1568,13 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "authentik",
-  "version": 3,
-  "weekStart": ""
+  "uid": "ee9zpq2tsfg8wd",
+  "version": 1,
+  "weekStart": "monday"
 }

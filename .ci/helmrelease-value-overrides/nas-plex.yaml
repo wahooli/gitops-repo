@@ -6,3 +6,11 @@ metadata:
 data:
   values.yaml: |
     runtimeClassName: ""
+    metrics:
+      enabled: false
+    containers:
+      plex-media-server-exporter:
+        enabled: false
+    initContainers:
+      import-configuration:
+        enabled: false
