@@ -3,18 +3,34 @@ image:
 fullnameOverride: mail-relay
 strategy:
   type: RollingUpdate
+hostname: mail-relay
+serviceMonitor:
+  create: true
+  jobLabel: app.kubernetes.io/name
+  endpoint:
+    relabelConfigs:
+    - action: labelmap
+      regex: "__meta_kubernetes_service_label_app_kubernetes_io_instance"
+      replacement: "instance"
 probe:
   liveness:
-    enabled: false
+    initialDelaySeconds: 10
+  readiness:
+    timeoutSeconds: 5
+    initialDelaySeconds: 5
 resources:
   limits:
-    cpu: 500m
     ephemeral-storage: 2048Mi
-    memory: 512Mi
-  requests:
-    cpu: 100m
-    ephemeral-storage: 200Mi
     memory: 256Mi
+  requests:
+    cpu: 160m
+    ephemeral-storage: 200Mi
+    memory: 128Mi
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 env:
   LDAP_BIND_PW:
     valueFrom:
@@ -32,6 +48,18 @@ envFrom:
     useFromChart: false
     name: mail-relay-env
 initContainers:
+  create-logfile:
+    image: busybox:1.37.0
+    imagePullPolicy: IfNotPresent
+    command:
+    - /bin/sh
+    - -c
+    args:
+    - 'touch /var/log/mail/mail.log'
+    volumeMounts:
+    - mountPath: /var/log/mail
+      name: data
+      subPath: logs
   copy-configuration:
     image: ghcr.io/wahooli/docker/envsubst:latest
     imagePullPolicy: IfNotPresent
@@ -44,6 +72,51 @@ initContainers:
       subPath: config
     - mountPath: /src
       name: mail-relay-config
+podAnnotations:
+  vector.dev/exclude-containers: "postfix-exporter" # ignore logs for exporter sidecar
+sidecars:
+  postfix-exporter:
+    image: ghcr.io/wahooli/docker/postfix_exporter:latest
+    imagePullPolicy: IfNotPresent
+    args:
+    - '--postfix.showq_path=/var/mail-state/spool-postfix/public/showq'
+    - '--postfix.logfile_path=/var/log/mail/mail.log'
+    - '--log.unsupported'
+    - '--web.listen-address=:9154'
+    - '--web.telemetry-path=/metrics'
+    ports:
+    - containerPort: 9154
+      name: metrics
+      protocol: TCP
+    volumeMounts:
+    - mountPath: /var/mail-state
+      name: data
+      subPath: state
+    - mountPath: /var/log/mail
+      name: data
+      subPath: logs
+    readinessProbe:
+      httpGet:
+        path: /
+        port: metrics
+      failureThreshold: 10
+      initialDelaySeconds: 0
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        cpu: 100m
+        memory: 50Mi
+    livenessProbe:
+      httpGet:
+        path: /
+        port: metrics
+      failureThreshold: 10
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
 persistence:
   data:
     name: data
@@ -82,3 +155,18 @@ persistence:
       useFromChart: false
       secret:
         name: tls-mail-relay
+service:
+  main:
+    ports:
+    - name: smtp
+      port: 25
+      protocol: TCP
+    - name: submissions
+      port: 465
+      protocol: TCP
+    - name: submission
+      port: 587
+      protocol: TCP
+    - name: metrics
+      port: 9154
+      protocol: TCP

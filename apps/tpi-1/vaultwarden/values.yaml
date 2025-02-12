@@ -5,12 +5,17 @@ envFrom:
     type: configMap
     useFromChart: false
     name: vaultwarden-env
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 initContainers:
   wait-for-psql:
     image: ghcr.io/wahooli/docker/wait-for-it:latest
     imagePullPolicy: IfNotPresent
     args:
-    - vaultwarden-postgresql:5432
+    - vaultwarden-postgresql.default.svc.cluster.local.:5432
     - -t
     - "300" # wait for 5 minutes
 env:
@@ -89,6 +94,18 @@ ingress:
     hosts:
     - host: vault.wahoo.li
       paths:
+      - path: /robots.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
+      - path: /ads.txt
+        pathType: Exact
+        service:
+          name: default-backend
+          port:
+            number: 80
       - path: /admin
         pathType: Prefix
         service:

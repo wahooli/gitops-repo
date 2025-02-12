@@ -12,8 +12,6 @@ spec:
   - action: labeldrop
     regex: (uid|pod_uid)
   - action: labeldrop
-    regex: (le)
-  - action: labeldrop
     regex: (id|name)
   - action: drop
     regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)

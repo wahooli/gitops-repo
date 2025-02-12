@@ -10,6 +10,7 @@ spec:
   vmstorage:
     replicaCount: 1
     extraArgs:
+      loggerFormat: json
       storageDataPath: /storage
       dedup.minScrapeInterval: 30s
     serviceSpec:
@@ -34,6 +35,9 @@ spec:
       repository: victoriametrics/vmselect
       tag: v1.108.1-cluster
       pullPolicy: IfNotPresent
+    extraArgs:
+      loggerFormat: json
+      dedup.minScrapeInterval: 30s
     storage:
       volumeClaimTemplate:
         spec:
@@ -54,6 +58,8 @@ spec:
       repository: victoriametrics/vminsert
       tag: v1.108.1-cluster
       pullPolicy: IfNotPresent
+    extraArgs:
+      loggerFormat: json
     serviceSpec:
       useAsDefault: true
       spec:

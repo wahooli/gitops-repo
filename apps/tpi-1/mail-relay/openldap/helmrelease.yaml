@@ -4,9 +4,9 @@ metadata:
   name: default--mail-relay-openldap
   namespace: flux-system
 spec:
-  # chart:
-  #   spec:
-  #     version: "16.5.0"
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
   releaseName: mail-relay-openldap
   interval: 5m
   targetNamespace: default

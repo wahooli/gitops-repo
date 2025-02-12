@@ -51,6 +51,7 @@ ip6.arpa:53 {
     prometheus :9253
 }
 .:53 {
+    log . "{\"question_type\": \"{type}\", \"question_class\": \"{class}\", \"question_name\": \"{name}\", \"client_ip\": \"{remote}\", \"msg\": \"query resolved\"}"
     errors
     cache 30
     reload

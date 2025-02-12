@@ -13,3 +13,5 @@ extraArgs:
 cainjector:
   extraArgs:
   - --logging-format=json
+prometheus:
+  enabled: true

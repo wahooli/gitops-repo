@@ -23,3 +23,26 @@ spec:
   - kind: ConfigMap
     name: reflector-values
     valuesKey: values-base.yaml
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          version: v1
+          kind: Deployment
+        patch: |
+          - op: add
+            path: /metadata/annotations/helm.toolkit.fluxcd.io~1driftDetection
+            value: disabled
+          - op: add
+            path: /spec/template/spec/containers/0/volumeMounts
+            value:
+              - mountPath: /app/reflector.logging.json
+                name: config
+                subPath: reflector.logging.json
+          - op: add
+            path: /spec/template/spec/volumes
+            value:
+              - name: config
+                configMap:
+                  defaultMode: 420
+                  name: reflector-config

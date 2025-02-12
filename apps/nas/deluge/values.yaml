@@ -2,7 +2,13 @@ image:
   tag: "2.1.1" # {"$imagepolicy": "flux-system:deluge:tag"}
 
 hostNetwork: true
-
+strategy:
+  type: Recreate
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 podAnnotations:
   backup.velero.io/backup-volumes: config
 global:
@@ -11,13 +17,36 @@ global:
     backupDaily: "true"
     app.kubernetes.io/part-of: deluge
 
-# resources:
-#   requests:
-#     memory: "256Mi"
-#     cpu: "400m"
-#   limits:
-#     memory: "3072Mi"
-#     cpu: "1000m"
+probe:
+  liveness:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 10
+    httpGet:
+      path: /
+      port: webui
+  readiness:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 10
+    httpGet:
+      path: /
+      port: webui
+
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "300m"
+  limits:
+    memory: "1536Mi"
+    cpu: "1000m"
 persistence:
   config:
     enabled: true

@@ -1,0 +1,24 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanagerConfig
+metadata:
+  name: generic-alerts
+  namespace: alerting
+spec:
+  route:
+    receiver: discord
+    # routes: child routes
+    matchers:
+    - source_type != journald
+    group_by:
+    - alertgroup
+    - alertname
+    group_wait: 0s
+    group_interval: 5m
+    repeat_interval: 3h
+  receivers:
+  - name: discord
+    discord_configs:
+    - webhook_url_secret:
+        name: discrord-webhook
+        key: url
+      send_resolved: true

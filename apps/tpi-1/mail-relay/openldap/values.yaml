@@ -35,6 +35,12 @@ initContainers:
       name: ldifs
     - mountPath: /src
       name: custom-ldif
+resources:
+  limits:
+    memory: 64Mi
+  requests:
+    cpu: 40m
+    memory: 32Mi
 persistence:
   ldif:
     name: custom-ldif

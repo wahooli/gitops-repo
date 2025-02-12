@@ -47,7 +47,7 @@ customResourceState:
             source_name: [spec, sourceRef, name]
       - groupVersionKind:
           group: helm.toolkit.fluxcd.io
-          version: v2beta2
+          version: v2
           kind: HelmRelease
         metricNamePrefix: gotk
         metrics:
@@ -86,7 +86,7 @@ customResourceState:
             url: [spec, url]
       - groupVersionKind:
           group: source.toolkit.fluxcd.io
-          version: v1beta2
+          version: v1
           kind: Bucket
         metricNamePrefix: gotk
         metrics:
@@ -106,7 +106,7 @@ customResourceState:
             bucket_name: [spec, bucketName]
       - groupVersionKind:
           group: source.toolkit.fluxcd.io
-          version: v1beta2
+          version: v1
           kind: HelmRepository
         metricNamePrefix: gotk
         metrics:
@@ -125,7 +125,7 @@ customResourceState:
             url: [spec, url]
       - groupVersionKind:
           group: source.toolkit.fluxcd.io
-          version: v1beta2
+          version: v1
           kind: HelmChart
         metricNamePrefix: gotk
         metrics:
@@ -250,7 +250,7 @@ customResourceState:
             source_name: [spec, imageRepositoryRef, name]
       - groupVersionKind:
           group: image.toolkit.fluxcd.io
-          version: v1beta1
+          version: v1beta2
           kind: ImageUpdateAutomation
         metricNamePrefix: gotk
         metrics:

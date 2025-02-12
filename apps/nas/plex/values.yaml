@@ -2,7 +2,58 @@ image:
   tag: "1.41.3" # {"$imagepolicy": "flux-system:plex:tag"}
 hostname: nasse
 runtimeClassName: nvidia
+strategy:
+  type: Recreate
 hostNetwork: true
+metrics:
+  enabled: true
+  image:
+    repository: ghcr.io/jsclayton/prometheus-plex-exporter
+    tag: "main"
+    digest: "sha256:18ef1b2197efbcb75bd7276380955760995f10a9fbe55106809a6fcff91c2940"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+serviceMonitor:
+  create: true
+  jobLabel: app.kubernetes.io/name
+  endpoints:
+  - targetPort: 9594
+    path: /metrics
+    scheme: http
+    interval: 15s
+    metricRelabelConfigs:
+    - action: replace
+      replacement: nasse
+      target_label: instance
+    - action: replace
+      replacement: nasse
+      target_label: server
+    - action: labeldrop
+      regex: (pod|container_id|image_id|container|service|namespace|prometheus)
+    - action: drop
+      regex: ^(plex_up|plex_info|plex_media_count|plex_media_downloads_count)$
+      source_labels:
+      - __name__
+  - targetPort: 9000
+    path: /metrics
+    scheme: http
+    metricRelabelConfigs:
+    - action: replace
+      replacement: nasse
+      target_label: instance
+    - action: labeldrop
+      regex: (pod|container_id|image_id|container|service|namespace|prometheus)
+    - action: drop
+      regex: ^(go_.*|promhttp_.*)$
+      source_labels:
+      - __name__
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 envFrom:
   envs:
     type: configMap
@@ -10,6 +61,7 @@ envFrom:
     name: plex-env
 podAnnotations:
   backup.velero.io/backup-volumes: config
+  vector.dev/exclude-containers: "plex-prometheus-exporter,plex-media-server-exporter"
 global:
   labels:
     backupWeekly: "true"
@@ -41,6 +93,65 @@ configMaps:
       rm pms.tgz
 
       echo "Done."
+containers:
+  plex-media-server-exporter:
+    image:
+      repository: ghcr.io/axsuul/plex-media-server-exporter
+      tag: "2.1.0"
+    env:
+      PLEX_SERVER: http://127.0.0.1:32400
+      PLEX_ADDR: http://127.0.0.1:32400
+    command:
+    - /entrypoint-override.sh
+    args:
+    - bundle
+    - exec
+    - puma
+    - -b
+    - tcp://0.0.0.0:9594
+    ports:
+    - containerPort: 9594
+      name: metrics
+      protocol: TCP
+    volumeMounts:
+    - name: shared
+      mountPath: /shared
+      readOnly: true
+      recursiveReadOnly: IfPossible
+    - mountPath: /entrypoint-override.sh
+      name: metrics-entrypoint
+      subPath: entrypoint-override.sh
+    probe:
+      readiness:
+        httpGet:
+          path: /
+          port: metrics
+        failureThreshold: 10
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 1
+      liveness:
+        httpGet:
+          path: /
+          port: metrics
+        failureThreshold: 10
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 1
+      startup:
+        exec:
+          command:
+          - sh
+          - -c
+          - test -e /shared/token
+        periodSeconds: 5
+        failureThreshold: 120
+        successThreshold: 1
+        timeoutSeconds: 1
+    resources:
+      limits:
+        cpu: 100m
+        memory: 100Mi
 initContainers:
   import-configuration:
     image: alpine:3.18.0
@@ -83,6 +194,9 @@ persistence:
       resources:
         requests:
           storage: "50Gi"
+    # spec:
+    #   persistentVolumeClaim:
+    #     claimName: config-plex
   movies:
     enabled: true
     mount:

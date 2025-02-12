@@ -4,6 +4,7 @@ resources:
 - ../../base/authentik/helmrepository.yaml
 - ../../base/authentik/namespace.yaml
 - ../../base/authentik/helmrelease-remote-cluster.yaml
+- service.yaml
 patches:
 - path: helmrelease-remote-cluster.yaml
   target:

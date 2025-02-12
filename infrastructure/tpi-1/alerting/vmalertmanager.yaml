@@ -1,0 +1,76 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlertmanager
+metadata:
+  name: tpi-1
+  namespace: alerting
+spec:
+  image:
+    repository: prom/alertmanager
+    tag: v0.28.0
+    pullPolicy: IfNotPresent
+  logFormat: json
+  disableNamespaceMatcher: true
+  clusterDomainName: cluster.local
+  additionalPeers:
+  - vmalertmanager-nas-0.vmalertmanager-nas.alerting.svc.cluster.local.:9094
+  configRawYaml: |
+    global:
+      resolve_timeout: 1h
+      http_config:
+        follow_redirects: true
+        enable_http2: true
+    route:
+      receiver: 'blackhole'
+      group_interval: 5m
+      repeat_interval: 12h
+    receivers:
+    - name: 'blackhole'
+  configNamespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: alerting
+  serviceSpec:
+    useAsDefault: true
+    spec:
+      type: ClusterIP
+    metadata:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/global-sync-endpoint-slices: "true"
+  externalURL: https://alertmanager.absolutist.it/
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
+  replicaCount: 2
+  storage:
+    volumeClaimTemplate:
+      spec:
+        resources:
+          requests:
+            storage: 2Gi
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: node-role.kubernetes.io/worker
+            operator: Exists
+          - key: node-role.kubernetes.io/control-plane
+            operator: DoesNotExist
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                - tpi-1
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - vmalertmanager
+            topologyKey: kubernetes.io/hostname
+          weight: 10

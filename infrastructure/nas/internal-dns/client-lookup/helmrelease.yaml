@@ -1,0 +1,9 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: internal-dns--client-lookup
+  namespace: flux-system
+spec:
+  releaseName: client-lookup
+  interval: 5m
+  targetNamespace: internal-dns

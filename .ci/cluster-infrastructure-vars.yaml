@@ -37,3 +37,4 @@ stringData:
   long_term_metrics_cluster_directory_type: DirectoryOrCreate
   long_term_logs_cluster_directory_path: /mnt/vlogs
   long_term_logs_cluster_directory_type: DirectoryOrCreate
+  vector_healthcheck: "false"

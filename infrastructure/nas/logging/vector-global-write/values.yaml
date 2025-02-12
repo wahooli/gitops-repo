@@ -1,0 +1,36 @@
+role: Stateless-Aggregator
+dataDir: /vector-data-dir
+resources: {}
+args:
+- -w
+- --config-dir
+- /etc/vector/
+service:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: log-write.nas.absolutist.it,log-write.nas.wahoo.li
+  ports:
+  - name: datadog-agent
+    port: 8282
+    protocol: TCP
+  - name: fluent
+    port: 24224
+    protocol: TCP
+  - name: logstash
+    port: 5044
+    protocol: TCP
+  - name: splunk-hec
+    port: 8080
+    protocol: TCP
+  - name: statsd
+    port: 8125
+    protocol: TCP
+  - name: syslog
+    port: 9000
+    protocol: TCP
+  - name: vector
+    port: 6000
+    protocol: TCP
+serviceHeadless:
+  enabled: false

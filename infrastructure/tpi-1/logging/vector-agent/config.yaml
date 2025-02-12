@@ -1,0 +1,448 @@
+data_dir: /vector-data-dir
+api:
+  enabled: false
+  address: 0.0.0.0:8686
+  playground: true
+sources:
+  k8s:
+    type: kubernetes_logs
+    timezone: Europe/Helsinki
+  journal:
+    current_boot_only: false
+    type: journald
+  internal_metrics:
+    type: internal_metrics
+transforms:
+  kube_multiline_reduce:
+    type: reduce
+    inputs:
+    - k8s
+    group_by:
+    - _stream_id
+    - kubernetes.container_name
+    - stream
+    merge_strategies:
+      message: concat_newline
+    starts_when:
+      type: "vrl"
+      source: |
+        if is_object(.kubernetes) && .kubernetes != null {
+          container_name = string(.kubernetes.container_name) ?? ""
+          stream = string(.stream) ?? ""
+          if container_name == "ombi" {
+            # stack traces start with whitespace
+            matched, err = match(.message, r'^\S+');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "prowlarr" || container_name == "sonarr" || container_name == "radarr"  {
+            # stack traces start with whitespace
+            matched, err = match(.message, r'^\[.*');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "bazarr"  {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\d+-\d{2}-\d+\s\d+:\d+:\d+,\d+');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "reflector" {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\[\d+-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+\d{2}:\d{2}');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "vaultwarden" {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\[(?<ts>\d+-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}.\d{3})\]');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "paperless-ngx"  {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\[\d+-\d{2}-\d+\s\d+:\d+:\d+,\d+\]');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "deluge"  {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\d+:\d+:\d+');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else if container_name == "jellyfin" {
+            if stream == "stdout" {
+              # customized log format
+              matched, err = match(.message, r'^\[\d+-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+\d{2}:\d{2}');
+              if err != null {
+                false
+              } else {
+                matched
+              }
+            } else {
+              # just match stderr to start with non whitespace character
+              matched, err = match(.message, r'^\S+');
+              if err != null {
+                false
+              } else {
+                matched
+              }
+            }
+          } else {
+            true
+          }
+        } else {
+          true
+        }
+  kube_log_parser:
+    type: remap
+    inputs:
+    - kube_multiline_reduce
+    source: |
+      .clustername = "tpi-1"
+      if is_object(.kubernetes) && .kubernetes != null {
+        .kubernetes = map_keys(object!(.kubernetes), recursive: true) -> |key| {
+          replace(replace(replace(key, ".", "_"), "/", "_"), "-", "_")
+        }
+        if exists(.kubernetes.pod_labels) && is_object(.kubernetes.pod_labels) {
+          .kubernetes.pod_labels = filter(object!(.kubernetes.pod_labels)) -> |key, _| {
+            key = downcase(key)
+            key != "checksum_configmaps" &&
+            key != "controller_revision_hash" &&
+            key != "backupdaily" &&
+            key != "backupweekly" &&
+            key != "pod_template_hash" &&
+            key != "scrape_job_name" &&
+            key != "helm_sh_chart" &&
+            key != "app_kubernetes_io_version"
+          }
+        }
+        .kubernetes = filter(.kubernetes) -> |key, _| {
+          key != "pod_uid" &&
+          key != "pod_ips" &&
+          key != "container_id" &&
+          key != "node_labels" &&
+          key != "container_image_id" &&
+          key != "pod_annotations" &&
+          key != "namespace_labels"
+        }
+      }
+      # coredns specific log parsing, might contain json after loglevel
+      if exists(.kubernetes.pod_labels.app_kubernetes_io_name) && .kubernetes.pod_labels.app_kubernetes_io_name == "coredns" {
+        structured = parse_regex(.message, r'^\[(?<level>\w+)\]\s(?<message>.+)$') ?? {}
+        . = merge(., structured)
+      }
+
+      structured, err = parse_json(.message)
+      # message is json
+      if err != null {
+        if .kubernetes.pod_labels.app_kubernetes_io_name == "bind9" {
+            structured = parse_regex(.message, r'(?<ts>\d+-\w+-\d{4}\s\d+:\d+:\d+\.\d+)\s+client\s+(?<client_key>@\S+)\s+(?<client_ip>\S+)#\S+\s(?<client_key_name>\S+)\s(?<message>\((?<domain>\S+)\).+)$') ?? {}
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%d-%b-%Y %H:%M:%S%.3f") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_part_of == "cilium" && .kubernetes.pod_labels.app_kubernetes_io_name != "clustermesh-apiserver" {
+            structured = parse_key_value(.message, key_value_delimiter: "=") ?? {}
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "clustermesh-apiserver" {
+            if .kubernetes.container_name == "kvstoremesh" || .kubernetes.container_name == "apiserver" || .kubernetes.container_name == "etcd-init" {
+              structured = parse_key_value(.message, key_value_delimiter: "=") ?? {}
+            }
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "bazarr" {
+            structured = parse_regex(.message, r'^(?<ts>\d+-\d{2}-\d+\s\d+:\d+:\d+,\d+)\s+-\s+\S+\s+\(\w+\)\s+:\s+(?<level>\w+)\s\((?<source>[\w:]+)\)\s+-\s(?<message>[\w\W]+)$') ?? {}
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%F %H:%M:%S,%3f", timezone: "Europe/Helsinki") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "jellyfin" {
+            structured = parse_regex(.message, r'^\[(?<ts>\S+)\]\s+\[(?<level>\w+)\]\s+\(?(?<context>\S+)\)\s+(?<message>.+(\n((?<exception>\S+):\s+(?<exception_message>.+))?([\s\S]+)?)?)') ?? {}
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%FT%T%.3f%:z") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "docker-mailserver" {
+            structured = parse_regex(.message, r'^(?<ts>\S+)\s+(?<hostname>\S+)\s+(?<context>[\w\/-]+)\S+\s+(?<message>.+)') ?? {}
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%+") ?? structured.ts
+            mail_meta, meta_err = parse_regex(structured.message, r'^(?<id>[A-Z0-9]+):\s((?<meta>((\S+=\S+)\s+)+)(\((?<log>.+)\))?|.+)')
+            if meta_err == null {
+              if exists(mail_meta.meta) {
+                meta = parse_key_value(mail_meta.meta, field_delimiter: ",", key_value_delimiter: "=") ?? parse_key_value(mail_meta.meta) ?? {}
+                del(mail_meta.meta)
+                if !is_empty(meta) {
+                  mail_meta = merge(mail_meta, meta)
+                }
+              }
+              structured.mail = mail_meta
+            }
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "overseerr" {
+            structured = parse_regex(.message, r'^(?<ts>\S+)\s\[(?<level>\w+)\]\[(?<component>.+)\]:\s(?<message>.+)') ?? {}
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%FT%T%.3fZ", timezone: "UTC") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "seaweedfs" {
+            structured, parse_err = parse_regex(.message, r'^(?<level>[A-Z])(?<ts>\d{4}\s\S+)\s+(?<file>\S+):(?<line>\d+)\s(?<message>.+)')
+            if parse_err == null {
+              if structured.level == "I" {
+                structured.level = "info"
+              } else if structured.level == "W" {
+                structured.level = "warning"
+              } else if structured.level == "E" {
+                structured.level = "error"
+              } else if structured.level == "F" {
+                structured.level = "fatal"
+              }
+            }
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%m%d %T%.f", timezone: "UTC") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "postgresql" {
+            structured, parse_err = parse_regex(.message, r'^(?<ts>\d+-\d+-\d+\s+\d+:\d+:\d+\.\d+\s+\S+)\s\[\d+\]\s+(?<level>\w+):\s+(?<message>.+)')
+            if parse_err != null {
+              # bitnami specific log row
+              structured = parse_regex(.message, r'^\w+\s+(?<time>\S+)\s+(?<level>\S+)\s+==>\s+(?<message>.+)') ?? {}
+              structured.time = parse_timestamp(string(structured.time) ?? "", format: "%T%.2f", timezone: "UTC") ?? structured.time
+            } else {
+              structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%F %T%.3f %Z") ?? structured.ts
+              if structured.level == "LOG" {
+                structured.level = "INFO"
+              }
+            }
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "reflector" {
+            structured = parse_regex(.message, r'^\[(?<ts>\S+)\]\s+\[(?<level>\w+)\]\s+\(?(?<context>\S+)\)\s+(?<message>.+(\n((?<exception>\S+):\s+(?<exception_message>.+))?([\s\S]+)?)?)') ?? {}
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%FT%T%.3f%:z") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "cloudflare-tunnel" {
+            structured, parse_err = parse_regex(.message, r'^(?<message_timestamp>\S+)\s+(?<level>\S{3})\s+(?<message>.+)')
+            if parse_err == null {
+              structured.message_timestamp = parse_timestamp(string(structured.message_timestamp) ?? "", format: "%FT%TZ") ?? structured.message_timestamp
+              if structured.level == "TRC" {
+                structured.level = "trace"
+              } else if structured.level == "DBG" {
+                structured.level = "debug"
+              } else if structured.level == "INF" {
+                structured.level = "info"
+              } else if structured.level == "WRN" {
+                structured.level = "warning"
+              } else if structured.level == "ERR" {
+                structured.level = "error"
+              } else if structured.level == "FTL" {
+                structured.level = "fatal"
+              } else if structured.level == "PNC" {
+                structured.level = "panic"
+              }
+              meta_part, meta_err = parse_regex(structured.message, r'(?<fmt>((\w+=\".+\"|\w+=\S+)[\s]?)+)')
+              if meta_err == null {
+                message_meta = parse_logfmt(meta_part.fmt) ?? {}
+                structured = merge(structured, message_meta)
+              }
+            }
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "tautulli" {
+            structured = parse_regex(.message, r'^(?<time>\d+-\d{2}-\d+\s+\d{2}:\d{2}:\d{2})\s-\s(?<level>\w+)\s::\s[\s\w\-\(\)]+:\s((?<context>.+)\s::\s)?(?<message>[\w\W]+)') ?? {}
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "paperless-ngx" {
+            structured = parse_regex(.message, r'^\[(?<ts>\d+-\d{2}-\d+\s\d+:\d+:\d+,\d+)\]\s+\[(?<level>\w+)\]\s+\[(?<component>[\w.]+)\]\s(?<message>.+)$') ?? {}
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%F %H:%M:%S,%3f", timezone: "Europe/Helsinki") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "vaultwarden" {
+            structured = parse_regex(.message, r'^\[(?<ts>\d+-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}.\d{3})\]\[(?<component>.+)\]\[(?<level>\w+)\]\s(?<message>[\S\s]+)') ?? {}
+            structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%F %T%.3f", timezone: "UTC") ?? structured.ts
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "deluge" {
+            structured = parse_regex(.message, r'^\d+:\d+:\d+\s+\[(?<level>\w+)[\s\[\]]+(?<component>\S+)[\s\[\]:\d]+(?<message>.*)$') ?? {}
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "ombi" {
+            structured = parse_regex(.message, r'^(?<level>[a-z]+):\s+(?<message>[\w\W]+)') ?? {}
+            level = string(structured.level) ?? ""
+            if level == "fail" {
+              structured.level = "error"
+            }
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "prowlarr" || .kubernetes.pod_labels.app_kubernetes_io_name == "sonarr" || .kubernetes.pod_labels.app_kubernetes_io_name == "radarr" {
+            structured = parse_regex(.message, r'^\[(?<level>\S+)\]\s+(?<component>\S+):\s(?<message>[\s\S]+)') ?? {}
+            # has version instead of level parsed into message. most likely exception
+            if match(string(structured.level) ?? "", r'\w?\d+\.\d+\.\d+.+') {
+              structured.version = del(structured.level)
+              structured.exception = del(structured.component)
+              structured.level = "error"
+            } else if contains(string(structured.message) ?? "", "exception", case_sensitive: false) {
+              structured.level = "error"
+            }
+        } else {
+            structured = parse_klog(.message) ?? {}
+        }
+      }
+      if !exists(structured.msg) && !exists(structured.message) && exists(.kubernetes.pod_labels.app_kubernetes_io_name) && starts_with(string(.kubernetes.pod_labels.app_kubernetes_io_name) ?? "", "authentik") {
+        if exists(structured.error) {
+          structured.msg = string!(structured.event) + ", error: " + string!(structured.error)
+        } else if exists(structured.event) {
+          structured.msg = structured.event
+        }
+        if exists(structured.timestamp) {
+          structured.message_timestamp = del(structured.timestamp)
+        }
+      }
+      if is_object(structured) {
+        . = merge(., structured) ?? .
+      }
+      if exists(.msg) {
+        .message = del(.msg)
+      }
+      if !exists(.message) {
+        if exists(.log) {
+          .message = del(.log)
+        }
+      }
+      if exists(.ts) && is_timestamp(.ts) {
+        .timestamp = del(.ts)
+      }
+      if exists(.user_agent) {
+        .user_agent_full = .user_agent
+        .user_agent = parse_user_agent(.user_agent) ?? {}
+      }
+  journald_parsed:
+    type: "remap"
+    inputs: ["journal"]
+    source: |
+      structured = {}
+      .syslog_identifier = downcase(string(.SYSLOG_IDENTIFIER) ?? downcase(string(._COMM) ?? ""))
+      .systemd_unit = ._SYSTEMD_UNIT || .syslog_identifier
+      if exists(._SYSTEMD_USER_UNIT) {
+        .systemd_user_unit = del(._SYSTEMD_USER_UNIT)
+      }
+
+      if .syslog_identifier == "networkmanager" {
+        structured = parse_regex(.message, r'^<(?P<loglevel>\w+)>\s+\[(?P<ts>.+)\]\s+(?P<message>.+)$') ?? {}
+        parsed_ts, err = parse_timestamp(.message.ts, format: "%s%.f")
+        if err == null {
+          structured.timestamp = parsed_ts
+        }
+        del(structured.ts)
+      } else if starts_with(string(.systemd_unit) ?? "", "k3s", case_sensitive: false) && ends_with(string(.systemd_unit) ?? "", ".service", case_sensitive: false) {
+        structured, err = parse_klog(.message)
+        # failed to parse klog, might contain key value pair log message
+        if err != null {
+          structured = parse_key_value(.message) ?? {}
+        } else {
+          structured.message_timestamp = structured.timestamp
+          del(structured.timestamp)
+          # contains key value pairs
+          if match(string(structured.message) ?? "", r'(\w+=\".+?\"|\w+=\S+)$') {
+            message_parts, err = parse_regex(structured.message, r'^\"(?<message>[\w\s\\\\."\)\(\:\/\-,]+)\"\s+(?<pairs>.+)$')
+            if err == null {
+              structured.message = message_parts.message
+              structured |= parse_key_value(string(message_parts.pairs) ?? "", key_value_delimiter: "=") ?? {}
+            }
+          }
+          # if message is wrapped in double quotes, trim them
+          if match(string(structured.message) ?? "", r'^\".+\"$') {
+            structured.message = slice(structured.message, start: 1, end: -1) ?? structured.message
+          }
+          # remove escapes on quotes
+          structured.message = replace(structured.message, "\\\"", "\"") ?? structured.message
+
+          # add error message to message if contains one
+          if exists(structured.err) {
+            structured.message = structured.message + ": " + structured.err ?? structured.message
+          }
+        }
+      } else if .syslog_identifier != "kernel" {
+        structured =
+          parse_json(.message) ??
+          parse_syslog(.message) ??
+          {}
+      }
+      if exists(.JOB_RESULT) && exists(.JOB_TYPE) && exists(.UNIT)  {
+        .JOB_TARGET_UNIT = del(.UNIT)
+      }
+      if exists(.CONTAINER_NAME) {
+        .systemd_unit = .CONTAINER_NAME
+        .syslog_identifier = .CONTAINER_NAME
+        .is_container = true
+      }
+      . = map_keys(.) -> |key| {
+        if match_any(key, [
+          r'^_UID$',
+          r'^_GID$',
+          r'^_CMDLINE$',
+          r'^_EXE$',
+          r'^_BOOT_ID$'
+        ]) {
+          downcase(replace(key, "_", "", count: 1))
+        } else { key }
+      }
+
+      if !exists(.cmdline) {
+        if exists(.exe) {
+          .cmdline = .exe
+        } else if exists(._SYSTEMD_USER_UNIT) || exists(._SYSTEMD_UNIT) {
+          .cmdline = string(._SYSTEMD_USER_UNIT) ?? ._SYSTEMD_UNIT
+        }
+      }
+      if exists(.exe) {
+        del(.exe)
+      }
+
+      # extract coredump vars under own object
+      if exists(.COREDUMP_SIGNAL) || exists(.COREDUMP_TIMESTAMP) {
+        .coredump = filter(.) -> |key, _| {
+          # keep everyting that starts with COREDUMP
+          starts_with(key, "COREDUMP")
+        }
+        .coredump = map_keys(.coredump) -> |key| {
+          downcase(replace(key, "COREDUMP_", "", count: 1))
+        }
+        if exists(.coredump.environ) {
+          .coredump.environ = parse_key_value(string(.coredump.environ) ?? "", key_value_delimiter: "=", field_delimiter: "\n") ?? .coredump.environ
+        }
+      }
+      . = filter(.) -> |key, _| {
+        # keep everyting that doesnt start with underscore
+        !starts_with(key, "_") &&
+          !starts_with(key, "CODE_") &&
+          !starts_with(key, "SYSLOG_") &&
+          !starts_with(key, "TIMESTAMP_") &&
+          !starts_with(key, "CONTAINER_") &&
+          !starts_with(key, "COREDUMP_") &&
+          key != "MESSAGE_ID" &&
+          key != "INVOCATION_ID" &&
+          key != "TID"
+      }
+
+      .systemd_host = del(.host)
+      if is_object(structured) {
+        . = merge(., structured) ?? .
+      } else {
+        .failed_merge = true
+        .structured = structured
+      }
+      if exists(.msg) {
+        .message = del(.msg)
+      }
+      if exists(.ts) && is_timestamp(.ts) {
+        .timestamp = del(.ts)
+      } else if exists(.time) && is_timestamp(.time) {
+        .timestamp = del(.time)
+      }
+      if !exists(.level) {
+        .level = .PRIORITY
+      }
+      if !exists(.message) {
+        if exists(.log) {
+          .message = del(.log)
+        }
+      }
+      if match(string(.message) ?? "", r'^\".+\"$') {
+        .message = slice(.message, start: 1, end: -1) ?? .message
+      }
+      if match(string(.level) ?? "", r'^\".+\"$') {
+        .level = slice(.level, start: 1, end: -1) ?? .level
+      }
+
+sinks:
+  exporter:
+    type: prometheus_exporter
+    address: 0.0.0.0:9090
+    inputs: [internal_metrics]
+  vlogs:
+    type: vector
+    inputs: [kube_log_parser, journald_parsed]
+    address: http://vector-global-write.logging.svc.cluster.local.:6000
+    compression: true
+    healthcheck:
+      enabled: true

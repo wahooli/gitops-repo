@@ -23,6 +23,7 @@ spec:
           service.cilium.io/global-sync-endpoint-slices: "true"
     extraArgs:
       dedup.minScrapeInterval: 30s
+      loggerFormat: json
     storage:
       volumeClaimTemplate:
         spec:
@@ -36,6 +37,7 @@ spec:
   vmselect:
     replicaCount: 2
     extraArgs:
+      loggerFormat: json
       dedup.minScrapeInterval: 30s
       storageNode: vmstorage-short-term-nas-0.vmstorage-short-term-nas.monitoring:8401,vmstorage-long-term-0.vmstorage-long-term.monitoring:8401,vmstorage-short-term-tpi-1-0.vmstorage-short-term-tpi-1.monitoring:8401,vmstorage-short-term-tpi-1-1.vmstorage-short-term-tpi-1.monitoring:8401,vmstorage-short-term-tpi-1-2.vmstorage-short-term-tpi-1.monitoring:8401,vmstorage-short-term-tpi-1-server-0.vmstorage-short-term-tpi-1-server.monitoring:8401
     storage:
@@ -62,6 +64,8 @@ spec:
           service.cilium.io/global-sync-endpoint-slices: "true"
   vminsert:
     replicaCount: 1
+    extraArgs:
+      loggerFormat: json
     image:
       repository: victoriametrics/vminsert
       tag: v1.108.1-cluster

@@ -1,0 +1,25 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: authentik
+  namespace: monitoring
+spec:
+  endpoints:
+  - port: http-metrics
+    scheme: http
+    path: /metrics
+    metricRelabelConfigs:
+    - action: labeldrop
+      regex: (pod|service|prometheus|endpoint|instance)
+    - action: drop
+      regex: ^(go_.*|django_.*|promhttp_.*)$
+      source_labels:
+      - __name__
+  jobLabel: scrape-job-name
+  namespaceSelector:
+    matchNames:
+    - default
+    - authentik
+  selector:
+    matchLabels:
+      goauthentik.io/scrape-metrics: "true"

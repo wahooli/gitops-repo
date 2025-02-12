@@ -11,6 +11,11 @@ spec:
     envFrom:
       envs:
         name: jellyfin-env
+    persistence:
+      config:
+        spec:
+          configMap:
+            name: jellyfin-config
   valuesFrom:
   - kind: ConfigMap
     name: jellyfin-values

@@ -12,3 +12,14 @@ spec:
   chart:
     spec:
       version: "4.43.1"
+  values:
+    extraArgs:
+    - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc|run|data.*|root|home.*|var/lib/docker.*|var/lib/kubelet.*)($$|/)'
+    - '--collector.ethtool.device-exclude=(veth.+|br-.+|lxc-.+|cilium.+)'
+    - '--collector.netdev.device-exclude=(veth.+|br-.+|lxc-.+|cilium.+)'
+    - '--no-collector.xfs'
+    - '--no-collector.tapestats'
+    - '--no-collector.infiniband'
+    - '--no-collector.bonding'
+    - '--no-collector.bcache'
+    - '--log.format=json'

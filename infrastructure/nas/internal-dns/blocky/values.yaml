@@ -1,33 +1,8 @@
 image:
   tag: "v0.25" # {"$imagepolicy": "flux-system:blocky:tag"}
 service:
-  main:
-    externalTrafficPolicy: Local
-    type: "${dns_svc_type:=LoadBalancer}"
+  nas:
     annotations:
-      lbipam.cilium.io/ips: ${dns_ip_addr_1},${dns_ip_addr_2},8.8.8.8,8.8.4.4
-persistence:
-  config:
-    enabled: true
-    mount:
-    - path: /app/config.yml
-      subPath: config.yml
-    - path: /app/tlds-alpha-by-domain.txt
-      subPath: tlds-alpha-by-domain.txt
-    spec:
-      useFromChart: false
-      configMap:
-        name: blocky-config
-  tls-cert:
-    enabled: true
-    mount:
-    - path: /app/certs/
-    spec:
-      useFromChart: false
-      secret:
-        name: tls-blocky
-        defaultMode: 0444
-workload:
-  annotations:
-    secret.reloader.stakater.com/reload: "tls-blocky"
-resources: {}
+      service.cilium.io/global: "true"
+    type: ClusterIP
+    portsFrom: main

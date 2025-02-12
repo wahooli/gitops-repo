@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: kube-dns
+    app.kubernetes.io/instance: kube-dns
+    app.kubernetes.io/name: coredns
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+    kustomize.toolkit.fluxcd.io/ssa: merge
+  name: coredns
+  namespace: kube-system
+spec:
+  replicas: ${coredns_replicas}
+  selector:
+    matchLabels:
+      k8s-app: kube-dns
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: kube-dns
+        app.kubernetes.io/name: coredns
+        k8s-app: kube-dns
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - coredns
+                - key: k8s-app
+                  operator: In
+                  values:
+                  - kube-dns
+              topologyKey: kubernetes.io/hostname
+            weight: 10
+      containers:
+      - name: coredns
+        image: coredns/coredns:1.11.3
+        args:
+        - -conf
+        - /etc/coredns/override/Corefile
+        volumeMounts:
+        - mountPath: /etc/coredns/override
+          name: config-override
+          readOnly: true
+      volumes:
+      - name: config-override
+        configMap:
+          defaultMode: 420
+          name: coredns

@@ -3,13 +3,19 @@ envFrom:
     type: configMap
     useFromChart: false
     name: jellyfin-env
+strategy:
+  type: Recreate
 image:
   tag: "10.10.5" # {"$imagepolicy": "flux-system:jellyfin:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: data
 runtimeClassName: nvidia
 # hostNetwork: true
-
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 global:
   labels:
     backupWeekly: "true"
@@ -34,6 +40,15 @@ persistence:
       resources:
         requests:
           storage: "60Gi"
+  config:
+    enabled: true
+    mount:
+    - path: /config/config/logging.json
+      subPath: logging.json
+    spec:
+      useFromChart: false
+      configMap:
+        name: jellyfin-config
   movies:
     enabled: true
     mount:

@@ -4,3 +4,8 @@ image:
 
 env:
   TZ: Europe/Helsinki
+
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"

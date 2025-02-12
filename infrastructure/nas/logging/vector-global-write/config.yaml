@@ -1,0 +1,51 @@
+data_dir: /vector-data-dir
+api:
+  enabled: false
+  address: 0.0.0.0:8686
+  playground: true
+sources:
+  datadog_agent:
+    address: 0.0.0.0:8282
+    type: datadog_agent
+  fluent:
+    address: 0.0.0.0:24224
+    type: fluent
+  internal_metrics:
+    type: internal_metrics
+  logstash:
+    address: 0.0.0.0:5044
+    type: logstash
+  splunk_hec:
+    address: 0.0.0.0:8080
+    type: splunk_hec
+  statsd:
+    address: 0.0.0.0:8125
+    mode: tcp
+    type: statsd
+  syslog:
+    address: 0.0.0.0:9000
+    mode: tcp
+    type: syslog
+  vector:
+    address: 0.0.0.0:6000
+    type: vector
+    version: "2"
+sinks:
+  exporter:
+    type: prometheus_exporter
+    address: 0.0.0.0:9090
+    inputs: [internal_metrics]
+  tpi1:
+    type: vector
+    inputs: [datadog_agent, fluent, logstash, splunk_hec, statsd, syslog, vector]
+    address: http://vector-lb-tpi.logging.svc.cluster.local.:6000
+    compression: true
+    healthcheck:
+      enabled: ${vector_healthcheck:=true}
+  nas:
+    type: vector
+    inputs: [datadog_agent, fluent, logstash, splunk_hec, statsd, syslog, vector]
+    address: http://vector-lb-nas.logging.svc.cluster.local.:6000
+    compression: true
+    healthcheck:
+      enabled: ${vector_healthcheck:=true}

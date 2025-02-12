@@ -8,6 +8,8 @@ stringData:
   cluster_dns_ip: 10.96.0.10
   unbound_cluster_ip: 10.96.0.20
   bind9_cluster_ip: 10.96.0.21
+  client_lookup_cluster_ip: 10.96.0.22
+  blocky_cluster_ip: 10.96.0.23
   dns_ip_addr_1: 192.168.0.1
   dns_ip_addr_2: 192.168.0.2
   dns_ip_addr_3: 192.168.0.3
@@ -42,3 +44,8 @@ stringData:
   dns_svc_port: "5353"
   dns_svc_type: ClusterIP
   certificate_cluster_issuer: selfsigned-ca
+  tpi_1_client_ip_lookup_except: "3.168.192.in-addr.arpa"
+  nas_client_ip_lookup_except: "2.168.192.in-addr.arpa"
+  nas_client_ip_lookup_regex: ".*"
+  tpi_1_dns_ip: 10.96.0.11
+  nas_dns_ip: 10.96.0.10

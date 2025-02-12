@@ -416,7 +416,11 @@ dnsPolicy: ClusterFirst
 
 # dnsConfig -- Specify the [dnsConfig](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config)
 # options for Vector Pods.
-dnsConfig: {}
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
   # nameservers:
   #   - 1.2.3.4
   # searches:

@@ -7,7 +7,7 @@ spec:
   redirectBackend:
     localEndpointSelector:
       matchLabels:
-        k8s-app: node-local-dns
+        app.kubernetes.io/instance: kube-dns
     toPorts:
     - name: dns
       port: "53"

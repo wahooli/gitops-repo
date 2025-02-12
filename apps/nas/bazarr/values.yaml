@@ -2,11 +2,39 @@ image:
   tag: "1.5.1" # {"$imagepolicy": "flux-system:bazarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
+  vector.dev/exclude-containers: "bazarr-exporter"
+strategy:
+  type: Recreate
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
 global:
   labels:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: bazarr
+metrics:
+  enabled: true
+  extraEnv:
+    ENABLE_ADDITIONAL_METRICS: "true"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 60Mi
+serviceMonitor:
+  create: true
+  jobLabel: app.kubernetes.io/name
+  endpoint:
+    interval: 300s # additional metrics makes scraping slow, and here's not that time sensitive data anyway
+    scrapeTimeout: 60s
+    metricRelabelConfigs:
+    - action: replace
+      replacement: nasse
+      target_label: instance
+    - action: labeldrop
+      regex: (pod|container|image_id|url|endpoint|namespace|prometheus)
 envFrom:
   envs:
     type: configMap
