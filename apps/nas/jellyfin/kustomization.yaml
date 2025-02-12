@@ -25,6 +25,17 @@ configMapGenerator:
       reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
   envs:
   - .env
+- name: jellyfin-config
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default"
+  files:
+  - logging.json=config/logging.json
 configurations:
 - ../../.config/valuesFrom.yaml
 - ../../.config/envFrom.yaml
+- kustomizeconfig.yaml

@@ -5,6 +5,8 @@ cp /tmp/docker-mailserver/postfix-sasl-password.cf /etc/postfix/sasl_passwd
 chown root:root /etc/postfix/{relayhost_map,sasl_passwd}
 chmod 0600 /etc/postfix/{relayhost_map,sasl_passwd}
 
+echo "root: /dev/null" > /etc/aliases
+
 # default relayhost = DUNNO should bounce emails if relayhost isn't mapped to sender domain
 postconf \
     "smtp_sasl_password_maps = texthash:/etc/postfix/sasl_passwd" \

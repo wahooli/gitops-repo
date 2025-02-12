@@ -1,14 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_VICTORIALOGS",
-      "label": "VictoriaLogs",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "victoriametrics-logs-datasource",
-      "pluginName": "VictoriaLogs"
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -47,10 +37,10 @@
     ]
   },
   "description": "Flux logs collected from Kubernetes, stored in Loki",
-  "editable": true,
+  "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 16,
+  "id": 7,
   "links": [],
   "panels": [
     {
@@ -70,7 +60,7 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "bars",
-            "fillOpacity": 0,
+            "fillOpacity": 100,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -135,7 +125,7 @@
         {
           "datasource": "${DS_VICTORIALOGS}",
           "editorMode": "code",
-          "expr": "* | clustername: $clustername | kubernetes.pod_namespace: $namespace | kubernetes.pod_labels.app: $controller | log.level: $level | stats count() | sum()\n",
+          "expr": "$query clustername: $clustername | kubernetes.pod_labels.app: $controller | level: $level {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} | stats count() | sum()\n",
           "instant": false,
           "legendFormat": "Log count",
           "queryType": "statsRange",
@@ -175,7 +165,7 @@
         {
           "datasource": "${DS_VICTORIALOGS}",
           "editorMode": "code",
-          "expr": "* | clustername: $clustername | kubernetes.pod_namespace: $namespace | kubernetes.pod_labels.app: $controller | log.level: $level | $query | format \"[<kubernetes.pod_labels.app>] <_msg>\" as _msg skip_empty_results",
+          "expr": "$query clustername: $clustername | kubernetes.pod_labels.app: $controller | level: $level {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} | format \"[<kubernetes.pod_labels.app>] <_msg>\" as _msg skip_empty_results",
           "legendFormat": "",
           "queryType": "instant",
           "refId": "A"
@@ -213,7 +203,10 @@
       },
       {
         "allValue": "*",
-        "current": {},
+        "current": {
+          "text": "$__all",
+          "value": "$__all"
+        },
         "includeAll": true,
         "name": "level",
         "options": [
@@ -255,7 +248,10 @@
       },
       {
         "allValue": "*",
-        "current": {},
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": "${DS_VICTORIALOGS}",
         "definition": "",
         "includeAll": true,
@@ -275,16 +271,19 @@
       },
       {
         "allValue": "*",
-        "current": {},
+        "current": {
+          "text": "flux-system",
+          "value": "flux-system"
+        },
         "datasource": "${DS_VICTORIALOGS}",
-        "definition": "clustername: $clustername | kubernetes.pod_labels.scrape-job-name: fluxcd",
+        "definition": "clustername: $clustername (kubernetes.pod_name:~\"kustomize-controller-.*\" OR kubernetes.pod_name:~\"helm-controller-.*\" OR kubernetes.pod_name:~\"source-controller-.*\" OR kubernetes.pod_name:~\"notification-controller-.*\") {source_type=\"kubernetes_logs\"}",
         "includeAll": false,
         "name": "namespace",
         "options": [],
         "query": {
           "field": "kubernetes.pod_namespace",
           "limit": 50,
-          "query": "clustername: $clustername | kubernetes.pod_labels.scrape-job-name: fluxcd",
+          "query": "clustername: $clustername (kubernetes.pod_name:~\"kustomize-controller-.*\" OR kubernetes.pod_name:~\"helm-controller-.*\" OR kubernetes.pod_name:~\"source-controller-.*\" OR kubernetes.pod_name:~\"notification-controller-.*\") {source_type=\"kubernetes_logs\"}",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },
@@ -294,7 +293,10 @@
       },
       {
         "allValue": "*",
-        "current": {},
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": "${DS_VICTORIALOGS}",
         "definition": "clustername: $clustername | kubernetes.pod_namespace: $namespace | kubernetes.pod_labels.app: $controller",
         "includeAll": true,
@@ -332,11 +334,11 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "Europe/Helsinki",
+  "timezone": "browser",
   "title": "Flux Logs",
   "uid": "flux-logs",
   "version": 1,

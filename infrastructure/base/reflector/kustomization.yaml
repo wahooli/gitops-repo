@@ -9,3 +9,11 @@ configMapGenerator:
   namespace: flux-system
   files:
   - values-base.yaml=values-base.yaml
+- name: reflector-config
+  namespace: reflector
+  files:
+  - reflector.logging.json=config/reflector.logging.json
+  options:
+    disableNameSuffixHash: true
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled

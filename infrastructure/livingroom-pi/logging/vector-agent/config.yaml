@@ -14,22 +14,39 @@ sources:
   internal_metrics:
     type: internal_metrics
 transforms:
-  backslash_multiline:
+  kube_multiline_reduce:
     type: reduce
-    inputs: [k8s]
-    group_by: [file, stream]
+    inputs:
+    - k8s
+    group_by:
+    - _stream_id
+    - kubernetes.container_name
+    - stream
     merge_strategies:
       message: concat_newline
-    ends_when: |
-      matched, err = match(.message, r'[^\\]$');
-      if err != null {
-        false;
-      } else {
-        matched;
-      }
+    starts_when:
+      type: "vrl"
+      source: |
+        if is_object(.kubernetes) && .kubernetes != null {
+          container_name = string(.kubernetes.container_name) ?? ""
+          if container_name == "reflector" {
+            # all "normal" log rows should start with timestamp
+            matched, err = match(.message, r'^\[\d+-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+\d{2}:\d{2}');
+            if err != null {
+              false
+            } else {
+              matched
+            }
+          } else {
+            true
+          }
+        } else {
+          true
+        }
   kube_log_parser:
     type: remap
-    inputs: [k8s]
+    inputs:
+    - kube_multiline_reduce
     source: |
       .clustername = "livingroom-pi"
       if is_object(.kubernetes) && .kubernetes != null {
@@ -52,6 +69,7 @@ transforms:
         .kubernetes = filter(.kubernetes) -> |key, _| {
           key != "pod_uid" &&
           key != "pod_ips" &&
+          key != "container_id" &&
           key != "node_labels" &&
           key != "container_image_id" &&
           key != "pod_annotations" &&
@@ -71,6 +89,9 @@ transforms:
           if .kubernetes.container_name == "kvstoremesh" || .kubernetes.container_name == "apiserver" || .kubernetes.container_name == "etcd-init" {
             structured = parse_key_value(.message, key_value_delimiter: "=") ?? {}
           }
+        } else if .kubernetes.pod_labels.app_kubernetes_io_name == "reflector" {
+          structured = parse_regex(.message, r'^\[(?<ts>\S+)\]\s+\[(?<level>\w+)\]\s+\(?(?<context>\S+)\)\s+(?<message>.+(\n((?<exception>\S+):\s+(?<exception_message>.+))?([\s\S]+)?)?)') ?? {}
+          structured.ts = parse_timestamp(string(structured.ts) ?? "", format: "%FT%T%.3f%:z") ?? structured.ts
         } else {
           structured = parse_klog(.message) ?? {}
         }

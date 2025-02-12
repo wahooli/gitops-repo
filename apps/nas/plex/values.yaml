@@ -61,7 +61,7 @@ envFrom:
     name: plex-env
 podAnnotations:
   backup.velero.io/backup-volumes: config
-  vector.dev/exclude-containers: "prometheus-exporter,plex-media-server-exporter"
+  vector.dev/exclude-containers: "plex-prometheus-exporter,plex-media-server-exporter"
 global:
   labels:
     backupWeekly: "true"

@@ -1,0 +1,24 @@
+{
+  "Serilog": {
+    "Using": [
+      "Serilog.Sinks.Console"
+    ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft.AspNetCore.Server.Kestrel": "Error",
+        "Microsoft": "Warning",
+        "System": "Warning",
+        "Microsoft.Extensions.Http": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "outputTemplate": "[{Timestamp:yyyy-MM-ddTHH:mm:ss.fffzzz}] [{Level:w}] ({SourceContext}) {Message:lj}{NewLine}{Exception}"
+        }
+      }
+    ]
+  }
+}

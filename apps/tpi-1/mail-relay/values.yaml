@@ -72,6 +72,8 @@ initContainers:
       subPath: config
     - mountPath: /src
       name: mail-relay-config
+podAnnotations:
+  vector.dev/exclude-containers: "postfix-exporter" # ignore logs for exporter sidecar
 sidecars:
   postfix-exporter:
     image: ghcr.io/wahooli/docker/postfix_exporter:latest

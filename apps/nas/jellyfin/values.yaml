@@ -40,6 +40,15 @@ persistence:
       resources:
         requests:
           storage: "60Gi"
+  config:
+    enabled: true
+    mount:
+    - path: /config/config/logging.json
+      subPath: logging.json
+    spec:
+      useFromChart: false
+      configMap:
+        name: jellyfin-config
   movies:
     enabled: true
     mount:

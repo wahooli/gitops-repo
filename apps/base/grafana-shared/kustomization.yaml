@@ -229,5 +229,32 @@ configMapGenerator:
       grafana_dashboard: "1"
     annotations:
       kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: media-stats-dashboard
+  namespace: grafana
+  files:
+  - media-stats.json=dashboards/media-stats.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: cert-manager-dashboard
+  namespace: grafana
+  files:
+  - cert-manager.json=dashboards/cert-manager.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: pod-logs-dashboard
+  namespace: grafana
+  files:
+  - pod-logs.json=dashboards/pod-logs.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
 configurations:
 - ../../.config/valuesFrom.yaml
