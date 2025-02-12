@@ -15,10 +15,10 @@
       }
     ]
   },
-  "editable": false,
+  "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 20,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -141,7 +141,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "client_names: $client_name AND client_ip: $client_ip {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"} | stats by (response_type) count()",
+          "expr": "prefix:\"queryLog\" client_names: $client_name AND client_ip: $client_ip {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"} | stats by (response_type) count()",
           "legendFormat": "{{response_type}}",
           "queryType": "stats",
           "refId": "A"
@@ -174,7 +174,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 13,
+        "h": 18,
         "w": 15,
         "x": 9,
         "y": 0
@@ -212,7 +212,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "{source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"} | stats by (client_names) count() as queries | order by (queries, client_names) desc ",
+          "expr": "prefix:\"queryLog\" {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"} | stats by (client_names) count() as queries | order by (queries, client_names) desc ",
           "legendFormat": "{{client_names}}",
           "queryType": "stats",
           "refId": "A"
@@ -323,7 +323,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "client_names: $client_name AND client_ip: $client_ip {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"} | stats by (question_name) count() as queries | order by (queries, question_name) desc | limit 20",
+          "expr": "prefix:\"queryLog\" client_names: $client_name AND client_ip: $client_ip {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"} | stats by (question_name) count() as queries | order by (queries, question_name) desc | limit 20",
           "legendFormat": "{{question_name}}",
           "queryType": "stats",
           "refId": "A"
@@ -523,7 +523,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "client_names: $client_name AND client_ip: $client_ip {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
+          "expr": "prefix:\"queryLog\" client_names: $client_name AND client_ip: $client_ip {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
           "maxLines": 10000,
           "queryType": "instant",
           "refId": "A"
@@ -617,7 +617,10 @@
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": {
+          "text": "VictoriaLogs - distributed",
+          "value": "PC27693B959EA3435"
+        },
         "label": "Datasource",
         "name": "datasource",
         "options": [],
@@ -636,20 +639,21 @@
           "type": "victoriametrics-logs-datasource",
           "uid": "${datasource}"
         },
-        "definition": "{source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
+        "definition": "_time:[${__from:date:iso}, ${__to:date:iso}] prefix:\"queryLog\" {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
         "includeAll": true,
         "label": "Client IP",
         "name": "client_ip",
         "options": [],
         "query": {
           "field": "client_ip",
-          "limit": 100,
-          "query": "{source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
+          "limit": 1000,
+          "query": "_time:[${__from:date:iso}, ${__to:date:iso}] prefix:\"queryLog\" {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },
         "refresh": 1,
         "regex": "",
+        "sort": 3,
         "type": "query"
       },
       {
@@ -662,32 +666,33 @@
           "type": "victoriametrics-logs-datasource",
           "uid": "${datasource}"
         },
-        "definition": "{source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
+        "definition": "_time:[${__from:date:iso}, ${__to:date:iso}] prefix:\"queryLog\" {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
         "includeAll": true,
         "label": "Client name",
         "name": "client_name",
         "options": [],
         "query": {
           "field": "client_names",
-          "limit": 100,
-          "query": "{source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
+          "limit": 1000,
+          "query": "_time:[${__from:date:iso}, ${__to:date:iso}] prefix:\"queryLog\" {source_type=\"kubernetes_logs\", kubernetes.pod_labels.app_kubernetes_io_name=\"blocky\"}",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },
         "refresh": 2,
         "regex": "",
+        "sort": 6,
         "type": "query"
       }
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Blocky queries",
   "uid": "ce9vtku59id4wd",
-  "version": 11,
+  "version": 1,
   "weekStart": "monday"
 }
