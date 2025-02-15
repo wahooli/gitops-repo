@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
 - helmrepository.yaml
 - helmrelease.yaml
+- imagerepository.yaml
+- imagepolicy.yaml
 configMapGenerator:
 - name: vector-values
   namespace: flux-system

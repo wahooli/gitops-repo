@@ -4088,10 +4088,10 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "radarr_movie_wanted_total{instance=~\"${radarr_instance}\"}",
+          "expr": "radarr_movie_missing_total{instance=~\"${radarr_instance}\"}",
           "hide": false,
           "instant": true,
-          "legendFormat": "Wanted",
+          "legendFormat": "Missing",
           "range": false,
           "refId": "D"
         }

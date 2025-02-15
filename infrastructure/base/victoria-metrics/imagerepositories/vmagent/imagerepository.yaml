@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: vmagent
+  namespace: flux-system
+spec:
+  image: victoriametrics/vmagent
+  interval: 24h

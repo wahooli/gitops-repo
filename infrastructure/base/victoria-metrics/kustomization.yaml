@@ -4,6 +4,8 @@ resources:
 - helmrepository.yaml
 - victoria-metrics-operator.helmrelease.yaml
 - namespace.yaml
+- victoria-metrics-operator.imagepolicy.yaml
+- victoria-metrics-operator.imagerepository.yaml
 configMapGenerator:
 - name: victoria-metrics-operator-values
   namespace: flux-system

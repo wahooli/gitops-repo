@@ -1,7 +1,7 @@
 #!/bin/bash
 TENANT="${TENANT:-$1}"
 KUSTOMIZATIONS="${KUSTOMIZATIONS:-$1}"
-KUSTOMIZATION_TIMEOUT="${KUSTOMIZATION_TIMEOUT:-3m}"
+KUSTOMIZATION_TIMEOUT="${KUSTOMIZATION_TIMEOUT:-10m}"
 
 function validate_kustomization() {
     local kustomization_file="$1"

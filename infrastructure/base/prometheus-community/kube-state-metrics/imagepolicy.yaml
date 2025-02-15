@@ -1,0 +1,11 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: kube-state-metrics
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: kube-state-metrics
+  policy:
+    semver:
+      range: x.x.x

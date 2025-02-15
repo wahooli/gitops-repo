@@ -1,0 +1,11 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: prometheus-operator-crds
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: prometheus-operator-crds
+  policy:
+    semver:
+      range: x.x.x

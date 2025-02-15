@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: vmselect
+  namespace: flux-system
+spec:
+  image: victoriametrics/vmselect
+  interval: 24h

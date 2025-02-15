@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: vmalert
+  namespace: flux-system
+spec:
+  image: victoriametrics/vmalert
+  interval: 24h

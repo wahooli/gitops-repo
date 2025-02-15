@@ -12,6 +12,11 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure/livingroom-pi/logging
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    name: vector-agent
+    namespace: logging
   postBuild:
     substituteFrom:
     - kind: Secret
