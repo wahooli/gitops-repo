@@ -4,6 +4,10 @@ metadata:
   name: short-term-nas
   namespace: logging
 spec:
+  image:
+    repository: victoriametrics/victoria-logs
+    tag: v1.10.1-victorialogs # {"$imagepolicy": "flux-system:victoria-logs:tag"}
+    pullPolicy: IfNotPresent
   retentionPeriod: "100y" # overridden by extraArg retention.maxDiskSpaceUsageBytes
   removePvcAfterDelete: true
   extraArgs:

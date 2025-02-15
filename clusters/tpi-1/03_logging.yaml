@@ -12,6 +12,27 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure/tpi-1/logging
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    name: vector-agent
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vector-global-write
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vector-lb-tpi
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmauth-read-proxy
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vlogs-short-term-tpi-1
+    namespace: logging
   postBuild:
     substituteFrom:
     - kind: Secret

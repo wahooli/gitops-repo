@@ -66,6 +66,9 @@ initContainers:
     envFrom:
     - secretRef:
         name: ${mail_relay_app_secret_name}
+    env:
+    - name: REPLACE_VARS
+      value: $${gmail_username} $${gmail_password} $${icloud_username} $${icloud_password}
     volumeMounts:
     - mountPath: /dest
       name: data
@@ -170,3 +173,4 @@ service:
     - name: metrics
       port: 9154
       protocol: TCP
+      serviceOnly: true

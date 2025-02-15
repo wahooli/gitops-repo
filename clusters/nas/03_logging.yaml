@@ -12,6 +12,31 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure/nas/logging
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    name: vector-agent
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vector-global-write
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vector-lb-nas
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vlogs-long-term-nas
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vlogs-short-term-nas
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmauth-read-proxy
+    namespace: logging
   postBuild:
     substituteFrom:
     - kind: Secret

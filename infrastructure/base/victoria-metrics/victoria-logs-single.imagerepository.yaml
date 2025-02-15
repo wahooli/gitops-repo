@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: victoria-logs-single
+  namespace: flux-system
+spec:
+  image: ghcr.io/victoriametrics/helm-charts/victoria-logs-single
+  interval: 24h

@@ -8,6 +8,10 @@ vmstorage:
   replicaCount: 1
   retentionPeriod: "1" # one month
   replicationFactor: 1
+  image:
+    repository: victoriametrics/vmstorage
+    tag: v1.111.0-cluster # {"$imagepolicy": "flux-system:vmstorage-cluster:tag"}
+    pullPolicy: IfNotPresent
   tolerations:
   - key: node-role.kubernetes.io/control-plane
     operator: "Exists"
@@ -31,6 +35,10 @@ vmstorage:
 vminsert:
   replicaCount: 1
   fullnameOverride: vminsert-short-term-tpi-1-server
+  image:
+    repository: victoriametrics/vminsert
+    tag: v1.111.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
+    pullPolicy: IfNotPresent
   extraArgs:
     loggerFormat: json
   service:

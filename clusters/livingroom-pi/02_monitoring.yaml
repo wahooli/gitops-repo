@@ -12,6 +12,11 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure/livingroom-pi/monitoring
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmagent-livingroom-pi
+    namespace: monitoring
   postBuild:
     substituteFrom:
     - kind: Secret

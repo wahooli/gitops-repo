@@ -13,6 +13,19 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure/nas/alerting
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmalert-vlogs-nas
+    namespace: alerting
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmalert-vmetrics-nas
+    namespace: alerting
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vmalertmanager-nas
+    namespace: alerting
   postBuild:
     substituteFrom:
     - kind: Secret

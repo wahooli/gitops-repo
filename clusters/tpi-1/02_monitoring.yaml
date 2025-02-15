@@ -12,6 +12,43 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure/tpi-1/monitoring
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmagent-tpi-1
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmauth-global-write
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmauth-read-proxy
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmclusterlb-short-term-tpi-1
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vminsert-short-term-tpi-1
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vminsert-short-term-tpi-1-server
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vmselect-short-term-tpi-1
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vmstorage-short-term-tpi-1
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vmstorage-short-term-tpi-1-server
+    namespace: monitoring
   postBuild:
     substituteFrom:
     - kind: Secret
