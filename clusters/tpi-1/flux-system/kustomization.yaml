@@ -37,3 +37,10 @@ patches:
   target:
     kind: Deployment
     name: "notification-controller"
+- patch: |
+    - op: replace
+      path: /spec/interval
+      value: 48h
+  target:
+    kind: GitRepository
+    name: flux-system
