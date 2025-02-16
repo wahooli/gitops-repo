@@ -1,11 +1,10 @@
 initContainers:
 - name: velero-plugin-for-aws
-  image: velero/velero-plugin-for-aws:v1.11.1 # {"$imagepolicy": "flux-system:velero-plugin-for-aws:tag"}
+  image: v1.11.1 # {"$imagepolicy": "flux-system:velero-plugin-for-aws:tag"}
   imagePullPolicy: IfNotPresent
   volumeMounts:
   - mountPath: /target
     name: plugins
-
 credentials:
   existingSecret:
   secretContents:
@@ -13,10 +12,8 @@ credentials:
       [default]
       aws_access_key_id=${velero_access_key_id}
       aws_secret_access_key=${velero_access_key}
-
 dnsPolicy: ClusterFirstWithHostNet
 snapshotsEnabled: false
-
 schedules:
   weekly:
     disabled: false
@@ -25,7 +22,7 @@ schedules:
     schedule: "5 2 */7 * *"
     useOwnerReferencesInBackup: false
     template:
-      ttl: "720h"  # month retain
+      ttl: "720h" # month retain
       labelSelector:
         matchLabels:
           backupWeekly: "true"
@@ -58,7 +55,7 @@ schedules:
     schedule: "5 1 * * *"
     useOwnerReferencesInBackup: false
     template:
-      ttl: "168h"  # week retain
+      ttl: "168h" # week retain
       labelSelector:
         matchLabels:
           backupDaily: "true"
@@ -112,7 +109,6 @@ schedules:
       - reloader
       - topolvm-system
       - velero
-
 nodeAgent:
   dnsConfig:
     options:
