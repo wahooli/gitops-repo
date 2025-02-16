@@ -4,6 +4,10 @@ resources:
 - helmrepository.yaml
 - namespace.yaml
 - helmrelease.yaml
+- imagerepository.yaml
+- imagepolicy.yaml
+- velero-plugin-aws.imagepolicy.yaml
+- velero-plugin-aws.imagerepository.yaml
 configMapGenerator:
 - name: velero-values
   namespace: flux-system

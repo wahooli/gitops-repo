@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: velero-plugin-for-aws
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: velero-plugin-for-aws
+  filterTags:
+    pattern: 'v(?P<version>[1-9]+\.[0-9]+\.[0-9]+)$'
+    extract: '$version'
+  policy:
+    semver:
+      range: 'x.x.x'

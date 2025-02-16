@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: velero-plugin-for-aws
+  namespace: flux-system
+spec:
+  image: velero/velero-plugin-for-aws
+  interval: 24h

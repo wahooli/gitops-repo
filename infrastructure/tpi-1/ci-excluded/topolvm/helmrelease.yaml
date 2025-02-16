@@ -11,7 +11,7 @@ spec:
     namespace: flux-system
   chart:
     spec:
-      version: "15.5.0"
+      version: "15.5.2"
   valuesFrom:
   - kind: ConfigMap
     name: topolvm-values
