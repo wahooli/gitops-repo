@@ -1,5 +1,5 @@
 image:
-  tag: "1.41.3" # {"$imagepolicy": "flux-system:plex:tag"}
+  tag: "1.41.4" # {"$imagepolicy": "flux-system:plex:tag"}
 hostname: nasse
 runtimeClassName: nvidia
 strategy:
@@ -194,9 +194,9 @@ persistence:
       resources:
         requests:
           storage: "50Gi"
-    # spec:
-    #   persistentVolumeClaim:
-    #     claimName: config-plex
+          # spec:
+          #   persistentVolumeClaim:
+          #     claimName: config-plex
   movies:
     enabled: true
     mount:
