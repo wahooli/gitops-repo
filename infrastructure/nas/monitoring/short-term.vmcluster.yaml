@@ -30,10 +30,10 @@ spec:
           resources:
             requests:
               storage: 20Gi
-    # resources:
-    #   limits:
-    #     cpu: "2"
-    #     memory: 2048Mi
+              # resources:
+              #   limits:
+              #     cpu: "2"
+              #     memory: 2048Mi
   vmselect:
     replicaCount: 2
     extraArgs:
@@ -68,7 +68,7 @@ spec:
       loggerFormat: json
     image:
       repository: victoriametrics/vminsert
-      tag: v1.111.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
+      tag: v1.112.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
       pullPolicy: IfNotPresent
     serviceSpec:
       useAsDefault: true
