@@ -88,14 +88,14 @@ spec:
                 - vmstorage
             topologyKey: kubernetes.io/hostname
           weight: 10
-    # resources:
-    #   limits:
-    #     cpu: "2"
-    #     memory: 2048Mi
+          # resources:
+          #   limits:
+          #     cpu: "2"
+          #     memory: 2048Mi
   vmselect:
     image:
       repository: victoriametrics/vmselect
-      tag: v1.111.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
+      tag: v1.112.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
       pullPolicy: IfNotPresent
     replicaCount: 3
     extraArgs:
@@ -131,10 +131,10 @@ spec:
           resources:
             requests:
               storage: 2Gi
-    # resources:
-    #   limits:
-    #     cpu: "1"
-    #     memory: "500Mi"
+              # resources:
+              #   limits:
+              #     cpu: "1"
+              #     memory: "500Mi"
   vminsert:
     replicaCount: 2
     image:
