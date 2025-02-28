@@ -86,11 +86,11 @@ ingress:
     labels:
       velero.io/exclude-from-backup: "true"
     annotations:
-      external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+      external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/custom-http-errors: "404"
       # This should be the in-cluster DNS name for the authentik outpost service
       # as when the external URL is specified here, nginx will overwrite some crucial headers
       nginx.ingress.kubernetes.io/auth-url: |-
@@ -113,7 +113,3 @@ ingress:
           name: ak-outpost-nasse-proxy
           port:
             number: 9000
-    tls:
-    - secretName: tls-bazarr-ingress
-      hosts:
-      - bazarr.wahoo.li

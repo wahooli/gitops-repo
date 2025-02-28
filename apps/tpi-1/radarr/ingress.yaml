@@ -4,10 +4,10 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/service-upstream: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/custom-http-errors: "404"
   labels:
     velero.io/exclude-from-backup: "true"
   name: radarr
@@ -20,25 +20,8 @@ spec:
       paths:
       - backend:
           service:
-            name: default-backend
-            port:
-              number: 80
-        path: /robots.txt
-        pathType: Exact
-      - backend:
-          service:
-            name: default-backend
-            port:
-              number: 80
-        path: /ads.txt
-        pathType: Exact
-      - backend:
-          service:
             name: ak-outpost-proxy-default
             port:
               number: 9000
         path: /
         pathType: Prefix
-  tls:
-  - hosts:
-    - radarr.wahoo.li

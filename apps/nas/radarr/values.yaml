@@ -77,10 +77,11 @@ ingress:
       velero.io/exclude-from-backup: "true"
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      nginx.ingress.kubernetes.io/service-upstream: "true"
+      external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/custom-http-errors: "404"
     hosts:
     - host: radarr.wahoo.li
       paths:
@@ -90,7 +91,3 @@ ingress:
           name: ak-outpost-nasse-proxy
           port:
             number: 9000
-    tls:
-    - secretName: tls-radarr-ingress
-      hosts:
-      - radarr.wahoo.li

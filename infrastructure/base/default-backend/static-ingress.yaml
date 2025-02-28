@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    nginx.ingress.kubernetes.io/access-log-filter: "true"
+  name: static-backend
+  namespace: infrastructure
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: static.wahoo.li
+    http:
+      paths:
+      - path: /()(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: default-backend
+            port:
+              number: 80

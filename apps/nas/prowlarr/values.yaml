@@ -56,7 +56,7 @@ service:
       service.cilium.io/global: "true"
 ingress:
   main:
-    enabled: true
+    enabled: false
     className: nginx
     labels:
       velero.io/exclude-from-backup: "true"
@@ -74,9 +74,9 @@ ingress:
       nginx.ingress.kubernetes.io/auth-snippet: |
         proxy_set_header X-Forwarded-Host $http_host;
       external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/custom-http-errors: "404"
     hosts:
     - host: prowlarr.wahoo.li
       paths:

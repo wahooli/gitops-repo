@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- service.yaml
+- deployment.yaml
+- overrides-ingress.yaml
+- robots-ingress.yaml
+- static-ingress.yaml
+configMapGenerator:
+- name: nginx-html
+  namespace: infrastructure
+  files:
+  - 404.html=config/web/404.html
+  - font-awesome.min.css=config/web/static/font-awesome.min.css
+  - style.css=config/web/static/style.css
+  - robots.txt=config/web/static/robots.txt
+- name: nginx-config
+  namespace: infrastructure
+  files:
+  - default.conf=config/nginx/default.conf
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/instance: default-backend
+images:
+- name: nginx
+  newTag: 1.27.3
+- name: busybox
+  newTag: 1.37.0
+configurations:
+- kustomizeconfig.yaml

@@ -3,28 +3,16 @@ kind: Ingress
 metadata:
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-  name: default-backend
+    nginx.ingress.kubernetes.io/custom-http-errors: "404"
+  name: overrides-ingress
   namespace: infrastructure
 spec:
   ingressClassName: nginx
   rules:
-  - host: static.wahoo.li
+  - host: vault.wahoo.li
     http:
       paths:
-      - path: /()(.*)
-        pathType: Prefix
-        backend:
-          service:
-            name: default-backend
-            port:
-              number: 80
-  - host: overseerr.wahoo.li
-    http:
-      paths:
-      - path: /setup(/|$)(.*)
+      - path: /admin
         pathType: Prefix
         backend:
           service:
@@ -34,26 +22,30 @@ spec:
   - host: paperless.wahoo.li
     http:
       paths:
-      - path: /admin(/|$)(.*)
+      - path: /admin
         pathType: Prefix
         backend:
           service:
             name: default-backend
             port:
               number: 80
-  - host: vault.wahoo.li
+  - host: jellyfin.wahoo.li
     http:
       paths:
-      - path: /admin(/|$)(.*)
+      - path: /metrics
         pathType: Prefix
         backend:
           service:
             name: default-backend
             port:
               number: 80
-  tls:
-  - hosts:
-    - overseerr.wahoo.li
-    - paperless.wahoo.li
-    - vault.wahoo.li
-    - static.wahoo.li
+  - host: overseerr.wahoo.li
+    http:
+      paths:
+      - path: /setup
+        pathType: Prefix
+        backend:
+          service:
+            name: default-backend
+            port:
+              number: 80

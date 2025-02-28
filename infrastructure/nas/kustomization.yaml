@@ -6,6 +6,7 @@ resources:
 - prometheus-operator-crds
 - gateway-api
 - cert-manager
+- default-backend
 - victoria-metrics-operator
 - node-exporter
 - gpu-exporter

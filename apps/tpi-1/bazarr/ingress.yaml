@@ -9,10 +9,10 @@ metadata:
       proxy_set_header X-Forwarded-Host $http_host;
     nginx.ingress.kubernetes.io/auth-url: http://ak-outpost-proxy-default.default.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/custom-http-errors: "404"
   labels:
     velero.io/exclude-from-backup: "true"
   name: bazarr
@@ -23,20 +23,6 @@ spec:
   - host: bazarr.wahoo.li
     http:
       paths:
-      - backend:
-          service:
-            name: default-backend
-            port:
-              number: 80
-        path: /robots.txt
-        pathType: Exact
-      - backend:
-          service:
-            name: default-backend
-            port:
-              number: 80
-        path: /ads.txt
-        pathType: Exact
       - backend:
           service:
             name: bazarr
@@ -51,6 +37,3 @@ spec:
               number: 9000
         path: /outpost.goauthentik.io
         pathType: Prefix
-  tls:
-  - hosts:
-    - bazarr.wahoo.li

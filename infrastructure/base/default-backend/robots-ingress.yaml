@@ -1,0 +1,53 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: robots-txt
+  namespace: infrastructure
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/custom-http-errors: "404"
+    nginx.ingress.kubernetes.io/access-log-filter: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "wahoo.li"
+    http: &ingressPaths
+      paths:
+      - path: "/robots.txt"
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: default-backend
+            port:
+              number: 80
+      - path: "/ads.txt"
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: default-backend
+            port:
+              number: 80
+  - host: "auth.wahoo.li"
+    http: *ingressPaths
+  - host: "ombi.wahoo.li"
+    http: *ingressPaths
+  - host: "paperless.wahoo.li"
+    http: *ingressPaths
+  - host: "tautulli.wahoo.li"
+    http: *ingressPaths
+  - host: "sonarr.wahoo.li"
+    http: *ingressPaths
+  - host: "radarr.wahoo.li"
+    http: *ingressPaths
+  - host: "bazarr.wahoo.li"
+    http: *ingressPaths
+  - host: "grafana.wahoo.li"
+    http: *ingressPaths
+  - host: "overseerr.wahoo.li"
+    http: *ingressPaths
+  - host: "jellyfin.wahoo.li"
+    http: *ingressPaths
+  - host: "plex.wahoo.li"
+    http: *ingressPaths
+  - host: "vault.wahoo.li"
+    http: *ingressPaths

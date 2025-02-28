@@ -119,35 +119,14 @@ ingress:
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: 25m
-      external-dns.alpha.kubernetes.io/target: ${cloudflare_tunnel_id}.cfargotunnel.com
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/custom-http-errors: "404"
     labels:
       velero.io/exclude-from-backup: "true"
     hosts:
     - host: paperless.wahoo.li
       paths:
-      - path: /robots.txt
-        pathType: Exact
-        service:
-          name: default-backend
-          port:
-            number: 80
-      - path: /ads.txt
-        pathType: Exact
-        service:
-          name: default-backend
-          port:
-            number: 80
       - path: "/"
         pathType: "Prefix"
-      # - path: /admin
-      #   pathType: Prefix
-      #   service:
-      #     name: default-backend
-      #     port:
-      #       number: 80
-    tls:
-    - hosts:
-      - paperless.wahoo.li
