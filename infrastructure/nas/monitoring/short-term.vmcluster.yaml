@@ -10,7 +10,7 @@ spec:
   vmstorage:
     image:
       repository: victoriametrics/vmstorage
-      tag: v1.111.0-cluster # {"$imagepolicy": "flux-system:vmstorage-cluster:tag"}
+      tag: v1.112.0-cluster # {"$imagepolicy": "flux-system:vmstorage-cluster:tag"}
       pullPolicy: IfNotPresent
     replicaCount: 1
     serviceSpec:
@@ -30,10 +30,10 @@ spec:
           resources:
             requests:
               storage: 20Gi
-    # resources:
-    #   limits:
-    #     cpu: "2"
-    #     memory: 2048Mi
+              # resources:
+              #   limits:
+              #     cpu: "2"
+              #     memory: 2048Mi
   vmselect:
     replicaCount: 2
     extraArgs:
@@ -48,7 +48,7 @@ spec:
               storage: 2Gi
     image:
       repository: victoriametrics/vmselect
-      tag: v1.111.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
+      tag: v1.112.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
       pullPolicy: IfNotPresent
     # resources:
     #   limits:
@@ -68,7 +68,7 @@ spec:
       loggerFormat: json
     image:
       repository: victoriametrics/vminsert
-      tag: v1.111.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
+      tag: v1.112.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
       pullPolicy: IfNotPresent
     serviceSpec:
       useAsDefault: true
