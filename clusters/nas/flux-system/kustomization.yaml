@@ -30,7 +30,7 @@ patches:
 - patch: |
     - op: add
       path: /spec/template/spec/containers/0/args/-
-      value: --rate-limit-interval=0m10s
+      value: --rate-limit-interval=0m4s
     - op: add
       path: /spec/template/spec/containers/0/args/-
       value: --concurrent=6
