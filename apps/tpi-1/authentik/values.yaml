@@ -64,6 +64,7 @@ server:
       nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       nginx.ingress.kubernetes.io/custom-http-errors: "404"
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
     hosts:
     - auth.wahoo.li
 

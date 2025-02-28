@@ -91,6 +91,7 @@ ingress:
       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/custom-http-errors: "404"
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
       # This should be the in-cluster DNS name for the authentik outpost service
       # as when the external URL is specified here, nginx will overwrite some crucial headers
       nginx.ingress.kubernetes.io/auth-url: |-

@@ -8,6 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
     nginx.ingress.kubernetes.io/custom-http-errors: "404"
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
   labels:
     velero.io/exclude-from-backup: "true"
   name: sonarr

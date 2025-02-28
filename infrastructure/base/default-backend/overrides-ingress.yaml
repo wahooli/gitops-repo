@@ -4,6 +4,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/custom-http-errors: "404"
+    external-dns.alpha.kubernetes.io/exclude: "true"
   name: overrides-ingress
   namespace: infrastructure
 spec:
