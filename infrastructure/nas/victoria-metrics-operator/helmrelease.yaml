@@ -13,4 +13,4 @@ spec:
   interval: 10m
   chart:
     spec:
-      version: "0.42.4" # {"$imagepolicy": "flux-system:victoria-metrics-operator:tag"}
+      version: "0.42.5" # {"$imagepolicy": "flux-system:victoria-metrics-operator:tag"}
