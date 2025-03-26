@@ -8,7 +8,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      version: "4.11.3"
+      version: "4.11.5"
   valuesFrom:
   - kind: ConfigMap
     name: ingress-nginx-values

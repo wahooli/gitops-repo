@@ -423,6 +423,7 @@
           },
           "editorMode": "code",
           "expr": "$filter clustername: $clustername kubernetes.container_name: $container_name kubernetes.pod_name: $pod kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"}",
+          "maxLines": 50000,
           "queryType": "instant",
           "refId": "A"
         }

@@ -39,7 +39,7 @@ controller:
         "~^1\d\d" "info";
         "~^4\d\d" "warn";
       }
-    # enable-gzip: "true"
+    enable-gzip: "true"
     enable-brotli: "true"
     proxy-real-ip-cidr: "${cluster_native_cidr},${cloud_lb_cidr}"
     log-format-escape-json: "true"
