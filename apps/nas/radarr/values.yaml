@@ -1,5 +1,5 @@
 image:
-  tag: "5.19.3" # {"$imagepolicy": "flux-system:radarr:tag"}
+  tag: "5.21.1" # {"$imagepolicy": "flux-system:radarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
   vector.dev/exclude-containers: "radarr-exporter"
