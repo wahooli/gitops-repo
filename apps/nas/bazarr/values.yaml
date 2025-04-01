@@ -21,7 +21,7 @@ metrics:
     ENABLE_ADDITIONAL_METRICS: "true"
   resources:
     limits:
-      cpu: 100m
+      cpu: 150m
       memory: 60Mi
 serviceMonitor:
   create: true
