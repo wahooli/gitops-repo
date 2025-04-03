@@ -1,0 +1,49 @@
+image:
+  tag: "4.0.5-r3-ls240" # {"$imagepolicy": "flux-system:transmission-old:tag"}
+fullnameOverride: transmission-old
+podAnnotations:
+  backup.velero.io/backup-volumes: config
+strategy:
+  type: Recreate
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: transmission-old
+wireguard:
+  enabled: false
+
+resources:
+  requests:
+    cpu: "300m"
+  limits:
+    cpu: "1000m"
+
+persistence:
+  config:
+    enabled: true
+    mount:
+    - path: /config
+    spec:
+      isPersistentVolumeClaim: true
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "1Gi"
+  downloads:
+    enabled: true
+    mount:
+    - path: /downloads
+    spec:
+      hostPath:
+        path: ${transmission_old_downloads_host_path}
+        type: Directory # DirectoryOrCreate
+ingress:
+  main:
+    enabled: false

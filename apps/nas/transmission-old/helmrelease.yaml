@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: default--transmission-old
+  namespace: flux-system
+spec:
+  releaseName: transmission-old
+  interval: 5m
+  targetNamespace: default
+  values:
+    envFrom:
+      envs:
+        type: configMap
+        useFromChart: false
+        name: transmission-old-env
+  valuesFrom:
+  - kind: ConfigMap
+    name: transmission-old-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: transmission-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml
