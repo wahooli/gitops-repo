@@ -44,14 +44,14 @@ jobs:
       if: github.event_name != 'workflow_dispatch'
       uses: fluxcd/flux2/action@main
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.2.2
     - name: 🚀 Run yamllint
       run: |
         yamllint -s -c .yamllint .
     - name: Get changed directories
       id: changed-directories
       if: github.event_name != 'workflow_dispatch'
-      uses: tj-actions/changed-files@v44.5.2
+      uses: tj-actions/changed-files@v46.0.5
       with:
         dir_names_exclude_current_dir: true
         files: |
@@ -85,7 +85,7 @@ jobs:
     if: ${{ needs.lint.outputs.matrix != '[]' && needs.lint.outputs.matrix != '' }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.2.2
       with:
         sparse-checkout: |
           .ci/
@@ -112,7 +112,7 @@ jobs:
       with:
         version: '${{ matrix.test.flux_version }}'
     - name: Setup Kubernetes
-      uses: helm/kind-action@v1.10.0
+      uses: helm/kind-action@v1.12.0
       with:
         cluster_name: flux
         config: .ci/end-to-end/kind-config.yaml
