@@ -8,4 +8,4 @@ spec:
   interval: 10m
   chart:
     spec:
-      version: "19.0.0" # {"$imagepolicy": "flux-system:prometheus-operator-crds:tag"}
+      version: "19.1.0" # {"$imagepolicy": "flux-system:prometheus-operator-crds:tag"}

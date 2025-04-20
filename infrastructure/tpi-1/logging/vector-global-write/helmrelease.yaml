@@ -14,7 +14,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      version: "0.41.0" # {"$imagepolicy": "flux-system:vector-helm-chart:tag"}
+      version: "0.42.1" # {"$imagepolicy": "flux-system:vector-helm-chart:tag"}
   valuesFrom:
   - kind: ConfigMap
     name: vector-global-write-values
