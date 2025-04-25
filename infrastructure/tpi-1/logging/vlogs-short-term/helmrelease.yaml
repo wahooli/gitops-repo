@@ -12,7 +12,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      version: "0.9.6" # {"$imagepolicy": "flux-system:victoria-logs-single:tag"}
+      version: "0.9.7" # {"$imagepolicy": "flux-system:victoria-logs-single:tag"}
   valuesFrom:
   - kind: ConfigMap
     name: victoria-logs-short-term-values
