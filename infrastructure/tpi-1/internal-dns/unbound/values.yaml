@@ -11,10 +11,8 @@ unbound:
     existingConfigMap: unbound-config
 redis:
   enabled: true
-
 image:
-  tag: "1.22.0-2" # {"$imagepolicy": "flux-system:unbound:tag"}
-
+  tag: "1.23.0-0" # {"$imagepolicy": "flux-system:unbound:tag"}
 service:
   main:
     type: ClusterIP
