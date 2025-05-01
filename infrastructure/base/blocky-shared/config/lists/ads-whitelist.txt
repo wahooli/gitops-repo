@@ -16,3 +16,4 @@
 *.stat.fi
 www.googletagmanager.com
 clients1.google.com
+*.claspws.tv
