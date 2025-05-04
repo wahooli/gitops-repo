@@ -1,6 +1,5 @@
 image:
-  tag: "2.1.1" # {"$imagepolicy": "flux-system:deluge:tag"}
-
+  tag: "2.2.0" # {"$imagepolicy": "flux-system:deluge:tag"}
 hostNetwork: true
 strategy:
   type: Recreate
@@ -16,7 +15,6 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: deluge
-
 probe:
   liveness:
     enabled: true
@@ -38,8 +36,6 @@ probe:
     httpGet:
       path: /
       port: webui
-
-
 resources:
   requests:
     memory: "512Mi"
@@ -67,12 +63,10 @@ persistence:
       hostPath:
         path: ${deluge_downloads_host_path}
         type: Directory # DirectoryOrCreate
-
 service:
   main:
     annotations:
       service.cilium.io/global: "true"
-
 ingress:
   main:
     enabled: false
