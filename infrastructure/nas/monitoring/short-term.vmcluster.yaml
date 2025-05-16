@@ -68,7 +68,7 @@ spec:
       loggerFormat: json
     image:
       repository: victoriametrics/vminsert
-      tag: v1.117.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
+      tag: v1.117.1-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
       pullPolicy: IfNotPresent
     serviceSpec:
       useAsDefault: true
