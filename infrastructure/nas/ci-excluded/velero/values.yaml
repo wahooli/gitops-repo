@@ -6,7 +6,7 @@ initContainers:
 #   - mountPath: /target
 #     name: plugins
 - name: velero-plugin-for-aws
-  image: velero/velero-plugin-for-aws:v1.12.0 # {"$imagepolicy": "flux-system:velero-plugin-for-aws"}
+  image: velero/velero-plugin-for-aws:v1.12.1 # {"$imagepolicy": "flux-system:velero-plugin-for-aws"}
   imagePullPolicy: IfNotPresent
   volumeMounts:
   - mountPath: /target
