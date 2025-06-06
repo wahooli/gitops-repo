@@ -8,7 +8,7 @@ spec:
   releaseName: velero
   chart:
     spec:
-      version: "10.0.1" # {"$imagepolicy": "flux-system:velero:tag"}
+      version: "10.0.2" # {"$imagepolicy": "flux-system:velero:tag"}
   upgrade:
     disableHooks: true
   valuesFrom:
