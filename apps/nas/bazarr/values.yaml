@@ -1,5 +1,5 @@
 image:
-  tag: "1.5.1" # {"$imagepolicy": "flux-system:bazarr:tag"}
+  tag: "1.5.2" # {"$imagepolicy": "flux-system:bazarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
   vector.dev/exclude-containers: "bazarr-exporter"
