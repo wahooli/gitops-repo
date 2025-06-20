@@ -10,7 +10,7 @@ server:
     retention.maxDiskSpaceUsageBytes: 14848MiB
   image:
     repository: victoriametrics/victoria-logs
-    tag: "v1.23.3-victorialogs" # {"$imagepolicy": "flux-system:victoria-logs:tag"}
+    tag: "v1.24.0-victorialogs" # {"$imagepolicy": "flux-system:victoria-logs:tag"}
     pullPolicy: IfNotPresent
   affinity:
     nodeAffinity:
