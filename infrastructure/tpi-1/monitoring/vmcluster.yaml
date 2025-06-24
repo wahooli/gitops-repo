@@ -95,7 +95,7 @@ spec:
   vmselect:
     image:
       repository: victoriametrics/vmselect
-      tag: v1.119.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
+      tag: v1.120.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
       pullPolicy: IfNotPresent
     replicaCount: 3
     extraArgs:
@@ -139,7 +139,7 @@ spec:
     replicaCount: 2
     image:
       repository: victoriametrics/vminsert
-      tag: v1.119.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
+      tag: v1.120.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
       pullPolicy: IfNotPresent
     extraArgs:
       loggerFormat: json
