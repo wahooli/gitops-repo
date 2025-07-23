@@ -1,19 +1,20 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../../../base/bitnami-redis
+- ../../../base/patroni
+- imagepolicy.yaml
 patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-    name: base-bitnami-redis
+    name: base-patroni
   options:
     allowNameChange: true
 configMapGenerator:
-- name: paperless-ngx-redis-values
-  namespace: flux-system
-  files:
-  - values-base.yaml=../../../base/bitnami-redis/values-base.yaml
+- files:
   - values.yaml=values.yaml
+  name: authentik-patroni-values
+  namespace: flux-system
 configurations:
 - ../../../.config/valuesFrom.yaml
+- ../../../.config/envFrom.yaml

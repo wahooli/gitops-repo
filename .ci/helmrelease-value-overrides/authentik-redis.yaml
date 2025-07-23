@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-redis-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    global:
+      redis:
+        cluster:
+          ordinals:
+            start: 0
+          replicaCount: 1
+
+    redis:
+      enabled: true
+
+    replicaCount: 1
+    ordinals:
+      start: 0
+
+    ssl:
+      issuerRef:
+        name: selfsigned
+        kind: ClusterIssuer
+
+    ciliumNetworkPolicies:
+      main:
+        enabled: false
+
+    haproxy:
+      ciliumNetworkPolicies:
+        main:
+          enabled: false
+
+    podMonitor:
+      create: false
+
+    metrics:
+      enabled: false

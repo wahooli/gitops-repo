@@ -1,3 +1,29 @@
+global:
+  image:
+    tag: 2025.6.4 # {"$imagepolicy": "flux-system:authentik:tag"}
+  podAnnotations:
+    secret.reloader.stakater.com/reload: "authentik-redis-server,authentik-patroni-server"
+  securityContext:
+    fsGroup: 1000
+    runAsUser: 1000
+    runAsGroup: 1000
+  volumes:
+  - name: redis-tls
+    secret:
+      defaultMode: 0400
+      optional: false
+      secretName: authentik-redis-server
+  - name: postgres-tls
+    secret:
+      defaultMode: 0400
+      optional: false
+      secretName: authentik-patroni-server
+  volumeMounts:
+  - mountPath: /certs/postgres
+    name: postgres-tls
+  - mountPath: /certs/redis
+    name: redis-tls
+
 authentik:
   secret_key: "${authentik_secret_key}"
   log_level: warn

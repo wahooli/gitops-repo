@@ -1,0 +1,169 @@
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+  redis:
+    redis:
+      sentinel:
+        masterName: authentik
+    cluster:
+      ordinals:
+        start: 0
+      replicaCount: 2
+
+replicaCount: 1
+ordinals:
+  start: 0
+
+ciliumNetworkPolicies:
+  main:
+    description: "Allow redis proxy and redis to redis communication"
+    endpointSelector:
+      matchLabels:
+        app.kubernetes.io/instance: authentik-redis
+        app.kubernetes.io/name: redis
+        io.kubernetes.pod.namespace: authentik
+    egress:
+    - toEndpoints:
+      - matchLabels:
+          "io.kubernetes.pod.namespace": kube-system
+          "k8s-app": kube-dns
+      toPorts:
+      - ports:
+        - port: "53"
+          protocol: ANY
+    - toEndpoints:
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
+          io.kubernetes.pod.namespace: authentik
+      toPorts:
+      - ports:
+        - port: "6379"
+          protocol: TCP
+        - port: "26379"
+          protocol: TCP
+    ingress:
+    - fromEndpoints:
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
+          io.kubernetes.pod.namespace: authentik
+      toPorts:
+      - ports:
+        - port: "6379"
+          protocol: TCP
+        - port: "26379"
+          protocol: TCP
+    - fromEndpoints:
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: proxy
+          io.kubernetes.pod.namespace: authentik
+      toPorts:
+      - ports:
+        - port: "6379"
+          protocol: TCP
+        - port: "26379"
+          protocol: TCP
+
+redis:
+  initialMaster: 0
+  enabled: true
+  sentinel:
+    enabled: true
+
+certificates:
+  server:
+    secretTemplate:
+      labels:
+        velero.io/exclude-from-backup: "true"
+
+ssl:
+  enabled: true
+  issuerRef:
+    name: clustermesh-issuer
+    kind: ClusterIssuer
+
+podAnnotations:
+  secret.reloader.stakater.com/reload: "authentik-redis-server"
+
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
+
+service:
+  main:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/global-sync-endpoint-slices: "true"
+  sentinel:
+    annotations:
+      service.cilium.io/global: "true"
+haproxy:
+  enabled: true
+  image:
+    repository: ghcr.io/wahooli/docker/haproxy-redis
+    tag: "3.2"
+  podAnnotations:
+    secret.reloader.stakater.com/reload: "authentik-redis-server"
+  ciliumNetworkPolicies:
+    main:
+      description: "Allow redis proxy to connect redis and redis-sentinel"
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: proxy
+          io.kubernetes.pod.namespace: authentik
+      egress:
+      - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+        toPorts:
+        - ports:
+          - port: "53"
+            protocol: ANY
+      - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: authentik-redis
+            app.kubernetes.io/name: redis
+            io.kubernetes.pod.namespace: authentik
+        toPorts:
+        - ports:
+          - port: "26379"
+            protocol: TCP
+          - port: "6379"
+            protocol: TCP
+      ingress:
+      - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: authentik
+            app.kubernetes.io/instance: authentik
+            app.kubernetes.io/part-of: authentik
+        toPorts:
+        - ports:
+          - port: "6379"
+            protocol: TCP
+      - fromEntities:
+        - cluster
+        toPorts:
+        - ports:
+          - port: "8404"
+            protocol: TCP
+
+persistence:
+  data:
+    enabled: true
+    mount:
+    - path: /data
+    labels:
+      velero.io/exclude-from-backup: "true"
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi

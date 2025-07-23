@@ -1,15 +1,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: base-redis
+  name: base-patroni
   namespace: flux-system
   annotations:
-    homelab.wahoo.li/base-helmrelease: redis
+    homelab.wahoo.li/base-helmrelease: patroni
 spec:
-  releaseName: base-redis
+  releaseName: base-patroni
   chart:
     spec:
-      chart: redis
+      chart: patroni
       sourceRef:
         kind: HelmRepository
         name: wahooli
@@ -19,7 +19,3 @@ spec:
   install:
     remediation:
       retries: -1
-  valuesFrom:
-  - kind: ConfigMap
-    name: redis-values
-    valuesKey: values-base.yaml

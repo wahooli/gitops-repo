@@ -1,0 +1,20 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: etcd--etcd
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
+  releaseName: etcd
+  interval: 5m
+  targetNamespace: etcd
+  valuesFrom:
+  - kind: ConfigMap
+    name: etcd-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: etcd-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml

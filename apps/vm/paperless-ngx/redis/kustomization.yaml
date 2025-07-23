@@ -1,15 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../../../base/redis
+- ../../../base/bitnami-redis
 patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-    name: base-redis
+    name: base-bitnami-redis
 - target:
     kind: HelmRelease
-    name: base-redis
+    name: base-bitnami-redis
   patch: |-
     - op: replace
       path: /metadata/name
@@ -18,7 +18,7 @@ configMapGenerator:
 - name: paperless-ngx-redis-values
   namespace: flux-system
   files:
-  - values-base.yaml=../../../base/redis/values-base.yaml
+  - values-base.yaml=../../../base/bitnami-redis/values-base.yaml
   - values.yaml=values.yaml
 configurations:
 - ../../../.config/valuesFrom.yaml

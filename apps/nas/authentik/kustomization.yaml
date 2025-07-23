@@ -5,10 +5,13 @@ resources:
 - ../../base/authentik/namespace.yaml
 - ../../base/authentik/helmrelease-remote-cluster.yaml
 - service.yaml
+- patroni
+- redis
 patches:
 - path: helmrelease-remote-cluster.yaml
   target:
     kind: HelmRelease
+    name: base-authentik-remote-cluster
   options:
     allowNameChange: true
 - path: namespace.yaml

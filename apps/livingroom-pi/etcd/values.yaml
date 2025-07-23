@@ -1,0 +1,161 @@
+global:
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+
+image:
+  tag: v3.6.3
+
+cluster:
+  ordinals:
+    start: 0
+  replicaCount: 3
+
+replicaCount: 1
+ordinals:
+  start: 2
+
+ssl:
+  enabled: true
+  issuerRef:
+    name: clustermesh-issuer
+    kind: ClusterIssuer
+
+podAnnotations:
+  backup.velero.io/backup-volumes: data
+  secret.reloader.stakater.com/reload: "etcd-client,etcd-server"
+
+ciliumNetworkPolicies:
+  main:
+    description: "Allow etcd instances to communicate between each other and allow etcd gateway to access"
+    endpointSelector:
+      matchLabels:
+        app.kubernetes.io/instance: etcd
+        app.kubernetes.io/name: etcd
+    egress:
+    - toEndpoints:
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+      toPorts:
+      - ports:
+        - port: "53"
+          protocol: ANY
+    - toEndpoints:
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd
+          app.kubernetes.io/name: etcd
+      toPorts:
+      - ports:
+        - port: "2380"
+          protocol: TCP
+    ingress:
+    # for metrics
+    - fromEntities:
+      - cluster
+      toPorts:
+      - ports:
+        - port: "8080"
+          protocol: TCP
+    - fromEndpoints:
+      - matchLabels:
+          k8s:io.kubernetes.pod.namespace: etcd
+          k8s:app.kubernetes.io/instance: etcd
+          k8s:app.kubernetes.io/name: etcd
+      toPorts:
+      - ports:
+        - port: "2380"
+          protocol: TCP
+    - fromEndpoints:
+      - matchLabels:
+          k8s:io.kubernetes.pod.namespace: etcd
+          k8s:app.kubernetes.io/instance: etcd-gateway
+          k8s:app.kubernetes.io/name: etcd-gateway
+      toPorts:
+      - ports:
+        - port: "8080"
+          protocol: TCP
+        - port: "2379"
+          protocol: TCP
+
+  gateway:
+    description: "Allow etcd gateway to access etcd"
+    endpointSelector:
+      matchLabels:
+        app.kubernetes.io/instance: etcd-gateway
+        app.kubernetes.io/name: etcd-gateway
+    egress:
+    - toEndpoints:
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+      toPorts:
+      - ports:
+        - port: "53"
+          protocol: ANY
+    - toEndpoints:
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd
+          app.kubernetes.io/name: etcd
+      toPorts:
+      - ports:
+        - port: "2379"
+          protocol: TCP
+        - port: "8080"
+          protocol: TCP
+    ingress:
+    - fromEndpoints:
+      - matchLabels:
+          # allow patroni in authentik namespace to access
+          io.kubernetes.pod.namespace: authentik
+          app.kubernetes.io/instance: authentik-patroni
+          app.kubernetes.io/name: patroni
+      toPorts:
+      - ports:
+        - port: "2379"
+          protocol: TCP
+
+certificates:
+  server:
+    secretTemplate:
+      labels:
+        velero.io/exclude-from-backup: "true"
+  client:
+    secretTemplate:
+      labels:
+        velero.io/exclude-from-backup: "true"
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik"
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
+
+service:
+  main:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/global-sync-endpoint-slices: "true"
+
+gateway:
+  enabled: true
+
+extraArgs:
+- --snapshot-count=100000
+- --auto-compaction-mode=periodic
+- --auto-compaction-retention=1h
+- --logger=zap
+- --log-outputs=stderr
+
+persistence:
+  data:
+    enabled: true
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
