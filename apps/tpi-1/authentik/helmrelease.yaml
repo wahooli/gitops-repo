@@ -4,12 +4,17 @@ metadata:
   name: authentik--authentik
   namespace: flux-system
 spec:
+  dependsOn:
+  - name: authentik--authentik-redis
+    namespace: flux-system
+  - name: authentik--authentik-patroni
+    namespace: flux-system
   releaseName: authentik
   interval: 5m
   targetNamespace: authentik
   chart:
     spec:
-      version: "2025.6.2" # {"$imagepolicy": "flux-system:authentik:tag"}
+      version: "2025.6.2"
   values:
     blueprints:
       configMaps:

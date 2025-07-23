@@ -5,6 +5,8 @@ resources:
 - ../../base/authentik/helmrelease-remote-cluster.yaml
 - imagepolicy.yaml
 - httproute.yaml
+- patroni
+- redis
 patches:
 - path: helmrelease.yaml
   target:

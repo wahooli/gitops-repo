@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: patroni-17
+  namespace: flux-system
+spec:
+  image: ghcr.io/wahooli/docker/patroni-17
+  interval: 24h

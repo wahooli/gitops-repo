@@ -1,0 +1,12 @@
+cluster:
+  replicaCount: 1
+
+replicaCount: 1
+ordinals:
+  start: 0
+
+ciliumNetworkPolicies:
+  main:
+    enabled: false
+  gateway:
+    enabled: false

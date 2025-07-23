@@ -8,3 +8,6 @@ resources:
 - nas-jellyfin.yaml
 - nas-transmission.yaml
 - vector-global-write.yaml
+- authentik-redis.yaml
+- authentik-patroni.yaml
+- etcd.yaml

@@ -1,0 +1,20 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik--authentik-redis
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
+  releaseName: authentik-redis
+  interval: 5m
+  targetNamespace: authentik
+  valuesFrom:
+  - kind: ConfigMap
+    name: authentik-redis-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: authentik-redis-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml

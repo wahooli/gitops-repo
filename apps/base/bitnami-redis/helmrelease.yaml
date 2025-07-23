@@ -1,20 +1,20 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: base-redis
+  name: base-bitnami-redis
   namespace: flux-system
   annotations:
-    homelab.wahoo.li/base-helmrelease: redis
+    homelab.wahoo.li/base-helmrelease: bitnami-redis
 spec:
-  releaseName: base-redis
+  releaseName: base-bitnami-redis
   chart:
     spec:
       chart: redis
       sourceRef:
         kind: HelmRepository
-        name: wahooli
+        name: bitnami
         namespace: flux-system
-      version: ">=0.1.0-0"
+      version: ">=16.1.1 <17.0.0"
       interval: 24h
   install:
     remediation:

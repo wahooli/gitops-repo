@@ -15,6 +15,10 @@ stringData:
   authentik_database_password: password
   authentik_email_password: password
   authentik_email_from: email@from.com
+  authentik_postgres_password: password
+  authentik_postgres_superuser_password: password
+  authentik_postgres_replication_password: password
+  authentik_postgres_rewind_password: password
   vaultwarden_database_password: dsadsadfdsfdssasdasdadasasd
   sonarr_external_ip: 192.168.1.1
   radarr_external_ip: 192.168.1.2
