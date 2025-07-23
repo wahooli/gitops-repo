@@ -33,6 +33,23 @@ authentik:
     enabled: false
   postgresql:
     password: "${authentik_database_password}"
+    name: authentik
+    user: authentik
+    host: authentik-patroni-proxy.authentik.svc.cluster.local
+    port: 5432
+    sslrootcert: /certs/postgres/ca.crt
+    sslcert: /certs/postgres/tls.crt
+    sslkey: /certs/postgres/tls.key
+    sslmode: verify-full
+    disable_server_side_cursors: true
+    conn_health_checks: true
+    conn_max_age: 0
+  redis:
+    host: authentik-redis-proxy.authentik.svc.cluster.local
+    port: 6379
+    tls: True # yamllint disable-line rule:truthy
+    tls_reqs: none
+    tls_ca_cert: "/certs/redis/ca.crt&ssl_keyfile=/certs/redis/tls.key&ssl_certfile=/certs/redis/tls.crt&ssl_check_hostname=false"
   email:
     host: "mail-relay.default"
     port: 25
@@ -95,7 +112,7 @@ server:
     - auth.wahoo.li
 
 postgresql:
-  enabled: true
+  enabled: false
   auth:
     database: authentik
     username: authentik
@@ -135,7 +152,7 @@ postgresql:
       enabled: true
       size: 2Gi
 redis:
-  enabled: true
+  enabled: false
   metrics:
     enabled: false
   # commonLabels:

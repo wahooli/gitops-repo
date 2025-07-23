@@ -27,6 +27,7 @@ podAnnotations:
 
 ciliumNetworkPolicies:
   main:
+    enabled: false # policies fail for some reason in this cluster
     description: "Allow etcd instances to communicate between each other and allow etcd gateway to access"
     endpointSelector:
       matchLabels:
@@ -80,6 +81,7 @@ ciliumNetworkPolicies:
           protocol: TCP
 
   gateway:
+    enabled: false # policies fail for some reason in this cluster
     description: "Allow etcd gateway to access etcd"
     endpointSelector:
       matchLabels:

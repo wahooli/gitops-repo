@@ -21,7 +21,7 @@ data:
 
     ssl:
       issuerRef:
-        name: selfsigned
+        name: selfsigned-ca
         kind: ClusterIssuer
 
     ciliumNetworkPolicies:
