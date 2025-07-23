@@ -17,6 +17,7 @@ ordinals:
 
 ciliumNetworkPolicies:
   main:
+    enabled: false # policies fail for some reason in this cluster
     description: "Allow redis proxy and redis to redis communication"
     endpointSelector:
       matchLabels:
@@ -111,6 +112,7 @@ haproxy:
     secret.reloader.stakater.com/reload: "authentik-redis-server"
   ciliumNetworkPolicies:
     main:
+      enabled: false # policies fail for some reason in this cluster
       description: "Allow redis proxy to connect redis and redis-sentinel"
       endpointSelector:
         matchLabels:

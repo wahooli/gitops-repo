@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: haproxy
+  namespace: flux-system
+spec:
+  image: docker.io/haproxy
+  interval: 24h
