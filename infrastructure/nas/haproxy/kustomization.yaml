@@ -1,21 +1,20 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../../base/tautulli
-- certificate.yaml
-- httproute.yaml
+- ../../base/haproxy
+- namespace.yaml
 - imagepolicy.yaml
 patches:
 - path: helmrelease.yaml
   target:
     kind: HelmRelease
-    name: base-tautulli
+    name: base-haproxy
   options:
     allowNameChange: true
 configMapGenerator:
 - files:
   - values.yaml=values.yaml
-  name: tautulli-values
+  name: haproxy-values
   namespace: flux-system
 configurations:
 - ../../.config/valuesFrom.yaml

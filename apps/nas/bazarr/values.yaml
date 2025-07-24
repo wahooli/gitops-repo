@@ -17,6 +17,7 @@ global:
     app.kubernetes.io/part-of: bazarr
 metrics:
   enabled: true
+  # dockerModsUrl: ghcr.io/linuxserver/mods
   extraEnv:
     ENABLE_ADDITIONAL_METRICS: "true"
   resources:
@@ -114,3 +115,11 @@ ingress:
           name: ak-outpost-nasse-proxy
           port:
             number: 9000
+
+dnsEndpoints:
+  main:
+    dnsName: bazarr.wahoo.li
+    recordTTL: 180
+    recordType: CNAME
+    targets:
+    - haproxy.nas.wahoo.li

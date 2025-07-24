@@ -1,0 +1,123 @@
+certificates:
+  wildcard:
+    secretTemplate:
+      labels:
+        velero.io/exclude-from-backup: "true"
+    dnsNames:
+    - '*.wahoo.li'
+    issuerRef:
+      kind: ClusterIssuer
+      name: letsencrypt-production
+    usages:
+    - digital signature
+    - key encipherment
+
+image:
+  tag: "3.2.3" # {"$imagepolicy": "flux-system:haproxy-3-2:tag"}
+
+service:
+  main:
+    externalTrafficPolicy: Local
+    type: LoadBalancer
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: haproxy.nas.absolutist.it,haproxy.nas.wahoo.li
+
+podAnnotations:
+  secret.reloader.stakater.com/reload: "haproxy-wildcard"
+
+configMaps:
+  config:
+    data:
+      haproxy.cfg: |
+        global
+            log stdout format raw local0
+            maxconn 2048
+            tune.ssl.default-dh-param 2048
+            ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+            ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+            ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+            h2-workaround-bogus-websocket-clients
+            stats           socket /var/lib/haproxy/stats
+
+        {{ include "haproxy.defaultsConfig" . }}
+
+        {{ include "haproxy.resolversBlock" . }}
+
+        {{ include "haproxy.statsEndpoint" . }}
+
+        {{ include "haproxy.httpsRedirectFrontend" . }}
+
+        frontend proxy_frontend
+            bind *:443 ssl crt /etc/haproxy/certs/wahoo.li.pem alpn h2,http/1.1
+            mode http
+            option http-server-close
+            option h1-case-adjust-bogus-client
+
+            # Set security and proxy headers
+            http-request set-header X-Forwarded-For %[src]
+            #http-request set-header X-Real-IP %[src]
+            http-request set-header Host %[req.hdr(Host)]  # Forward Host header (important for SNI and routing)
+            http-request set-header Origin %[req.hdr(Origin)]  # Forward Origin header (for security checks)
+            http-request set-header X-Proxy-Name "haproxy.nas.wahoo.li"
+            http-response set-header X-Content-Type-Options "nosniff"
+            http-response set-header X-Frame-Options "DENY"
+            http-response set-header Vary "Accept-Encoding" unless { res.hdr(vary) -m found }
+            http-response del-header X-Powered-By
+            http-response del-header Server
+            http-response del-header X-XSS-Protection
+            http-response del-header X-Response-Time-MS
+
+            acl is_websocket hdr(Upgrade) -i WebSocket
+            http-request set-var(txn.is_websocket) bool(true) if is_websocket
+
+            default_backend nginx
+
+        backend nginx
+            mode http
+            # compression settings
+            filter compression
+            compression algo gzip
+            compression direction both
+            compression type text/css text/html text/javascript application/javascript text/plain text/xml application/json
+            compression offload
+
+            # Conditionally forward WebSocket headers and set a longer timeout
+            http-request set-header Connection %[req.hdr(Connection)] if { var(txn.is_websocket) -m bool }
+            http-request set-header Upgrade %[req.hdr(Upgrade)] if { var(txn.is_websocket) -m bool }
+            http-request set-timeout tunnel 1h if { var(txn.is_websocket) -m bool }
+
+            default-server inter 3s rise 1 fall 3 on-marked-down shutdown-sessions resolvers k8s init-addr none
+            server nginx ingress-nginx-controller.ingress-nginx.svc.cluster.local.:80 send-proxy-v2 check alpn h2
+
+        {{- include "haproxy.endConfig" . }}
+
+initContainers:
+  combine-certs:
+    image: busybox:1.37
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      echo "Combining tls.key and tls.crt into a single .pem file...";
+      cat /mnt/secret/tls.key /mnt/secret/tls.crt > /mnt/certs/wahoo.li.pem;
+      echo "Certificate prepared.";
+    volumeMounts:
+    - name: tls
+      mountPath: /mnt/secret # Mount the secret read-only
+      readOnly: true
+    - name: certs
+      mountPath: /mnt/certs # Mount the shared volume to write the .pem file
+
+persistence:
+  certs:
+    enabled: true
+    mount:
+    - path: /etc/haproxy/certs
+  tls:
+    enabled: true
+    spec:
+      useFromChart: false
+      secret:
+        defaultMode: 0400
+        name: haproxy-wildcard
+        optional: false

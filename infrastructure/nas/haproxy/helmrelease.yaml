@@ -1,21 +1,20 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: default--bazarr
+  name: haproxy--haproxy
   namespace: flux-system
 spec:
-  releaseName: bazarr
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
+  releaseName: haproxy
   interval: 5m
-  targetNamespace: default
-  values:
-    envFrom:
-      envs:
-        name: bazarr-env
+  targetNamespace: haproxy
   valuesFrom:
   - kind: ConfigMap
-    name: bazarr-values
+    name: haproxy-values
     valuesKey: values.yaml
   - kind: ConfigMap
-    name: bazarr-helmrelease-overrides
+    name: haproxy-helmrelease-overrides
     optional: true
     valuesKey: values.yaml

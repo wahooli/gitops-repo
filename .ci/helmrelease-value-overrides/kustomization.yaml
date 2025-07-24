@@ -4,6 +4,7 @@ resources:
 - nas-plex.yaml
 - external-dns.yaml
 - ingress-nginx.yaml
+- haproxy.yaml
 - linkerd-multicluster.yaml
 - nas-jellyfin.yaml
 - nas-transmission.yaml
@@ -11,3 +12,4 @@ resources:
 - authentik-redis.yaml
 - authentik-patroni.yaml
 - etcd.yaml
+- nas-bazarr.yaml

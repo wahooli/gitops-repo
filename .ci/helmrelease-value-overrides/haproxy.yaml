@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    service:
+      main:
+        externalTrafficPolicy: ""
+        type: ClusterIP
+    certificates:
+      wildcard:
+        issuerRef:
+          name: selfsigned-ca
+          kind: ClusterIssuer
