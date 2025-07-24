@@ -5,6 +5,7 @@ resources:
 - infrastructure-namespace.yaml
 - prometheus-operator-crds
 - gateway-api
+- haproxy
 - cert-manager
 - default-backend
 - victoria-metrics-operator

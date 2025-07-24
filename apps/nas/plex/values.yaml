@@ -7,6 +7,7 @@ strategy:
 hostNetwork: true
 metrics:
   enabled: true
+  # dockerModsUrl: ghcr.io/linuxserver/mods
   image:
     repository: ghcr.io/jsclayton/prometheus-plex-exporter
     tag: "main"

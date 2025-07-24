@@ -56,3 +56,11 @@ ingress:
           name: ak-outpost-proxy-default
           port:
             number: 9000
+
+dnsEndpoints:
+  main:
+    dnsName: tautulli.wahoo.li
+    recordTTL: 180
+    recordType: CNAME
+    targets:
+    - haproxy.tpi-1.wahoo.li
