@@ -67,6 +67,12 @@ configMaps:
             http-response del-header X-XSS-Protection
             http-response del-header X-Response-Time-MS
 
+            # ACL to identify static file extensions
+            acl is_static path_end -i .css .js .jpg .jpeg .png .gif .ico
+
+            # Set a long cache header for static files
+            http-response set-header Cache-Control "public, max-age=604800" if is_static
+
             acl is_websocket hdr(Upgrade) -i WebSocket
             http-request set-var(txn.is_websocket) bool(true) if is_websocket
 
