@@ -15,6 +15,9 @@ configMapGenerator:
   namespace: flux-system
   files:
   - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: victoria-metrics-datasource
   namespace: grafana
   files:

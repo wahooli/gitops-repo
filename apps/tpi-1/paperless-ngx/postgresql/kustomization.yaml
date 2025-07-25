@@ -15,5 +15,8 @@ configMapGenerator:
   files:
   - values-base.yaml=../../../base/postgresql/values-base.yaml
   - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 configurations:
 - ../../../.config/valuesFrom.yaml

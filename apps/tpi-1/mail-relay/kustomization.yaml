@@ -18,6 +18,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: docker-mailserver-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: mail-relay-env
   options:
     annotations:

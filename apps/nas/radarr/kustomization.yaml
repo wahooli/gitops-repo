@@ -16,6 +16,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: radarr-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: radarr-env
   namespace: flux-system
   options:

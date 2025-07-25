@@ -15,6 +15,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: jellyfin-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: jellyfin-env
   namespace: flux-system
   options:

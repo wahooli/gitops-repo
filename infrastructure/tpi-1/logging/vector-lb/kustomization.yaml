@@ -15,6 +15,9 @@ configMapGenerator:
   behavior: merge
   files:
   - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: vector-lb-config
   namespace: flux-system
   options:

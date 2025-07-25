@@ -11,3 +11,6 @@ configMapGenerator:
   namespace: flux-system
   files:
   - values-base.yaml=operator.values-base.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"

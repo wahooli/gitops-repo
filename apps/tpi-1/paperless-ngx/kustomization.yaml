@@ -20,6 +20,9 @@ configMapGenerator:
   - imagetag.yaml=imagetag.yaml
   name: paperless-ngx-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: paperless-ngx-env
   options:
     annotations:

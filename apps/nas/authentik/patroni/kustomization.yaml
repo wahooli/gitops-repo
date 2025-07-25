@@ -15,6 +15,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: authentik-patroni-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 configurations:
 - ../../../.config/valuesFrom.yaml
 - ../../../.config/envFrom.yaml

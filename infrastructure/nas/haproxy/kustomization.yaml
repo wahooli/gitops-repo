@@ -16,5 +16,8 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: haproxy-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 configurations:
 - ../../.config/valuesFrom.yaml

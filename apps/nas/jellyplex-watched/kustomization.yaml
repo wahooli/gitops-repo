@@ -13,6 +13,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: jellyplex-watched-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: jellyplex-watched-env
   namespace: flux-system
   options:

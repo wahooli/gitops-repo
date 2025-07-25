@@ -13,6 +13,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: ps3netsrv-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: ps3netsrv-env
   namespace: flux-system
   options:

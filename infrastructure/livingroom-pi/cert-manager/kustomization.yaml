@@ -15,5 +15,8 @@ configMapGenerator:
   behavior: merge
   files:
   - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 configurations:
 - ../../.config/valuesFrom.yaml

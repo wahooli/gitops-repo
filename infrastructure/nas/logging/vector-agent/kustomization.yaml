@@ -17,6 +17,9 @@ configMapGenerator:
   files:
   - values-base.yaml=../../../base/vector/values-base.yaml
   - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: vector-agent-config
   namespace: flux-system
   options:

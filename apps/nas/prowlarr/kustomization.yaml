@@ -16,6 +16,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: prowlarr-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: prowlarr-env
   namespace: flux-system
   options:

@@ -17,5 +17,8 @@ configMapGenerator:
   name: seaweedfs-values
   behavior: merge
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 configurations:
 - ../../.config/valuesFrom.yaml

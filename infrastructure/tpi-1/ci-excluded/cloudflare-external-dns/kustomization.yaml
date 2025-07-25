@@ -14,5 +14,8 @@ configMapGenerator:
   files:
   - values-base.yaml=../../../base/external-dns/values-base.yaml
   - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 configurations:
 - ../../../.config/valuesFrom.yaml

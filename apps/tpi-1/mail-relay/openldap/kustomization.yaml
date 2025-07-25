@@ -17,6 +17,9 @@ configMapGenerator:
   behavior: merge
   files:
   - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: mail-relay-ldap-ldifs
   namespace: flux-system
   options:

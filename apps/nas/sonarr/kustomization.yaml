@@ -16,6 +16,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: sonarr-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: sonarr-env
   namespace: flux-system
   options:

@@ -15,6 +15,9 @@ configMapGenerator:
   - values.yaml=values.yaml
   name: transmission-old-values
   namespace: flux-system
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
 - name: transmission-old-env
   namespace: flux-system
   options:

@@ -5,7 +5,6 @@ metadata:
   namespace: infrastructure
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns.alpha.kubernetes.io/hostname: gw.tpi-1.absolutist.it,gw.tpi-1.wahoo.li
 spec:
   gatewayClassName: cilium
   infrastructure:
@@ -14,6 +13,7 @@ spec:
       service.cilium.io/forwarding-mode: dsr
       # kube-vip.io/ignore: "true"
       lbipam.cilium.io/ips: "${internal_gw_lb_ip}"
+      external-dns.alpha.kubernetes.io/hostname: gw.tpi-1.absolutist.it,gw.tpi-1.wahoo.li
   listeners:
   - name: internal-wahooli-http
     protocol: HTTP
