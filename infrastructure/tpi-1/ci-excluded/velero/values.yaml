@@ -27,14 +27,28 @@ schedules:
         matchLabels:
           backupWeekly: "true"
       storageLocation: seaweedfs
-      excludedResources:
+      excludedResources: &excludedResources
       - storageclasses.storage.k8s.io
       - certificaterequests.cert-manager.io
-      - certificates.cert-manager.io
+      - challenges.acme.cert-manager.io
       - orders.acme.cert-manager.io
+      - ciliumendpoints.cilium.io
+      - ciliumnetworkpolicies.cilium.io
       - networkpolicy
+      - endpointslice
+      - endpoint
+      - replicasets
+      - controllerrevisions.apps
+      - ciliumnodes.cilium.io
+      - events
+      - nodes
+      - leases.coordination.k8s.io
+      - csinodes.storage.k8s.io
+      - volumeattachments.storage.k8s.io
+      - events.events.k8s.io
+      - replicasets.apps
       # - ingress
-      excludedNamespaces:
+      excludedNamespaces: &excludedNamespaces
       - kube-public
       - kube-node-lease
       # - flux-system  # required for configmapgenerator envs
@@ -60,27 +74,8 @@ schedules:
         matchLabels:
           backupDaily: "true"
       storageLocation: seaweedfs
-      excludedResources:
-      - storageclasses.storage.k8s.io
-      - certificaterequests.cert-manager.io
-      - certificates.cert-manager.io
-      - orders.acme.cert-manager.io
-      - networkpolicy
-      # - ingress
-      excludedNamespaces:
-      - kube-public
-      - kube-node-lease
-      # - flux-system  # required for configmapgenerator envs
-      - cert-manager
-      - cilium-secrets
-      - ingress-nginx
-      - infrastructure
-      - kube-system
-      - metallb-system
-      - reflector
-      - reloader
-      - topolvm-system
-      - velero
+      excludedResources: *excludedResources
+      excludedNamespaces: *excludedNamespaces
   hourly:
     disabled: true
     labels:
@@ -95,20 +90,8 @@ schedules:
           backupHourly: "true"
       ttl: "6h"
       storageLocation: seaweedfs
-      excludedNamespaces:
-      - kube-public
-      - kube-node-lease
-      # - flux-system  # required for configmapgenerator envs
-      - cert-manager
-      - cilium-secrets
-      - ingress-nginx
-      - infrastructure
-      - kube-system
-      - metallb-system
-      - reflector
-      - reloader
-      - topolvm-system
-      - velero
+      excludedResources: *excludedResources
+      excludedNamespaces: *excludedNamespaces
 nodeAgent:
   dnsConfig:
     options:
@@ -134,6 +117,7 @@ configuration:
     config:
       region: ${velero_backup_bucket_region}
       s3ForcePathStyle: true
+      checksumAlgorithm: ""
       s3Url: ${velero_backup_bucket_url}
       publicUrl: ${velero_backup_bucket_public_url}
   # - name: seaweedfs-vm
