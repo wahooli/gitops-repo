@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.cilium.io/global: "true"
+  name: vlsingle-long-term-nas
+  namespace: logging
+spec:
+  ports:
+  - name: http
+    port: 9428
+    protocol: TCP
+    targetPort: 9428
+  type: ClusterIP

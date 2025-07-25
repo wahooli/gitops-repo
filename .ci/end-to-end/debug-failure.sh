@@ -3,6 +3,7 @@ HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 DEBUG_LOGS="${DEBUG_LOGS:-false}"
 DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns logging authentik victoria-metrics}"
+DEBUG_RESOURCES="${DEBUG_RESOURCES:-deployment statefulset pod vlsingle}"
 DEBUG_NAMESPACES="${DEBUG_NAMESPACES:-default cert-manager internal-dns logging authentik}"
 
 echo "::group::Describe all cluster nodes"
@@ -38,30 +39,18 @@ kubectl get pods --all-namespaces
 echo "::endgroup::"
 
 for namespace in ${DEBUG_NAMESPACES}; do
-    echo "::group::Workloads in namespace: ${namespace}"
+    echo "::group::Describe resources in namespace: ${namespace}"
 
-    deployments=$(kubectl get deployments -n "${namespace}" -o name)
-    for deploy in $deployments; do
-        name=${deploy##*/}
-        echo "::group::Deployment: ${name}"
-        kubectl describe "$deploy" -n "${namespace}"
-        echo "::endgroup::"
-    done
+    for kind in ${DEBUG_RESOURCES}; do
+        plural="${kind}s"
+        resources=$(kubectl get "${plural}" -n "${namespace}" -o name 2>/dev/null || true)
 
-    statefulsets=$(kubectl get statefulsets -n "${namespace}" -o name)
-    for sts in $statefulsets; do
-        name=${sts##*/}
-        echo "::group::StatefulSet: ${name}"
-        kubectl describe "$sts" -n "${namespace}"
-        echo "::endgroup::"
-    done
-
-    pods=$(kubectl get pods -n "${namespace}" -o name)
-    for pod in $pods; do
-        name=${pod##*/}
-        echo "::group::Pod: ${name}"
-        kubectl describe "$pod" -n "${namespace}"
-        echo "::endgroup::"
+        for res in $resources; do
+            name=${res##*/}
+            echo "::group::${kind^}: ${name}"   # Capitalized header
+            kubectl describe "$res" -n "${namespace}"
+            echo "::endgroup::"
+        done
     done
 
     echo "::endgroup::"
