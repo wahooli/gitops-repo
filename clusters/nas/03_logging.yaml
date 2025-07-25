@@ -27,11 +27,11 @@ spec:
     namespace: logging
   - apiVersion: apps/v1
     kind: Deployment
-    name: vlogs-long-term-nas
+    name: vlsingle-long-term-nas
     namespace: logging
   - apiVersion: apps/v1
     kind: Deployment
-    name: vlogs-short-term-nas
+    name: vlsingle-short-term-nas
     namespace: logging
   - apiVersion: apps/v1
     kind: Deployment

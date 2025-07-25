@@ -2,8 +2,9 @@
 HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 DEBUG_LOGS="${DEBUG_LOGS:-false}"
-DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns logging authentik}"
-DESCRIBE_PODS_NAMESPACES="${DESCRIBE_PODS_NAMESPACES:-default cert-manager monitoring logging authentik}"
+DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns logging authentik victoria-metrics}"
+DEBUG_RESOURCES="${DEBUG_RESOURCES:-deployment statefulset pod vlsingle}"
+DEBUG_NAMESPACES="${DEBUG_NAMESPACES:-default cert-manager internal-dns logging authentik}"
 
 echo "::group::Describe all cluster nodes"
 kubectl describe nodes -A
@@ -37,9 +38,21 @@ echo "::group::Pods in all namespaces"
 kubectl get pods --all-namespaces
 echo "::endgroup::"
 
-for namespace in ${DESCRIBE_PODS_NAMESPACES}; do
-    echo "::group::Describe pods in ${namespace} namespace"
-    kubectl describe pods -n ${namespace}
+for namespace in ${DEBUG_NAMESPACES}; do
+    echo "::group::Describe resources in namespace: ${namespace}"
+
+    for kind in ${DEBUG_RESOURCES}; do
+        plural="${kind}s"
+        resources=$(kubectl get "${plural}" -n "${namespace}" -o name 2>/dev/null || true)
+
+        for res in $resources; do
+            name=${res##*/}
+            echo "::group::${kind^}: ${name}"   # Capitalized header
+            kubectl describe "$res" -n "${namespace}"
+            echo "::endgroup::"
+        done
+    done
+
     echo "::endgroup::"
 done
 

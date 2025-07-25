@@ -19,7 +19,7 @@ sinks:
     type: elasticsearch
     inputs: [vector]
     endpoints:
-    - http://vlogs-short-term-nas.logging.svc.cluster.local.:9428/insert/elasticsearch
+    - http://vlsingle-short-term-nas.logging.svc.cluster.local.:9428/insert/elasticsearch
     mode: bulk
     api_version: v8
     compression: gzip
@@ -36,7 +36,7 @@ sinks:
     type: elasticsearch
     inputs: [vector]
     endpoints:
-    - http://vlogs-long-term-nas.logging.svc.cluster.local.:9428/insert/elasticsearch
+    - http://vlsingle-long-term-nas.logging.svc.cluster.local.:9428/insert/elasticsearch
     mode: bulk
     api_version: v8
     compression: gzip

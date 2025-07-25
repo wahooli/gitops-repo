@@ -35,7 +35,7 @@ datasources:
   access: proxy
   # <string> Sets URL for sending queries to VictoriaLogs server.
   # see https://docs.victoriametrics.com/victorialogs/querying/
-  url: http://vlogs-long-term-nas.logging.svc.cluster.local.:9428
+  url: http://vlsingle-long-term-nas.logging.svc.cluster.local.:9428
   # <string> Sets the pre-selected datasource for new panels.
   # You can set only one default data source per organization.
   isDefault: false
