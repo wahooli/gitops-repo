@@ -77,7 +77,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "$filter clustername: $clustername kubernetes.pod_name: $pod kubernetes.container_name: $container_name kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} | stats rate() as lines_per_second",
+          "expr": "$filter clustername:~\"$clustername\" kubernetes.pod_name: $pod kubernetes.container_name: $container_name kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} | stats rate() as lines_per_second",
           "legendFormat": "",
           "queryType": "stats",
           "refId": "A"
@@ -175,7 +175,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "$filter clustername: $clustername kubernetes.pod_name: $pod kubernetes.container_name: $container_name kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} | stats count() Lines",
+          "expr": "$filter clustername:~\"$clustername\" kubernetes.pod_name: $pod kubernetes.container_name: $container_name kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} | stats count() Lines",
           "queryType": "statsRange",
           "refId": "A"
         }
@@ -259,7 +259,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "$filter clustername: $clustername kubernetes.pod_name: $pod kubernetes.container_name: $container_name kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} | stats(kubernetes.pod_name) count() as entries | order by(entries) desc | pack_json",
+          "expr": "$filter clustername:~\"$clustername\" kubernetes.pod_name: $pod kubernetes.container_name: $container_name kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} | stats(kubernetes.pod_name) count() as entries | order by(entries) desc | pack_json",
           "queryType": "instant",
           "refId": "A"
         }
@@ -379,7 +379,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "$filter clustername: $clustername kubernetes.pod_name: $pod kubernetes.container_name: $container_name kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"}| stats count() as lines",
+          "expr": "$filter clustername:~\"$clustername\" kubernetes.pod_name: $pod kubernetes.container_name: $container_name kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"}| stats count() as lines",
           "queryType": "stats",
           "refId": "A"
         }
@@ -422,7 +422,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "$filter clustername: $clustername kubernetes.container_name: $container_name kubernetes.pod_name: $pod kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"}",
+          "expr": "$filter clustername:~\"$clustername\" kubernetes.container_name: $container_name kubernetes.pod_name: $pod kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"}",
           "maxLines": 50000,
           "queryType": "instant",
           "refId": "A"
@@ -461,7 +461,7 @@
           "type": "victoriametrics-logs-datasource",
           "uid": "${datasource}"
         },
-        "definition": "clustername: $clustername {source_type=\"kubernetes_logs\"} ",
+        "definition": "clustername:~\"$clustername\" {source_type=\"kubernetes_logs\"} ",
         "description": "Namespace of the pod",
         "includeAll": false,
         "label": "Namespace",
@@ -470,7 +470,7 @@
         "query": {
           "field": "kubernetes.pod_namespace",
           "limit": 100,
-          "query": "clustername: $clustername {source_type=\"kubernetes_logs\"} ",
+          "query": "clustername:~\"$clustername\" {source_type=\"kubernetes_logs\"} ",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },
@@ -479,7 +479,7 @@
         "type": "query"
       },
       {
-        "allValue": "*",
+        "allValue": ".*",
         "current": {
           "text": "All",
           "value": "$__all"
@@ -492,6 +492,7 @@
         "description": "Name of the cluster",
         "includeAll": true,
         "label": "Cluster",
+        "multi": true,
         "name": "clustername",
         "options": [],
         "query": {
@@ -515,7 +516,7 @@
           "type": "victoriametrics-logs-datasource",
           "uid": "${datasource}"
         },
-        "definition": "clustername: $clustername kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
+        "definition": "clustername:~\"$clustername\" kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
         "includeAll": true,
         "label": "Pod name",
         "name": "pod",
@@ -523,7 +524,7 @@
         "query": {
           "field": "kubernetes.pod_name",
           "limit": 150,
-          "query": "clustername: $clustername kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
+          "query": "clustername:~\"$clustername\" kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },
@@ -541,7 +542,7 @@
           "type": "victoriametrics-logs-datasource",
           "uid": "${datasource}"
         },
-        "definition": "clustername: $clustername kubernetes.pod_name: $pod kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
+        "definition": "clustername:~\"$clustername\" kubernetes.pod_name: $pod kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
         "description": "Container name within pod",
         "includeAll": true,
         "label": "Container name",
@@ -550,7 +551,7 @@
         "query": {
           "field": "kubernetes.container_name",
           "limit": 150,
-          "query": "clustername: $clustername kubernetes.pod_name: $pod kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
+          "query": "clustername:~\"$clustername\" kubernetes.pod_name: $pod kubernetes.pod_labels.app_kubernetes_io_name:~$name kubernetes.pod_labels.app_kubernetes_io_instance:~$instance {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },
@@ -559,7 +560,7 @@
         "type": "query"
       },
       {
-        "allValue": "*",
+        "allValue": ".*",
         "current": {
           "text": "All",
           "value": "$__all"
@@ -568,7 +569,7 @@
           "type": "victoriametrics-logs-datasource",
           "uid": "${datasource}"
         },
-        "definition": "clustername: $clustername {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
+        "definition": "clustername:~\"$clustername\" {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
         "description": "Value of app.kubernetes.io/instance",
         "includeAll": true,
         "label": "Instance",
@@ -577,7 +578,7 @@
         "query": {
           "field": "kubernetes.pod_labels.app_kubernetes_io_instance",
           "limit": 100,
-          "query": "clustername: $clustername {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
+          "query": "clustername:~\"$clustername\" {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },
@@ -586,7 +587,7 @@
         "type": "query"
       },
       {
-        "allValue": "*",
+        "allValue": ".*",
         "current": {
           "text": "All",
           "value": "$__all"
@@ -595,7 +596,7 @@
           "type": "victoriametrics-logs-datasource",
           "uid": "${datasource}"
         },
-        "definition": "clustername: $clustername {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
+        "definition": "clustername:~\"$clustername\" {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
         "description": "Value of app.kubernetes.io/name",
         "includeAll": true,
         "label": "Name",
@@ -604,7 +605,7 @@
         "query": {
           "field": "kubernetes.pod_labels.app_kubernetes_io_name",
           "limit": 100,
-          "query": "clustername: $clustername {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
+          "query": "clustername:~\"$clustername\" {source_type=\"kubernetes_logs\", kubernetes.pod_namespace=\"$namespace\"} ",
           "refId": "VictoriaLogsVariableQueryEditor-VariableQuery",
           "type": "fieldValue"
         },
