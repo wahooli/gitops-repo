@@ -2,9 +2,9 @@
 HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 DEBUG_LOGS="${DEBUG_LOGS:-false}"
-DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns logging authentik victoria-metrics}"
+DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns logging authentik victoria-metrics crowdsec}"
 DEBUG_RESOURCES="${DEBUG_RESOURCES:-deployment statefulset pod vlsingle}"
-DEBUG_NAMESPACES="${DEBUG_NAMESPACES:-default cert-manager internal-dns logging authentik}"
+DEBUG_NAMESPACES="${DEBUG_NAMESPACES:-default cert-manager internal-dns logging authentik crowdsec}"
 
 echo "::group::Describe all cluster nodes"
 kubectl describe nodes -A

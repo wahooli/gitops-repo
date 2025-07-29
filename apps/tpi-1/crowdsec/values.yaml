@@ -1,0 +1,21 @@
+image:
+  tag: "v1.6.11" # {"$imagepolicy": "flux-system:crowdsec:tag"}
+
+agent:
+  acquisition:
+  - namespace: ingress-nginx
+    podName: ingress-nginx-controller-*
+    program: ingress-nginx
+    poll_without_inotify: true
+  - namespace: authentik
+    podName: authentik-server-*
+    program: authentik
+    poll_without_inotify: true
+  - namespace: default
+    podName: vaultwarden-*
+    program: vaultwarden
+    poll_without_inotify: true
+  - namespace: default
+    podName: paperless-ngx-*
+    program: paperless-ngx
+    poll_without_inotify: true

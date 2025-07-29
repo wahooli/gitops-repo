@@ -19,6 +19,13 @@ stringData:
   authentik_postgres_superuser_password: password
   authentik_postgres_replication_password: password
   authentik_postgres_rewind_password: password
+  crowdsec_database_password: password
+  crowdsec_postgres_password: password
+  crowdsec_postgres_superuser_password: password
+  crowdsec_postgres_replication_password: password
+  crowdsec_postgres_rewind_password: password
+  crowdsec_enroll_key: dsadsadfdsfdssasdasdadasasd
+  crowdsec_enroll_instance_name: ci-test
   vaultwarden_database_password: dsadsadfdsfdssasdasdadasasd
   sonarr_external_ip: 192.168.1.1
   radarr_external_ip: 192.168.1.2

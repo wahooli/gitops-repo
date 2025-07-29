@@ -4,7 +4,7 @@ global:
     backupDaily: "true"
 
 image:
-  tag: v3.6.3
+  tag: v3.6.3 # {"$imagepolicy": "flux-system:etcd:tag"}
 
 cluster:
   ordinals:
@@ -116,6 +116,16 @@ ciliumNetworkPolicies:
       - ports:
         - port: "2379"
           protocol: TCP
+    - fromEndpoints:
+      - matchLabels:
+          # allow patroni in authentik namespace to access
+          io.kubernetes.pod.namespace: crowdsec
+          app.kubernetes.io/instance: crowdsec-patroni
+          app.kubernetes.io/name: patroni
+      toPorts:
+      - ports:
+        - port: "2379"
+          protocol: TCP
 
 certificates:
   server:
@@ -128,7 +138,9 @@ certificates:
         velero.io/exclude-from-backup: "true"
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik,crowdsec"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "crowdsec"
 
 dnsConfig:
   options:

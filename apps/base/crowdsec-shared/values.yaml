@@ -1,0 +1,156 @@
+image:
+  repository: crowdsecurity/crowdsec
+  pullPolicy: IfNotPresent
+
+agent:
+  acquisition:
+  - namespace: ingress-nginx
+    podName: ingress-nginx-controller-*
+    program: ingress-nginx
+    poll_without_inotify: true
+  - namespace: authentik
+    podName: authentik-server-*
+    program: authentik
+    poll_without_inotify: true
+  env:
+  - name: COLLECTIONS
+    value: "crowdsecurity/traefik"
+  extraVolumes: &extraVolumes
+  - name: postgres-tls
+    secret:
+      defaultMode: 0444
+      optional: false
+      secretName: crowdsec-patroni-server
+  extraVolumeMounts: &extraVolumeMounts
+  - mountPath: /certs/postgres
+    name: postgres-tls
+
+lapi:
+  extraVolumes: *extraVolumes
+  extraVolumeMounts: *extraVolumeMounts
+  replicas: 1
+  storeCAPICredentialsInSecret: true
+  persistentVolume:
+    config:
+      enabled: false
+    data:
+      enabled: false
+  env:
+  # To enroll the Security Engine to the console
+  - name: ENROLL_KEY
+    value: '${crowdsec_enroll_key}'
+  - name: ENROLL_INSTANCE_NAME
+    value: '${crowdsec_enroll_instance_name}'
+  - name: ENROLL_TAGS
+    value: 'k8s k3s linux'
+  - name: DB_PASSWORD
+    value: ${crowdsec_database_password}
+config:
+  console.yaml: |
+    share_manual_decisions: false
+    share_tainted: false
+    share_custom: false
+  parsers:
+    s01-parse:
+      wahooli-nginx-json-access-log.yaml: |
+        name: wahooli/nginx_json_access_log
+        description: "Parse custom nginx access log"
+        onsuccess: next_stage
+        filter: "Upper(evt.Line.Labels.program) == 'INGRESS-NGINX' && Upper(evt.Parsed.stream) == 'STDOUT'"
+        statics:
+        - meta: source_ip
+          expression: JsonExtractUnescape(evt.Parsed.message, "remote_addr")
+        - meta: vhost
+          expression: JsonExtractUnescape(evt.Parsed.message, "vhost")
+        - meta: http_status
+          expression: JsonExtract(evt.Parsed.message, "status")
+        - meta: http_path
+          expression: JsonExtractUnescape(evt.Parsed.message, "path")
+        - meta: program
+          expression: Lower(evt.Line.Labels.program)
+  scenarios:
+    wahooli-block-wp-scanners-nginx.yaml: |
+      type: leaky
+      name: wahooli/block-wp-scanners-nginx
+      description: "Detect WordPress scan: vuln hunting"
+      groupby: evt.Meta.source_ip
+      distinct: evt.Meta.http_path
+      leakspeed: "30s"
+      blackhole: 600m
+      capacity: 3
+      filter: |
+        evt.Meta.program == 'ingress-nginx' and
+        evt.Meta.http_status matches "^[34]" and
+        (
+          Lower(evt.Meta.http_path) contains "/.well-known" or
+          Lower(evt.Meta.http_path) contains "/filemanager" or
+          Lower(evt.Meta.http_path) contains "/ini" or
+          Lower(evt.Meta.http_path) contains "/install" or
+          Lower(evt.Meta.http_path) contains "/epinyins" or
+          Lower(evt.Meta.http_path) contains "/alfa-rex" or
+          Lower(evt.Meta.http_path) contains "/autoload" or
+          Lower(evt.Meta.http_path) contains "/database" or
+          Lower(evt.Meta.http_path) contains "/xhell" or
+          Lower(evt.Meta.http_path) contains "/alfashell" or
+          Lower(evt.Meta.http_path) contains "/shell" or
+          Lower(evt.Meta.http_path) contains "/vuln" or
+          Lower(evt.Meta.http_path) contains "/wp-"
+        ) and
+        Lower(evt.Meta.http_path) endsWith ".php"
+      labels:
+        remediation: true
+        behavior: "http:scan"
+        label: "WordPress Vuln Hunting"
+        confidence: 3
+    wahooli-secret-scanners-nginx.yaml: |
+      type: leaky
+      name: wahooli/block-secret-scanners-nginx
+      description: "Detect vulnerability scanners"
+      groupby: evt.Meta.source_ip
+      leakspeed: "60s"
+      blackhole: 600m
+      capacity: 2
+      filter: |
+        evt.Meta.program == 'ingress-nginx' and
+        evt.Meta.http_status matches "^[34]" and
+        (
+          Lower(evt.Meta.http_path) startsWith "/.env" or
+          Lower(evt.Meta.http_path) startsWith "/.git" or
+          Lower(evt.Meta.http_path) startsWith "/.well-known" or
+          Lower(evt.Meta.http_path) startsWith "/.ssh" or
+          Lower(evt.Meta.http_path) startsWith "/admin/upload"
+        )
+      labels:
+        remediation: true
+        behavior: "http:scan"
+        label: "WordPress Vuln Hunting"
+        confidence: 3
+  config.yaml.local: |
+    common:
+      log_media: stdout
+      log_format: json
+      log_level: warn
+    db_config:
+      type:     postgresql
+      user:     crowdsec
+      password: $${DB_PASSWORD}
+      db_name:  crowdsec
+      host:     crowdsec-patroni-proxy.crowdsec.svc.cluster.local
+      port:     5432
+      ssl_ca_cert: /certs/postgres/ca.crt
+      ssl_client_cert: /certs/postgres/tls.crt
+      ssl_client_key: /certs/postgres/tls.key
+    api:
+      server:
+        use_forwarded_for_headers: true
+        trusted_proxies:
+        - "10.0.0.0/8"
+        - "172.16.0.0/12"
+        auto_registration: # Activate if not using TLS for authentication
+          enabled: true
+          token: "$${REGISTRATION_TOKEN}"  # /!\ do not change
+          allowed_ranges: # /!\ adapt to the pod IP ranges used by your cluster
+          - "127.0.0.1/32"
+          - "192.168.0.0/16"
+          - "10.0.0.0/8"
+          - "172.16.0.0/12"
