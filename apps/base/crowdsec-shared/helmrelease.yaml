@@ -4,6 +4,9 @@ metadata:
   name: crowdsec--crowdsec
   namespace: flux-system
 spec:
+  chart:
+    spec:
+      version: "0.19.5"
   dependsOn:
   - name: crowdsec--crowdsec-patroni
     namespace: flux-system
