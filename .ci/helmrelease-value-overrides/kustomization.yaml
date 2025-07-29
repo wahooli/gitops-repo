@@ -11,5 +11,7 @@ resources:
 - vector-global-write.yaml
 - authentik-redis.yaml
 - authentik-patroni.yaml
+- crowdsec-patroni.yaml
+- crowdsec.yaml
 - etcd.yaml
 - nas-bazarr.yaml

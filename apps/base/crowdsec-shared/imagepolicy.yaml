@@ -1,0 +1,11 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: crowdsec
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: crowdsec
+  policy:
+    semver:
+      range: vx.x.x

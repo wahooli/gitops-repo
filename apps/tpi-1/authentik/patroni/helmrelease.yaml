@@ -7,6 +7,8 @@ spec:
   dependsOn:
   - name: cert-manager--cert-manager
     namespace: flux-system
+  - name: reflector--reflector
+    namespace: flux-system
   - name: etcd--etcd
     namespace: flux-system
   releaseName: authentik-patroni

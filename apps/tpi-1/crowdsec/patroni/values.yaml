@@ -24,12 +24,16 @@ postgresql:
     database: crowdsec # creates a database with this name
     username: crowdsec # creates a user with this name
     password: ${crowdsec_database_password} # sets the password for the user
+    extraSql:
+      90_grant_create_schema.sh: |
+        #!/bin/bash
+        psql -d crowdsec -c "GRANT CREATE on SCHEMA public TO crowdsec;"
 
-secrets:
-  etcd-client:
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflects: "etcd/etcd-client"
-      reflector.v1.k8s.emberstack.com/reflected-version: ""
+# secrets:
+#   etcd-client:
+#     annotations:
+#       reflector.v1.k8s.emberstack.com/reflects: "etcd/etcd-client"
+#       reflector.v1.k8s.emberstack.com/reflected-version: ""
 
 certificates:
   server:
@@ -69,7 +73,7 @@ podAnnotations:
   pre.hook.backup.velero.io/container: patroni
   post.hook.restore.velero.io/container: patroni
   pre.hook.backup.velero.io/command: '["/bin/bash", "/backup-scripts/pre-backup.sh"]'
-  secret.reloader.stakater.com/reload: "crowdsec-patroni-etcd-client,crowdsec-patroni-server"
+  secret.reloader.stakater.com/reload: "etcd-client,crowdsec-patroni-server"
   configmap.reloader.stakater.com/reload: "pgbouncer-env"
 
 ssl:
@@ -366,7 +370,7 @@ persistence:
     - path: /home/postgres/certs/etcd
       readOnly: true
     spec:
-      useFromChart: true
+      useFromChart: false
       secret:
         name: etcd-client
         optional: false

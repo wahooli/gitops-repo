@@ -4,7 +4,7 @@ global:
     backupDaily: "true"
 
 image:
-  tag: v3.6.3
+  tag: v3.6.3 # {"$imagepolicy": "flux-system:etcd:tag"}
 
 cluster:
   ordinals:
@@ -139,6 +139,8 @@ certificates:
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik,crowdsec"
+        reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "crowdsec"
 
 dnsConfig:
   options:

@@ -1,3 +1,7 @@
+image:
+  repository: crowdsecurity/crowdsec
+  pullPolicy: IfNotPresent
+
 agent:
   acquisition:
   - namespace: ingress-nginx
@@ -42,6 +46,10 @@ lapi:
   - name: DB_PASSWORD
     value: ${crowdsec_database_password}
 config:
+  console.yaml: |
+    share_manual_decisions: false
+    share_tainted: false
+    share_custom: false
   parsers:
     s01-parse:
       wahooli-nginx-json-access-log.yaml: |

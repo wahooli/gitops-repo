@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: authentik-patroni-helmrelease-overrides
+  name: crowdsec-patroni-helmrelease-overrides
   namespace: flux-system
 data:
   values.yaml: |

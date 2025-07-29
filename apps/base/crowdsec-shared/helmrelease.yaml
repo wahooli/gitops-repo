@@ -21,3 +21,7 @@ spec:
     name: crowdsec-values
     optional: true
     valuesKey: values.yaml
+  - kind: ConfigMap
+    name: crowdsec-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml
