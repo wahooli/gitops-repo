@@ -1,0 +1,19 @@
+container_runtime: containerd
+appsec:
+  enabled: false
+
+lapi:
+  dashboard:
+    enabled: false
+    image:
+      tag: v0.55.9.4 # chart default value didn't work properly with arm64
+    env: []
+#    - name: MB_DB_CONNECTION_URI
+#      value: jdbc:postgresql://crowdsec-patroni-proxy.crowdsec.svc.cluster.local:5432/metabase?user=metabase&password=password&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory
+
+config:
+  agent_config.yaml.local: |
+    common:
+      log_media: stdout
+      log_format: json
+      log_level: warn

@@ -1,0 +1,372 @@
+global:
+  patroni:
+    pgbouncer:
+      enabled: true
+    cluster:
+      ordinals:
+        start: 0
+      replicaCount: 2
+  labels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    app.kubernetes.io/part-of: crowdsec
+
+replicaCount: 1
+ordinals:
+  start: 1
+
+image:
+  repository: ghcr.io/wahooli/docker/patroni-17
+  tag: 4.0.6
+
+postgresql:
+  bootstrap:
+    database: crowdsec # creates a database with this name
+    username: crowdsec # creates a user with this name
+    password: ${crowdsec_database_password} # sets the password for the user
+
+secrets:
+  etcd-client:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflects: "etcd/etcd-client"
+      reflector.v1.k8s.emberstack.com/reflected-version: ""
+
+certificates:
+  server:
+    secretTemplate:
+      labels:
+        velero.io/exclude-from-backup: "true"
+
+metrics:
+  enabled: false
+
+initContainers:
+  wait-for-etcdgw:
+    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    imagePullPolicy: IfNotPresent
+    args:
+    - etcd-gateway.etcd.svc.cluster.local.:2379
+    - -t
+    - "300" # wait for 5 minutes
+
+configMaps:
+  backup-scripts:
+    data:
+      pre-backup.sh: |
+        #!/bin/bash
+        set -euo pipefail
+        export PATRONI_SUPERUSER_PASSWORD="{{ (.Values.env).PATRONI_SUPERUSER_PASSWORD | default .Values.patroni.superuserPassword }}"
+        export PATRONI_SUPERUSER_USERNAME="{{ (.Values.env).PATRONI_SUPERUSER_USERNAME | default (((((.Values.patroni.config).postgresql).authentication).superuser).username | default "postgres") }}"
+        export PATRONI_REPLICATION_PASSWORD="{{ (.Values.env).PATRONI_REPLICATION_PASSWORD | default .Values.patroni.replicationPassword }}"
+        export PATRONI_REPLICATION_USERNAME="{{ (.Values.env).PATRONI_REPLICATION_USERNAME | default (((((.Values.patroni.config).postgresql).authentication).replication).username | default "replicator") }}"
+        /db-backup.sh
+
+podAnnotations:
+  backup.velero.io/backup-volumes: backup
+  pre.hook.backup.velero.io/timeout: 10m
+  pre.hook.restore.velero.io/timeout: 5m
+  post.hook.restore.velero.io/timeout: 5m
+  pre.hook.backup.velero.io/container: patroni
+  post.hook.restore.velero.io/container: patroni
+  pre.hook.backup.velero.io/command: '["/bin/bash", "/backup-scripts/pre-backup.sh"]'
+  secret.reloader.stakater.com/reload: "crowdsec-patroni-etcd-client,crowdsec-patroni-server"
+  configmap.reloader.stakater.com/reload: "pgbouncer-env"
+
+ssl:
+  enabled: true
+  issuerRef:
+    name: clustermesh-issuer
+    kind: ClusterIssuer
+
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
+
+# env:
+#   LOG_MAX_SIZE: 2K
+
+service:
+  main:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/global-sync-endpoint-slices: "true"
+
+podMonitor:
+  create: false
+  jobLabel: app.kubernetes.io/instance
+  endpoints:
+  - filterRunning: true
+    path: /metrics
+    scheme: http
+    targetPort: restapi
+  - port: pg-metrics
+    path: /metrics
+    filterRunning: true
+    relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+      separator: "-"
+      targetLabel: job
+      replacement: "$1-postgres"
+    metricRelabelConfigs:
+    - sourceLabels: [__name__]
+      action: drop
+      regex: ^(go_.*|promhttp_.*)$
+    - action: replace
+      replacement: tpi-1
+      target_label: instance
+    - action: labeldrop
+      regex: (pod|container_id|image_id|container|service|namespace|prometheus)
+  - port: pgb-metrics
+    path: /metrics
+    filterRunning: true
+    relabelConfigs:
+    - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+      separator: "-"
+      targetLabel: job
+      replacement: "$1-pgbouncer"
+    metricRelabelConfigs:
+    - source_labels: [__name__]
+      action: drop
+      regex: ^(go_.*|promhttp_.*)$
+    - action: replace
+      replacement: tpi-1
+      target_label: instance
+    - action: labeldrop
+      regex: (pod|container_id|image_id|container|service|namespace|prometheus)
+  # victoriaMetrics: false
+
+pgbouncer:
+  envFrom:
+    poolMode:
+      type: configMap
+      useFromChart: false
+      name: crowdsec-pgbouncer-env
+  env:
+    SERVER_RESET_QUERY: "DISCARD ALL"
+    IGNORE_STARTUP_PARAMETERS: extra_float_digits
+    MAX_CLIENT_CONN: 100
+    DEFAULT_POOL_SIZE: 20
+    SERVER_LOGIN_RETRY: 10
+    QUERY_WAIT_TIMEOUT: 0
+    RESERVE_POOL_SIZE: 5
+    RESERVE_POOL_TIMEOUT: 3
+    LOG_CONNECTIONS: 0
+    LOG_POOLER_ERRORS: 1
+    LOG_DISCONNECTIONS: 0
+    LOG_STATS: 0
+
+patroni:
+  scope: crowdsec
+  allowLoginFrom:
+  - 127.0.0.1/32
+  - ::1/128
+  - 10.0.0.0/8
+  - 192.168.0.0/16
+  # - 172.16.0.0/12
+  allowReplicationFrom:
+  - 127.0.0.1/32
+  - ::1/128
+  - 10.0.0.0/8
+  superuserPassword: ${crowdsec_postgres_superuser_password}
+  replicationPassword: ${crowdsec_postgres_replication_password}
+  rewindPassword: ${crowdsec_postgres_rewind_password}
+  jsonLog: true
+  config:
+    # log:
+    #   level: INFO
+    bootstrap:
+      dcs:
+        postgresql:
+          parameters:
+            wal_level: logical
+    watchdog:
+      mode: off # yamllint disable-line rule:truthy
+    etcd3:
+      hosts:
+      - etcd-gateway.etcd.svc.cluster.local.:2379
+      use_proxies: true
+      protocol: https
+    postgresql:
+      pg_hba:
+      - local all all scram-sha-256
+      - local replication replicator scram-sha-256
+      - host all all 127.0.0.1/32 scram-sha-256
+      - host all all ::1/128 scram-sha-256
+      parameters:
+        wal_level: logical
+        max_prepared_transactions: 0
+        max_worker_processes: 8
+        max_connections: 100
+        wal_compression: on # yamllint disable-line rule:truthy
+        log_destination: stderr
+        logging_collector: off # yamllint disable-line rule:truthy
+
+    tags:
+      nosync: false
+      preferred: true
+      noloadbalance: false
+      clonefrom: true
+      nostream: false
+
+ciliumNetworkPolicies:
+  main:
+    description: "Allow patroni to patroni and proxy communication. Allow access to etcd"
+    endpointSelector:
+      matchLabels:
+        app.kubernetes.io/instance: crowdsec-patroni
+        app.kubernetes.io/name: patroni
+        app.kubernetes.io/part-of: crowdsec
+    egress:
+    - toEndpoints:
+      - matchLabels:
+          "k8s:io.kubernetes.pod.namespace": kube-system
+          "k8s:k8s-app": kube-dns
+      toPorts:
+      - ports:
+        - port: "53"
+          protocol: ANY
+    - toEndpoints:
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: etcd-gateway
+          k8s:app.kubernetes.io/name: etcd-gateway
+          k8s:io.kubernetes.pod.namespace: etcd
+      toPorts:
+      - ports:
+        - port: "2379"
+          protocol: TCP
+    - toEndpoints:
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: crowdsec-patroni
+          k8s:app.kubernetes.io/name: patroni
+          k8s:app.kubernetes.io/part-of: crowdsec
+          k8s:io.kubernetes.pod.namespace: crowdsec
+      toPorts:
+      - ports:
+        - port: "8008"
+          protocol: TCP
+        - port: "5432"
+          protocol: TCP
+    ingress:
+    - fromEntities:
+      - cluster
+      toPorts:
+      - ports:
+        - port: "8008"
+          protocol: TCP
+        - port: "9630"
+          protocol: TCP
+        - port: "9631"
+          protocol: TCP
+    - fromEndpoints:
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: crowdsec-patroni
+          k8s:app.kubernetes.io/name: proxy
+          k8s:app.kubernetes.io/part-of: crowdsec
+          k8s:io.kubernetes.pod.namespace: crowdsec
+      toPorts:
+      - ports:
+        - port: "6432"
+          protocol: TCP
+        - port: "8008"
+          protocol: TCP
+    - fromEndpoints:
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: crowdsec-patroni
+          k8s:app.kubernetes.io/name: patroni
+          k8s:app.kubernetes.io/part-of: crowdsec
+          k8s:io.kubernetes.pod.namespace: crowdsec
+      toPorts:
+      - ports:
+        - port: "8008"
+          protocol: TCP
+        - port: "5432"
+          protocol: TCP
+
+haproxy:
+  enabled: true
+  ciliumNetworkPolicies:
+    main:
+      description: "Allow patroni proxy to connect patroni instances and allow access within namespace"
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: crowdsec-patroni
+          app.kubernetes.io/name: proxy
+          app.kubernetes.io/part-of: crowdsec
+      egress:
+      - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+        toPorts:
+        - ports:
+          - port: "53"
+            protocol: ANY
+      - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: crowdsec-patroni
+            app.kubernetes.io/name: patroni
+            app.kubernetes.io/part-of: crowdsec
+        toPorts:
+        - ports:
+          - port: "8008"
+            protocol: TCP
+          - port: "6432"
+            protocol: TCP
+      ingress:
+      - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: crowdsec
+        toPorts:
+        - ports:
+          - port: "5432"
+            protocol: TCP
+          - port: "5433"
+            protocol: TCP
+      - fromEntities:
+        - cluster
+        toPorts:
+        - ports:
+          - port: "8404"
+            protocol: TCP
+  podAnnotations:
+    secret.reloader.stakater.com/reload: "crowdsec-patroni-server"
+  # service:
+  #   main:
+  #     annotations:
+  #       service.cilium.io/global: "true"
+
+persistence:
+  pgdata:
+    enabled: true
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 4Gi
+  backup-scripts:
+    enabled: true
+    mount:
+    - path: /backup-scripts
+    spec:
+      useFromChart: true
+      configMap:
+        name: backup-scripts
+        defaultMode: 0111
+  backup:
+    enabled: true
+    mount:
+    - path: /dbdump
+  etcd-tls:
+    enabled: true
+    mount:
+    - path: /home/postgres/certs/etcd
+      readOnly: true
+    spec:
+      useFromChart: true
+      secret:
+        name: etcd-client
+        optional: false
+        defaultMode: 0400

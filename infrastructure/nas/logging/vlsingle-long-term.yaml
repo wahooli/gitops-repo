@@ -10,14 +10,9 @@ spec:
     pullPolicy: IfNotPresent
   retentionPeriod: "100y" # overridden by extraArg retention.maxDiskSpaceUsageBytes
   logFormat: json
-  # storageDataPath: /storage
   retentionMaxDiskSpaceUsageBytes: 100GiB
-  # removePvcAfterDelete: true
   extraArgs:
     storageDataPath: /storage
-  #   retention.maxDiskSpaceUsageBytes: 100GiB
-  #   storageDataPath: /storage
-  #   loggerFormat: json
   serviceSpec:
     useAsDefault: true
     spec:

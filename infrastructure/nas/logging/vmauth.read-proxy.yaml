@@ -8,14 +8,13 @@ spec:
   unauthorizedUserAccessSpec:
     url_map:
     - src_paths:
-      - "/select/.+"
+      - "/select/.*"
+      - ""
       load_balancing_policy: first_available
       retry_status_codes:
       - 503
       url_prefix:
-      # - http://vlogs-short-term-nas.logging.svc.cluster.local.:9428
       - http://vlsingle-short-term-nas.logging.svc.cluster.local.:9428
       - http://vlogs-short-term-tpi-1-0.vlogs-short-term-tpi-1.logging.svc.cluster.local.:9428
       - http://vlogs-short-term-tpi-1-1.vlogs-short-term-tpi-1.logging.svc.cluster.local.:9428
-      # - http://vlogs-long-term-nas.logging.svc.cluster.local.:9428
       - http://vlsingle-long-term-nas.logging.svc.cluster.local.:9428

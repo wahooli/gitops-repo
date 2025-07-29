@@ -2,8 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - ../../../base/patroni
-- ../../../base/patroni/imagerepository.yaml
-- ../../../base/patroni/imagepolicy.yaml
 patches:
 - path: helmrelease.yaml
   target:
@@ -14,7 +12,7 @@ patches:
 configMapGenerator:
 - files:
   - values.yaml=values.yaml
-  name: authentik-patroni-values
+  name: crowdsec-patroni-values
   namespace: flux-system
   options:
     labels:

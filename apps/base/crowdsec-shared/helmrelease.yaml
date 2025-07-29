@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: crowdsec--crowdsec
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: crowdsec--crowdsec-patroni
+    namespace: flux-system
+  releaseName: crowdsec
+  interval: 5m
+  targetNamespace: crowdsec
+  valuesFrom:
+  - kind: ConfigMap
+    name: crowdsec-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: crowdsec-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: crowdsec-values
+    optional: true
+    valuesKey: values.yaml

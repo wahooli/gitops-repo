@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+- ../crowdsec
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
+- path: namespace.yaml
+  target:
+    kind: Namespace
+configMapGenerator:
+- name: crowdsec-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values-shared.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
+configurations:
+- ../../.config/valuesFrom.yaml
