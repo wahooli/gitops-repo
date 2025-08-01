@@ -2,29 +2,23 @@ global:
   labels:
     backupWeekly: "true"
     backupDaily: "true"
-
 image:
-  tag: v3.6.3 # {"$imagepolicy": "flux-system:etcd:tag"}
-
+  tag: v3.6.4 # {"$imagepolicy": "flux-system:etcd:tag"}
 cluster:
   ordinals:
     start: 0
   replicaCount: 3
-
 replicaCount: 1
 ordinals:
   start: 1
-
 ssl:
   enabled: true
   issuerRef:
     name: clustermesh-issuer
     kind: ClusterIssuer
-
 podAnnotations:
   backup.velero.io/backup-volumes: data
   secret.reloader.stakater.com/reload: "etcd-client,etcd-server"
-
 ciliumNetworkPolicies:
   main:
     description: "Allow etcd instances to communicate between each other and allow etcd gateway to access"
@@ -78,7 +72,6 @@ ciliumNetworkPolicies:
           protocol: TCP
         - port: "2379"
           protocol: TCP
-
   gateway:
     description: "Allow etcd gateway to access etcd"
     endpointSelector:
@@ -126,7 +119,6 @@ ciliumNetworkPolicies:
       - ports:
         - port: "2379"
           protocol: TCP
-
 certificates:
   server:
     secretTemplate:
@@ -141,22 +133,18 @@ certificates:
         reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik,crowdsec"
         reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
         reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "crowdsec"
-
 dnsConfig:
   options:
   - name: ndots
     value: "1"
   - name: edns0
-
 service:
   main:
     annotations:
       service.cilium.io/global: "true"
       service.cilium.io/global-sync-endpoint-slices: "true"
-
 gateway:
   enabled: true
-
 persistence:
   data:
     enabled: true
