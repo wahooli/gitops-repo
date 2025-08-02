@@ -91,10 +91,12 @@ config:
           Lower(evt.Meta.http_path) contains "/autoload" or
           Lower(evt.Meta.http_path) contains "/database" or
           Lower(evt.Meta.http_path) contains "/xhell" or
-          Lower(evt.Meta.http_path) contains "/alfashell" or
+          Lower(evt.Meta.http_path) contains "/alfa" or
           Lower(evt.Meta.http_path) contains "/shell" or
           Lower(evt.Meta.http_path) contains "/vuln" or
-          Lower(evt.Meta.http_path) contains "/wp-"
+          Lower(evt.Meta.http_path) contains "/wp-" or
+          Lower(evt.Meta.http_path) contains "/class" or 
+          Lower(evt.Meta.http_path) contains "/phpinfo" 
         ) and
         Lower(evt.Meta.http_path) endsWith ".php"
       labels:
@@ -109,12 +111,12 @@ config:
       groupby: evt.Meta.source_ip
       leakspeed: "60s"
       blackhole: 600m
-      capacity: 2
+      capacity: 1
       filter: |
         evt.Meta.program == 'ingress-nginx' and
         evt.Meta.http_status matches "^[34]" and
         (
-          Lower(evt.Meta.http_path) startsWith "/.env" or
+          Lower(evt.Meta.http_path) startsWith ".env" or
           Lower(evt.Meta.http_path) startsWith "/.git" or
           Lower(evt.Meta.http_path) startsWith "/.well-known" or
           Lower(evt.Meta.http_path) startsWith "/.ssh" or
