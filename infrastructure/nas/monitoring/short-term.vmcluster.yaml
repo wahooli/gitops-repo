@@ -48,7 +48,7 @@ spec:
               storage: 2Gi
     image:
       repository: victoriametrics/vmselect
-      tag: v1.122.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
+      tag: v1.123.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
       pullPolicy: IfNotPresent
     # resources:
     #   limits:
@@ -68,7 +68,7 @@ spec:
       loggerFormat: json
     image:
       repository: victoriametrics/vminsert
-      tag: v1.122.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
+      tag: v1.123.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
       pullPolicy: IfNotPresent
     serviceSpec:
       useAsDefault: true
