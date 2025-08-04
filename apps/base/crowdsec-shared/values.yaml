@@ -82,12 +82,10 @@ config:
         evt.Meta.program == 'ingress-nginx' and
         evt.Meta.http_status matches "^[34]" and
         (
-          Lower(evt.Meta.http_path) contains "/.well-known" or
           Lower(evt.Meta.http_path) contains "/filemanager" or
           Lower(evt.Meta.http_path) contains "/ini" or
           Lower(evt.Meta.http_path) contains "/install" or
           Lower(evt.Meta.http_path) contains "/epinyins" or
-          Lower(evt.Meta.http_path) contains "/alfa-rex" or
           Lower(evt.Meta.http_path) contains "/autoload" or
           Lower(evt.Meta.http_path) contains "/database" or
           Lower(evt.Meta.http_path) contains "/xhell" or
@@ -95,8 +93,10 @@ config:
           Lower(evt.Meta.http_path) contains "/shell" or
           Lower(evt.Meta.http_path) contains "/vuln" or
           Lower(evt.Meta.http_path) contains "/wp-" or
-          Lower(evt.Meta.http_path) contains "/class" or 
-          Lower(evt.Meta.http_path) contains "/phpinfo" 
+          Lower(evt.Meta.http_path) contains "/class" or
+          Lower(evt.Meta.http_path) contains "/phpinfo" or
+          Lower(evt.Meta.http_path) contains "/adminer" or
+          Lower(evt.Meta.http_path) contains "/composer"
         ) and
         Lower(evt.Meta.http_path) endsWith ".php"
       labels:
@@ -127,6 +127,24 @@ config:
         behavior: "http:scan"
         label: "WordPress Vuln Hunting"
         confidence: 3
+    wahooli-generic-php-scanner.yaml: |
+      type: leaky
+      name: wahooli/block-secret-scanners-nginx
+      description: "Detect vulnerability scanners"
+      groupby: evt.Meta.source_ip
+      distinct: evt.Meta.http_path
+      leakspeed: "60s"
+      blackhole: 600m
+      capacity: 5
+      filter: |
+        evt.Meta.program == 'ingress-nginx' and
+        evt.Meta.http_status matches "^[34]" and
+        Lower(evt.Meta.http_path) endsWith ".php"
+      labels:
+        remediation: true
+        behavior: "http:scan"
+        label: "Generic PHP Scan"
+        confidence: 2
   config.yaml.local: |
     common:
       log_media: stdout
