@@ -1,5 +1,5 @@
 image:
-  tag: "2.15.2" # {"$imagepolicy": "flux-system:tautulli:tag"}
+  tag: "2.15.3" # {"$imagepolicy": "flux-system:tautulli:tag"}
 env:
   TZ: Europe/Helsinki
 podAnnotations:
@@ -56,7 +56,6 @@ ingress:
           name: ak-outpost-proxy-default
           port:
             number: 9000
-
 dnsEndpoints:
   main:
     dnsName: tautulli.wahoo.li
