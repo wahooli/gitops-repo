@@ -46,7 +46,7 @@ spec:
   vmstorage:
     image:
       repository: victoriametrics/vmstorage
-      tag: v1.122.0-cluster # {"$imagepolicy": "flux-system:vmstorage-cluster:tag"}
+      tag: v1.123.0-cluster # {"$imagepolicy": "flux-system:vmstorage-cluster:tag"}
       pullPolicy: IfNotPresent
     replicaCount: 3
     extraArgs:
