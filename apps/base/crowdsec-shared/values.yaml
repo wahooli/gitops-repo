@@ -14,7 +14,7 @@ agent:
     poll_without_inotify: true
   env:
   - name: COLLECTIONS
-    value: "crowdsecurity/traefik"
+    value: "crowdsecurity/http-cve"
   extraVolumes: &extraVolumes
   - name: postgres-tls
     secret:
@@ -58,16 +58,28 @@ config:
         onsuccess: next_stage
         filter: "Upper(evt.Line.Labels.program) == 'INGRESS-NGINX' && Upper(evt.Parsed.stream) == 'STDOUT'"
         statics:
+        - meta: service
+          value: http
+        - meta: log_type
+          value: http_access-log
         - meta: source_ip
           expression: JsonExtractUnescape(evt.Parsed.message, "remote_addr")
-        - meta: vhost
+        - meta: target_fqdn
           expression: JsonExtractUnescape(evt.Parsed.message, "vhost")
+        - meta: http_verb
+          expression: JsonExtractUnescape(evt.Parsed.message, "method")
+        - parsed: http_args
+          expression: JsonExtractUnescape(evt.Parsed.message, "request_query")
         - meta: http_status
           expression: JsonExtract(evt.Parsed.message, "status")
-        - meta: http_path
+        - parsed: request
           expression: JsonExtractUnescape(evt.Parsed.message, "path")
+        - meta: http_path
+          expression: 'evt.Parsed.request + (evt.Parsed.http_args != "" ? "?" + evt.Parsed.http_args : "")'
         - meta: program
           expression: Lower(evt.Line.Labels.program)
+        - parsed: http_user_agent
+          expression: JsonExtractUnescape(evt.Parsed.message, "user_agent")
   scenarios:
     wahooli-block-wp-scanners-nginx.yaml: |
       type: leaky
@@ -105,13 +117,11 @@ config:
         label: "WordPress Vuln Hunting"
         confidence: 3
     wahooli-secret-scanners-nginx.yaml: |
-      type: leaky
+      type: trigger
       name: wahooli/block-secret-scanners-nginx
       description: "Detect vulnerability scanners"
       groupby: evt.Meta.source_ip
-      leakspeed: "60s"
       blackhole: 600m
-      capacity: 1
       filter: |
         evt.Meta.program == 'ingress-nginx' and
         evt.Meta.http_status matches "^[34]" and
@@ -129,17 +139,16 @@ config:
         confidence: 3
     wahooli-generic-php-scanner.yaml: |
       type: leaky
-      name: wahooli/block-secret-scanners-nginx
-      description: "Detect vulnerability scanners"
+      name: wahooli/generic-php-scanner
+      description: "Detect generic php scanners"
       groupby: evt.Meta.source_ip
-      distinct: evt.Meta.http_path
       leakspeed: "60s"
       blackhole: 600m
       capacity: 5
       filter: |
         evt.Meta.program == 'ingress-nginx' and
         evt.Meta.http_status matches "^[34]" and
-        Lower(evt.Meta.http_path) endsWith ".php"
+        Lower(evt.Parsed.request) endsWith ".php"
       labels:
         remediation: true
         behavior: "http:scan"
