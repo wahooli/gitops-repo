@@ -144,7 +144,7 @@ config:
       groupby: evt.Meta.source_ip
       leakspeed: "60s"
       blackhole: 600m
-      capacity: 5
+      capacity: 4
       filter: |
         evt.Meta.program == 'ingress-nginx' and
         evt.Meta.http_status matches "^[34]" and
