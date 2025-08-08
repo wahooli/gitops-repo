@@ -8,6 +8,8 @@ resources:
 image:
   digest: "803451d0200610298d30d3151240f47c5de4d6558f6a3a36340692048cdf28e0"
 
+replicaCount: 0
+
 podAnnotations:
   k8s.v1.cni.cncf.io/networks: |-
     [{
