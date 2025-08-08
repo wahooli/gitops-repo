@@ -11,7 +11,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      version: "6.1.0" # {"$imagepolicy": "flux-system:kube-state-metrics:tag"}
+      version: "6.1.3" # {"$imagepolicy": "flux-system:kube-state-metrics:tag"}
   valuesFrom:
   - kind: ConfigMap
     name: kube-state-metrics-values
