@@ -127,6 +127,8 @@ config:
         evt.Meta.http_status matches "^[34]" and
         (
           Lower(evt.Meta.http_path) startsWith ".env" or
+          Lower(evt.Meta.http_path) startsWith "/admin/.env" or
+          Lower(evt.Meta.http_path) startsWith "/backend/.env" or
           Lower(evt.Meta.http_path) startsWith "/.git" or
           Lower(evt.Meta.http_path) startsWith "/.well-known" or
           Lower(evt.Meta.http_path) startsWith "/.ssh" or

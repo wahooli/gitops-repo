@@ -189,7 +189,7 @@
           "editorMode": "code",
           "expr": "systemd_host:=$host {source_type=\"journald\", systemd_unit!=\"\"} | stats(systemd_unit) count() as entries | order by(entries) desc | pack_json",
           "legendFormat": "",
-          "maxLines": 1000,
+          "maxLines": 10000,
           "queryType": "instant",
           "refId": "A",
           "step": ""

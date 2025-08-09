@@ -12,11 +12,11 @@ spec:
     interval: 1m
     rules:
     - record: systemdLogCount
-      expr: '_time: 1m systemd_unit:!~"user@[0-9]+.service" {source_type="journald"} | stats by (systemd_unit, systemd_host) count () as total'
+      expr: '_time: 1m systemd_unit:!~"user@[0-9]+.service" systemd_unit:!~"archlinux-keyring.+-sync.service" {source_type="journald"} | stats by (systemd_unit, systemd_host) count () as total'
       annotations:
         description: "unit {{$labels.systemd_unit}} at {{$labels.systemd_host}} generated {{$value}} logs in the last 1 minute"
     - alert: tooManySystemdLogs
-      expr: '_time: 1m systemd_unit:!~"user@[0-9]+.service" {source_type="journald"} | stats by (systemd_unit, systemd_host, source_type) count () as total | filter total:>50'
+      expr: '_time: 1m systemd_unit:!~"user@[0-9]+.service" systemd_unit:!~"archlinux-keyring.+-sync.service" {source_type="journald"} | stats by (systemd_unit, systemd_host, source_type) count () as total | filter total:>50'
       annotations:
         description: "unit {{$labels.systemd_unit}} at {{$labels.systemd_host}} generated more than 50 log entries in the last 1 minute: {{$value}}"
         dashboard: https://grafana.wahoo.li/d/ce9vopbczsc8wd/systemd-logs?orgId=1&timezone=browser&var-host={{$labels.systemd_host}}&var-unit={{$labels.systemd_unit}}&from={{($activeAt.Add (parseDurationTime "-15m")).UnixMilli}}&to={{($activeAt.Add (parseDurationTime "15m")).UnixMilli}}
