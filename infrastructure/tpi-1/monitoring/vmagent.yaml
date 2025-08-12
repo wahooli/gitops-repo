@@ -15,7 +15,7 @@ spec:
     log-format: json
   resources:
     limits:
-      cpu: 350m
+      cpu: 650m
       memory: 350Mi
     requests:
       cpu: 200m

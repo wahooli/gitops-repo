@@ -35,6 +35,13 @@ lapi:
       enabled: false
     data:
       enabled: false
+  resources:
+    limits:
+      memory: 500Mi
+      cpu: 800m
+    requests:
+      cpu: 500m
+      memory: 500Mi
   env:
   # To enroll the Security Engine to the console
   - name: ENROLL_KEY
