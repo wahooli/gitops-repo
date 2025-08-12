@@ -8,6 +8,8 @@ webhook:
   resources:
     limits:
       memory: 64Mi
+      cpu: 500m
+    requests:
       cpu: 175m
 resources:
   requests:
