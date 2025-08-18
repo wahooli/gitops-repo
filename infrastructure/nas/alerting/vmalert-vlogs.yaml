@@ -8,7 +8,7 @@ spec:
   evaluationInterval: "10s"
   image:
     repository: victoriametrics/vmalert
-    tag: v1.123.0 # {"$imagepolicy": "flux-system:vmalert:tag"}
+    tag: v1.124.0 # {"$imagepolicy": "flux-system:vmalert:tag"}
     pullPolicy: IfNotPresent
   # selectAllByDefault: true
   ruleSelector:
