@@ -11,20 +11,16 @@ certificates:
     usages:
     - digital signature
     - key encipherment
-
 image:
-  tag: "3.2.3" # {"$imagepolicy": "flux-system:haproxy-3-2:tag"}
-
+  tag: "3.2.4" # {"$imagepolicy": "flux-system:haproxy-3-2:tag"}
 service:
   main:
     externalTrafficPolicy: Local
     type: LoadBalancer
     annotations:
       external-dns.alpha.kubernetes.io/hostname: haproxy.nas.absolutist.it,haproxy.nas.wahoo.li
-
 podAnnotations:
   secret.reloader.stakater.com/reload: "haproxy-wildcard"
-
 configMaps:
   config:
     data:
@@ -96,7 +92,6 @@ configMaps:
             server nginx ingress-nginx-controller.ingress-nginx.svc.cluster.local.:80 send-proxy-v2 check alpn h2
 
         {{- include "haproxy.endConfig" . }}
-
 initContainers:
   combine-certs:
     image: busybox:1.37
@@ -113,7 +108,6 @@ initContainers:
       readOnly: true
     - name: certs
       mountPath: /mnt/certs # Mount the shared volume to write the .pem file
-
 persistence:
   certs:
     enabled: true

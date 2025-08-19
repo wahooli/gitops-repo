@@ -1,5 +1,5 @@
 image:
-  tag: "15.0.2" # {"$imagepolicy": "flux-system:docker-mailserver:tag"}
+  tag: "15.1.0" # {"$imagepolicy": "flux-system:docker-mailserver:tag"}
 fullnameOverride: mail-relay
 strategy:
   type: RollingUpdate
