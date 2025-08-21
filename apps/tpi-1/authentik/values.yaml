@@ -1,6 +1,6 @@
 global:
   image:
-    tag: 2025.6.4 # {"$imagepolicy": "flux-system:authentik:tag"}
+    tag: 2025.8.0 # {"$imagepolicy": "flux-system:authentik:tag"}
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server,authentik-patroni-server"
   securityContext:
@@ -23,7 +23,6 @@ global:
     name: postgres-tls
   - mountPath: /certs/redis
     name: redis-tls
-
 authentik:
   secret_key: "${authentik_secret_key}"
   log_level: warn
@@ -110,7 +109,6 @@ server:
       external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
     hosts:
     - auth.wahoo.li
-
 postgresql:
   enabled: false
   auth:
@@ -166,16 +164,16 @@ redis:
     extraVolumes:
     - name: dummydata
       emptyDir: {}
-    # extraVolumeMounts:
-    # - name: dummydata
-    #   mountPath: /dummy
-    # podAnnotations:
-    #   backup.velero.io/backup-volumes: dummydata  # backups essentially empty volume, so always new instance is initialized
-    #   pre.hook.backup.velero.io/timeout: 5m
-    #   pre.hook.restore.velero.io/timeout: 5m
-    #   post.hook.restore.velero.io/timeout: 5m
-    #   pre.hook.backup.velero.io/container: redis
-    #   post.hook.restore.velero.io/container: redis
-    #   pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "rm -rf /dummy/*"]'
+      # extraVolumeMounts:
+      # - name: dummydata
+      #   mountPath: /dummy
+      # podAnnotations:
+      #   backup.velero.io/backup-volumes: dummydata  # backups essentially empty volume, so always new instance is initialized
+      #   pre.hook.backup.velero.io/timeout: 5m
+      #   pre.hook.restore.velero.io/timeout: 5m
+      #   post.hook.restore.velero.io/timeout: 5m
+      #   pre.hook.backup.velero.io/container: redis
+      #   post.hook.restore.velero.io/container: redis
+      #   pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "rm -rf /dummy/*"]'
   auth:
     enabled: false
