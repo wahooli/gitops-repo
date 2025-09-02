@@ -51,7 +51,7 @@ spec:
       regex: retention_period
   image:
     repository: victoriametrics/vmagent
-    tag: v1.124.0 # {"$imagepolicy": "flux-system:vmagent:tag"}
+    tag: v1.125.0 # {"$imagepolicy": "flux-system:vmagent:tag"}
     pullPolicy: IfNotPresent
   serviceSpec:
     useAsDefault: true
