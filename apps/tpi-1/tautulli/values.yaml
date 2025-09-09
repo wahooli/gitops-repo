@@ -1,5 +1,5 @@
 image:
-  tag: "2.15.3" # {"$imagepolicy": "flux-system:tautulli:tag"}
+  tag: "2.16.0" # {"$imagepolicy": "flux-system:tautulli:tag"}
 env:
   TZ: Europe/Helsinki
 podAnnotations:
