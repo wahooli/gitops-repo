@@ -54,4 +54,4 @@ controller:
     type: LoadBalancer
     annotations:
       external-dns.alpha.kubernetes.io/hostname: nginx.nas.absolutist.it,nginx.nas.wahoo.li
-      lbipam.cilium.io/ips: ${nginx_lb_ip}
+      # lbipam.cilium.io/ips: ${nginx_lb_ip}
