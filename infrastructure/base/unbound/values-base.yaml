@@ -7,3 +7,9 @@ image:
   repository: madnuttah/unbound
 
 hostname: unbound
+
+resources:
+  limits:
+    memory: 640Mi
+  requests:
+    memory: 450Mi
