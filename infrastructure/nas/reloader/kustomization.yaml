@@ -8,6 +8,13 @@ patches:
     kind: HelmRelease
   options:
     allowNameChange: true
+- target:
+    kind: Namespace
+    name: reloader
+  patch: |-
+    - op: add
+      path: /metadata/labels/topolvm.io~1webhook
+      value: "ignore"
 configMapGenerator:
 - name: reloader-values
   namespace: flux-system

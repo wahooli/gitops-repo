@@ -11,7 +11,7 @@ spec:
   retentionPeriod: "100y" # overridden by extraArg retention.maxDiskSpaceUsageBytes
   removePvcAfterDelete: true
   extraArgs:
-    retention.maxDiskSpaceUsageBytes: 100GiB
+    retention.maxDiskSpaceUsageBytes: 200GiB
     storageDataPath: /storage
     loggerFormat: json
   serviceSpec:
