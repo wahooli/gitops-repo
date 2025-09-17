@@ -12,7 +12,7 @@ unbound:
 redis:
   enabled: true
 image:
-  tag: "1.23.1-1" # {"$imagepolicy": "flux-system:unbound:tag"}
+  tag: "1.23.1-2" # {"$imagepolicy": "flux-system:unbound:tag"}
 service:
   main:
     type: ClusterIP
