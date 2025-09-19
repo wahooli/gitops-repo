@@ -1,5 +1,5 @@
 image:
-  tag: "2025.8.1" # {"$imagepolicy": "flux-system:cloudflare-tunnel:tag"}
+  tag: "2025.9.0" # {"$imagepolicy": "flux-system:cloudflare-tunnel:tag"}
 podMonitor:
   create: true
   jobLabel: app.kubernetes.io/instance
