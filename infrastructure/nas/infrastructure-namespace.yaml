@@ -4,3 +4,4 @@ metadata:
   name: infrastructure
   labels:
     internal-services: "true"
+    topolvm.io/webhook: ignore

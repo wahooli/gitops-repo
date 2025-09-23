@@ -9,6 +9,12 @@ args:
 - -c
 - /etc/bind/named.conf
 
+resources:
+  limits:
+    memory: 512Mi
+  requests:
+    memory: 300Mi
+
 bind9:
   namedConfGenerator:
     enabled: true

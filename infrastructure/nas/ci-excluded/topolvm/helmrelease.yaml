@@ -1,18 +1,21 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: openebs--openebs-zfs
+  name: topolvm-system--topolvm
   namespace: flux-system
 spec:
   interval: 10m
-  releaseName: openebs
+  releaseName: topolvm
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
   chart:
     spec:
-      version: "4.1.3"
+      version: "15.6.1"
   valuesFrom:
   - kind: ConfigMap
-    name: openebs-values
+    name: topolvm-values
     valuesKey: values-base.yaml
   - kind: ConfigMap
-    name: openebs-values
+    name: topolvm-values
     valuesKey: values.yaml

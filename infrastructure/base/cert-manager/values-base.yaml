@@ -7,9 +7,10 @@ installCRDs: 'true'
 webhook:
   resources:
     limits:
-      memory: 64Mi
+      memory: 175Mi
       cpu: 500m
     requests:
+      memory: 64Mi
       cpu: 175m
 resources:
   requests:
