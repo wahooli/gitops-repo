@@ -15,6 +15,8 @@ agent:
   env:
   - name: COLLECTIONS
     value: "crowdsecurity/http-cve"
+  - name: CROWDSEC_BYPASS_DB_VOLUME_CHECK
+    value: "TRUE"
   extraVolumes: &extraVolumes
   - name: postgres-tls
     secret:
