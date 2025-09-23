@@ -1,6 +1,5 @@
 image:
-  tag: "v1.6.11" # {"$imagepolicy": "flux-system:crowdsec:tag"}
-
+  tag: "v1.7.0" # {"$imagepolicy": "flux-system:crowdsec:tag"}
 agent:
   acquisition:
   - namespace: ingress-nginx

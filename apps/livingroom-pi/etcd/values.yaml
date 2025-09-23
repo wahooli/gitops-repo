@@ -2,29 +2,23 @@ global:
   labels:
     backupWeekly: "true"
     backupDaily: "true"
-
 image:
-  tag: v3.6.4 # {"$imagepolicy": "flux-system:etcd:tag"}
-
+  tag: v3.6.5 # {"$imagepolicy": "flux-system:etcd:tag"}
 cluster:
   ordinals:
     start: 0
   replicaCount: 3
-
 replicaCount: 1
 ordinals:
   start: 2
-
 ssl:
   enabled: true
   issuerRef:
     name: clustermesh-issuer
     kind: ClusterIssuer
-
 podAnnotations:
   backup.velero.io/backup-volumes: data
   secret.reloader.stakater.com/reload: "etcd-client,etcd-server"
-
 ciliumNetworkPolicies:
   main:
     enabled: false # policies fail for some reason in this cluster
@@ -79,7 +73,6 @@ ciliumNetworkPolicies:
           protocol: TCP
         - port: "2379"
           protocol: TCP
-
   gateway:
     enabled: false # policies fail for some reason in this cluster
     description: "Allow etcd gateway to access etcd"
@@ -118,7 +111,6 @@ ciliumNetworkPolicies:
       - ports:
         - port: "2379"
           protocol: TCP
-
 certificates:
   server:
     secretTemplate:
@@ -136,23 +128,19 @@ dnsConfig:
   - name: ndots
     value: "1"
   - name: edns0
-
 service:
   main:
     annotations:
       service.cilium.io/global: "true"
       service.cilium.io/global-sync-endpoint-slices: "true"
-
 gateway:
   enabled: true
-
 extraArgs:
 - --snapshot-count=100000
 - --auto-compaction-mode=periodic
 - --auto-compaction-retention=1h
 - --logger=zap
 - --log-outputs=stderr
-
 persistence:
   data:
     enabled: true
