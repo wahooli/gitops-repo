@@ -11,7 +11,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      version: "0.15.4" # {"$imagepolicy": "flux-system:prometheus-smartctl-exporter:tag"}
+      version: "0.16.0" # {"$imagepolicy": "flux-system:prometheus-smartctl-exporter:tag"}
   driftDetection:
     ignore:
     - paths: ["/spec/template/spec/containers/0/args"]
