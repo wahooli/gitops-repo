@@ -60,7 +60,7 @@ spec:
     replicaCount: 1
     image:
       repository: victoriametrics/vminsert
-      tag: v1.127.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
+      tag: v1.128.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
       pullPolicy: IfNotPresent
     extraArgs:
       loggerFormat: json
