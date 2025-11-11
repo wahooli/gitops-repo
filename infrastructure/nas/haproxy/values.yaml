@@ -12,7 +12,7 @@ certificates:
     - digital signature
     - key encipherment
 image:
-  tag: "3.2.7" # {"$imagepolicy": "flux-system:haproxy-3-2:tag"}
+  tag: "3.2.8" # {"$imagepolicy": "flux-system:haproxy-3-2:tag"}
 service:
   main:
     externalTrafficPolicy: Local
