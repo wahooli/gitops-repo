@@ -1,5 +1,5 @@
 image:
-  tag: "v0.28.1" # {"$imagepolicy": "flux-system:blocky:tag"}
+  tag: "v0.28.2" # {"$imagepolicy": "flux-system:blocky:tag"}
 service:
   tpi-1:
     annotations:
