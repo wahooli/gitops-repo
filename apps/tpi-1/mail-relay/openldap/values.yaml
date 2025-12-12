@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/wahooli/docker/openldap
   tag: "2.6.10" # {"$imagepolicy": "flux-system:openldap:tag"}
 env:
   LDAP_ADMIN_USERNAME:

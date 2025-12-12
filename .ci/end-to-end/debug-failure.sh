@@ -4,7 +4,7 @@ DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 DEBUG_LOGS="${DEBUG_LOGS:-false}"
 DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns logging authentik victoria-metrics crowdsec haproxy etcd}"
 DEBUG_RESOURCES="${DEBUG_RESOURCES:-deployment statefulset pod vlsingle}"
-DEBUG_NAMESPACES="${DEBUG_NAMESPACES:-default cert-manager internal-dns logging authentik crowdsec haproxy etcd}"
+DEBUG_NAMESPACES="${DEBUG_NAMESPACES:-alerting default cert-manager internal-dns logging authentik crowdsec haproxy etcd}"
 
 echo "::group::Describe all cluster nodes"
 kubectl describe nodes -A

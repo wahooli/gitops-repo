@@ -1,5 +1,5 @@
 image:
-  tag: 16.2.0-debian-12-r8
+  tag: "16.2.0"
 metrics:
   enabled: false
 commonLabels:
