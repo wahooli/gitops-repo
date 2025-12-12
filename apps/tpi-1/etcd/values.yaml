@@ -16,6 +16,8 @@ ssl:
   issuerRef:
     name: clustermesh-issuer
     kind: ClusterIssuer
+env:
+  ETCD_QUOTA_BACKEND_BYTES: "6442450944"
 podAnnotations:
   backup.velero.io/backup-volumes: data
   secret.reloader.stakater.com/reload: "etcd-client,etcd-server"
@@ -152,4 +154,4 @@ persistence:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 2Gi
+          storage: 8Gi
