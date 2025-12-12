@@ -84,6 +84,16 @@ jobs:
         test: ${{ fromJSON(needs.lint.outputs.matrix ) }}
     if: ${{ needs.lint.outputs.matrix != '[]' && needs.lint.outputs.matrix != '' }}
     steps:
+    - name: Get more disk space
+      uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        swap-storage: true
+        docker-images: false
     - name: Checkout
       uses: actions/checkout@v4.2.2
       with:
