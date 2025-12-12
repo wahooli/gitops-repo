@@ -1,5 +1,7 @@
 image:
-  tag: 10.5.13-debian-10-r32
+  registry: ghcr.io
+  repository: wahooli/docker/mariadb
+  tag: "11.2.3"
 architecture: standalone
 diagnosticMode:
   enabled: false

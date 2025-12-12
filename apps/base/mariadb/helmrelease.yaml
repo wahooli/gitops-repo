@@ -12,7 +12,7 @@ spec:
       chart: mariadb
       sourceRef:
         kind: HelmRepository
-        name: bitnami-oci
+        name: wahooli
         namespace: flux-system
       interval: 24h
   install:

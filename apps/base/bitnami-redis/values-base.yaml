@@ -1,5 +1,7 @@
 image:
-  tag: 6.2.6-debian-10-r53
+  registry: ghcr.io
+  repository: wahooli/docker/redis-legacy
+  tag: "7.2.4"
 architecture: standalone
 diagnosticMode:
   enabled: false

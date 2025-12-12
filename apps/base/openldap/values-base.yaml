@@ -2,3 +2,6 @@ resources:
   requests:
     cpu: 100m
     memory: 64Mi
+image:
+  repository: ghcr.io/wahooli/docker/openldap
+  tag: "2.6.10"

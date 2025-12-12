@@ -20,10 +20,10 @@ spec:
     log-format: json
   resources:
     limits:
-      # cpu: 1000m
+      cpu: 1000m
       memory: 350Mi
     requests:
-      # cpu: 500m
+      cpu: 500m
       memory: 200Mi
   remoteWrite:
   - url: http://vmauth-global-write.monitoring.svc.cluster.local.:8427/prometheus/api/v1/write

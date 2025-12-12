@@ -1,5 +1,7 @@
 image:
-  tag: 14.1.0-debian-10-r52
+  registry: ghcr.io
+  repository: wahooli/docker/postgresql
+  tag: "16.2.0"
 replication:
   enabled: false
 diagnosticMode:

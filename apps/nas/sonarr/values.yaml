@@ -1,5 +1,5 @@
 image:
-  tag: "4.0.15" # {"$imagepolicy": "flux-system:sonarr:tag"}
+  tag: "4.0.16" # {"$imagepolicy": "flux-system:sonarr:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: config
   vector.dev/exclude-containers: "sonarr-exporter"
@@ -94,7 +94,6 @@ ingress:
           name: ak-outpost-nasse-proxy
           port:
             number: 9000
-
 dnsEndpoints:
   main:
     dnsName: sonarr.wahoo.li

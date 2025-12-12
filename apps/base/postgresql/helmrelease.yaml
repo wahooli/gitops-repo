@@ -12,9 +12,9 @@ spec:
       chart: postgresql
       sourceRef:
         kind: HelmRepository
-        name: bitnami
+        name: wahooli
         namespace: flux-system
-      version: ">=11.6.2 <11.7.0"
+      version: "14.3.3"
       interval: 24h
   install:
     remediation:
