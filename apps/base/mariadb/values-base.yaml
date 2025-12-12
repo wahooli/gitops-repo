@@ -1,5 +1,6 @@
 image:
-  repository: ghcr.io/wahooli/docker/mariadb
+  registry: ghcr.io
+  repository: wahooli/docker/mariadb
   tag: "11.2.3"
 architecture: standalone
 diagnosticMode:

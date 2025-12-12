@@ -1,5 +1,6 @@
 image:
-  repository: ghcr.io/wahooli/docker/postgresql
+  registry: ghcr.io
+  repository: wahooli/docker/postgresql
   tag: "16.2.0"
 replication:
   enabled: false
