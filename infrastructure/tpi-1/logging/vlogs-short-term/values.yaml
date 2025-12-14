@@ -36,7 +36,8 @@ server:
         weight: 10
   persistentVolume:
     enabled: true
-    size: 19Gi
+    size: 15Gi
+    # size: 19Gi
   service:
     annotations:
       service.cilium.io/global: "true"
