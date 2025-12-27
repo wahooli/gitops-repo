@@ -6,7 +6,7 @@ envFrom:
 strategy:
   type: Recreate
 image:
-  tag: "10.11.4" # {"$imagepolicy": "flux-system:jellyfin:tag"}
+  tag: "10.11.5" # {"$imagepolicy": "flux-system:jellyfin:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: data
 runtimeClassName: nvidia

@@ -8,7 +8,6 @@ sources:
     type: kubernetes_logs
     timezone: Europe/Helsinki
   journal:
-    current_boot_only: false
     type: journald
     journal_directory: /run/log/journal
   internal_metrics:
