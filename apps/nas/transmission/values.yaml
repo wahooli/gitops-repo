@@ -18,7 +18,7 @@ global:
 wireguard:
   enabled: true
   image:
-    tag: "version-1.0.20250521-r0" # {"$imagepolicy": "flux-system:wireguard-release:tag"}
+    tag: "version-1.0.20250521-r1" # {"$imagepolicy": "flux-system:wireguard-release:tag"}
 #   config:
 #     existingConfigMap: transmission-wireguard-config
 # resources:
