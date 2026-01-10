@@ -11,7 +11,7 @@ spec:
     replicaCount: 1
     image:
       repository: victoriametrics/vmstorage
-      tag: v1.131.0-cluster # {"$imagepolicy": "flux-system:vmstorage-cluster:tag"}
+      tag: v1.133.0-cluster # {"$imagepolicy": "flux-system:vmstorage-cluster:tag"}
       pullPolicy: IfNotPresent
     extraArgs:
       loggerFormat: json
@@ -37,7 +37,7 @@ spec:
     replicaCount: 1
     image:
       repository: victoriametrics/vmselect
-      tag: v1.131.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
+      tag: v1.133.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
       pullPolicy: IfNotPresent
     extraArgs:
       loggerFormat: json
@@ -60,7 +60,7 @@ spec:
     replicaCount: 1
     image:
       repository: victoriametrics/vminsert
-      tag: v1.131.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
+      tag: v1.133.0-cluster # {"$imagepolicy": "flux-system:vminsert-cluster:tag"}
       pullPolicy: IfNotPresent
     extraArgs:
       loggerFormat: json
