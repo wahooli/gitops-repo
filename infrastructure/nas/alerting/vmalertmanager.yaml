@@ -6,7 +6,7 @@ metadata:
 spec:
   image:
     repository: prom/alertmanager
-    tag: v0.30.0 # {"$imagepolicy": "flux-system:vmalertmanager:tag"}
+    tag: v0.30.1 # {"$imagepolicy": "flux-system:vmalertmanager:tag"}
     pullPolicy: IfNotPresent
   logFormat: json
   disableNamespaceMatcher: true
