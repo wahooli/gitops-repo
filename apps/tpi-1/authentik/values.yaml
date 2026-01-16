@@ -1,6 +1,6 @@
 global:
   image:
-    tag: 2025.12.0 # {"$imagepolicy": "flux-system:authentik:tag"}
+    tag: 2025.12.1 # {"$imagepolicy": "flux-system:authentik:tag"}
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server,authentik-patroni-server"
   securityContext:
