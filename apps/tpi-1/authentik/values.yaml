@@ -77,6 +77,9 @@ worker:
       value: "1"
     - name: edns0
 server:
+  env:
+  - name: POSTGRES_PASSWORD
+    value: "${authentik_database_password}"
   dnsConfig:
     options:
     - name: ndots
