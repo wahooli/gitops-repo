@@ -1,5 +1,5 @@
 image:
-  tag: "4.47.1" # {"$imagepolicy": "flux-system:ombi:tag"}
+  tag: "4.53.4" # {"$imagepolicy": "flux-system:ombi:tag"}
 initContainers:
   copy-configuration:
     image: ghcr.io/wahooli/docker/envsubst:latest
@@ -74,7 +74,6 @@ ingress:
           name: ak-outpost-proxy-default
           port:
             number: 9000
-
 dnsEndpoints:
   main:
     dnsName: ombi.wahoo.li
