@@ -1,7 +1,7 @@
 global:
   patroni:
     pgbouncer:
-      enabled: true
+      enabled: false
     cluster:
       ordinals:
         start: 0
