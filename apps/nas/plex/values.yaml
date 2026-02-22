@@ -194,7 +194,7 @@ persistence:
       - "ReadWriteOnce"
       resources:
         requests:
-          storage: "50Gi"
+          storage: "60Gi"
           # spec:
           #   persistentVolumeClaim:
           #     claimName: config-plex
