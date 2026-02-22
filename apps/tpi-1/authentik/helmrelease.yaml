@@ -14,7 +14,7 @@ spec:
   targetNamespace: authentik
   chart:
     spec:
-      version: "2025.6.2"
+      version: "2025.12.4"
   values:
     blueprints:
       configMaps:
