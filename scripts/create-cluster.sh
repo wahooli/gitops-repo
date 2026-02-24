@@ -196,8 +196,8 @@ for node in $NODES; do
   '
 done
 
-# Ensure /etc/machine-id and /run/log/journal exist in all nodes (needed by Vector agent for journald)
-echo "Ensuring /etc/machine-id and /run/log/journal exist in k3d containers"
+# Ensure /etc/machine-id, /run/log/journal and /run/topolvm exist in all nodes
+echo "Ensuring /etc/machine-id, /run/log/journal and /run/topolvm exist in k3d containers"
 for node in $NODES; do
   docker exec "$node" sh -c '
     if [ ! -f /etc/machine-id ]; then
@@ -205,6 +205,7 @@ for node in $NODES; do
       cat /proc/sys/kernel/random/uuid | tr -d "-" > /etc/machine-id
     fi
     mkdir -p /run/log/journal
+    mkdir -p /run/topolvm
   '
 done
 

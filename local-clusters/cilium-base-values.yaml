@@ -1,3 +1,4 @@
+localRedirectPolicy: true
 clustermesh:
   apiserver:
     enabled: true

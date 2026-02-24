@@ -38,6 +38,15 @@ if [[ ! -d "$REPO_ROOT/clusters/$CLUSTER_NAME" ]]; then
   exit 1
 fi
 
+is_kustomization_ready() {
+  local name="$1"
+  local namespace="$2"
+  local status
+  status=$(kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" get kustomization "$name" \
+    -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null)
+  [[ "$status" == "True" ]]
+}
+
 verify_kustomization() {
   local kustomization_file="$1"
   local strict="${2:-}"
@@ -67,17 +76,21 @@ verify_kustomization() {
       --path "$REPO_ROOT/$(yq -r '.spec.path' "$kustomization_file" | sed 's|^\./||')" \
       "${CONTEXT_ARGS[@]}" > /dev/null && echo ": success!" || (echo ": failure!" && exit 1)
 
-    echo "flux reconcile"
-    flux reconcile kustomization "$kustomization" \
-      -n "$namespace" \
-      --timeout="${KUSTOMIZATION_TIMEOUT}" \
-      "${CONTEXT_ARGS[@]}" || exit 1
+    if is_kustomization_ready "$kustomization" "$namespace"; then
+      echo "kustomization $kustomization is already ready, skipping reconcile"
+    else
+      echo "flux reconcile"
+      flux reconcile kustomization "$kustomization" \
+        -n "$namespace" \
+        --timeout="${KUSTOMIZATION_TIMEOUT}" \
+        "${CONTEXT_ARGS[@]}" || exit 1
 
-    echo "kubectl wait"
-    kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" \
-      wait kustomization/"$kustomization" \
-      --for=condition=ready \
-      --timeout="${KUSTOMIZATION_TIMEOUT}" || exit 1
+      echo "kubectl wait"
+      kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" \
+        wait kustomization/"$kustomization" \
+        --for=condition=ready \
+        --timeout="${KUSTOMIZATION_TIMEOUT}" || exit 1
+    fi
 
     group_end
   fi

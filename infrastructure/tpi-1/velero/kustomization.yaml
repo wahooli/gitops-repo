@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../../../base/velero
+- ../../base/velero
 patches:
 - path: helmrelease.yaml
   target:
@@ -25,4 +25,4 @@ configMapGenerator:
     labels:
       velero.io/exclude-from-backup: "true"
 configurations:
-- ../../../.config/valuesFrom.yaml
+- ../../.config/valuesFrom.yaml

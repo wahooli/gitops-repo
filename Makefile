@@ -1,7 +1,7 @@
 SCRIPTS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))scripts
 CLUSTER := $(word 2, $(MAKECMDGOALS))
 
-.PHONY: deploy create bootstrap down artifact verify verify-kustomization verify-helmrelease verify-workload help
+.PHONY: deploy create bootstrap down artifact verify verify-kustomization verify-helmrelease verify-workload lint help
 
 help:
 	@echo "Usage:"
@@ -14,6 +14,7 @@ help:
 	@echo "  make verify-kustomization <cluster> Verify Flux kustomization reconciliation"
 	@echo "  make verify-helmrelease <cluster>   Verify HelmRelease reconciliation"
 	@echo "  make verify-workload <cluster>      Verify all workloads are healthy"
+	@echo "  make lint                          Run yamllint across the repo"
 	@echo ""
 	@echo "Available clusters:"
 	@for dir in clusters/*/; do echo "  $$(basename $$dir)"; done
@@ -41,6 +42,9 @@ endif
 
 artifact:
 	@$(SCRIPTS_DIR)/create-artifact.sh
+
+lint:
+	@yamllint .
 
 verify: _require-cluster _ensure-cluster
 	@CONTEXT=k3d-$(CLUSTER) $(SCRIPTS_DIR)/verify-kustomizations.sh $(CLUSTER)
