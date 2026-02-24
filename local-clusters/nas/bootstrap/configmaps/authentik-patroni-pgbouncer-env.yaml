@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-pgbouncer-env
+  namespace: authentik
+data:
+  POOL_MODE: session

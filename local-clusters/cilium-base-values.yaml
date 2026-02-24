@@ -1,0 +1,12 @@
+clustermesh:
+  apiserver:
+    enabled: true
+    service:
+      type: LoadBalancer
+  enableEndpointSliceSynchronization: false
+hostServices:
+  enabled: false
+ipv6:
+  enabled: false
+ipam:
+  mode: cluster-pool

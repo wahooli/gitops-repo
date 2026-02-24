@@ -12,6 +12,11 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure/tpi-1/kube-dns-patches
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: coredns
+    namespace: kube-system
   postBuild:
     substitute:
       coredns_replicas: "4"

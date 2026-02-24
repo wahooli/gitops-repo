@@ -13,6 +13,15 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: unbound
+    namespace: internal-dns
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: blocky
+    namespace: internal-dns
   path: ./infrastructure/nas/internal-dns
   postBuild:
     substituteFrom:

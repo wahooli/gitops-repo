@@ -1,0 +1,5 @@
+- name: nfs-share
+  image: nimbix/unfs3:20190318-1
+  args: -it
+  networkAliases:
+  - nfs_share
