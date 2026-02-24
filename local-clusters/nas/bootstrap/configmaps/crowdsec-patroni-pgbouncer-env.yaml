@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: crowdsec-pgbouncer-env
+  namespace: crowdsec
+data:
+  POOL_MODE: session

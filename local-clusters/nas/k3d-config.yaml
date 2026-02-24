@@ -1,0 +1,52 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: nas
+servers: 1
+network: k3d-multicluster-net
+ports:
+- port: 8082:80
+  nodeFilters:
+  - loadbalancer
+- port: 32400:32400
+  nodeFilters:
+  - loadbalancer
+env:
+- envVar: KRUN_INIT_PID1=1
+  nodeFilters:
+  - server:*
+  - agent:*
+registries:
+  use:
+  - k3d-reg-docker:5000
+  - k3d-reg-oci:5000
+  config: |
+    mirrors:
+      "*":
+        endpoint:
+          - "http://k3d-reg-docker:5000"
+options:
+  k3d:
+    disableRollback: true
+  k3s:
+    extraArgs:
+    - arg: "--disable-network-policy"
+      nodeFilters: [server:*]
+    - arg: "--flannel-backend=none"
+      nodeFilters: [server:*]
+    - arg: "--cluster-cidr=10.12.0.0/16"
+      nodeFilters: [server:*]
+    - arg: "--service-cidr=10.22.0.0/16"
+      nodeFilters: [server:*]
+    - arg: "--disable=traefik"
+      nodeFilters: [server:*]
+    - arg: "--disable=metrics-server"
+      nodeFilters: [server:*]
+    - arg: "--kubelet-arg=eviction-hard=imagefs.available<1%,nodefs.available<1%"
+      nodeFilters: [server:*, agent:*]
+    - arg: "--kubelet-arg=eviction-minimum-reclaim=imagefs.available=1%,nodefs.available=1%"
+      nodeFilters: [server:*, agent:*]
+    - arg: "--kubelet-arg=max-pods=500"
+      nodeFilters: [server:*, agent:*]
+    - arg: "--kubelet-arg=address=0.0.0.0"
+      nodeFilters: [server:*, agent:*]
