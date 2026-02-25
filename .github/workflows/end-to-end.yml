@@ -97,6 +97,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4.2.2
       with:
+        fetch-depth: 0
         sparse-checkout: |
           .ci/
           .github/workflows
