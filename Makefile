@@ -1,11 +1,12 @@
 SCRIPTS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))scripts
 CLUSTER := $(word 2, $(MAKECMDGOALS))
 
-.PHONY: deploy create bootstrap down artifact verify verify-kustomization verify-helmrelease verify-workload lint help
+.PHONY: deploy create bootstrap down artifact verify verify-kustomization verify-helmrelease verify-workload lint help mesh
 
 help:
 	@echo "Usage:"
 	@echo "  make deploy <cluster>              Create cluster and bootstrap Flux"
+	@echo "  make deploy mesh                   Deploy all clusters and connect via ClusterMesh"
 	@echo "  make create <cluster>              Create k3d cluster only"
 	@echo "  make bootstrap <cluster>           Bootstrap Flux only"
 	@echo "  make down [cluster]                Delete k3d cluster (all if omitted)"
@@ -19,9 +20,13 @@ help:
 	@echo "Available clusters:"
 	@for dir in clusters/*/; do echo "  $$(basename $$dir)"; done
 
-deploy: _require-cluster
+deploy: $(if $(filter mesh,$(CLUSTER)),,_require-cluster)
+ifeq ($(CLUSTER),mesh)
+	@$(SCRIPTS_DIR)/deploy-mesh.sh
+else
 	@$(SCRIPTS_DIR)/create-cluster.sh $(CLUSTER)
 	@$(SCRIPTS_DIR)/bootstrap-flux.sh $(CLUSTER)
+endif
 
 create: _require-cluster
 	@$(SCRIPTS_DIR)/create-cluster.sh $(CLUSTER)
@@ -70,6 +75,9 @@ endif
 ifeq ($(wildcard clusters/$(CLUSTER)),)
 	$(error Unknown cluster '$(CLUSTER)'. Run 'make help' to see available clusters)
 endif
+
+mesh:
+	@:
 
 # Swallow cluster name argument so Make doesn't treat it as a target
 %:

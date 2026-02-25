@@ -21,4 +21,4 @@ resources:
 - cilium
 - velero
 - topolvm
-# - ci-excluded.yaml
+- ci-excluded.yaml

@@ -42,6 +42,9 @@ ciliumNetworkPolicies:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd
           app.kubernetes.io/name: etcd
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "2380"
@@ -59,6 +62,9 @@ ciliumNetworkPolicies:
           k8s:io.kubernetes.pod.namespace: etcd
           k8s:app.kubernetes.io/instance: etcd
           k8s:app.kubernetes.io/name: etcd
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "2380"
@@ -68,6 +74,9 @@ ciliumNetworkPolicies:
           k8s:io.kubernetes.pod.namespace: etcd
           k8s:app.kubernetes.io/instance: etcd-gateway
           k8s:app.kubernetes.io/name: etcd-gateway
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "8080"
@@ -94,6 +103,9 @@ ciliumNetworkPolicies:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd
           app.kubernetes.io/name: etcd
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "2379"

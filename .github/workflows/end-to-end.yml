@@ -67,12 +67,12 @@ jobs:
       id: helmreleases
       env:
         FILES: "${{ steps.changed-directories.outputs.all_changed_files }}"
-      run: .ci/end-to-end/get-changed-helmreleases.sh
+      run: scripts/ci/get-changed-helmreleases.sh
     - name: Define test matrix
       if: github.event_name == 'workflow_dispatch'
       id: clusters
       run: |
-        .ci/end-to-end/parse-workflow-dispatch-input.sh "${{ inputs.cluster }}"
+        scripts/ci/parse-workflow-dispatch-input.sh "${{ inputs.cluster }}"
 
   kubernetes:
     runs-on: ubuntu-latest
@@ -98,7 +98,7 @@ jobs:
       uses: actions/checkout@v4.2.2
       with:
         sparse-checkout: |
-          .ci/end-to-end/
+          scripts/ci/
           .github/workflows
           apps
           crds
@@ -160,4 +160,4 @@ jobs:
       env:
         DEBUG_LOGS: "true"
         HELM_RELEASES: "${{ steps.helmrelease-verify.outputs.failing_helmrelease || join(matrix.test.helmreleases, ',') }}"
-      run: .ci/end-to-end/debug-failure.sh
+      run: scripts/ci/debug-failure.sh

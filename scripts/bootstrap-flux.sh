@@ -67,6 +67,21 @@ else
   flux reconcile kustomization local-bootstrap --context "$CONTEXT_NAME"
 fi
 
+HELM_VALUES_PATH="${HELM_VALUES_PATH:-extra-helm-values}"
+
+if ! flux get kustomization local-bootstrap-overrides --context "$CONTEXT_NAME" >/dev/null 2>&1; then
+  echo "Creating Kustomization local-bootstrap-overrides..."
+  flux create kustomization local-bootstrap-overrides \
+    --source=OCIRepository/flux-system \
+    --path="./local-clusters/$CLUSTER_NAME/$HELM_VALUES_PATH" \
+    --depends-on=local-bootstrap \
+    --prune \
+    --interval=2m \
+    --context "$CONTEXT_NAME"
+else
+  flux reconcile kustomization local-bootstrap-overrides --context "$CONTEXT_NAME"
+fi
+
 # Build root Kustomization manifest
 echo "Preparing Kustomization flux-system..."
 KUSTOMIZATION_YAML=$(cat <<ENDOFYAML

@@ -17,7 +17,7 @@ ordinals:
 
 ciliumNetworkPolicies:
   main:
-    enabled: false # policies fail for some reason in this cluster
+    enabled: true # policies fail for some reason in this cluster
     description: "Allow redis proxy and redis to redis communication"
     endpointSelector:
       matchLabels:
@@ -38,6 +38,9 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: redis
           io.kubernetes.pod.namespace: authentik
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "6379"
@@ -50,10 +53,11 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: redis
           io.kubernetes.pod.namespace: authentik
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
-        - port: "6379"
-          protocol: TCP
         - port: "26379"
           protocol: TCP
     - fromEndpoints:
@@ -61,10 +65,11 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: proxy
           io.kubernetes.pod.namespace: authentik
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
-        - port: "6379"
-          protocol: TCP
         - port: "26379"
           protocol: TCP
 
@@ -133,6 +138,9 @@ haproxy:
             app.kubernetes.io/instance: authentik-redis
             app.kubernetes.io/name: redis
             io.kubernetes.pod.namespace: authentik
+          matchExpressions:
+          - key: io.cilium.k8s.policy.cluster
+            operator: Exists
         toPorts:
         - ports:
           - port: "26379"

@@ -21,7 +21,6 @@ podAnnotations:
   secret.reloader.stakater.com/reload: "etcd-client,etcd-server"
 ciliumNetworkPolicies:
   main:
-    enabled: false # policies fail for some reason in this cluster
     description: "Allow etcd instances to communicate between each other and allow etcd gateway to access"
     endpointSelector:
       matchLabels:
@@ -41,6 +40,9 @@ ciliumNetworkPolicies:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd
           app.kubernetes.io/name: etcd
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "2380"
@@ -58,6 +60,9 @@ ciliumNetworkPolicies:
           k8s:io.kubernetes.pod.namespace: etcd
           k8s:app.kubernetes.io/instance: etcd
           k8s:app.kubernetes.io/name: etcd
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "2380"
@@ -67,6 +72,9 @@ ciliumNetworkPolicies:
           k8s:io.kubernetes.pod.namespace: etcd
           k8s:app.kubernetes.io/instance: etcd-gateway
           k8s:app.kubernetes.io/name: etcd-gateway
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "8080"
@@ -74,7 +82,6 @@ ciliumNetworkPolicies:
         - port: "2379"
           protocol: TCP
   gateway:
-    enabled: false # policies fail for some reason in this cluster
     description: "Allow etcd gateway to access etcd"
     endpointSelector:
       matchLabels:
@@ -94,6 +101,9 @@ ciliumNetworkPolicies:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd
           app.kubernetes.io/name: etcd
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "2379"
