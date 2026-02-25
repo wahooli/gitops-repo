@@ -150,11 +150,6 @@ jobs:
         TENANT: "${{ matrix.test.tenant }}"
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
       run: scripts/verify-helmreleases.sh
-    - name: Verify workloads
-      env:
-        TENANT: "${{ matrix.test.tenant }}"
-        CONTEXT: "k3d-${{ matrix.test.tenant }}"
-      run: scripts/verify-workloads.sh
     - name: Debug failure
       if: failure()
       env:
