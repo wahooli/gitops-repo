@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-redis-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    podMonitor:
+      create: false
+
+    metrics:
+      enabled: false

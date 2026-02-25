@@ -11,7 +11,7 @@ on:
     - 'LICENSE'
     - 'charts/**'
     - 'clusters/**'
-    - '.ci/**'
+    - 'scripts/ci/**'
     - '.github/**'
 
 jobs:
@@ -56,6 +56,6 @@ jobs:
         export FILES=$(git diff --name-only origin/${HEAD_BRANCH})
         export BODY_FILE="/tmp/pr-body.txt"
         echo "# ${TITLE}" > $BODY_FILE
-        .ci/end-to-end/get-changed-helmreleases.sh >> $BODY_FILE
+        scripts/ci/get-changed-helmreleases.sh >> $BODY_FILE
         git reset --hard >/dev/null 2>&1
         gh pr create --title "${TITLE}" --reviewer $OWNER --base ${HEAD_BRANCH} --head ${SOURCE_BRANCH} -l FluxCD -l Update --body-file $BODY_FILE || gh pr edit ${SOURCE_BRANCH} --add-label FluxCD --add-label Update --title "${TITLE}" --body-file $BODY_FILE

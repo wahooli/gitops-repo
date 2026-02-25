@@ -246,6 +246,9 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: patroni
           k8s:app.kubernetes.io/part-of: crowdsec
           k8s:io.kubernetes.pod.namespace: crowdsec
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "8008"
@@ -269,6 +272,9 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: proxy
           k8s:app.kubernetes.io/part-of: crowdsec
           k8s:io.kubernetes.pod.namespace: crowdsec
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "6432"
@@ -281,6 +287,9 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: patroni
           k8s:app.kubernetes.io/part-of: crowdsec
           k8s:io.kubernetes.pod.namespace: crowdsec
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: Exists
       toPorts:
       - ports:
         - port: "8008"
@@ -312,6 +321,9 @@ haproxy:
             app.kubernetes.io/instance: crowdsec-patroni
             app.kubernetes.io/name: patroni
             app.kubernetes.io/part-of: crowdsec
+          matchExpressions:
+          - key: io.cilium.k8s.policy.cluster
+            operator: Exists
         toPorts:
         - ports:
           - port: "8008"

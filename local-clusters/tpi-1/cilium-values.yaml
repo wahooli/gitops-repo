@@ -1,3 +1,5 @@
+bgpControlPlane:
+  enabled: true
 cluster:
   id: 1
   name: tpi-1

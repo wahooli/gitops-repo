@@ -14,6 +14,7 @@ USE_DEFAULT_REGISTRY=0
 OCI_REGISTRY_NAME="reg-oci"
 OCI_REGISTRY_PORT=5050
 
+IN_DEVCONTAINER="${IN_DEVCONTAINER:-false}"
 # --- Argument parsing & validation ---
 CLUSTER_NAME="${1:-}"
 if [[ -z "$CLUSTER_NAME" ]]; then
@@ -184,6 +185,16 @@ fi
 echo "Creating k3d cluster: $CLUSTER_NAME"
 k3d cluster create --config "$K3D_CONFIG"
 
+# When running inside a dev-container the kubeconfig server address is written
+# as https://0.0.0.0:<random-port> which is unreachable from inside Docker.
+# Patch it to use the serverlb container name on its internal port so that
+# kubectl/helm/flux commands work without leaving the Docker network.
+if [[ "${IN_DEVCONTAINER,,}" == "true" ]]; then
+  echo "Dev-container detected: patching kubeconfig server to use serverlb container name"
+  kubectl config set-cluster "k3d-$CLUSTER_NAME" \
+    --server="https://k3d-${CLUSTER_NAME}-serverlb:6443"
+fi
+
 # Mount BPF filesystem in all nodes
 echo "Mounting bpffs in k3d containers"
 NODES=$(docker ps --filter "name=k3d-$CLUSTER_NAME" --format "{{.Names}}")
@@ -196,8 +207,8 @@ for node in $NODES; do
   '
 done
 
-# Ensure /etc/machine-id and /run/log/journal exist in all nodes (needed by Vector agent for journald)
-echo "Ensuring /etc/machine-id and /run/log/journal exist in k3d containers"
+# Ensure /etc/machine-id, /run/log/journal and /run/topolvm exist in all nodes
+echo "Ensuring /etc/machine-id, /run/log/journal and /run/topolvm exist in k3d containers"
 for node in $NODES; do
   docker exec "$node" sh -c '
     if [ ! -f /etc/machine-id ]; then
@@ -205,6 +216,7 @@ for node in $NODES; do
       cat /proc/sys/kernel/random/uuid | tr -d "-" > /etc/machine-id
     fi
     mkdir -p /run/log/journal
+    mkdir -p /run/topolvm
   '
 done
 

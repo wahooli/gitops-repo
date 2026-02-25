@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-dns-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    extraArgs: []
+    provider:
+      name: inmemory

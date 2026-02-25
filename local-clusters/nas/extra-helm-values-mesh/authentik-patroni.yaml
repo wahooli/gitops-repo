@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-patroni-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    patroni:
+      jsonLog: false
+
+    podMonitor:
+      create: false
+
+    metrics:
+      enabled: false
