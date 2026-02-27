@@ -1,5 +1,5 @@
 image:
-  tag: "amd64-version-4.1.0-r0" # {"$imagepolicy": "flux-system:transmission-release:tag"}
+  tag: "amd64-version-4.1.1-r0" # {"$imagepolicy": "flux-system:transmission-release:tag"}
 hostNetwork: false
 podAnnotations:
   backup.velero.io/backup-volumes: config
