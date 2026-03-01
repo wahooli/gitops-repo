@@ -17,7 +17,7 @@ ordinals:
 
 ciliumNetworkPolicies:
   main:
-    enabled: false # policies fail for some reason in this cluster
+    enabled: true # policies fail for some reason in this cluster
     description: "Allow redis proxy and redis to redis communication"
     endpointSelector:
       matchLabels:
