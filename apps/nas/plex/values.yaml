@@ -8,6 +8,11 @@ hostNetwork: true
 metrics:
   enabled: true
   # dockerModsUrl: ghcr.io/linuxserver/mods
+  env:
+    GOMAXPROCS:
+      valueFrom:
+        resourceFieldRef:
+          resource: limits.cpu
   image:
     repository: ghcr.io/jsclayton/prometheus-plex-exporter
     tag: "main"

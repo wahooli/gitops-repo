@@ -17,6 +17,11 @@ dnsConfig:
   - name: edns0
 metrics:
   enabled: true
+  extraEnv:
+    GOMAXPROCS:
+      valueFrom:
+        resourceFieldRef:
+          resource: limits.cpu
   resources:
     limits:
       cpu: 150m

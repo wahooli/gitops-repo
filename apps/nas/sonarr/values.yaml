@@ -19,6 +19,10 @@ metrics:
   enabled: true
   extraEnv:
     ENABLE_ADDITIONAL_METRICS: "true"
+    GOMAXPROCS:
+      valueFrom:
+        resourceFieldRef:
+          resource: limits.cpu
   resources:
     limits:
       cpu: 200m
