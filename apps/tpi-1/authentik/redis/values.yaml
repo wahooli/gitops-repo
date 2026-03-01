@@ -38,9 +38,16 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: redis
           io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
+          io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - livingroom-pi
       toPorts:
       - ports:
         - port: "6379"
@@ -53,23 +60,30 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: redis
           io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
+          io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
-      toPorts:
-      - ports:
-        - port: "6379"
-          protocol: TCP
-        - port: "26379"
-          protocol: TCP
-    - fromEndpoints:
+          operator: In
+          values:
+          - nas
+          - livingroom-pi
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: proxy
+          io.kubernetes.pod.namespace: authentik
       - matchLabels:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: proxy
           io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - livingroom-pi
       toPorts:
       - ports:
         - port: "6379"
@@ -142,9 +156,16 @@ haproxy:
             app.kubernetes.io/instance: authentik-redis
             app.kubernetes.io/name: redis
             io.kubernetes.pod.namespace: authentik
+        - matchLabels:
+            app.kubernetes.io/instance: authentik-redis
+            app.kubernetes.io/name: redis
+            io.kubernetes.pod.namespace: authentik
           matchExpressions:
           - key: io.cilium.k8s.policy.cluster
-            operator: Exists
+            operator: In
+            values:
+            - nas
+            - livingroom-pi
         toPorts:
         - ports:
           - port: "26379"

@@ -27,8 +27,8 @@ ciliumNetworkPolicies:
     egress:
     - toEndpoints:
       - matchLabels:
-          "io.kubernetes.pod.namespace": kube-system
-          "k8s-app": kube-dns
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
       toPorts:
       - ports:
         - port: "53"
@@ -38,9 +38,16 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: redis
           io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          io.kubernetes.pod.namespace: authentik
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - tpi-1
       toPorts:
       - ports:
         - port: "6379"
@@ -51,28 +58,22 @@ ciliumNetworkPolicies:
     - fromEndpoints:
       - matchLabels:
           app.kubernetes.io/instance: authentik-redis
-          app.kubernetes.io/name: redis
+          app.kubernetes.io/name: proxy
           io.kubernetes.pod.namespace: authentik
-        matchExpressions:
-        - key: io.cilium.k8s.policy.cluster
-          operator: Exists
-      toPorts:
-      - ports:
-        - port: "26379"
-          protocol: TCP
-    - fromEndpoints:
       - matchLabels:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: proxy
           io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - tpi-1
       toPorts:
       - ports:
         - port: "26379"
           protocol: TCP
-
 redis:
   initialMaster: 0
   enabled: false
@@ -140,13 +141,21 @@ haproxy:
             io.kubernetes.pod.namespace: authentik
           matchExpressions:
           - key: io.cilium.k8s.policy.cluster
-            operator: Exists
+            operator: In
+            values:
+            - nas
+            - tpi-1
+        - matchLabels:
+            app.kubernetes.io/instance: authentik-redis
+            app.kubernetes.io/name: redis
+            io.kubernetes.pod.namespace: authentik
         toPorts:
         - ports:
           - port: "26379"
             protocol: TCP
           - port: "6379"
             protocol: TCP
+
       ingress:
       - fromEndpoints:
         - matchLabels:
