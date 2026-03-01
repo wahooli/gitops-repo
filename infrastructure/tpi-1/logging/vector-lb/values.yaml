@@ -9,6 +9,7 @@ service:
   enabled: true
   annotations:
     service.cilium.io/global: "true"
+    service.cilium.io/affinity: "local"
   ports:
   - name: vector
     port: 6000

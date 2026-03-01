@@ -17,7 +17,7 @@ ordinals:
 
 ciliumNetworkPolicies:
   main:
-    enabled: true # policies fail for some reason in this cluster
+    enabled: true
     description: "Allow redis proxy and redis to redis communication"
     endpointSelector:
       matchLabels:
@@ -29,6 +29,9 @@ ciliumNetworkPolicies:
       - matchLabels:
           io.kubernetes.pod.namespace: kube-system
           k8s-app: kube-dns
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"
@@ -58,6 +61,20 @@ ciliumNetworkPolicies:
     - fromEndpoints:
       - matchLabels:
           app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
+          io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
+          io.kubernetes.pod.namespace: authentik
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: In
+          values:
+          - nas
+          - tpi-1
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: proxy
           io.kubernetes.pod.namespace: authentik
       - matchLabels:
@@ -72,6 +89,8 @@ ciliumNetworkPolicies:
           - tpi-1
       toPorts:
       - ports:
+        - port: "6379"
+          protocol: TCP
         - port: "26379"
           protocol: TCP
 redis:
@@ -109,6 +128,7 @@ service:
   sentinel:
     annotations:
       service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
 haproxy:
   enabled: false
   image:
@@ -118,7 +138,7 @@ haproxy:
     secret.reloader.stakater.com/reload: "authentik-redis-server"
   ciliumNetworkPolicies:
     main:
-      enabled: false # policies fail for some reason in this cluster
+      enabled: false
       description: "Allow redis proxy to connect redis and redis-sentinel"
       endpointSelector:
         matchLabels:
@@ -130,6 +150,9 @@ haproxy:
         - matchLabels:
             io.kubernetes.pod.namespace: kube-system
             k8s-app: kube-dns
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: node-local-dns
         toPorts:
         - ports:
           - port: "53"

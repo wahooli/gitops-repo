@@ -23,7 +23,7 @@ podAnnotations:
   secret.reloader.stakater.com/reload: "etcd-client,etcd-server"
 ciliumNetworkPolicies:
   main:
-    enabled: true # policies fail for some reason in this cluster
+    enabled: true
     description: "Allow etcd instances to communicate between each other and allow etcd gateway to access"
     endpointSelector:
       matchLabels:
@@ -34,6 +34,9 @@ ciliumNetworkPolicies:
       - matchLabels:
           io.kubernetes.pod.namespace: kube-system
           k8s-app: kube-dns
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"
@@ -101,7 +104,7 @@ ciliumNetworkPolicies:
         - port: "2379"
           protocol: TCP
   gateway:
-    enabled: true # policies fail for some reason in this cluster
+    enabled: true
     description: "Allow etcd gateway to access etcd"
     endpointSelector:
       matchLabels:
@@ -112,6 +115,9 @@ ciliumNetworkPolicies:
       - matchLabels:
           io.kubernetes.pod.namespace: kube-system
           k8s-app: kube-dns
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"

@@ -69,6 +69,7 @@ service:
   main:
     annotations:
       service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
 ingress:
   main:
     enabled: true

@@ -43,6 +43,7 @@ spec:
         metadata:
           annotations:
             service.cilium.io/global: "true"
+            service.cilium.io/affinity: "local"
   vmstorage:
     image:
       repository: victoriametrics/vmstorage
@@ -60,6 +61,7 @@ spec:
         annotations:
           service.cilium.io/global: "true"
           service.cilium.io/global-sync-endpoint-slices: "true"
+          service.cilium.io/affinity: "local"
     storage:
       volumeClaimTemplate:
         spec:
