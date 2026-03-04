@@ -67,12 +67,12 @@ jobs:
       id: helmreleases
       env:
         FILES: "${{ steps.changed-directories.outputs.all_changed_files }}"
-      run: .ci/end-to-end/get-changed-helmreleases.sh
+      run: scripts/ci/get-changed-helmreleases.sh
     - name: Define test matrix
       if: github.event_name == 'workflow_dispatch'
       id: clusters
       run: |
-        .ci/end-to-end/parse-workflow-dispatch-input.sh "${{ inputs.cluster }}"
+        scripts/ci/parse-workflow-dispatch-input.sh "${{ inputs.cluster }}"
 
   kubernetes:
     runs-on: ubuntu-latest
@@ -92,139 +92,70 @@ jobs:
         dotnet: true
         haskell: true
         large-packages: true
-        swap-storage: true
+        swap-storage: false
         docker-images: false
     - name: Checkout
       uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
         sparse-checkout: |
-          .ci/
+          scripts/ci/
           .github/workflows
           apps
           crds
           clusters
           infrastructure
+          local-clusters
+          scripts
           .sourceignore
     - name: Install required self-hosted dependencies
       if: runner.environment == 'self-hosted'
       run: |
         sudo apt-get update -qqy
-        sudo apt-get install curl nfs-common wget -qqy --no-install-recommends
-        sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-        sudo chmod a+x /usr/bin/yq
-    - name: Install nfs-common
+        sudo apt-get install git curl wget jq openssl -qqy --no-install-recommends
+        curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        sudo wget -qO /usr/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        sudo chmod +x /usr/bin/yq
+    - name: Install tools
       if: runner.environment != 'self-hosted'
       run: |
-        sudo apt-get update -qqy
-        sudo apt-get install nfs-common -qqy --no-install-recommends
+        curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        sudo wget -qO /usr/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        sudo chmod +x /usr/bin/yq
     - name: Setup Flux
       uses: fluxcd/flux2/action@main
       with:
         version: '${{ matrix.test.flux_version }}'
-    - name: Setup Kubernetes
-      uses: helm/kind-action@v1.12.0
-      with:
-        cluster_name: flux
-        config: .ci/end-to-end/kind-config.yaml
-    # - name: Setup k3d
-    #   uses: rinx/setup-k3d@v0.0.4
-    #   with:
-    #     version: v5.7.5
-    #     skipClusterCreation: 'true'
-    #     # options: >-
-    #     #   --image docker.io/rancher/k3s:v1.31.3-k3s1
-    #     #   --agents 3
-    #     #   --no-lb
-    #     #   --timeout 30s
-    #     #   --k3s-arg '--disable=traefik,servicelb@server:*'
-    #     #   --k3s-arg '--disable-cloud-controller@server:*'
-    #     #   --k3s-arg '--disable-network-policy@server:*'
-    #     #   --k3s-arg '--flannel-backend=none@server:*'
-    #     #   --k3s-arg '--cluster-cidr=10.244.0.0/16@server:*'
-    #     # name: "flux-e2e"
-    # - name: create cluster
-    #   env:
-    #     clustername: flux-e2e
-    #   run: |
-    #     k3d cluster create "${clustername}" \
-    #       --image docker.io/rancher/k3s:v1.31.3-k3s1 \
-    #       --agents 3 \
-    #       --no-lb \
-    #       --timeout 30s \
-    #       --k3s-arg '--disable-network-policy@server:*' \
-    #       --k3s-arg '--disable-cloud-controller@server:*' \
-    #       --k3s-arg '--cluster-cidr=10.244.0.0/16@server:*' \
-    #       --k3s-arg '--disable=traefik,servicelb@server:*'
-    #     k3d kubeconfig get "${clustername}" > k3d.yaml
-    #     echo "KUBECONFIG=$(pwd)/k3d.yaml" >> $GITHUB_ENV
-    # - name: Deploy nfs container within k3d network
-    #   env:
-    #     IMAGE: nimbix/unfs3:20190318-1
-    #   run: docker run -itd --name nfs_share --network k3d-flux-e2e $IMAGE
-    - name: Deploy nfs container within kind network
+    - name: Create k3d cluster
       env:
-        IMAGE: nimbix/unfs3:20190318-1
-      run: docker run -itd --name nfs_share --network kind $IMAGE
-    # - name: Setup cilium in ${{ matrix.test.tenant }}
-    #   run: |
-    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml
-    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml
-    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml
-    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml
-    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml
-    #     kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.2.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml
-
-    #     helm repo add cilium https://helm.cilium.io/
-    #     helm install cilium cilium/cilium --version 1.17.0-pre.3 --wait \
-    #       --namespace kube-system \
-    #       --set ipam.mode=kubernetes \
-    #       --set cni.exclusive=false \
-    #       --set gatewayAPI.enabled=true \
-    #       --set operator.replicas=1
-    - name: Install Flux in Kubernetes
-      run: flux install --components-extra="image-reflector-controller,image-automation-controller"
-    - name: Setup cluster reconciliation in tenant ${{ matrix.test.tenant }}
-      run: |
-        # this variable is defined only in pull requests
-        if [ -z "${GITHUB_HEAD_REF}" ]; then
-          flux create source git flux-system \
-          --url=${{ github.event.repository.html_url }} \
-          --branch=${GITHUB_REF#refs/heads/} \
-          --username=${GITHUB_ACTOR} \
-          --commit=${GITHUB_SHA} \
-          --password=${{ secrets.GITHUB_TOKEN }} \
-          --ignore-paths="clusters/**/flux-system/,inventory/,**/ci-excluded"
-        else
-          flux create source git flux-system \
-          --url=${{ github.event.repository.html_url }} \
-          --branch=${GITHUB_HEAD_REF} \
-          --username=${GITHUB_ACTOR} \
-          --password=${{ secrets.GITHUB_TOKEN }} \
-          --ignore-paths="clusters/**/flux-system/,inventory/,**/ci-excluded"
-        fi
-
-        kubectl apply -k .ci/
-
-        kubectl create secret --namespace flux-system generic github-token --from-literal=token=${{ secrets.GITHUB_TOKEN }}
-
-        flux create kustomization flux-system \
-        --source=flux-system \
-        --path=./clusters/${{ matrix.test.tenant }}
-
-    - name: Verify cluster reconciliation
+        K3D_SERVERS: "1"
+        K3D_AGENTS: "0"
+      run: scripts/create-cluster.sh ${{ matrix.test.tenant }}
+    - name: Patch manifests for CI
+      run: scripts/ci/patch-manifests.sh
+    - name: Bootstrap Flux
+      run: scripts/bootstrap-flux.sh ${{ matrix.test.tenant }}
+    - name: Verify kustomization reconciliation
       env:
         TENANT: "${{ matrix.test.tenant }}"
-      run: .ci/end-to-end/verify-cluster.sh
+        CONTEXT: "k3d-${{ matrix.test.tenant }}"
+      run: scripts/verify-kustomizations.sh
+    - name: Suspend all HelmReleases
+      env:
+        CONTEXT: "k3d-${{ matrix.test.tenant }}"
+      run: flux suspend helmrelease --all -n flux-system --context "$CONTEXT"
     - name: Verify helmrelease reconciliation
       id: helmrelease-verify
-      if: github.event_name != 'workflow_dispatch'
       env:
         HELM_RELEASES: "${{ join(matrix.test.helmreleases, ',') }}"
-      run: .ci/end-to-end/reconcile-helmreleases.sh
+        TENANT: "${{ matrix.test.tenant }}"
+        CONTEXT: "k3d-${{ matrix.test.tenant }}"
+      run: scripts/verify-helmreleases.sh
     - name: Debug failure
       if: failure()
       env:
         DEBUG_LOGS: "true"
         HELM_RELEASES: "${{ steps.helmrelease-verify.outputs.failing_helmrelease || join(matrix.test.helmreleases, ',') }}"
-      run: .ci/end-to-end/debug-failure.sh
+      run: scripts/ci/debug-failure.sh

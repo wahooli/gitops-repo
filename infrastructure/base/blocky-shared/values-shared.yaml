@@ -13,6 +13,7 @@ service:
     annotations:
       lbipam.cilium.io/ips: ${dns_ip_addr_1},${dns_ip_addr_2},8.8.8.8,8.8.4.4
       service.cilium.io/global: "true"
+      service.cilium.io/affinity: local
 
 persistence:
   config:

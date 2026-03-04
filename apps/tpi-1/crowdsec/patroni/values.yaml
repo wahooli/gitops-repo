@@ -226,8 +226,11 @@ ciliumNetworkPolicies:
     egress:
     - toEndpoints:
       - matchLabels:
-          "k8s:io.kubernetes.pod.namespace": kube-system
-          "k8s:k8s-app": kube-dns
+          k8s:io.kubernetes.pod.namespace: kube-system
+          k8s:k8s-app: kube-dns
+      - matchLabels:
+          k8s:io.kubernetes.pod.namespace: kube-system
+          k8s:k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"
@@ -247,6 +250,16 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: patroni
           k8s:app.kubernetes.io/part-of: crowdsec
           k8s:io.kubernetes.pod.namespace: crowdsec
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: crowdsec-patroni
+          k8s:app.kubernetes.io/name: patroni
+          k8s:app.kubernetes.io/part-of: crowdsec
+          k8s:io.kubernetes.pod.namespace: crowdsec
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: In
+          values:
+          - nas
       toPorts:
       - ports:
         - port: "8008"
@@ -260,6 +273,8 @@ ciliumNetworkPolicies:
       - ports:
         - port: "8008"
           protocol: TCP
+        - port: "6432"
+          protocol: TCP
         - port: "9630"
           protocol: TCP
         - port: "9631"
@@ -270,8 +285,20 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: proxy
           k8s:app.kubernetes.io/part-of: crowdsec
           k8s:io.kubernetes.pod.namespace: crowdsec
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: crowdsec-patroni
+          k8s:app.kubernetes.io/name: proxy
+          k8s:app.kubernetes.io/part-of: crowdsec
+          k8s:io.kubernetes.pod.namespace: crowdsec
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: In
+          values:
+          - nas
       toPorts:
       - ports:
+        - port: "5432"
+          protocol: TCP
         - port: "6432"
           protocol: TCP
         - port: "8008"
@@ -282,6 +309,16 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: patroni
           k8s:app.kubernetes.io/part-of: crowdsec
           k8s:io.kubernetes.pod.namespace: crowdsec
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: crowdsec-patroni
+          k8s:app.kubernetes.io/name: patroni
+          k8s:app.kubernetes.io/part-of: crowdsec
+          k8s:io.kubernetes.pod.namespace: crowdsec
+        matchExpressions:
+        - key: io.cilium.k8s.policy.cluster
+          operator: In
+          values:
+          - nas
       toPorts:
       - ports:
         - port: "8008"
@@ -304,6 +341,9 @@ haproxy:
         - matchLabels:
             io.kubernetes.pod.namespace: kube-system
             k8s-app: kube-dns
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: node-local-dns
         toPorts:
         - ports:
           - port: "53"
@@ -313,9 +353,20 @@ haproxy:
             app.kubernetes.io/instance: crowdsec-patroni
             app.kubernetes.io/name: patroni
             app.kubernetes.io/part-of: crowdsec
+        - matchLabels:
+            app.kubernetes.io/instance: crowdsec-patroni
+            app.kubernetes.io/name: patroni
+            app.kubernetes.io/part-of: crowdsec
+          matchExpressions:
+          - key: io.cilium.k8s.policy.cluster
+            operator: In
+            values:
+            - nas
         toPorts:
         - ports:
           - port: "8008"
+            protocol: TCP
+          - port: "5432"
             protocol: TCP
           - port: "6432"
             protocol: TCP

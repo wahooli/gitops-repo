@@ -3,6 +3,7 @@ kind: Service
 metadata:
   annotations:
     service.cilium.io/global: "true"
+    service.cilium.io/affinity: "local"
   name: kube-dns-nas
   namespace: kube-system
 spec:

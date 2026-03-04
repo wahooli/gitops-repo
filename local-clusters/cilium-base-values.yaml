@@ -1,0 +1,20 @@
+localRedirectPolicy: true
+clustermesh:
+  cacheTTL: 15m
+  useAPIServer: true
+  config:
+    enabled: true
+  apiserver:
+    service:
+      type: LoadBalancer
+  enableEndpointSliceSynchronization: true
+hostServices:
+  enabled: false
+ipv6:
+  enabled: false
+ipam:
+  mode: cluster-pool
+operator:
+  extraEnv:
+  - name: KUBE_FEATURE_WatchListClient
+    value: "false"

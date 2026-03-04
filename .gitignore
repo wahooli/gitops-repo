@@ -11,6 +11,10 @@
 !/.sourceignore
 !/.yamllint
 !/LICENSE
+!/scripts
+!/local-clusters
 # allow globally these files
 !.gitignore
 !README.md
+!Makefile
+!.devcontainer

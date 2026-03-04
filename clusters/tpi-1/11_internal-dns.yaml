@@ -10,6 +10,15 @@ spec:
   - name: infrastructure
   - name: infrastructure-depends
   - name: monitoring
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: unbound
+    namespace: internal-dns
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: blocky
+    namespace: internal-dns
   sourceRef:
     kind: GitRepository
     name: flux-system

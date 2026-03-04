@@ -60,6 +60,7 @@ spec:
     metadata:
       annotations:
         service.cilium.io/global: "true"
+        service.cilium.io/affinity: "local"
   nodeScrapeRelabelTemplate:
   - action: labeldrop
     regex: (beta_kubernetes_.*|kubernetes_io_hostname|node_role_kubernetes_io_.*|openebs_io_.*|topology_topolvm_.*)

@@ -1,0 +1,4 @@
+!*
+.cilium-ca/
+.clustermesh-ca/
+.registry/

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plex-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    runtimeClassName: ""
+    hostNetwork: false
+    initContainers:
+      import-configuration:
+        enabled: false
+    metrics:
+      enabled: false
+    containers:
+      plex-media-server-exporter:
+        enabled: false

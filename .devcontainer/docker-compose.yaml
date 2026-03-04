@@ -1,0 +1,13 @@
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/base:noble
+    volumes:
+    - ..:/home/vscode/workspace:delegated
+    networks:
+    - k3d-multicluster-net
+    environment:
+    - IN_DEVCONTAINER=true
+
+networks:
+  k3d-multicluster-net:
+    external: true

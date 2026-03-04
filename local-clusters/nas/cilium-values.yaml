@@ -1,0 +1,11 @@
+bgpControlPlane:
+  enabled: true
+cluster:
+  id: 2
+  name: nas
+operator:
+  replicas: 1
+ipam:
+  operator:
+    clusterPoolIPv4PodCIDRList:
+    - "10.12.0.0/16"

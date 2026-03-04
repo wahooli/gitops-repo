@@ -1,0 +1,32 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+	"name": "Ubuntu",
+	"service": "devcontainer",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
+		"ghcr.io/rio/features/k3d:1": {},
+		"ghcr.io/audacioustux/devcontainers/cilium:1": {},
+		"ghcr.io/goldsam/dev-container-features/flux2:1": {},
+		"ghcr.io/larsnieuwenhuizen/features/jqyq:0": {},
+		"ghcr.io/lentzi90/features/yamlfmt:0": {}
+	},
+	"overrideCommand": true,
+	"dockerComposeFile": "docker-compose.yaml",
+	"workspaceFolder": "/home/vscode/workspace"
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "uname -a",
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

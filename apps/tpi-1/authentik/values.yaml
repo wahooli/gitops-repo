@@ -97,6 +97,7 @@ server:
   service:
     annotations:
       service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
   ingress:
     enabled: true
     ingressClassName: nginx
