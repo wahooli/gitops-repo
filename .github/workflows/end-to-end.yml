@@ -132,6 +132,8 @@ jobs:
         K3D_SERVERS: "1"
         K3D_AGENTS: "0"
       run: scripts/create-cluster.sh ${{ matrix.test.tenant }}
+    - name: Patch manifests for CI
+      run: scripts/ci/patch-manifests.sh
     - name: Bootstrap Flux
       run: scripts/bootstrap-flux.sh ${{ matrix.test.tenant }}
     - name: Verify kustomization reconciliation
