@@ -3,6 +3,8 @@ bgpControlPlane:
 cluster:
   id: 1
   name: tpi-1
+operator:
+  replicas: 1
 ipam:
   operator:
     clusterPoolIPv4PodCIDRList:

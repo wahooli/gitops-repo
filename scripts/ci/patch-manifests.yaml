@@ -1,0 +1,16 @@
+rules:
+- description: Remove pod affinity rules (node affinity, pod anti-affinity, etc.)
+  expression: |
+    del(.. | select(has("affinity")).affinity)
+
+- description: Remove topology spread constraints
+  expression: |
+    del(.. | select(has("topologySpreadConstraints")).topologySpreadConstraints)
+
+- description: >-
+    Remove CPU and memory requests/limits from container resources,
+    while preserving PVC storage requests
+  expression: |
+    del(.. | select(has("resources")).resources.requests | select(has("cpu") or has("memory"))) |
+    del(.. | select(has("resources")).resources.limits | select(has("cpu") or has("memory")))
+  error_tolerant: true
