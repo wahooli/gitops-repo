@@ -103,6 +103,8 @@ ciliumNetworkPolicies:
           protocol: TCP
         - port: "2379"
           protocol: TCP
+        - port: "2380"
+          protocol: TCP
   gateway:
     enabled: true
     description: "Allow etcd gateway to access etcd"
