@@ -18,6 +18,7 @@ service:
   tpi-1:
     annotations:
       service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
     type: ClusterIP
     portsFrom: main
 

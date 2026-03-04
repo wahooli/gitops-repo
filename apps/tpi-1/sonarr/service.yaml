@@ -5,6 +5,7 @@ metadata:
   namespace: default
   annotations:
     service.cilium.io/global: "true"
+    service.cilium.io/affinity: "remote"
 spec:
   internalTrafficPolicy: Cluster
   ports:

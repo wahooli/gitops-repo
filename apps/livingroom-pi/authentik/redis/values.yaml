@@ -17,7 +17,7 @@ ordinals:
 
 ciliumNetworkPolicies:
   main:
-    enabled: false # policies fail for some reason in this cluster
+    enabled: true
     description: "Allow redis proxy and redis to redis communication"
     endpointSelector:
       matchLabels:
@@ -27,8 +27,11 @@ ciliumNetworkPolicies:
     egress:
     - toEndpoints:
       - matchLabels:
-          "io.kubernetes.pod.namespace": kube-system
-          "k8s-app": kube-dns
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"
@@ -38,9 +41,16 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: redis
           io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          io.kubernetes.pod.namespace: authentik
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - tpi-1
       toPorts:
       - ports:
         - port: "6379"
@@ -53,26 +63,36 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: redis
           io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: redis
+          io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
-      toPorts:
-      - ports:
-        - port: "26379"
-          protocol: TCP
-    - fromEndpoints:
+          operator: In
+          values:
+          - nas
+          - tpi-1
+      - matchLabels:
+          app.kubernetes.io/instance: authentik-redis
+          app.kubernetes.io/name: proxy
+          io.kubernetes.pod.namespace: authentik
       - matchLabels:
           app.kubernetes.io/instance: authentik-redis
           app.kubernetes.io/name: proxy
           io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - tpi-1
       toPorts:
       - ports:
+        - port: "6379"
+          protocol: TCP
         - port: "26379"
           protocol: TCP
-
 redis:
   initialMaster: 0
   enabled: false
@@ -108,6 +128,7 @@ service:
   sentinel:
     annotations:
       service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
 haproxy:
   enabled: false
   image:
@@ -117,7 +138,7 @@ haproxy:
     secret.reloader.stakater.com/reload: "authentik-redis-server"
   ciliumNetworkPolicies:
     main:
-      enabled: false # policies fail for some reason in this cluster
+      enabled: false
       description: "Allow redis proxy to connect redis and redis-sentinel"
       endpointSelector:
         matchLabels:
@@ -129,6 +150,9 @@ haproxy:
         - matchLabels:
             io.kubernetes.pod.namespace: kube-system
             k8s-app: kube-dns
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: node-local-dns
         toPorts:
         - ports:
           - port: "53"
@@ -140,13 +164,21 @@ haproxy:
             io.kubernetes.pod.namespace: authentik
           matchExpressions:
           - key: io.cilium.k8s.policy.cluster
-            operator: Exists
+            operator: In
+            values:
+            - nas
+            - tpi-1
+        - matchLabels:
+            app.kubernetes.io/instance: authentik-redis
+            app.kubernetes.io/name: redis
+            io.kubernetes.pod.namespace: authentik
         toPorts:
         - ports:
           - port: "26379"
             protocol: TCP
           - port: "6379"
             protocol: TCP
+
       ingress:
       - fromEndpoints:
         - matchLabels:

@@ -16,12 +16,14 @@ ssl:
   issuerRef:
     name: clustermesh-issuer
     kind: ClusterIssuer
+env:
+  ETCD_QUOTA_BACKEND_BYTES: "6442450944"
 podAnnotations:
   backup.velero.io/backup-volumes: data
   secret.reloader.stakater.com/reload: "etcd-client,etcd-server"
 ciliumNetworkPolicies:
   main:
-    enabled: false # policies fail for some reason in this cluster
+    enabled: true
     description: "Allow etcd instances to communicate between each other and allow etcd gateway to access"
     endpointSelector:
       matchLabels:
@@ -32,6 +34,9 @@ ciliumNetworkPolicies:
       - matchLabels:
           io.kubernetes.pod.namespace: kube-system
           k8s-app: kube-dns
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"
@@ -41,9 +46,16 @@ ciliumNetworkPolicies:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd
           app.kubernetes.io/name: etcd
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd
+          app.kubernetes.io/name: etcd
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - tpi-1
       toPorts:
       - ports:
         - port: "2380"
@@ -61,29 +73,40 @@ ciliumNetworkPolicies:
           k8s:io.kubernetes.pod.namespace: etcd
           k8s:app.kubernetes.io/instance: etcd
           k8s:app.kubernetes.io/name: etcd
+      - matchLabels:
+          k8s:io.kubernetes.pod.namespace: etcd
+          k8s:app.kubernetes.io/instance: etcd
+          k8s:app.kubernetes.io/name: etcd
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
-      toPorts:
-      - ports:
-        - port: "2380"
-          protocol: TCP
-    - fromEndpoints:
+          operator: In
+          values:
+          - nas
+          - tpi-1
+      - matchLabels:
+          k8s:io.kubernetes.pod.namespace: etcd
+          k8s:app.kubernetes.io/instance: etcd-gateway
+          k8s:app.kubernetes.io/name: etcd-gateway
       - matchLabels:
           k8s:io.kubernetes.pod.namespace: etcd
           k8s:app.kubernetes.io/instance: etcd-gateway
           k8s:app.kubernetes.io/name: etcd-gateway
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - tpi-1
       toPorts:
       - ports:
         - port: "8080"
           protocol: TCP
         - port: "2379"
           protocol: TCP
+        - port: "2380"
+          protocol: TCP
   gateway:
-    enabled: false # policies fail for some reason in this cluster
+    enabled: true
     description: "Allow etcd gateway to access etcd"
     endpointSelector:
       matchLabels:
@@ -94,6 +117,9 @@ ciliumNetworkPolicies:
       - matchLabels:
           io.kubernetes.pod.namespace: kube-system
           k8s-app: kube-dns
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"
@@ -103,9 +129,20 @@ ciliumNetworkPolicies:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd
           app.kubernetes.io/name: etcd
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd
+          app.kubernetes.io/name: etcd
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - tpi-1
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd-gateway
+          app.kubernetes.io/name: etcd-gateway
       toPorts:
       - ports:
         - port: "2379"
@@ -115,14 +152,23 @@ ciliumNetworkPolicies:
     ingress:
     - fromEndpoints:
       - matchLabels:
-          # allow patroni in authentik namespace to access
-          io.kubernetes.pod.namespace: authentik
-          app.kubernetes.io/instance: authentik-patroni
-          app.kubernetes.io/name: patroni
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd-gateway
+          app.kubernetes.io/name: etcd-gateway
       toPorts:
       - ports:
         - port: "2379"
           protocol: TCP
+    # - fromEndpoints:
+    #   - matchLabels:
+    #       # allow patroni in authentik namespace to access
+    #       io.kubernetes.pod.namespace: authentik
+    #       app.kubernetes.io/instance: authentik-patroni
+    #       app.kubernetes.io/name: patroni
+    #   toPorts:
+    #   - ports:
+    #     - port: "2379"
+    #       protocol: TCP
 certificates:
   server:
     secretTemplate:

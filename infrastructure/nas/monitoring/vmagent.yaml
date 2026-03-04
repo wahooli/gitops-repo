@@ -65,3 +65,4 @@ spec:
     metadata:
       annotations:
         service.cilium.io/global: "true"
+        service.cilium.io/affinity: "local"

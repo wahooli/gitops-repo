@@ -21,6 +21,7 @@ spec:
         annotations:
           service.cilium.io/global: "true"
           service.cilium.io/global-sync-endpoint-slices: "true"
+          service.cilium.io/affinity: "local"
     extraArgs:
       dedup.minScrapeInterval: 30s
       loggerFormat: json
@@ -62,6 +63,7 @@ spec:
         annotations:
           service.cilium.io/global: "true"
           service.cilium.io/global-sync-endpoint-slices: "true"
+          service.cilium.io/affinity: "local"
   vminsert:
     replicaCount: 1
     extraArgs:

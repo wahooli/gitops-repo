@@ -33,6 +33,9 @@ ciliumNetworkPolicies:
       - matchLabels:
           io.kubernetes.pod.namespace: kube-system
           k8s-app: kube-dns
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"
@@ -42,9 +45,16 @@ ciliumNetworkPolicies:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd
           app.kubernetes.io/name: etcd
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd
+          app.kubernetes.io/name: etcd
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - livingroom-pi
       toPorts:
       - ports:
         - port: "2380"
@@ -62,26 +72,37 @@ ciliumNetworkPolicies:
           k8s:io.kubernetes.pod.namespace: etcd
           k8s:app.kubernetes.io/instance: etcd
           k8s:app.kubernetes.io/name: etcd
+      - matchLabels:
+          k8s:io.kubernetes.pod.namespace: etcd
+          k8s:app.kubernetes.io/instance: etcd
+          k8s:app.kubernetes.io/name: etcd
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
-      toPorts:
-      - ports:
-        - port: "2380"
-          protocol: TCP
-    - fromEndpoints:
+          operator: In
+          values:
+          - nas
+          - livingroom-pi
+      - matchLabels:
+          k8s:io.kubernetes.pod.namespace: etcd
+          k8s:app.kubernetes.io/instance: etcd-gateway
+          k8s:app.kubernetes.io/name: etcd-gateway
       - matchLabels:
           k8s:io.kubernetes.pod.namespace: etcd
           k8s:app.kubernetes.io/instance: etcd-gateway
           k8s:app.kubernetes.io/name: etcd-gateway
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - livingroom-pi
       toPorts:
       - ports:
         - port: "8080"
           protocol: TCP
         - port: "2379"
+          protocol: TCP
+        - port: "2380"
           protocol: TCP
   gateway:
     description: "Allow etcd gateway to access etcd"
@@ -94,6 +115,9 @@ ciliumNetworkPolicies:
       - matchLabels:
           io.kubernetes.pod.namespace: kube-system
           k8s-app: kube-dns
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: node-local-dns
       toPorts:
       - ports:
         - port: "53"
@@ -103,9 +127,20 @@ ciliumNetworkPolicies:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd
           app.kubernetes.io/name: etcd
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd
+          app.kubernetes.io/name: etcd
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - nas
+          - livingroom-pi
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd-gateway
+          app.kubernetes.io/name: etcd-gateway
       toPorts:
       - ports:
         - port: "2379"
@@ -115,20 +150,17 @@ ciliumNetworkPolicies:
     ingress:
     - fromEndpoints:
       - matchLabels:
-          # allow patroni in authentik namespace to access
-          io.kubernetes.pod.namespace: authentik
-          app.kubernetes.io/instance: authentik-patroni
-          app.kubernetes.io/name: patroni
-      toPorts:
-      - ports:
-        - port: "2379"
-          protocol: TCP
-    - fromEndpoints:
-      - matchLabels:
-          # allow patroni in authentik namespace to access
           io.kubernetes.pod.namespace: crowdsec
           app.kubernetes.io/instance: crowdsec-patroni
           app.kubernetes.io/name: patroni
+      - matchLabels:
+          io.kubernetes.pod.namespace: authentik
+          app.kubernetes.io/instance: authentik-patroni
+          app.kubernetes.io/name: patroni
+      - matchLabels:
+          io.kubernetes.pod.namespace: etcd
+          app.kubernetes.io/instance: etcd-gateway
+          app.kubernetes.io/name: etcd-gateway
       toPorts:
       - ports:
         - port: "2379"

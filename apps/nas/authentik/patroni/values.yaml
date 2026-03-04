@@ -243,9 +243,16 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: patroni
           k8s:app.kubernetes.io/part-of: authentik
           k8s:io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: authentik-patroni
+          k8s:app.kubernetes.io/name: patroni
+          k8s:app.kubernetes.io/part-of: authentik
+          k8s:io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - tpi-1
       toPorts:
       - ports:
         - port: "8008"
@@ -259,6 +266,8 @@ ciliumNetworkPolicies:
       - ports:
         - port: "8008"
           protocol: TCP
+        - port: "6432"
+          protocol: TCP
         - port: "9630"
           protocol: TCP
         - port: "9631"
@@ -269,11 +278,20 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: proxy
           k8s:app.kubernetes.io/part-of: authentik
           k8s:io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: authentik-patroni
+          k8s:app.kubernetes.io/name: proxy
+          k8s:app.kubernetes.io/part-of: authentik
+          k8s:io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - tpi-1
       toPorts:
       - ports:
+        - port: "5432"
+          protocol: TCP
         - port: "6432"
           protocol: TCP
         - port: "8008"
@@ -284,9 +302,16 @@ ciliumNetworkPolicies:
           k8s:app.kubernetes.io/name: patroni
           k8s:app.kubernetes.io/part-of: authentik
           k8s:io.kubernetes.pod.namespace: authentik
+      - matchLabels:
+          k8s:app.kubernetes.io/instance: authentik-patroni
+          k8s:app.kubernetes.io/name: patroni
+          k8s:app.kubernetes.io/part-of: authentik
+          k8s:io.kubernetes.pod.namespace: authentik
         matchExpressions:
         - key: io.cilium.k8s.policy.cluster
-          operator: Exists
+          operator: In
+          values:
+          - tpi-1
       toPorts:
       - ports:
         - port: "8008"
@@ -318,12 +343,20 @@ haproxy:
             app.kubernetes.io/instance: authentik-patroni
             app.kubernetes.io/name: patroni
             app.kubernetes.io/part-of: authentik
+        - matchLabels:
+            app.kubernetes.io/instance: authentik-patroni
+            app.kubernetes.io/name: patroni
+            app.kubernetes.io/part-of: authentik
           matchExpressions:
           - key: io.cilium.k8s.policy.cluster
-            operator: Exists
+            operator: In
+            values:
+            - tpi-1
         toPorts:
         - ports:
           - port: "8008"
+            protocol: TCP
+          - port: "5432"
             protocol: TCP
           - port: "6432"
             protocol: TCP
