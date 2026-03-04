@@ -1,5 +1,5 @@
 image:
-  tag: "18.04.1" # {"$imagepolicy": "flux-system:deluge:tag"}
+  tag: "2.2.0"
 hostNetwork: true
 strategy:
   type: Recreate
