@@ -128,6 +128,9 @@ reconcile() {
     fi
 
     IFS=$ORIG_IFS
+    # Resume helmrelease if suspended (no-op if not suspended)
+    flux resume helmrelease "$helmrelease" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true
+
     if [[ " ${RECONCILED[*]:-} " =~ [[:space:]]${helmrelease}[[:space:]] ]]; then
       echo "  $helmrelease: previously reconciled, skipping"
     else

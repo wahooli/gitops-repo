@@ -15,6 +15,10 @@ OCI_REGISTRY_NAME="reg-oci"
 OCI_REGISTRY_PORT=5050
 
 IN_DEVCONTAINER="${IN_DEVCONTAINER:-false}"
+# Optional overrides for k3d node counts (useful for CI with limited resources)
+K3D_SERVERS="${K3D_SERVERS:-}"
+K3D_AGENTS="${K3D_AGENTS:-}"
+
 # --- Argument parsing & validation ---
 CLUSTER_NAME="${1:-}"
 if [[ -z "$CLUSTER_NAME" ]]; then
@@ -181,9 +185,29 @@ else
   echo "Using existing OCI registry $OCI_REGISTRY_NAME"
 fi
 
+# Apply server/agent overrides if set
+K3D_CONFIG_EFFECTIVE="$K3D_CONFIG"
+if [[ -n "$K3D_SERVERS" || -n "$K3D_AGENTS" ]]; then
+  K3D_CONFIG_EFFECTIVE="$REPO_ROOT/local-clusters/$CLUSTER_NAME/.k3d-config-override.yaml"
+  cp "$K3D_CONFIG" "$K3D_CONFIG_EFFECTIVE"
+  if [[ -n "$K3D_SERVERS" ]]; then
+    echo "Overriding servers: $(yq '.servers' "$K3D_CONFIG") -> $K3D_SERVERS"
+    yq -i ".servers = $K3D_SERVERS" "$K3D_CONFIG_EFFECTIVE"
+  fi
+  if [[ -n "$K3D_AGENTS" ]]; then
+    echo "Overriding agents: $(yq '.agents' "$K3D_CONFIG") -> $K3D_AGENTS"
+    yq -i ".agents = $K3D_AGENTS" "$K3D_CONFIG_EFFECTIVE"
+  fi
+fi
+
 # Create the k3d cluster using config file
 echo "Creating k3d cluster: $CLUSTER_NAME"
-k3d cluster create --config "$K3D_CONFIG"
+k3d cluster create --config "$K3D_CONFIG_EFFECTIVE"
+
+# Clean up override config
+if [[ "$K3D_CONFIG_EFFECTIVE" != "$K3D_CONFIG" ]]; then
+  rm -f "$K3D_CONFIG_EFFECTIVE"
+fi
 
 # When running inside a dev-container the kubeconfig server address is written
 # as https://0.0.0.0:<random-port> which is unreachable from inside Docker.

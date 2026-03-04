@@ -92,7 +92,7 @@ jobs:
         dotnet: true
         haskell: true
         large-packages: true
-        swap-storage: true
+        swap-storage: false
         docker-images: false
     - name: Checkout
       uses: actions/checkout@v4.2.2
@@ -128,6 +128,9 @@ jobs:
       with:
         version: '${{ matrix.test.flux_version }}'
     - name: Create k3d cluster
+      env:
+        K3D_SERVERS: "1"
+        K3D_AGENTS: "0"
       run: scripts/create-cluster.sh ${{ matrix.test.tenant }}
     - name: Bootstrap Flux
       run: scripts/bootstrap-flux.sh ${{ matrix.test.tenant }}
@@ -136,6 +139,10 @@ jobs:
         TENANT: "${{ matrix.test.tenant }}"
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
       run: scripts/verify-kustomizations.sh
+    - name: Suspend all HelmReleases
+      env:
+        CONTEXT: "k3d-${{ matrix.test.tenant }}"
+      run: flux suspend helmrelease --all -n flux-system --context "$CONTEXT"
     - name: Verify helmrelease reconciliation
       id: helmrelease-verify
       env:
