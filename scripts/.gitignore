@@ -1,2 +1,4 @@
 !*.sh
+!ci/
 !ci/*.sh
+!ci/patch-manifests.yaml

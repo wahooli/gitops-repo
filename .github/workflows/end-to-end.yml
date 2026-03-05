@@ -141,10 +141,6 @@ jobs:
         TENANT: "${{ matrix.test.tenant }}"
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
       run: scripts/verify-kustomizations.sh
-    - name: Suspend all HelmReleases
-      env:
-        CONTEXT: "k3d-${{ matrix.test.tenant }}"
-      run: flux suspend helmrelease --all -n flux-system --context "$CONTEXT"
     - name: Verify helmrelease reconciliation
       id: helmrelease-verify
       env:

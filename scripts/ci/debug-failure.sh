@@ -2,115 +2,114 @@
 HELM_RELEASES="${HELM_RELEASES:-$1}"
 DEBUG_STORAGE="${DEBUG_STORAGE:-false}"
 DEBUG_LOGS="${DEBUG_LOGS:-false}"
-DEBUG_LOGS_NAMESPACES="${DEBUG_LOGS_NAMESPACES:-default cert-manager internal-dns logging authentik victoria-metrics crowdsec haproxy etcd}"
-DEBUG_RESOURCES="${DEBUG_RESOURCES:-deployment statefulset pod vlsingle}"
-DEBUG_NAMESPACES="${DEBUG_NAMESPACES:-alerting default cert-manager internal-dns logging authentik crowdsec haproxy etcd}"
+DEBUG_LOGS_EXCLUDE_NS="${DEBUG_LOGS_EXCLUDE_NS:-kube-system kube-public kube-node-lease local-path-storage flux-system}"
+DEBUG_NODES="${DEBUG_NODES:-false}"
 
-echo "::group::Describe all cluster nodes"
-kubectl describe nodes -A
-echo "::endgroup::"
+# Run a command inside a collapsible group, suppressing stderr.
+# Uses GitHub Actions syntax when on CI, plain headers locally.
+# Usage: group "Title" command [args...]
+group() {
+  local title="$1"; shift
+  if [ -n "$GITHUB_ACTIONS" ]; then
+    echo "::group::${title}"
+    "$@" 2>/dev/null || true
+    echo "::endgroup::"
+  else
+    printf '\n\033[1;34m── %s ──\033[0m\n' "$title"
+    "$@" 2>/dev/null || true
+  fi
+}
 
-echo "::group::flux-system GitRepository definition"
-kubectl get gitrepository -n flux-system flux-system -o yaml
-echo "::endgroup::"
+unhealthy_pod_filter='$4 != "Running" && $4 != "Completed" && $4 != "Succeeded"'
 
-echo "::group::All in flux-system namespace"
-kubectl -n flux-system get all
-echo "::endgroup::"
+# ── 1. Failure Summary ──────────────────────────────────────────────
 
-echo "::group::FluxCD source-controller logs"
-kubectl -n flux-system logs deploy/source-controller
-echo "::endgroup::"
+# flux get columns (tab-separated): NAMESPACE NAME REVISION SUSPENDED READY MESSAGE
+group "Failure Summary: Flux Kustomizations" \
+  bash -c 'flux get kustomization -A 2>/dev/null | awk -F"\t" "NR==1 || \$5 ~ /False/" || echo "All kustomizations ready"'
 
-echo "::group::FluxCD kustomize-controller logs"
-kubectl -n flux-system logs deploy/kustomize-controller
-echo "::endgroup::"
+group "Failure Summary: HelmReleases" \
+  bash -c 'flux get helmrelease -A 2>/dev/null | awk -F"\t" "NR==1 || (\$5 ~ /False/ && \$6 !~ /waiting to be reconciled/)" || echo "All HelmReleases ready"'
 
-echo "::group::FluxCD helm-controller logs"
-kubectl -n flux-system logs deploy/helm-controller
-echo "::endgroup::"
+group "Failure Summary: Unhealthy Pods" \
+  bash -c "kubectl get pods -A --no-headers 2>/dev/null | awk '${unhealthy_pod_filter}' || echo 'All pods healthy'"
 
-echo "::group::All FluxCD resources"
-flux get all --all-namespaces
-echo "::endgroup::"
+group "Failure Summary: Recent Warning Events (last 30)" \
+  bash -c 'kubectl events -A --types=Warning --sort-by=lastTimestamp 2>/dev/null | tail -n 30'
 
-echo "::group::Pods in all namespaces"
-kubectl get pods --all-namespaces
-echo "::endgroup::"
+# ── 2. Unhealthy Pod Details ────────────────────────────────────────
 
-for namespace in ${DEBUG_NAMESPACES}; do
-    echo "::group::Describe resources in namespace: ${namespace}"
+kubectl get pods -A --no-headers 2>/dev/null \
+  | awk "${unhealthy_pod_filter} { print \$1, \$2, \$4 }" \
+  | while IFS=' ' read -r ns pod status; do
+      group "Describe unhealthy pod: ${ns}/${pod} (${status})" \
+        kubectl describe pod -n "$ns" "$pod"
 
-    for kind in ${DEBUG_RESOURCES}; do
-        plural="${kind}s"
-        resources=$(kubectl get "${plural}" -n "${namespace}" -o name 2>/dev/null || true)
+      group "Logs for unhealthy pod: ${ns}/${pod}" \
+        kubectl logs -n "$ns" "$pod" --tail=100
 
-        for res in $resources; do
-            name=${res##*/}
-            echo "::group::${kind^}: ${name}"   # Capitalized header
-            kubectl describe "$res" -n "${namespace}"
-            echo "::endgroup::"
-        done
+      if [ "$status" = "CrashLoopBackOff" ] || [ "$status" = "Error" ]; then
+        group "Previous logs for: ${ns}/${pod}" \
+          kubectl logs -n "$ns" "$pod" --previous --tail=100
+      fi
     done
 
-    echo "::endgroup::"
-done
-
-if [ "$DEBUG_LOGS" = true ]; then
-    for namespace in ${DEBUG_LOGS_NAMESPACES}; do
-        echo "::group::Logs for pods in ${namespace} namespace"
-        pods=$(kubectl get pods -n $namespace -o jsonpath='{.items[*].metadata.name}')
-        for pod in $pods; do
-            echo "::group::Logs for pod $pod"
-            kubectl logs -n $namespace $pod
-            echo "::endgroup::"
-        done
-        echo "::endgroup::"
-    done
-fi
-
-if [ "$DEBUG_STORAGE" = true ]; then
-    echo "::group::All PVCs"
-    kubectl get pvc -A
-    echo "::endgroup::"
-
-    echo "::group::Describe all PVCs"
-    kubectl describe pvc -A
-    echo "::endgroup::"
-
-    echo "::group::Get all PVs"
-    kubectl get pv -A
-    echo "::endgroup::"
-
-    echo "::group::Describe all PVs"
-    kubectl describe pv
-    echo "::endgroup::"
-
-    echo "::group::Describe all StorageClasses"
-    kubectl describe sc
-    echo "::endgroup::"
-
-    echo "::group::local-path-provisioner logs"
-    kubectl logs -n local-path-storage deploy/local-path-provisioner
-    echo "::endgroup::"
-
-    echo "::group::local-path-storage namespaced events"
-    kubectl events -n local-path-storage
-    echo "::endgroup::"
-fi
-
+# ── 3. Failed HelmRelease Details ──────────────────────────────────
 
 IFS=","
 for helmrelease in $HELM_RELEASES; do
-    echo "::group::Describe HelmRelease $helmrelease"
-    kubectl describe helmrelease -n flux-system $helmrelease
-    echo "::endgroup::"
+  group "Describe HelmRelease $helmrelease" \
+    kubectl describe helmrelease -n flux-system "$helmrelease"
 
-    echo "::group::Events for HelmRelease $helmrelease"
-    kubectl events -n flux-system --for HelmRelease/$helmrelease
-    echo "::endgroup::"
+  group "Events for HelmRelease $helmrelease" \
+    kubectl events -n flux-system --for "HelmRelease/$helmrelease"
 
-    echo "::group::flux logs for HelmRelease $helmrelease"
-    flux logs --kind=HelmRelease --name=$helmrelease
-    echo "::endgroup::"
+  group "Flux logs for HelmRelease $helmrelease" \
+    flux logs --kind=HelmRelease --name="$helmrelease"
 done
+unset IFS
+
+# ── 4. Flux Controller Error Logs ──────────────────────────────────
+
+for controller in kustomize-controller helm-controller; do
+  group "${controller} errors" bash -c "
+    errors=\$(kubectl -n flux-system logs deploy/${controller} 2>/dev/null | grep 'level=error')
+    if [ -n \"\$errors\" ]; then
+      echo \"\$errors\"
+    else
+      echo 'No error-level logs found, showing last 50 lines:'
+      kubectl -n flux-system logs deploy/${controller} --tail=50 2>/dev/null
+    fi
+  "
+done
+
+# ── 5. Conditional Verbose Sections ────────────────────────────────
+
+if [ "$DEBUG_STORAGE" = true ]; then
+  group "All PVCs"              kubectl get pvc -A
+  group "Describe all PVCs"     kubectl describe pvc -A
+  group "All PVs"               kubectl get pv -A
+  group "Describe all PVs"      kubectl describe pv
+  group "All StorageClasses"    kubectl describe sc
+  group "local-path-provisioner logs"   kubectl logs -n local-path-storage deploy/local-path-provisioner
+  group "local-path-storage events"     kubectl events -n local-path-storage
+fi
+
+if [ "$DEBUG_LOGS" = true ]; then
+  exclude_pattern=$(echo "$DEBUG_LOGS_EXCLUDE_NS" | tr ' ' '\n' | sed 's/^/^/;s/$/$/' | paste -sd '|')
+  namespaces=$(kubectl get ns --no-headers -o custom-columns=':metadata.name' 2>/dev/null \
+    | grep -Ev "$exclude_pattern" || true)
+
+  for namespace in $namespaces; do
+    group "${namespace} pod logs" bash -c "
+      for pod in \$(kubectl get pods -n '$namespace' -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
+        printf '\n--- %s ---\n' \"\$pod\"
+        kubectl logs -n '$namespace' \"\$pod\" 2>/dev/null || true
+      done
+    "
+  done
+fi
+
+if [ "$DEBUG_NODES" = true ]; then
+  group "Describe all cluster nodes" kubectl describe nodes -A
+fi

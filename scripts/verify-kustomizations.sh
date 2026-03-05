@@ -146,4 +146,11 @@ fi
 echo "Waiting for CoreDNS rollout..."
 kubectl "${CONTEXT_ARGS[@]}" -n kube-system rollout status deployment/coredns --timeout="${KUSTOMIZATION_TIMEOUT}"
 
+# In CI, suspend all kustomizations to prevent the kustomization controller from
+# re-applying suspend: true to HelmReleases during helmrelease verification
+if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+  echo "Suspending all kustomizations..."
+  flux suspend kustomization --all -n flux-system "${CONTEXT_ARGS[@]}"
+fi
+
 exit 0
