@@ -11,6 +11,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CLUSTER_NAME="${TENANT:-${1:-}}"
 KUSTOMIZATIONS="${KUSTOMIZATIONS:-${2:-}}"
 KUSTOMIZATION_TIMEOUT="${KUSTOMIZATION_TIMEOUT:-5m}"
+RECONCILE_READY="${RECONCILE_READY:-true}"
 
 # Optional context override (Makefile sets CONTEXT=k3d-<cluster>; CI uses default)
 CONTEXT_ARGS=()
@@ -47,56 +48,48 @@ is_kustomization_ready() {
   [[ "$status" == "True" ]]
 }
 
-verify_kustomization() {
-  local kustomization_file="$1"
-  local strict="${2:-}"
+build_kustomization() {
+  local name="$1"
+  local file="$2"
+  local namespace="$3"
 
-  if [[ ! -f "$kustomization_file" ]]; then
-    echo "$kustomization_file doesn't exist!"
-    exit 1
-  fi
-
-  local kustomization namespace
-  kustomization=$(yq -r 'select(.kind == "Kustomization") | .metadata.name' "$kustomization_file")
-
-  if [[ -z "$kustomization" ]] && [[ "$strict" == "true" ]]; then
-    echo "$kustomization_file is not Kustomization kind!"
-    exit 1
-  elif [[ -n "$kustomization" ]]; then
-    namespace=$(yq -r '.metadata.namespace' "$kustomization_file")
-
-    group_start "Kustomization $kustomization"
-
-    echo "kustomization file path: $kustomization_file"
-
-    echo -n "flux build kustomization $kustomization"
-    flux build kustomization "$kustomization" \
-      -n "$namespace" \
-      --kustomization-file "$kustomization_file" \
-      --path "$REPO_ROOT/$(yq -r '.spec.path' "$kustomization_file" | sed 's|^\./||')" \
-      "${CONTEXT_ARGS[@]}" > /dev/null && echo ": success!" || (echo ": failure!" && exit 1)
-
-    if is_kustomization_ready "$kustomization" "$namespace"; then
-      echo "kustomization $kustomization is already ready, skipping reconcile"
-    else
-      echo "flux reconcile"
-      flux reconcile kustomization "$kustomization" \
-        -n "$namespace" \
-        --timeout="${KUSTOMIZATION_TIMEOUT}" \
-        "${CONTEXT_ARGS[@]}" || exit 1
-
-      echo "kubectl wait"
-      kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" \
-        wait kustomization/"$kustomization" \
-        --for=condition=ready \
-        --timeout="${KUSTOMIZATION_TIMEOUT}" || exit 1
-    fi
-
-    group_end
-  fi
+  echo -n "flux build kustomization $name"
+  flux build kustomization "$name" \
+    -n "$namespace" \
+    --kustomization-file "$file" \
+    --path "$REPO_ROOT/$(yq -r '.spec.path' "$file" | sed 's|^\./||')" \
+    "${CONTEXT_ARGS[@]}" > /dev/null && echo ": success!" || { echo ": failure!"; return 1; }
 }
 
-# Reconcile flux-system first to ensure child Kustomization CRs exist
+reconcile_kustomization() {
+  local name="$1"
+  local namespace="$2"
+  local file="$3"
+
+  group_start "Kustomization $name"
+  echo "kustomization file path: $file"
+
+  if [[ "$RECONCILE_READY" != "true" ]] && is_kustomization_ready "$name" "$namespace"; then
+    echo "kustomization $name is already ready, skipping reconcile"
+  else
+    echo "flux reconcile"
+    flux reconcile kustomization "$name" \
+      -n "$namespace" \
+      --timeout="${KUSTOMIZATION_TIMEOUT}" \
+      "${CONTEXT_ARGS[@]}" || return 1
+
+    echo "kubectl wait"
+    kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" \
+      wait kustomization/"$name" \
+      --for=condition=ready \
+      --timeout="${KUSTOMIZATION_TIMEOUT}" || return 1
+  fi
+
+  group_end
+}
+
+# --- Bootstrap: reconcile flux-system and local-bootstrap first ---
+
 group_start "Kustomization flux-system"
 echo "flux reconcile"
 flux reconcile kustomization flux-system \
@@ -128,17 +121,116 @@ if flux get kustomization local-bootstrap -n flux-system "${CONTEXT_ARGS[@]}" >/
   group_end
 fi
 
-if [[ -z "$KUSTOMIZATIONS" ]]; then
-  echo "Iterating files in clusters/${CLUSTER_NAME}"
-  for file in $(cd "$REPO_ROOT/clusters/${CLUSTER_NAME}" && ls -dv1 * 2>/dev/null); do
-    kustomization_file="$REPO_ROOT/clusters/${CLUSTER_NAME}/${file}"
-    [[ -f "$kustomization_file" ]] && verify_kustomization "$kustomization_file"
-  done
-else
+# --- Explicit kustomization list: sequential ---
+
+if [[ -n "$KUSTOMIZATIONS" ]]; then
   IFS=","
   for kustomization in $KUSTOMIZATIONS; do
     kustomization_file="$REPO_ROOT/clusters/${CLUSTER_NAME}/${kustomization}.yaml"
-    verify_kustomization "$kustomization_file" "true"
+    if [[ ! -f "$kustomization_file" ]]; then
+      echo "$kustomization_file doesn't exist!"
+      exit 1
+    fi
+    name=$(yq -r 'select(.kind == "Kustomization") | .metadata.name' "$kustomization_file")
+    if [[ -z "$name" ]]; then
+      echo "$kustomization_file is not Kustomization kind!"
+      exit 1
+    fi
+    namespace=$(yq -r '.metadata.namespace' "$kustomization_file")
+    build_kustomization "$name" "$kustomization_file" "$namespace" || exit 1
+    reconcile_kustomization "$name" "$namespace" "$kustomization_file" || exit 1
+  done
+  unset IFS
+else
+
+  # --- Auto-discovery: parallel waves based on dependency graph ---
+
+  echo "Iterating files in clusters/${CLUSTER_NAME}"
+
+  declare -A ks_file ks_ns ks_deps
+  all_ks=()
+
+  for file in $(cd "$REPO_ROOT/clusters/${CLUSTER_NAME}" && ls -dv1 * 2>/dev/null); do
+    kustomization_file="$REPO_ROOT/clusters/${CLUSTER_NAME}/${file}"
+    [[ -f "$kustomization_file" ]] || continue
+
+    name=$(yq -r 'select(.kind == "Kustomization") | .metadata.name' "$kustomization_file" 2>/dev/null)
+    [[ -z "$name" ]] && continue
+
+    ks_file[$name]="$kustomization_file"
+    ks_ns[$name]=$(yq -r '.metadata.namespace' "$kustomization_file" 2>/dev/null)
+    ks_deps[$name]=$(yq -r 'select(.kind == "Kustomization") | [.spec.dependsOn[]?.name] | join(" ")' "$kustomization_file" 2>/dev/null)
+    all_ks+=("$name")
+  done
+
+  # Process kustomizations in dependency waves
+  declare -A completed=()
+
+  while [[ ${#completed[@]} -lt ${#all_ks[@]} ]]; do
+    wave=()
+    for ks in "${all_ks[@]}"; do
+      [[ -n "${completed[$ks]:-}" ]] && continue
+      # Check if all dependencies are completed (or external to the graph)
+      deps_met=true
+      for dep in ${ks_deps[$ks]}; do
+        if [[ -n "${ks_file[$dep]:-}" && -z "${completed[$dep]:-}" ]]; then
+          deps_met=false
+          break
+        fi
+      done
+      $deps_met && wave+=("$ks")
+    done
+
+    if [[ ${#wave[@]} -eq 0 ]]; then
+      echo "Error: circular dependency detected among remaining kustomizations"
+      exit 1
+    fi
+
+    echo ""
+    echo "Wave [${wave[*]}]"
+
+    # Validate all kustomizations in the wave (sequential, fast)
+    for ks in "${wave[@]}"; do
+      build_kustomization "$ks" "${ks_file[$ks]}" "${ks_ns[$ks]}" || exit 1
+    done
+
+    if [[ ${#wave[@]} -eq 1 ]]; then
+      # Single kustomization — run directly, no need for background jobs
+      reconcile_kustomization "${wave[0]}" "${ks_ns[${wave[0]}]}" "${ks_file[${wave[0]}]}" || exit 1
+      completed[${wave[0]}]=1
+    else
+      # Parallel reconciliation with captured output
+      tmpdir=$(mktemp -d)
+      wave_pids=()
+
+      for ks in "${wave[@]}"; do
+        ( reconcile_kustomization "$ks" "${ks_ns[$ks]}" "${ks_file[$ks]}" ) \
+          > "$tmpdir/$ks.log" 2>&1 &
+        wave_pids+=($!)
+      done
+
+      wave_failed=0
+      failed_ks=""
+      for i in "${!wave_pids[@]}"; do
+        if ! wait "${wave_pids[$i]}"; then
+          wave_failed=1
+          failed_ks="${failed_ks} ${wave[$i]}"
+        fi
+      done
+
+      # Print captured output sequentially
+      for ks in "${wave[@]}"; do
+        cat "$tmpdir/$ks.log"
+        completed[$ks]=1
+      done
+
+      rm -rf "$tmpdir"
+
+      if [[ $wave_failed -ne 0 ]]; then
+        echo "Failed kustomizations:${failed_ks}"
+        exit 1
+      fi
+    fi
   done
 fi
 

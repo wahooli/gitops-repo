@@ -140,6 +140,7 @@ jobs:
       env:
         TENANT: "${{ matrix.test.tenant }}"
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
+        RECONCILE_READY: "false"
       run: scripts/verify-kustomizations.sh
     - name: Verify helmrelease reconciliation
       id: helmrelease-verify
@@ -147,6 +148,7 @@ jobs:
         HELM_RELEASES: "${{ join(matrix.test.helmreleases, ',') }}"
         TENANT: "${{ matrix.test.tenant }}"
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
+        RECONCILE_READY: "false"
       run: scripts/verify-helmreleases.sh
     - name: Debug failure
       if: failure()
