@@ -4,7 +4,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-    external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+    external-dns.alpha.kubernetes.io/target: gw.${domain_wahoo_li:=wahoo.li}
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
     nginx.ingress.kubernetes.io/access-log-filter: "true"
   name: static-backend
@@ -12,7 +12,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: static.wahoo.li
+  - host: static.${domain_wahoo_li:=wahoo.li}
     http:
       paths:
       - path: /()(.*)

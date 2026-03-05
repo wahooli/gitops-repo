@@ -18,6 +18,6 @@ controller:
     labels:
       ingress: internal
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: vm-nginx.absolutist.it,vm-nginx.wahoo.li
+      external-dns.alpha.kubernetes.io/hostname: vm-nginx.${domain_absolutist_it:=absolutist.it},vm-nginx.${domain_wahoo_li:=wahoo.li}
       metallb.universe.tf/loadBalancerIPs: ${cluster_bgp_loadbalaner_ip}
-      # external-dns.alpha.kubernetes.io/hostname: "nginx.absolutist.it."
+      # external-dns.alpha.kubernetes.io/hostname: "nginx.${domain_absolutist_it:=absolutist.it}."

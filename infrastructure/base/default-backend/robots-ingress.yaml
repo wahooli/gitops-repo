@@ -11,7 +11,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: "wahoo.li"
+  - host: "${domain_wahoo_li:=wahoo.li}"
     http: &ingressPaths
       paths:
       - path: "/robots.txt"
@@ -28,27 +28,27 @@ spec:
             name: default-backend
             port:
               number: 80
-  - host: "auth.wahoo.li"
+  - host: "auth.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "ombi.wahoo.li"
+  - host: "ombi.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "paperless.wahoo.li"
+  - host: "paperless.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "tautulli.wahoo.li"
+  - host: "tautulli.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "sonarr.wahoo.li"
+  - host: "sonarr.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "radarr.wahoo.li"
+  - host: "radarr.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "bazarr.wahoo.li"
+  - host: "bazarr.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "grafana.wahoo.li"
+  - host: "grafana.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "overseerr.wahoo.li"
+  - host: "overseerr.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "jellyfin.wahoo.li"
+  - host: "jellyfin.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "plex.wahoo.li"
+  - host: "plex.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths
-  - host: "vault.wahoo.li"
+  - host: "vault.${domain_wahoo_li:=wahoo.li}"
     http: *ingressPaths

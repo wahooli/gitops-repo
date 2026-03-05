@@ -303,6 +303,11 @@ IFS=$ORIG_IFS
 if [[ "github_json" == "$OUTPUT_MODE" ]]; then
     helmreleases_out="["
     for key in "${!HELM_RELEASES[@]}"; do
+        # Skip tenants without k3d config (no local cluster available for testing)
+        if [[ ! -f "local-clusters/$key/k3d-config.yaml" ]]; then
+            msg "Skipping tenant $key: no k3d config found"
+            continue
+        fi
         releases_unique=$(echo "${HELM_RELEASES[$key]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
         releases_unique=${releases_unique## }
         releases_unique=${releases_unique%% }

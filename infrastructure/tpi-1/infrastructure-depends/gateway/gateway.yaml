@@ -13,12 +13,12 @@ spec:
       service.cilium.io/forwarding-mode: dsr
       # kube-vip.io/ignore: "true"
       lbipam.cilium.io/ips: "${internal_gw_lb_ip}"
-      external-dns.alpha.kubernetes.io/hostname: gw.tpi-1.absolutist.it,gw.tpi-1.wahoo.li
+      external-dns.alpha.kubernetes.io/hostname: gw.tpi-1.${domain_absolutist_it:=absolutist.it},gw.tpi-1.${domain_wahoo_li:=wahoo.li}
   listeners:
   - name: internal-wahooli-http
     protocol: HTTP
     port: 80
-    hostname: "*.wahoo.li"
+    hostname: "*.${domain_wahoo_li:=wahoo.li}"
     allowedRoutes:
       namespaces:
         from: Selector
@@ -28,7 +28,7 @@ spec:
   - name: internal-wahooli-https
     protocol: HTTPS
     port: 443
-    hostname: "*.wahoo.li"
+    hostname: "*.${domain_wahoo_li:=wahoo.li}"
     tls:
       mode: Terminate
       certificateRefs:
@@ -37,7 +37,7 @@ spec:
   - name: internal-absolutistit-http
     protocol: HTTP
     port: 80
-    hostname: "*.absolutist.it"
+    hostname: "*.${domain_absolutist_it:=absolutist.it}"
     allowedRoutes:
       namespaces:
         from: Selector
@@ -47,7 +47,7 @@ spec:
   - name: internal-absolutistit-https
     protocol: HTTPS
     port: 443
-    hostname: "*.absolutist.it"
+    hostname: "*.${domain_absolutist_it:=absolutist.it}"
     tls:
       mode: Terminate
       certificateRefs:

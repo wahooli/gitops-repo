@@ -85,7 +85,7 @@ ingress:
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: 100m
-      external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+      external-dns.alpha.kubernetes.io/target: gw.${domain_wahoo_li:=wahoo.li}
       nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       nginx.ingress.kubernetes.io/custom-http-errors: "404"
@@ -93,7 +93,7 @@ ingress:
     labels:
       velero.io/exclude-from-backup: "true"
     hosts:
-    - host: vault.wahoo.li
+    - host: vault.${domain_wahoo_li:=wahoo.li}
       paths:
       - path: /
         pathType: Prefix

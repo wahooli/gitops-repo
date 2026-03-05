@@ -23,7 +23,7 @@ entries:
   model: authentik_flows.flow
   attrs:
     name: Registration Flow
-    title: Welcome to auth.wahoo.li
+    title: Welcome to auth.${domain_wahoo_li:=wahoo.li}
     designation: enrollment
     authentication: require_unauthenticated
 - model: authentik_policies_expression.expressionpolicy

@@ -9,7 +9,7 @@ service:
   enabled: true
   type: LoadBalancer
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: log-write.tpi-1.absolutist.it,log-write.tpi-1.wahoo.li
+    external-dns.alpha.kubernetes.io/hostname: log-write.tpi-1.${domain_absolutist_it:=absolutist.it},log-write.tpi-1.${domain_wahoo_li:=wahoo.li}
   ports:
   - name: datadog-agent
     port: 8282

@@ -27,7 +27,7 @@ entries:
     required: false
 - attrs:
     designation: authentication
-    name: Welcome to auth.wahoo.li
+    name: Welcome to auth.${domain_wahoo_li:=wahoo.li}
     title: Login
     authentication: none
   identifiers:

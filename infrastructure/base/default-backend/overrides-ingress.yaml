@@ -10,7 +10,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: vault.wahoo.li
+  - host: vault.${domain_wahoo_li:=wahoo.li}
     http:
       paths:
       - path: /admin
@@ -20,7 +20,7 @@ spec:
             name: default-backend
             port:
               number: 80
-  - host: paperless.wahoo.li
+  - host: paperless.${domain_wahoo_li:=wahoo.li}
     http:
       paths:
       - path: /admin
@@ -30,7 +30,7 @@ spec:
             name: default-backend
             port:
               number: 80
-  - host: jellyfin.wahoo.li
+  - host: jellyfin.${domain_wahoo_li:=wahoo.li}
     http:
       paths:
       - path: /metrics
@@ -40,7 +40,7 @@ spec:
             name: default-backend
             port:
               number: 80
-  - host: overseerr.wahoo.li
+  - host: overseerr.${domain_wahoo_li:=wahoo.li}
     http:
       paths:
       - path: /setup

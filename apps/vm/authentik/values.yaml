@@ -11,7 +11,7 @@ authentik:
     host: "mail-relay.default"
     port: 25
     username: "authentik"
-    from: "auth.wahoo.li <${authentik_email_from}>"
+    from: "auth.${domain_wahoo_li:=wahoo.li} <${authentik_email_from}>"
     # from: "${authentik_email_from}"
     password: "${authentik_email_password}"
     use_ssl: false
@@ -35,17 +35,17 @@ server:
     labels:
       ingress: internal
     annotations:
-      external-dns.alpha.kubernetes.io/target: vm-nginx.wahoo.li
+      external-dns.alpha.kubernetes.io/target: vm-nginx.${domain_wahoo_li:=wahoo.li}
       # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       cert-manager.io/cluster-issuer: letsencrypt-production
     hosts:
-    - auth.wahoo.li
-    - auth.absolutist.it
+    - auth.${domain_wahoo_li:=wahoo.li}
+    - auth.${domain_absolutist_it:=absolutist.it}
     tls:
     - secretName: tls-authentik-ingress
       hosts:
-      - auth.wahoo.li
-      - auth.absolutist.it
+      - auth.${domain_wahoo_li:=wahoo.li}
+      - auth.${domain_absolutist_it:=absolutist.it}
   service:
     labels:
       mirror.linkerd.io/exported: "true"

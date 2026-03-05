@@ -51,12 +51,12 @@ ingress:
       ingress: internal
       velero.io/exclude-from-backup: "true"
     annotations:
-      external-dns.alpha.kubernetes.io/target: vm-nginx.absolutist.it
+      external-dns.alpha.kubernetes.io/target: vm-nginx.${domain_absolutist_it:=absolutist.it}
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       cert-manager.io/cluster-issuer: letsencrypt-production
       # nginx.ingress.kubernetes.io/proxy-body-size: 25m
     hosts:
-    - host: overseerr.wahoo.li
+    - host: overseerr.${domain_wahoo_li:=wahoo.li}
       paths:
       - path: "/"
         pathType: "Prefix"
@@ -66,7 +66,7 @@ ingress:
           name: nginx-errors
           port:
             number: 80
-    - host: overseerr.absolutist.it
+    - host: overseerr.${domain_absolutist_it:=absolutist.it}
       paths:
       - path: "/"
         pathType: "Prefix"
@@ -79,5 +79,5 @@ ingress:
     tls:
     - secretName: tls-overseerr-ingress
       hosts:
-      - overseerr.absolutist.it
-      - overseerr.wahoo.li
+      - overseerr.${domain_absolutist_it:=absolutist.it}
+      - overseerr.${domain_wahoo_li:=wahoo.li}

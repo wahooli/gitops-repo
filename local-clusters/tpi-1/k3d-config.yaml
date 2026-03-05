@@ -9,6 +9,9 @@ ports:
 - port: 8081:80
   nodeFilters:
   - loadbalancer
+- port: 8091:8080
+  nodeFilters:
+  - loadbalancer
 env:
 - envVar: KRUN_INIT_PID1=1
   nodeFilters:

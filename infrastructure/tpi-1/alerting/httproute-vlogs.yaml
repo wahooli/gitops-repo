@@ -4,13 +4,13 @@ metadata:
   name: vmalert-vlogs
   namespace: alerting
   annotations:
-    external-dns.alpha.kubernetes.io/target: gw.nas.absolutist.it
+    external-dns.alpha.kubernetes.io/target: gw.nas.${domain_absolutist_it:=absolutist.it}
 spec:
   parentRefs:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "log-alerts.absolutist.it"
+  - "log-alerts.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: vmalert-vlogs-tpi-1

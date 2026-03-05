@@ -6,7 +6,7 @@ entries:
 - attrs:
     designation: enrollment
     name: SSO registration Flow
-    title: Welcome to auth.wahoo.li
+    title: Welcome to auth.${domain_wahoo_li:=wahoo.li}
     authentication: none
   identifiers:
     slug: sso-registration

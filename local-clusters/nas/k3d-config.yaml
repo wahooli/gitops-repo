@@ -8,6 +8,9 @@ ports:
 - port: 8082:80
   nodeFilters:
   - loadbalancer
+- port: 8092:8080
+  nodeFilters:
+  - loadbalancer
 - port: 32400:32400
   nodeFilters:
   - loadbalancer

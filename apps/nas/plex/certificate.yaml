@@ -23,5 +23,5 @@ spec:
     name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
-  - plex.wahoo.li
-  - plex.absolutist.it
+  - plex.${domain_wahoo_li:=wahoo.li}
+  - plex.${domain_absolutist_it:=absolutist.it}

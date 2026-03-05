@@ -23,5 +23,5 @@ spec:
     name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
-  - radarr.wahoo.li
-  - radarr.absolutist.it
+  - radarr.${domain_wahoo_li:=wahoo.li}
+  - radarr.${domain_absolutist_it:=absolutist.it}

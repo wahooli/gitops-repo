@@ -9,6 +9,8 @@ for tenant in $tenants; do
     tenant=$(echo "$tenant" | xargs)
     if [ ! -d "clusters/${tenant}" ]; then
         echo "$tenant doesn't exist!"
+    elif [ ! -f "local-clusters/${tenant}/k3d-config.yaml" ]; then
+        echo "$tenant has no k3d config, skipping"
     elif [[ "$test_matrix" != *"\"$tenant\""* ]] && [ -n "$tenant" ]; then
         flux_components_file="clusters/${tenant}/flux-system/gotk-components.yaml"
         # Defaults to "latest" version

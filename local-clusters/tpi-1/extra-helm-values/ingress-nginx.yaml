@@ -8,6 +8,9 @@ data:
     controller:
       admissionWebhooks:
         enabled: false
+      config:
+        use-proxy-protocol: "false"
+        ssl-redirect: "false"
       service:
         externalTrafficPolicy: ""
         annotations:

@@ -87,10 +87,10 @@ ingress:
       nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       nginx.ingress.kubernetes.io/custom-http-errors: "404"
-      external-dns.alpha.kubernetes.io/target: gw02.wahoo.li
+      external-dns.alpha.kubernetes.io/target: gw02.${domain_wahoo_li:=wahoo.li}
       external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
     hosts:
-    - host: jellyfin.wahoo.li
+    - host: jellyfin.${domain_wahoo_li:=wahoo.li}
       paths:
       - path: "/"
         pathType: "Prefix"

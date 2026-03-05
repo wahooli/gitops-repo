@@ -23,4 +23,4 @@ spec:
     name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
-  - prowlarr.wahoo.li
+  - prowlarr.${domain_wahoo_li:=wahoo.li}

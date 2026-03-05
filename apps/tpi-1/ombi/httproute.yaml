@@ -8,7 +8,7 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "ombi.absolutist.it"
+  - "ombi.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: ombi

@@ -11,14 +11,14 @@ master:
     size: "4Gi"
   ingress:
     enabled: false
-    host: master.seaweedfs.absolutist.it
+    host: master.seaweedfs.${domain_absolutist_it:=absolutist.it}
     className: nginx
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     tls:
     - secretName: tls-seaweedfs-ingress
       hosts:
-      - master.seaweedfs.absolutist.it
+      - master.seaweedfs.${domain_absolutist_it:=absolutist.it}
 
 volume:
   enabled: true
@@ -52,7 +52,7 @@ filer:
     size: "4Gi"
   ingress:
     enabled: false
-    host: seaweedfs.absolutist.it
+    host: seaweedfs.${domain_absolutist_it:=absolutist.it}
     className: nginx
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
@@ -62,12 +62,12 @@ filer:
     tls:
     - secretName: tls-seaweedfs-ingress
       hosts:
-      - seaweedfs.absolutist.it
+      - seaweedfs.${domain_absolutist_it:=absolutist.it}
 
 s3:
   ingress:
     enabled: false
-    host: s3.absolutist.it
+    host: s3.${domain_absolutist_it:=absolutist.it}
     className: nginx
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
@@ -77,4 +77,4 @@ s3:
     tls:
     - secretName: tls-seaweedfs-ingress
       hosts:
-      - s3.absolutist.it
+      - s3.${domain_absolutist_it:=absolutist.it}

@@ -18,5 +18,5 @@ spec:
             key: api-token
       selector:
         dnsZones:
-        - absolutist.it
-        - wahoo.li
+        - ${domain_absolutist_it:=absolutist.it}
+        - ${domain_wahoo_li:=wahoo.li}

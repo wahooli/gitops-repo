@@ -34,7 +34,7 @@ entries:
       !Find [authentik_flows.flow, [slug, default-user-settings-flow]]
     flow_recovery:
       !Find [authentik_flows.flow, [slug, password-reset]]
-    branding_title: auth.wahoo.li
+    branding_title: auth.${domain_wahoo_li:=wahoo.li}
     branding_favicon: /static/dist/assets/icons/icon.png
     branding_logo: /static/dist/assets/icons/icon_left_brand.svg
   identifiers:

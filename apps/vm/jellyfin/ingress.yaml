@@ -14,7 +14,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: jellyfin.wahoo.li
+  - host: jellyfin.${domain_wahoo_li:=wahoo.li}
     http:
       paths:
       - backend:
@@ -24,7 +24,7 @@ spec:
               number: 8096
         path: /
         pathType: Prefix
-  - host: jellyfin.absolutist.it
+  - host: jellyfin.${domain_absolutist_it:=absolutist.it}
     http:
       paths:
       - backend:
@@ -36,6 +36,6 @@ spec:
         pathType: Prefix
   tls:
   - hosts:
-    - jellyfin.wahoo.li
-    - jellyfin.absolutist.it
+    - jellyfin.${domain_wahoo_li:=wahoo.li}
+    - jellyfin.${domain_absolutist_it:=absolutist.it}
     secretName: tls-jellyfin-ingress

@@ -22,11 +22,11 @@ env:
         "APPS": [
           {
             "provider_id": "authentik",
-            "name": "auth.wahoo.li",
+            "name": "auth.${domain_wahoo_li:=wahoo.li}",
             "client_id": "${authentik_paperless_client_id}",
             "secret": "${authentik_paperless_client_secret}",
             "settings": {
-              "server_url": "https://auth.wahoo.li/application/o/paperless-ngx/.well-known/openid-configuration"
+              "server_url": "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/paperless-ngx/.well-known/openid-configuration"
             }
           }
         ],
@@ -119,7 +119,7 @@ ingress:
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: 25m
-      external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+      external-dns.alpha.kubernetes.io/target: gw.${domain_wahoo_li:=wahoo.li}
       nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       nginx.ingress.kubernetes.io/custom-http-errors: "404"
@@ -127,7 +127,7 @@ ingress:
     labels:
       velero.io/exclude-from-backup: "true"
     hosts:
-    - host: paperless.wahoo.li
+    - host: paperless.${domain_wahoo_li:=wahoo.li}
       paths:
       - path: "/"
         pathType: "Prefix"

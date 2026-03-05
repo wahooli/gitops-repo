@@ -4,4 +4,4 @@ metadata:
   name: authentik
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
-    kustomize.toolkit.fluxcd.io/ssa: merge
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent

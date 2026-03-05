@@ -95,17 +95,17 @@ ingress:
       cert-manager.io/cluster-issuer: letsencrypt-production
       # nginx.ingress.kubernetes.io/proxy-body-size: 25m
     hosts:
-    - host: netboot.absolutist.it
+    - host: netboot.${domain_absolutist_it:=absolutist.it}
       paths:
       - path: "/"
         pathType: "Prefix"
     tls:
     - secretName: tls-netbootxyz-ingress
       hosts:
-      - netboot.absolutist.it
-      - netboot.wahoo.li
-      - assets.netboot.absolutist.it
-      - assets.netboot.wahoo.li
+      - netboot.${domain_absolutist_it:=absolutist.it}
+      - netboot.${domain_wahoo_li:=wahoo.li}
+      - assets.netboot.${domain_absolutist_it:=absolutist.it}
+      - assets.netboot.${domain_wahoo_li:=wahoo.li}
   assets:
     enabled: true
     className: nginx
@@ -118,14 +118,14 @@ ingress:
       cert-manager.io/cluster-issuer: letsencrypt-production
       # nginx.ingress.kubernetes.io/proxy-body-size: 25m
     hosts:
-    - host: assets.netboot.absolutist.it
+    - host: assets.netboot.${domain_absolutist_it:=absolutist.it}
       paths:
       - path: "/"
         pathType: "Prefix"
     tls:
     - secretName: tls-netbootxyz-ingress
       hosts:
-      - netboot.absolutist.it
-      - netboot.wahoo.li
-      - assets.netboot.absolutist.it
-      - assets.netboot.wahoo.li
+      - netboot.${domain_absolutist_it:=absolutist.it}
+      - netboot.${domain_wahoo_li:=wahoo.li}
+      - assets.netboot.${domain_absolutist_it:=absolutist.it}
+      - assets.netboot.${domain_wahoo_li:=wahoo.li}

@@ -19,3 +19,7 @@ spec:
   - kind: ConfigMap
     name: nas-external-dns-values
     valuesKey: values.yaml
+  - kind: ConfigMap
+    name: external-dns-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml
