@@ -5,18 +5,18 @@ function read_ignores() {
     local -
     shopt -s globstar nullglob extglob;
     local file=$1
-    ignores=($(grep -v '^#' $IGNORE_FILE | grep '[^[:blank:]]' | sed 's/#.*//' | awk '{$1=$1};1' ))
+    mapfile -t ignores < <(grep -v '^#' "$IGNORE_FILE" | grep '[^[:blank:]]' | sed 's/#.*//' | awk '{$1=$1};1')
 }
 
-read_ignores $IGNORE_FILE
+read_ignores "$IGNORE_FILE"
 
 OUTPUT_MODE=${OUTPUT_MODE:-github_json}
 ORIG_IFS=$IFS
 HEAD_BRANCH=main
 SOURCE_BRANCH=flux-image-updates
-FILES="${FILES}"
+FILES="${FILES:-}"
 if [ -z "$FILES" ]; then
-    FILES="${@:1}"
+    FILES="${*:1}"
 fi
 CLUSTERS_PATH="clusters/"
 APPS_PATH="apps/"
@@ -25,7 +25,7 @@ CRDS_PATH="crds/"
 REPO_PATHS=("${CLUSTERS_PATH}" "${APPS_PATH}" "${INFRASTRUCTURE_PATH}" "${CRDS_PATH}")
 
 function msg() {
-    if [[ "github_json" == $OUTPUT_MODE ]]; then
+    if [[ "github_json" == "$OUTPUT_MODE" ]]; then
         echo "$1"
     fi
 }
@@ -36,7 +36,7 @@ function debug() {
         echo "--DEBUG--" >> /dev/stderr
         IFS=$ORIG_IFS
         for msg in "${@}"; do
-            echo ${msg//\'/} >> /dev/stderr
+            echo "${msg//\'/}" >> /dev/stderr
         done
         IFS=$prev_ifs
         echo -e "--DEBUG--\n" >> /dev/stderr
@@ -61,14 +61,13 @@ function get_find_ignore_args() {
 }
 
 function get_kustomize_ignore_args() {
-    grep -v '^#' $IGNORE_FILE | sed 's/#.*//' | awk '{$1=$1};1' | grep '[^[:blank:]]' | paste -sd ','
+    grep -v '^#' "$IGNORE_FILE" | sed 's/#.*//' | awk '{$1=$1};1' | grep '[^[:blank:]]' | paste -sd ','
 }
 
 function populate_ignore_realpath_dirs() {
     for ignore in "${ignores[@]}"; do
         if [[ -d $ignore ]]; then
-            # echo $ignore
-            IGNORE_DIRS+=("$(realpath $ignore)")
+            IGNORE_DIRS+=("$(realpath "$ignore")")
         fi
     done
 }
@@ -83,8 +82,8 @@ function longest_common_prefix()
     name="$1"
     while x=$(dirname "$name"); [ "$x" != "/" ]
     do
-        parts[$i]="$x"
-        i=$(($i + 1))
+        parts[i]="$x"
+        i=$((i + 1))
         name="$x"
     done
 
@@ -92,7 +91,7 @@ function longest_common_prefix()
     do
         for name in "${names[@]}"
         do
-            if [ "${name#$prefix/}" = "${name}" ]
+            if [ "${name#"$prefix"/}" = "${name}" ]
             then continue 2
             fi
         done
@@ -108,9 +107,11 @@ function find_helmrelease_name() {
     local selector=$4
     local debug=$5
     [ -z "$kustomization_file" ] && return
-    local max_depth=$(realpath $(yq -r ".spec.path" $kustomization_file))
-    current_dir=$(realpath $file)
-    local common_max_depth=$(longest_common_prefix $max_depth $current_dir)
+    local max_depth
+    max_depth=$(realpath "$(yq -r ".spec.path" "$kustomization_file")")
+    current_dir=$(realpath "$file")
+    local common_max_depth
+    common_max_depth=$(longest_common_prefix "$max_depth" "$current_dir")
     local previous_debug=$DEBUG
     if [ "$debug" = true ]; then
         DEBUG=$debug
@@ -121,17 +122,18 @@ function find_helmrelease_name() {
         "selector: $selector" \
         "max_depth: $max_depth" \
         "common_max_depth: $common_max_depth"
-    
+
     local error=""
-    local ignore_paths="$(get_kustomize_ignore_args)"
+    local ignore_paths
+    ignore_paths="$(get_kustomize_ignore_args)"
     # this function iterates directories relative to repository root
     # if there's no slashes in current_dir or somehow this while has iterated into repo root or system root, this should break
     while [ "$current_dir" != "/" ] && [ "$current_dir" != "." ] && [[ $current_dir == *"/"* ]]; do
         local kustomization_build=""
         if [[ ! " ${IGNORE_DIRS[*]} " =~ [[:space:]]${current_dir}[[:space:]] && -d $current_dir ]]; then
-            kustomization_build=$(flux build kustomization $kustomization --ignore-paths "${ignore_paths}" --kustomization-file $kustomization_file --path $current_dir --dry-run 2>/dev/null | yq -Nr "${selector}")
+            kustomization_build=$(flux build kustomization "$kustomization" --ignore-paths "${ignore_paths}" --kustomization-file "$kustomization_file" --path "$current_dir" --dry-run 2>/dev/null | yq -Nr "${selector}")
             if [ ! -n "$kustomization_build" ]; then
-                error=$(flux build kustomization $kustomization --ignore-paths "${ignore_paths}" --kustomization-file $kustomization_file --path $current_dir --dry-run 2>&1 >/dev/null)
+                error=$(flux build kustomization "$kustomization" --ignore-paths "${ignore_paths}" --kustomization-file "$kustomization_file" --path "$current_dir" --dry-run 2>&1 >/dev/null)
                 [ -n "$error" ] && error+="\n[ command: flux build kustomization $kustomization --ignore-paths \"${ignore_paths}\" --kustomization-file $kustomization_file --path $current_dir --dry-run ]"
             fi
         fi
@@ -140,14 +142,14 @@ function find_helmrelease_name() {
         if [ -n "$error" ]; then
             break
         elif [ -n "$kustomization_build" ]; then
-            echo $kustomization_build
+            echo "$kustomization_build"
             break
         else
             current_dir=$(dirname "$current_dir")
             # break if current dir equals to path defined in kustomization
             [[ $current_dir -ef $max_depth ]] && break
             [[ $current_dir -ef $common_max_depth ]] && break
-            (! [[ $common_max_depth -ef $max_depth ]]) && [[ $(dirname $current_dir) -ef $common_max_depth ]] && break
+            { ! [[ $common_max_depth -ef $max_depth ]]; } && [[ $(dirname "$current_dir") -ef $common_max_depth ]] && break
         fi
     done
     DEBUG=$previous_debug
@@ -163,8 +165,8 @@ function get_cluster_flux_version() {
         local filename="${CLUSTERS_PATH}${tenant}/flux-system/gotk-components.yaml"
         # Defaults to "latest" version
         local flux_version="latest"
-        if [ -f $filename ]; then
-            flux_version=$(yq -r 'select(.kind == "Namespace") | .metadata.labels."app.kubernetes.io/version"' $filename 2>/dev/null)
+        if [ -f "$filename" ]; then
+            flux_version=$(yq -r 'select(.kind == "Namespace") | .metadata.labels."app.kubernetes.io/version"' "$filename" 2>/dev/null)
         fi
         FLUX_VERSIONS[$tenant]="$flux_version"
     fi
@@ -178,12 +180,12 @@ function find_kustomization_file() {
     if [[ ! -v KUSTOMIZATION_FILES[$key] ]]; then
         # iterate files under clusters/[tenant]
         local kustomization_file=""
-        for filename in ${CLUSTERS_PATH%/}/$tenant/*; do
+        for filename in "${CLUSTERS_PATH%/}"/"$tenant"/*; do
             # not file
             [ ! -f "$filename" ] && continue
 
-            found_kustomization=$(yq -r 'select(.kind == "Kustomization") | .metadata.name' $filename 2>/dev/null)
-            if [ ! -z $found_kustomization ] && [ "$found_kustomization" == "$kustomization" ]; then
+            found_kustomization=$(yq -r 'select(.kind == "Kustomization") | .metadata.name' "$filename" 2>/dev/null)
+            if [ -n "$found_kustomization" ] && [ "$found_kustomization" == "$kustomization" ]; then
                 kustomization_file=$filename
                 break
             fi
@@ -220,7 +222,7 @@ for file in $FILES; do
     for path in "${REPO_PATHS[@]}"; do
         tenant=${tenant#"$path"}
     done
-    [[ $file == $tenant ]] && continue
+    [[ $file == "$tenant" ]] && continue
     tenant=${tenant%%"/"*}
     kustomization=${file%%"/"*}
     IFS=$ORIG_IFS
@@ -230,20 +232,19 @@ for file in $FILES; do
     msg "::group::File $file"
     if [[ "$file" =~ ^clusters\/.*?\/flux-system\/.*?\.yaml$ ]]; then
         for kustomization in "infrastructure" "crds" "apps"; do
-            kustomization_file=$(find_kustomization_file "$tenant" $kustomization)
-            helmreleases=($(find_helmrelease_name "$kustomization/$tenant/" $kustomization "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.name'))
+            kustomization_file=$(find_kustomization_file "$tenant" "$kustomization")
+            mapfile -t helmreleases < <(find_helmrelease_name "$kustomization/$tenant/" "$kustomization" "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.name')
             if [ -n "${helmreleases[*]}" ]; then
-                add_helmreleases_for_tenant $tenant "${helmreleases[*]}"
+                add_helmreleases_for_tenant "$tenant" "${helmreleases[*]}"
                 msg "Kustomization: $kustomization, Tenant: $tenant, Added helmreleases: ${helmreleases[*]}"
             fi
         done
     elif [[ "base" = "$tenant" ]]; then
         # this overrides tenant variable if modifications were done in base overlay
-        # readarray -t find_args <<< "$(get_find_ignore_args $kustomization)"
-        find_args=($(get_find_ignore_args $kustomization))
-        debug "find $kustomization -mindepth 1 -maxdepth 1 -type d ( ! -name 'base' ) "${find_args[@]}" -printf '%f '"
-        for tenant in $(find $kustomization -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) "${find_args[@]}" -printf '%f '); do
-            kustomization_file=$(find_kustomization_file $tenant $kustomization)
+        mapfile -t find_args < <(get_find_ignore_args "$kustomization")
+        debug "find $kustomization -mindepth 1 -maxdepth 1 -type d ( ! -name 'base' ) ${find_args[*]} -printf '%f '"
+        while IFS= read -r tenant; do
+            kustomization_file=$(find_kustomization_file "$tenant" "$kustomization")
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
                 echo "We have error - finding kustomization file failed!"
@@ -251,7 +252,7 @@ for file in $FILES; do
             fi
             # continue loop if empty value is returned
             [[ ! -f $kustomization_file ]] && continue
-            base_helmrelease=$(find_helmrelease_name $file $kustomization $kustomization_file 'select(.kind == "HelmRelease") | .metadata.annotations."homelab.wahoo.li/base-helmrelease"')
+            base_helmrelease=$(find_helmrelease_name "$file" "$kustomization" "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.annotations."homelab.wahoo.li/base-helmrelease"')
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
                 echo "We have error - finding base helmreleases failed for tenant \"$tenant\"!"
@@ -262,8 +263,8 @@ for file in $FILES; do
                 # break whole loop if base helmrelease could not be determined
                 break
             fi
-            tenant_kustomization_path=$(yq -r ".spec.path" $kustomization_file)
-            helmreleases=$(find_helmrelease_name $tenant_kustomization_path $kustomization $kustomization_file 'select(.kind == "HelmRelease" and .metadata.annotations."homelab.wahoo.li/base-helmrelease" == "'$base_helmrelease'") | .metadata.name')
+            tenant_kustomization_path=$(yq -r ".spec.path" "$kustomization_file")
+            helmreleases=$(find_helmrelease_name "$tenant_kustomization_path" "$kustomization" "$kustomization_file" 'select(.kind == "HelmRelease" and .metadata.annotations."homelab.wahoo.li/base-helmrelease" == "'"$base_helmrelease"'") | .metadata.name')
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
                 echo "We have error - finding tenant helmreleases failed for tenant \"$tenant\"!"
@@ -275,13 +276,13 @@ for file in $FILES; do
                 # skip this tenant if helmreleases could not be determined
                 continue
             fi
-            add_helmreleases_for_tenant $tenant "${helmreleases[*]}"
+            add_helmreleases_for_tenant "$tenant" "${helmreleases[*]}"
             msg "Tenant: $tenant, Added helmreleases: ${helmreleases[*]}"
-        done
+        done < <(find "$kustomization" -mindepth 1 -maxdepth 1 -type d \( ! -name 'base' \) "${find_args[@]}" -printf '%f\n')
     else
         kustomization_file=$(find_kustomization_file "$tenant" "$kustomization")
         if [[ -f $kustomization_file ]]; then
-            helmreleases=($(find_helmrelease_name "$file" "$kustomization" "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.name'))
+            mapfile -t helmreleases < <(find_helmrelease_name "$file" "$kustomization" "$kustomization_file" 'select(.kind == "HelmRelease") | .metadata.name')
             exit_status=$?
             if [ ${exit_status} -ne 0 ]; then
                 echo "We have error - finding tenant helmreleases failed for tenant \"$tenant\"!"
@@ -289,7 +290,7 @@ for file in $FILES; do
             fi
             helmreleases=( "${helmreleases[@]/---}" )
             if [ -n "${helmreleases[*]}" ]; then
-                add_helmreleases_for_tenant $tenant "${helmreleases[*]}"
+                add_helmreleases_for_tenant "$tenant" "${helmreleases[*]}"
                 msg "Tenant: $tenant, Added helmreleases: ${helmreleases[*]}"
             fi
         fi
@@ -299,13 +300,13 @@ for file in $FILES; do
 done
 IFS=$ORIG_IFS
 
-if [[ "github_json" == $OUTPUT_MODE ]]; then
+if [[ "github_json" == "$OUTPUT_MODE" ]]; then
     helmreleases_out="["
     for key in "${!HELM_RELEASES[@]}"; do
         releases_unique=$(echo "${HELM_RELEASES[$key]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
         releases_unique=${releases_unique## }
         releases_unique=${releases_unique%% }
-        flux_version=$(get_cluster_flux_version $key)
+        flux_version=$(get_cluster_flux_version "$key")
         helmreleases_out+="{\"tenant\": \"$key\", \"flux_version\": \"$flux_version\", \"helmreleases\": [\""
         helmreleases_out+=${releases_unique// /'", "'}
         helmreleases_out+="\"]}, "
@@ -314,8 +315,8 @@ if [[ "github_json" == $OUTPUT_MODE ]]; then
     helmreleases_out+="]"
 
     echo "test_matrix=$helmreleases_out" >> "$GITHUB_OUTPUT"
-    
-elif [[ "pr_description" == $OUTPUT_MODE ]]; then
+
+elif [[ "pr_description" == "$OUTPUT_MODE" ]]; then
     affected_helmreleases=()
     for key in "${!HELM_RELEASES[@]}"; do
         affected_helmreleases+=("### Tenant: $key")
@@ -331,18 +332,22 @@ elif [[ "pr_description" == $OUTPUT_MODE ]]; then
     fi
 
     IFS=$'\n'
-    git_log=$(git log origin/${HEAD_BRANCH}..${SOURCE_BRANCH} --format="%B")
+    git_log=$(git log "origin/${HEAD_BRANCH}..${SOURCE_BRANCH}" --format="%B")
     changed_images=()
     parsing_images=false
-    debug ${git_log[*]}
+    debug "${git_log[*]}"
     for line in $git_log; do
         if [ -f "$line" ]; then
             parsing_images=false
-        elif [[ "Images:" == $line ]]; then
+        elif [[ "Images:" == "$line" ]]; then
             parsing_images=true
         elif [ "$parsing_images" = true ]; then
             # if line starts with dash, images are being parsed from commit message
-            [[ $line = -* ]] && changed_images+=($line)|| parsing_images=false  
+            if [[ $line = -* ]]; then
+                changed_images+=("$line")
+            else
+                parsing_images=false
+            fi
         fi
     done
 
@@ -351,10 +356,10 @@ elif [[ "pr_description" == $OUTPUT_MODE ]]; then
         printf '%s\n' "${changed_images[@]}"
         echo ""
     fi
-    
+
     IFS=$'\n '
     echo "## Changed files"
-    for file in $FILES; do 
+    for file in $FILES; do
         echo "- $file"
     done
 fi

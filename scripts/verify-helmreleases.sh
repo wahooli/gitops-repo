@@ -45,7 +45,7 @@ if [[ -z "$HELM_RELEASES" ]]; then
   echo "Discovering HelmReleases for cluster: $CLUSTER_NAME"
   DISCOVERED=()
 
-  for file in $(cd "$REPO_ROOT/clusters/${CLUSTER_NAME}" && ls -dv1 * 2>/dev/null); do
+  for file in $(cd "$REPO_ROOT/clusters/${CLUSTER_NAME}" && ls -dv1 -- * 2>/dev/null); do
     kustomization_file="$REPO_ROOT/clusters/${CLUSTER_NAME}/${file}"
     [[ -f "$kustomization_file" ]] || continue
 
@@ -107,7 +107,9 @@ expand_deps() {
   [[ -z "${hr_ready[$hr]:-}" ]] && return  # doesn't exist in cluster
   to_process[$hr]=1
   for dep in ${hr_deps[$hr]}; do
-    [[ "${hr_ready[$dep]:-}" != "True" ]] && expand_deps "$dep"
+    if [[ "${hr_ready[$dep]:-}" != "True" ]]; then
+      expand_deps "$dep"
+    fi
   done
 }
 
@@ -125,7 +127,9 @@ done
 # Pre-mark ready HRs as completed (unless they're targets being re-reconciled)
 declare -A completed=()
 for name in "${all_hr_names[@]}"; do
-  [[ "${hr_ready[$name]}" == "True" && -z "${to_process[$name]:-}" ]] && completed[$name]=1
+  if [[ "${hr_ready[$name]}" == "True" && -z "${to_process[$name]:-}" ]]; then
+    completed[$name]=1
+  fi
 done
 
 ready_count=${#completed[@]}
@@ -217,7 +221,9 @@ while [[ $processed -lt $process_count ]]; do
       deps_met=false
       break
     done
-    $deps_met && wave+=("$hr")
+    if $deps_met; then
+      wave+=("$hr")
+    fi
   done
 
   if [[ ${#wave[@]} -eq 0 ]]; then

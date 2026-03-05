@@ -20,14 +20,17 @@ group() {
   fi
 }
 
+# shellcheck disable=SC2016
 unhealthy_pod_filter='$4 != "Running" && $4 != "Completed" && $4 != "Succeeded"'
 
 # ── 1. Failure Summary ──────────────────────────────────────────────
 
 # flux get columns (tab-separated): NAMESPACE NAME REVISION SUSPENDED READY MESSAGE
+# shellcheck disable=SC2016
 group "Failure Summary: Flux Kustomizations" \
   bash -c 'flux get kustomization -A 2>/dev/null | awk -F"\t" "NR==1 || \$5 ~ /False/" || echo "All kustomizations ready"'
 
+# shellcheck disable=SC2016
 group "Failure Summary: HelmReleases" \
   bash -c 'flux get helmrelease -A 2>/dev/null | awk -F"\t" "NR==1 || (\$5 ~ /False/ && \$6 !~ /waiting to be reconciled/)" || echo "All HelmReleases ready"'
 

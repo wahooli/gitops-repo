@@ -82,7 +82,11 @@ if [[ -f "$CONTAINERS_CONFIG" ]]; then
   for i in $(seq 0 $((CONTAINER_COUNT - 1))); do
     CONTAINER_NAME=$(yq -r ".[$i].name" "$CONTAINERS_CONFIG")
     CONTAINER_IMAGE=$(yq -r ".[$i].image" "$CONTAINERS_CONFIG")
-    CONTAINER_ARGS=$(yq -r ".[$i].args // \"\"" "$CONTAINERS_CONFIG")
+    CONTAINER_ARGS_STR=$(yq -r ".[$i].args // \"\"" "$CONTAINERS_CONFIG")
+    CONTAINER_ARGS_ARR=()
+    if [[ -n "$CONTAINER_ARGS_STR" ]]; then
+      read -ra CONTAINER_ARGS_ARR <<< "$CONTAINER_ARGS_STR"
+    fi
 
     # Build network alias flags
     ALIAS_ARGS=()
@@ -102,7 +106,7 @@ if [[ -f "$CONTAINERS_CONFIG" ]]; then
       docker run -d --name "$CONTAINER_NAME" \
         --network "$DOCKER_NETWORK" \
         "${ALIAS_ARGS[@]}" \
-        $CONTAINER_ARGS \
+        "${CONTAINER_ARGS_ARR[@]}" \
         "$CONTAINER_IMAGE"
     fi
   done

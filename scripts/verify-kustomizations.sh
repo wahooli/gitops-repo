@@ -54,11 +54,16 @@ build_kustomization() {
   local namespace="$3"
 
   echo -n "flux build kustomization $name"
-  flux build kustomization "$name" \
+  if flux build kustomization "$name" \
     -n "$namespace" \
     --kustomization-file "$file" \
     --path "$REPO_ROOT/$(yq -r '.spec.path' "$file" | sed 's|^\./||')" \
-    "${CONTEXT_ARGS[@]}" > /dev/null && echo ": success!" || { echo ": failure!"; return 1; }
+    "${CONTEXT_ARGS[@]}" > /dev/null; then
+    echo ": success!"
+  else
+    echo ": failure!"
+    return 1
+  fi
 }
 
 reconcile_kustomization() {
@@ -150,7 +155,7 @@ else
   declare -A ks_file ks_ns ks_deps
   all_ks=()
 
-  for file in $(cd "$REPO_ROOT/clusters/${CLUSTER_NAME}" && ls -dv1 * 2>/dev/null); do
+  for file in $(cd "$REPO_ROOT/clusters/${CLUSTER_NAME}" && ls -dv1 -- * 2>/dev/null); do
     kustomization_file="$REPO_ROOT/clusters/${CLUSTER_NAME}/${file}"
     [[ -f "$kustomization_file" ]] || continue
 
@@ -178,7 +183,9 @@ else
           break
         fi
       done
-      $deps_met && wave+=("$ks")
+      if $deps_met; then
+        wave+=("$ks")
+      fi
     done
 
     if [[ ${#wave[@]} -eq 0 ]]; then
