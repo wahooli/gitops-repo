@@ -10,8 +10,8 @@ spec:
   - name: internal-gw
     sectionName: internal-absolutistit-http
   hostnames:
-  - "*.absolutist.it"
-  - "*.wahoo.li"
+  - "*.${domain_absolutist_it:=absolutist.it}"
+  - "*.${domain_wahoo_li:=wahoo.li}"
   rules:
   - filters:
     - type: RequestRedirect

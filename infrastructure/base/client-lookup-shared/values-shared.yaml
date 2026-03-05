@@ -32,6 +32,7 @@ securityContext:
 servers:
 - zones:
   - zone: .
+    use_tcp: true
   port: 53
   plugins:
   # - name: log

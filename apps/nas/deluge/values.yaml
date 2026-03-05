@@ -75,11 +75,11 @@ ingress:
       ingress: internal
       velero.io/exclude-from-backup: "true"
     hosts:
-    - host: deluge.wahoo.li
+    - host: deluge.${domain_wahoo_li:=wahoo.li}
       paths:
       - path: "/"
         pathType: "Prefix"
     tls:
     - secretName: tls-deluge-ingress
       hosts:
-      - deluge.wahoo.li
+      - deluge.${domain_wahoo_li:=wahoo.li}

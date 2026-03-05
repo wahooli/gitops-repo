@@ -4,14 +4,14 @@ metadata:
   name: transmission-old
   namespace: default
   annotations:
-    external-dns.alpha.kubernetes.io/target: gw.nas.absolutist.it
+    external-dns.alpha.kubernetes.io/target: gw.nas.${domain_absolutist_it:=absolutist.it}
 spec:
   parentRefs:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "transmission-old.absolutist.it"
-  - "transmission-old.wahoo.li"
+  - "transmission-old.${domain_absolutist_it:=absolutist.it}"
+  - "transmission-old.${domain_wahoo_li:=wahoo.li}"
   rules:
   - backendRefs:
     - name: transmission-old

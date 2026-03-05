@@ -8,8 +8,8 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "paperless.wahoo.li"
-  - "paperless.absolutist.it"
+  - "paperless.${domain_wahoo_li:=wahoo.li}"
+  - "paperless.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: paperless-ngx

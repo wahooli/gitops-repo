@@ -8,8 +8,8 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "vault.absolutist.it"
-  - "vault.wahoo.li"
+  - "vault.${domain_absolutist_it:=absolutist.it}"
+  - "vault.${domain_wahoo_li:=wahoo.li}"
   rules:
   - backendRefs:
     - name: vaultwarden

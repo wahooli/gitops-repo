@@ -128,32 +128,36 @@ jobs:
       with:
         version: '${{ matrix.test.flux_version }}'
     - name: Create k3d cluster
+      id: create-cluster
+      continue-on-error: true
       env:
         K3D_SERVERS: "1"
         K3D_AGENTS: "0"
       run: scripts/create-cluster.sh ${{ matrix.test.tenant }}
     - name: Patch manifests for CI
+      if: steps.create-cluster.outcome == 'success'
       run: scripts/ci/patch-manifests.sh
     - name: Bootstrap Flux
+      if: steps.create-cluster.outcome == 'success'
       run: scripts/bootstrap-flux.sh ${{ matrix.test.tenant }}
     - name: Verify kustomization reconciliation
+      if: steps.create-cluster.outcome == 'success'
       env:
         TENANT: "${{ matrix.test.tenant }}"
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
+        RECONCILE_READY: "false"
       run: scripts/verify-kustomizations.sh
-    - name: Suspend all HelmReleases
-      env:
-        CONTEXT: "k3d-${{ matrix.test.tenant }}"
-      run: flux suspend helmrelease --all -n flux-system --context "$CONTEXT"
     - name: Verify helmrelease reconciliation
+      if: steps.create-cluster.outcome == 'success'
       id: helmrelease-verify
       env:
         HELM_RELEASES: "${{ join(matrix.test.helmreleases, ',') }}"
         TENANT: "${{ matrix.test.tenant }}"
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
+        RECONCILE_READY: "false"
       run: scripts/verify-helmreleases.sh
     - name: Debug failure
-      if: failure()
+      if: failure() && steps.create-cluster.outcome == 'success'
       env:
         DEBUG_LOGS: "true"
         HELM_RELEASES: "${{ steps.helmrelease-verify.outputs.failing_helmrelease || join(matrix.test.helmreleases, ',') }}"

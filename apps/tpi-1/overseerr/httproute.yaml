@@ -8,8 +8,8 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "overseerr.absolutist.it"
-  - "overseerr.wahoo.li"
+  - "overseerr.${domain_absolutist_it:=absolutist.it}"
+  - "overseerr.${domain_wahoo_li:=wahoo.li}"
   rules:
   - backendRefs:
     - name: overseerr

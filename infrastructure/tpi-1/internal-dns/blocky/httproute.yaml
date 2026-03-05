@@ -8,8 +8,8 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "blocky-api.wahoo.li"
-  - "blocky-api.absolutist.it"
+  - "blocky-api.${domain_wahoo_li:=wahoo.li}"
+  - "blocky-api.${domain_absolutist_it:=absolutist.it}"
   rules:
   - matches:
     - path:

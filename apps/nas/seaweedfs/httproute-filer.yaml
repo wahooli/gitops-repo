@@ -8,8 +8,8 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "seaweedfs.wahoo.li"
-  - "seaweedfs.absolutist.it"
+  - "seaweedfs.${domain_wahoo_li:=wahoo.li}"
+  - "seaweedfs.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: seaweedfs-filer

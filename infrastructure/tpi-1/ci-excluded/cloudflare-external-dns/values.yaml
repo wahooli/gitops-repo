@@ -1,6 +1,6 @@
 logFormat: json
 domainFilters:
-- wahoo.li
+- ${domain_wahoo_li:=wahoo.li}
 sources:
 - ingress
 provider:

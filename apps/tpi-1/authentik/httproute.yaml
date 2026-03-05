@@ -8,10 +8,10 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "auth.wahoo.li"
-  - "auth.absolutist.it"
-  - "authentik.wahoo.li"
-  - "authentik.absolutist.it"
+  - "auth.${domain_wahoo_li:=wahoo.li}"
+  - "auth.${domain_absolutist_it:=absolutist.it}"
+  - "authentik.${domain_wahoo_li:=wahoo.li}"
+  - "authentik.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: authentik-server

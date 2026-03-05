@@ -12,11 +12,7 @@ CLUSTER_NAME="${TENANT:-${1:-}}"
 HELM_RELEASES="${HELM_RELEASES:-${2:-}}"
 HELMRELEASE_NAMESPACE="${HELMRELEASE_NAMESPACE:-flux-system}"
 HELMRELEASE_TIMEOUT="${HELMRELEASE_TIMEOUT:-4m}"
-RECONCILED=()
-RECONCILED_SOURCES=()
-RECONCILED_CHARTS=()
-OCI_SOURCES=()
-ORIG_IFS=$IFS
+RECONCILE_READY="${RECONCILE_READY:-true}"
 
 # Optional context override (Makefile sets CONTEXT=k3d-<cluster>; CI uses default)
 CONTEXT_ARGS=()
@@ -49,7 +45,7 @@ if [[ -z "$HELM_RELEASES" ]]; then
   echo "Discovering HelmReleases for cluster: $CLUSTER_NAME"
   DISCOVERED=()
 
-  for file in $(cd "$REPO_ROOT/clusters/${CLUSTER_NAME}" && ls -dv1 * 2>/dev/null); do
+  for file in $(cd "$REPO_ROOT/clusters/${CLUSTER_NAME}" && ls -dv1 -- * 2>/dev/null); do
     kustomization_file="$REPO_ROOT/clusters/${CLUSTER_NAME}/${file}"
     [[ -f "$kustomization_file" ]] || continue
 
@@ -69,7 +65,6 @@ if [[ -z "$HELM_RELEASES" ]]; then
       | yq -N 'select(.kind == "HelmRelease") | .metadata.name' 2>/dev/null || true)
 
     for release in $releases; do
-      # Deduplicate
       if [[ ! " ${DISCOVERED[*]:-} " =~ [[:space:]]${release}[[:space:]] ]]; then
         DISCOVERED+=("$release")
       fi
@@ -85,161 +80,214 @@ if [[ -z "$HELM_RELEASES" ]]; then
   echo "Found HelmReleases: $HELM_RELEASES"
 fi
 
-# --- Reconciliation ---
-fail() {
-  local helmrelease=$1
-  local message=${2:-}
-  if [[ -n "$message" ]]; then
-    echo "$message" >&2
-  fi
-  if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-    echo "failing_helmrelease=$helmrelease" >> "$GITHUB_OUTPUT"
-  fi
-  exit 1
+# --- Fetch all HelmRelease data from cluster ---
+declare -A hr_deps=() hr_source=() hr_ready=()
+all_hr_names=()
+
+while IFS='|' read -r name deps source ready; do
+  [[ -z "$name" ]] && continue
+  all_hr_names+=("$name")
+  hr_deps[$name]="$deps"
+  hr_source[$name]="$source"
+  hr_ready[$name]="$ready"
+done < <(kubectl "${CONTEXT_ARGS[@]}" get helmrelease -n "$HELMRELEASE_NAMESPACE" -o json 2>/dev/null \
+  | jq -r '.items[] | [
+      .metadata.name,
+      ([.spec.dependsOn[]?.name] | join(" ")),
+      (.spec.chart.spec.sourceRef.name // ""),
+      ((.status.conditions // []) | map(select(.type == "Ready")) | .[0].status // "Unknown")
+    ] | join("|")')
+
+# --- Build processing set: targets + transitive unready deps ---
+declare -A to_process=()
+
+expand_deps() {
+  local hr="$1"
+  [[ -n "${to_process[$hr]:-}" ]] && return
+  [[ -z "${hr_ready[$hr]:-}" ]] && return  # doesn't exist in cluster
+  to_process[$hr]=1
+  for dep in ${hr_deps[$hr]}; do
+    if [[ "${hr_ready[$dep]:-}" != "True" ]]; then
+      expand_deps "$dep"
+    fi
+  done
 }
 
-reconcile() {
-  local helmrelease=$1
-
-  # Check helmrelease exists in cluster
-  local check_exists
-  check_exists=$(flux get helmrelease "$helmrelease" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true)
-
-  if [[ -n "$check_exists" ]]; then
-    # Resolve dependencies
-    local dependencies
-    dependencies=$(kubectl "${CONTEXT_ARGS[@]}" get -n "$HELMRELEASE_NAMESPACE" helmrelease/"$helmrelease" -o yaml \
-      | yq -e -r '[ .spec.dependsOn[].name ] | join(",")' 2>/dev/null || true)
-
-    if [[ -n "$dependencies" ]]; then
-      echo "  Resolving dependencies: $dependencies"
-      IFS=","
-      for dependency in $dependencies; do
-        reconcile "$dependency"
-      done
-      # Ensure all dependencies are currently ready before proceeding
-      IFS=","
-      for dependency in $dependencies; do
-        kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" \
-          wait helmrelease/"$dependency" \
-          --for=condition=ready \
-          --timeout="${HELMRELEASE_TIMEOUT}" >/dev/null 2>&1 || true
-      done
-    fi
-
-    IFS=$ORIG_IFS
-    # Resume helmrelease if suspended (no-op if not suspended)
-    flux resume helmrelease "$helmrelease" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true
-
-    if [[ " ${RECONCILED[*]:-} " =~ [[:space:]]${helmrelease}[[:space:]] ]]; then
-      echo "  $helmrelease: previously reconciled, skipping"
-    else
-      IFS=","
-
-      # Get helmrelease details for source/chart reconciliation
-      local hr_yaml
-      hr_yaml=$(kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" get helmrelease/"$helmrelease" -o yaml 2>/dev/null)
-
-      # Reconcile HelmRepository source if not already done
-      local source_name
-      source_name=$(echo "$hr_yaml" | yq -r '.spec.chart.spec.sourceRef.name' 2>/dev/null || true)
-      if [[ -n "$source_name" && "$source_name" != "null" ]] && \
-         [[ ! " ${RECONCILED_SOURCES[*]:-} " =~ [[:space:]]${source_name}[[:space:]] ]]; then
-        echo "  Reconciling source: $source_name"
-        local source_output
-        source_output=$(flux reconcile source helm "$source_name" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>&1) || true
-        RECONCILED_SOURCES+=("$source_name")
-        if [[ "$source_output" == *"not supported"* ]]; then
-          OCI_SOURCES+=("$source_name")
-        fi
-      fi
-
-      # Reconcile HelmChart if not already done, or always if source is OCI
-      local chart_name="${HELMRELEASE_NAMESPACE}-${helmrelease}"
-      local oci_source=0
-      [[ " ${OCI_SOURCES[*]:-} " =~ [[:space:]]${source_name}[[:space:]] ]] && oci_source=1
-
-      if [[ ! " ${RECONCILED_CHARTS[*]:-} " =~ [[:space:]]${chart_name}[[:space:]] ]] || [[ "$oci_source" -eq 1 ]]; then
-        local chart_ready
-        chart_ready=$(flux get source chart "$chart_name" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null | awk '{print tolower($4)}')
-        if [[ "$chart_ready" != "true" || "$oci_source" -eq 1 ]]; then
-          echo "  Reconciling chart: $chart_name"
-          flux reconcile source chart "$chart_name" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}"
-        fi
-        RECONCILED_CHARTS+=("$chart_name")
-      fi
-
-      # Check if already ready (may have become ready since script start)
-      local ready_status
-      ready_status=$(flux get helmrelease "$helmrelease" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null | awk '{print tolower($4)}')
-      if [[ "$ready_status" == "true" ]]; then
-        RECONCILED+=("$helmrelease")
-        echo "  $helmrelease: already ready, skipping"
-      elif [[ "$ready_status" == "unknown" ]]; then
-        echo "  $helmrelease: status unknown, waiting for ready condition..."
-        kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" \
-          wait helmrelease/"$helmrelease" \
-          --for=condition=ready \
-          --timeout="${HELMRELEASE_TIMEOUT}" \
-          || fail "$helmrelease" "Failed ready condition for helmrelease: $helmrelease"
-        RECONCILED+=("$helmrelease")
-        echo "  $helmrelease: OK"
-      else
-        echo "  Reconciling $helmrelease..."
-        if ! flux reconcile helmrelease "$helmrelease" \
-          -n "$HELMRELEASE_NAMESPACE" \
-          --timeout="${HELMRELEASE_TIMEOUT}" \
-          "${CONTEXT_ARGS[@]}"; then
-          # Reconcile command failed — check if the release is actually ready
-          local post_ready
-          post_ready=$(flux get helmrelease "$helmrelease" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null | awk '{print tolower($4)}')
-          if [[ "$post_ready" != "true" ]]; then
-            fail "$helmrelease" "Failed reconciling helmrelease: $helmrelease"
-          fi
-          echo "  $helmrelease: reconcile command failed but release is ready"
-        fi
-
-        kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" \
-          wait helmrelease/"$helmrelease" \
-          --for=condition=ready \
-          --timeout="${HELMRELEASE_TIMEOUT}" \
-          || fail "$helmrelease" "Failed ready condition for helmrelease: $helmrelease"
-
-        RECONCILED+=("$helmrelease")
-        echo "  $helmrelease: OK"
-      fi
-    fi
-    IFS=","
-  else
-    echo "  $helmrelease: doesn't exist in cluster, skipping"
+IFS="," read -ra targets <<< "$HELM_RELEASES"
+for hr in "${targets[@]}"; do
+  if [[ -z "${hr_ready[$hr]:-}" ]]; then
+    echo "  $hr: doesn't exist in cluster, skipping"
+  elif [[ "$RECONCILE_READY" == "true" ]]; then
+    to_process[$hr]=1
+  elif [[ "${hr_ready[$hr]}" != "True" ]]; then
+    expand_deps "$hr"
   fi
-}
+done
 
-# Prepopulate RECONCILED with already-ready HelmReleases
-while IFS= read -r ready_release; do
-  [[ -n "$ready_release" ]] && RECONCILED+=("$ready_release")
-done < <(flux get helmrelease -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null \
-  | awk 'tolower($4) == "true" { print $1 }')
+# Pre-mark ready HRs as completed (unless they're targets being re-reconciled)
+declare -A completed=()
+for name in "${all_hr_names[@]}"; do
+  if [[ "${hr_ready[$name]}" == "True" && -z "${to_process[$name]:-}" ]]; then
+    completed[$name]=1
+  fi
+done
 
-# Prepopulate RECONCILED_CHARTS with already-ready HelmCharts
-while IFS= read -r ready_chart; do
-  [[ -n "$ready_chart" ]] && RECONCILED_CHARTS+=("$ready_chart")
-done < <(flux get source chart -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null \
-  | awk 'tolower($4) == "true" { print $1 }')
+ready_count=${#completed[@]}
+process_count=${#to_process[@]}
+echo "Already ready: $ready_count HelmReleases, to process: $process_count"
 
-if [[ ${#RECONCILED[@]} -gt 0 ]]; then
-  echo "Already reconciled: ${#RECONCILED[@]} HelmReleases, ${#RECONCILED_CHARTS[@]} HelmCharts"
+if [[ $process_count -eq 0 ]]; then
+  echo "All target HelmReleases are ready."
+  exit 0
 fi
 
-IFS=","
-for helmrelease in $HELM_RELEASES; do
-  group_start "HelmRelease $helmrelease"
-  reconcile "$helmrelease"
-  group_end
+# --- Per-HelmRelease reconciliation (runs in subshell for parallel waves) ---
+reconcile_helmrelease() {
+  local hr="$1"
+
+  # Resume if suspended
+  flux resume helmrelease "$hr" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true
+
+  # Reconcile source if not ready
+  local source="${hr_source[$hr]}"
+  if [[ -n "$source" && "$source" != "null" ]]; then
+    local source_ready
+    source_ready=$(flux get source helm "$source" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null | awk '{print tolower($4)}')
+    if [[ "$source_ready" != "true" ]]; then
+      echo "  Reconciling source: $source"
+      flux reconcile source helm "$source" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true
+    fi
+  fi
+
+  # Reconcile chart if not ready
+  local chart_name="${HELMRELEASE_NAMESPACE}-${hr}"
+  local chart_ready
+  chart_ready=$(flux get source chart "$chart_name" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null | awk '{print tolower($4)}')
+  if [[ "$chart_ready" != "true" ]]; then
+    echo "  Reconciling chart: $chart_name"
+    flux reconcile source chart "$chart_name" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true
+  fi
+
+  # Check current ready status
+  local ready_status
+  ready_status=$(flux get helmrelease "$hr" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null \
+    | awk '{print tolower($4)}')
+
+  if [[ "$ready_status" == "true" && "$RECONCILE_READY" != "true" ]]; then
+    echo "  $hr: already ready"
+  elif [[ "$ready_status" == "unknown" ]]; then
+    echo "  $hr: status unknown, waiting..."
+    kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" \
+      wait helmrelease/"$hr" \
+      --for=condition=ready \
+      --timeout="${HELMRELEASE_TIMEOUT}" || return 1
+    echo "  $hr: OK"
+  else
+    echo "  Reconciling $hr..."
+    if ! flux reconcile helmrelease "$hr" \
+      -n "$HELMRELEASE_NAMESPACE" \
+      --timeout="${HELMRELEASE_TIMEOUT}" \
+      "${CONTEXT_ARGS[@]}"; then
+      # Reconcile command failed — check if the release is actually ready
+      local post_ready
+      post_ready=$(flux get helmrelease "$hr" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null \
+        | awk '{print tolower($4)}')
+      if [[ "$post_ready" != "true" ]]; then
+        echo "  Failed reconciling helmrelease: $hr" >&2
+        return 1
+      fi
+      echo "  $hr: reconcile command failed but release is ready"
+    fi
+
+    kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" \
+      wait helmrelease/"$hr" \
+      --for=condition=ready \
+      --timeout="${HELMRELEASE_TIMEOUT}" || return 1
+    echo "  $hr: OK"
+  fi
+}
+
+# --- Process in dependency waves ---
+processed=0
+
+while [[ $processed -lt $process_count ]]; do
+  wave=()
+  for hr in "${!to_process[@]}"; do
+    [[ -n "${completed[$hr]:-}" ]] && continue
+    deps_met=true
+    for dep in ${hr_deps[$hr]}; do
+      # Dep is met if: completed, or not in cluster (external/missing)
+      [[ -n "${completed[$dep]:-}" || -z "${hr_ready[$dep]:-}" ]] && continue
+      deps_met=false
+      break
+    done
+    if $deps_met; then
+      wave+=("$hr")
+    fi
+  done
+
+  if [[ ${#wave[@]} -eq 0 ]]; then
+    echo "Error: circular dependencies among remaining HelmReleases"
+    exit 1
+  fi
+
+  # Sort wave for deterministic output
+  mapfile -t wave < <(printf '%s\n' "${wave[@]}" | sort)
+
+  echo ""
+  echo "Wave [${wave[*]}] (${#wave[@]} HelmReleases)"
+
+  if [[ ${#wave[@]} -eq 1 ]]; then
+    # Single HR — run directly
+    hr="${wave[0]}"
+    group_start "HelmRelease $hr"
+    if ! reconcile_helmrelease "$hr"; then
+      group_end
+      [[ -n "${GITHUB_OUTPUT:-}" ]] && echo "failing_helmrelease=$hr" >> "$GITHUB_OUTPUT"
+      exit 1
+    fi
+    group_end
+    completed[$hr]=1
+    ((++processed))
+  else
+    # Parallel reconciliation with captured output
+    tmpdir=$(mktemp -d)
+    wave_pids=()
+
+    for hr in "${wave[@]}"; do
+      (
+        group_start "HelmRelease $hr"
+        reconcile_helmrelease "$hr"
+        group_end
+      ) > "$tmpdir/$hr.log" 2>&1 &
+      wave_pids+=($!)
+    done
+
+    # Wait for all and collect results
+    wave_failed=""
+    for i in "${!wave_pids[@]}"; do
+      if ! wait "${wave_pids[$i]}"; then
+        [[ -z "$wave_failed" ]] && wave_failed="${wave[$i]}"
+      fi
+    done
+
+    # Print captured output sequentially
+    for hr in "${wave[@]}"; do
+      cat "$tmpdir/$hr.log"
+      completed[$hr]=1
+      ((++processed))
+    done
+
+    rm -rf "$tmpdir"
+
+    if [[ -n "$wave_failed" ]]; then
+      [[ -n "${GITHUB_OUTPUT:-}" ]] && echo "failing_helmrelease=$wave_failed" >> "$GITHUB_OUTPUT"
+      exit 1
+    fi
+  fi
 done
-IFS=$ORIG_IFS
 
 echo ""
-echo "HelmRelease verification complete. (${#RECONCILED[@]} reconciled)"
+echo "HelmRelease verification complete. ($process_count reconciled, $ready_count already ready)"
 
 exit 0

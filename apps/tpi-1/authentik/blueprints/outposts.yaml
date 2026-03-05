@@ -27,7 +27,7 @@ entries:
   state: present
   attrs:
     config:
-      authentik_host: https://auth.wahoo.li/
+      authentik_host: https://auth.${domain_wahoo_li:=wahoo.li}/
       authentik_host_browser: ''
       authentik_host_insecure: true
       container_image: null
@@ -66,7 +66,7 @@ entries:
   state: present
   attrs:
     config:
-      authentik_host: https://auth.wahoo.li/
+      authentik_host: https://auth.${domain_wahoo_li:=wahoo.li}/
       kubernetes_json_patches:
         deployment:
         - op: add

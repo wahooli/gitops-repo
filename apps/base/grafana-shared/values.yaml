@@ -16,13 +16,13 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: 25m
-    external-dns.alpha.kubernetes.io/target: gw.wahoo.li
+    external-dns.alpha.kubernetes.io/target: gw.${domain_wahoo_li:=wahoo.li}
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/custom-http-errors: "404"
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
   hosts:
-  - grafana.wahoo.li
+  - grafana.${domain_wahoo_li:=wahoo.li}
 dnsConfig:
   options:
   - name: ndots
@@ -39,8 +39,8 @@ grafana.ini:
   log.console:
     format: json
   server:
-    domain: grafana.wahoo.li
-    root_url: "https://grafana.wahoo.li/"
+    domain: grafana.${domain_wahoo_li:=wahoo.li}
+    root_url: "https://grafana.${domain_wahoo_li:=wahoo.li}/"
     serve_from_sub_path: false
   users:
     auto_assign_org: true
@@ -48,7 +48,7 @@ grafana.ini:
     default_theme: dark
   auth:
     disable_login_form: true
-    signout_redirect_url: "https://auth.wahoo.li/application/o/grafana/end-session/"
+    signout_redirect_url: "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/grafana/end-session/"
     oauth_auto_login: true
   auth.generic_oauth:
     name: authentik
@@ -57,9 +57,9 @@ grafana.ini:
     client_id: $__file{/etc/secrets/auth_generic_oauth/client_id}
     client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
     scopes: "openid profile email"
-    auth_url: "https://auth.wahoo.li/application/o/authorize/"
-    token_url: "https://auth.wahoo.li/application/o/token/"
-    api_url: "https://auth.wahoo.li/application/o/userinfo/"
+    auth_url: "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/authorize/"
+    token_url: "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/token/"
+    api_url: "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/userinfo/"
     # Optionally map user groups to Grafana roles
     role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || contains(groups, 'Grafana Viewers') &&  'Viewer' || 'None'
   plugins:

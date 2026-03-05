@@ -4,7 +4,7 @@ certificates:
       labels:
         velero.io/exclude-from-backup: "true"
     dnsNames:
-    - '*.wahoo.li'
+    - '*.${domain_wahoo_li:=wahoo.li}'
     issuerRef:
       kind: ClusterIssuer
       name: letsencrypt-production
@@ -18,7 +18,7 @@ service:
     externalTrafficPolicy: Local
     type: LoadBalancer
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: haproxy.nas.absolutist.it,haproxy.nas.wahoo.li
+      external-dns.alpha.kubernetes.io/hostname: haproxy.nas.${domain_absolutist_it:=absolutist.it},haproxy.nas.${domain_wahoo_li:=wahoo.li}
 podAnnotations:
   secret.reloader.stakater.com/reload: "haproxy-wildcard"
 configMaps:
@@ -44,7 +44,7 @@ configMaps:
         {{ include "haproxy.httpsRedirectFrontend" . }}
 
         frontend proxy_frontend
-            bind *:443 ssl crt /etc/haproxy/certs/wahoo.li.pem alpn h2,http/1.1
+            bind *:443 ssl crt /etc/haproxy/certs/${domain_wahoo_li:=wahoo.li}.pem alpn h2,http/1.1
             mode http
             option http-server-close
             option h1-case-adjust-bogus-client
@@ -54,7 +54,7 @@ configMaps:
             #http-request set-header X-Real-IP %[src]
             http-request set-header Host %[req.hdr(Host)]  # Forward Host header (important for SNI and routing)
             http-request set-header Origin %[req.hdr(Origin)]  # Forward Origin header (for security checks)
-            http-request set-header X-Proxy-Name "haproxy.nas.wahoo.li"
+            http-request set-header X-Proxy-Name "haproxy.nas.${domain_wahoo_li:=wahoo.li}"
             http-response set-header X-Content-Type-Options "nosniff"
             http-response set-header X-Frame-Options "DENY"
             http-response set-header Vary "Accept-Encoding" unless { res.hdr(vary) -m found }
@@ -100,7 +100,7 @@ initContainers:
     args:
     - |
       echo "Combining tls.key and tls.crt into a single .pem file...";
-      cat /mnt/secret/tls.key /mnt/secret/tls.crt > /mnt/certs/wahoo.li.pem;
+      cat /mnt/secret/tls.key /mnt/secret/tls.crt > /mnt/certs/${domain_wahoo_li:=wahoo.li}.pem;
       echo "Certificate prepared.";
     volumeMounts:
     - name: tls

@@ -27,7 +27,7 @@ spec:
       defaultMode: 0444
   extraArgs:
     loggerFormat: json
-    external.url: https://grafana.wahoo.li
+    external.url: https://grafana.${domain_wahoo_li:=wahoo.li}
     rule.templates: "/templates/*.tpl"
     external.alert.source: '{{ template "grafana.logsUrl" (args ($activeAt.Add (parseDurationTime (or $labels.timespan "1h"))).UnixMilli ($activeAt.Add (parseDurationTime (printf "-%s" (or $labels.timespan "1h")))).UnixMilli (.Expr|jsonEscape) $labels) }}'
   datasource:

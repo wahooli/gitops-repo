@@ -22,11 +22,11 @@ env:
         "APPS": [
           {
             "provider_id": "authentik",
-            "name": "auth.wahoo.li",
+            "name": "auth.${domain_wahoo_li:=wahoo.li}",
             "client_id": "${authentik_paperless_client_id}",
             "secret": "${authentik_paperless_client_secret}",
             "settings": {
-              "server_url": "https://auth.wahoo.li/application/o/paperless-ngx/.well-known/openid-configuration"
+              "server_url": "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/paperless-ngx/.well-known/openid-configuration"
             }
           }
         ],
@@ -117,12 +117,12 @@ ingress:
       ingress: internal
       velero.io/exclude-from-backup: "true"
     annotations:
-      external-dns.alpha.kubernetes.io/target: vm-nginx.absolutist.it
+      external-dns.alpha.kubernetes.io/target: vm-nginx.${domain_absolutist_it:=absolutist.it}
       # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: 25m
       cert-manager.io/cluster-issuer: letsencrypt-production
     hosts:
-    - host: paperless.wahoo.li
+    - host: paperless.${domain_wahoo_li:=wahoo.li}
       paths:
       - path: "/"
         pathType: "Prefix"
@@ -132,7 +132,7 @@ ingress:
           name: nginx-errors
           port:
             number: 80
-    - host: paperless.absolutist.it
+    - host: paperless.${domain_absolutist_it:=absolutist.it}
       paths:
       - path: "/"
         pathType: "Prefix"
@@ -145,5 +145,5 @@ ingress:
     tls:
     - secretName: tls-paperless-ingress
       hosts:
-      - paperless.wahoo.li
-      - paperless.absolutist.it
+      - paperless.${domain_wahoo_li:=wahoo.li}
+      - paperless.${domain_absolutist_it:=absolutist.it}

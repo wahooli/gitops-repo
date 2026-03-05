@@ -23,6 +23,6 @@ spec:
     name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
-  - s3.absolutist.it
-  - seaweedfs.absolutist.it
-  - master.seaweedfs.absolutist.it
+  - s3.${domain_absolutist_it:=absolutist.it}
+  - seaweedfs.${domain_absolutist_it:=absolutist.it}
+  - master.seaweedfs.${domain_absolutist_it:=absolutist.it}

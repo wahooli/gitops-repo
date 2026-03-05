@@ -15,6 +15,9 @@ OCI_REGISTRY_NAME="reg-oci"
 OCI_REGISTRY_PORT=5050
 
 IN_DEVCONTAINER="${IN_DEVCONTAINER:-false}"
+# Install Envoy Gateway as local Gateway API backend (set to 0 to skip)
+INSTALL_ENVOY_GATEWAY="${INSTALL_ENVOY_GATEWAY:-1}"
+ENVOY_GATEWAY_VERSION="${ENVOY_GATEWAY_VERSION:-v1.7.0}"
 # Optional overrides for k3d node counts (useful for CI with limited resources)
 K3D_SERVERS="${K3D_SERVERS:-}"
 K3D_AGENTS="${K3D_AGENTS:-}"
@@ -82,7 +85,11 @@ if [[ -f "$CONTAINERS_CONFIG" ]]; then
   for i in $(seq 0 $((CONTAINER_COUNT - 1))); do
     CONTAINER_NAME=$(yq -r ".[$i].name" "$CONTAINERS_CONFIG")
     CONTAINER_IMAGE=$(yq -r ".[$i].image" "$CONTAINERS_CONFIG")
-    CONTAINER_ARGS=$(yq -r ".[$i].args // \"\"" "$CONTAINERS_CONFIG")
+    CONTAINER_ARGS_STR=$(yq -r ".[$i].args // \"\"" "$CONTAINERS_CONFIG")
+    CONTAINER_ARGS_ARR=()
+    if [[ -n "$CONTAINER_ARGS_STR" ]]; then
+      read -ra CONTAINER_ARGS_ARR <<< "$CONTAINER_ARGS_STR"
+    fi
 
     # Build network alias flags
     ALIAS_ARGS=()
@@ -102,7 +109,7 @@ if [[ -f "$CONTAINERS_CONFIG" ]]; then
       docker run -d --name "$CONTAINER_NAME" \
         --network "$DOCKER_NETWORK" \
         "${ALIAS_ARGS[@]}" \
-        $CONTAINER_ARGS \
+        "${CONTAINER_ARGS_ARR[@]}" \
         "$CONTAINER_IMAGE"
     fi
   done
@@ -305,6 +312,28 @@ fi
 helm "${HELM_ARGS[@]}"
 
 echo "Cilium installed successfully in $CLUSTER_NAME"
+
+# Install Envoy Gateway as local Gateway API backend (avoids Cilium kubeProxyReplacement requirement)
+if [[ "${INSTALL_ENVOY_GATEWAY}" -eq 1 ]]; then
+  echo "Installing Envoy Gateway in cluster $CLUSTER_NAME"
+  helm upgrade --install eg oci://docker.io/envoyproxy/gateway-helm \
+    --version "$ENVOY_GATEWAY_VERSION" \
+    --namespace envoy-gateway-system --create-namespace \
+    --kube-context "$CONTEXT_NAME" \
+    --wait
+
+  # Create GatewayClass named "cilium" pointing to Envoy Gateway controller
+  kubectl --context "$CONTEXT_NAME" apply -f - <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: cilium
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+EOF
+
+  echo "Envoy Gateway installed successfully in $CLUSTER_NAME"
+fi
 
 kubectl --context "$CONTEXT_NAME" create -f "$REPO_ROOT/clusters/$CLUSTER_NAME/flux-system/gotk-components.yaml"
 

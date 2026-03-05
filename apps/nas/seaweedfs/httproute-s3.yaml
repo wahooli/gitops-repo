@@ -8,8 +8,8 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "s3.wahoo.li"
-  - "s3.absolutist.it"
+  - "s3.${domain_wahoo_li:=wahoo.li}"
+  - "s3.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: seaweedfs-s3

@@ -1,3 +1,6 @@
+cni:
+  exclusive: false
+defaultLBServiceIPAM: none
 localRedirectPolicy: true
 clustermesh:
   cacheTTL: 15m

@@ -18,4 +18,4 @@ spec:
     name: letsencrypt-production
     kind: ClusterIssuer
   dnsNames:
-  - ombi.wahoo.li
+  - ombi.${domain_wahoo_li:=wahoo.li}

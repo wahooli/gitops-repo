@@ -13,7 +13,7 @@ entries:
 - attrs:
     authentication: require_outpost
     designation: authentication
-    name: Welcome to auth.wahoo.li
+    name: Welcome to auth.${domain_wahoo_li:=wahoo.li}
     title: LDAP login
   identifiers:
     slug: ldap-login

@@ -8,8 +8,8 @@ spec:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "vm-write.wahoo.li"
-  - "vm-write.absolutist.it"
+  - "vm-write.${domain_wahoo_li:=wahoo.li}"
+  - "vm-write.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: vmauth-global-write

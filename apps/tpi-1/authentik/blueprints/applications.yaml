@@ -27,7 +27,7 @@ entries:
     access_token_validity: hours=24
     authentication_flow: !Find [authentik_flows.flow, [slug, login]]
     authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-    external_host: https://ombi.wahoo.li
+    external_host: https://ombi.${domain_wahoo_li:=wahoo.li}
     intercept_header_auth: true
     internal_host_ssl_validation: true
     mode: forward_single
@@ -43,7 +43,7 @@ entries:
   attrs:
     name: Ombi
     meta_description: Media request system
-    meta_launch_url: https://ombi.wahoo.li
+    meta_launch_url: https://ombi.${domain_wahoo_li:=wahoo.li}
     policy_engine_mode: any
     provider: !KeyOf ombi-provider
     icon: https://raw.githubusercontent.com/Ombi-app/Ombi/gh-pages/img/android-chrome-512x512.png
@@ -85,7 +85,7 @@ entries:
     access_token_validity: hours=24
     authentication_flow: !Find [authentik_flows.flow, [slug, login]]
     authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-    external_host: https://sonarr.wahoo.li
+    external_host: https://sonarr.${domain_wahoo_li:=wahoo.li}
     intercept_header_auth: true
     internal_host_ssl_validation: true
     mode: forward_single
@@ -99,7 +99,7 @@ entries:
   state: present
   attrs:
     name: Sonarr
-    meta_launch_url: https://sonarr.wahoo.li/
+    meta_launch_url: https://sonarr.${domain_wahoo_li:=wahoo.li}/
     policy_engine_mode: any
     provider: !KeyOf sonarr-provider
     icon: https://raw.githubusercontent.com/Sonarr/Sonarr/develop/Logo/512.png
@@ -132,7 +132,7 @@ entries:
     access_token_validity: hours=24
     authentication_flow: !Find [authentik_flows.flow, [slug, login]]
     authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-    external_host: https://bazarr.wahoo.li
+    external_host: https://bazarr.${domain_wahoo_li:=wahoo.li}
     intercept_header_auth: true
     internal_host_ssl_validation: true
     mode: forward_single
@@ -146,7 +146,7 @@ entries:
   state: present
   attrs:
     name: Bazarr
-    meta_launch_url: https://bazarr.wahoo.li/
+    meta_launch_url: https://bazarr.${domain_wahoo_li:=wahoo.li}/
     policy_engine_mode: any
     provider: !KeyOf bazarr-provider
     icon: https://raw.githubusercontent.com/morpheus65535/bazarr/master/frontend/public/images/logo128.png
@@ -179,7 +179,7 @@ entries:
     access_token_validity: hours=24
     authentication_flow: !Find [authentik_flows.flow, [slug, login]]
     authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-    external_host: https://radarr.wahoo.li
+    external_host: https://radarr.${domain_wahoo_li:=wahoo.li}
     intercept_header_auth: true
     internal_host_ssl_validation: true
     mode: forward_single
@@ -193,7 +193,7 @@ entries:
   state: present
   attrs:
     name: Radarr
-    meta_launch_url: https://radarr.wahoo.li/
+    meta_launch_url: https://radarr.${domain_wahoo_li:=wahoo.li}/
     policy_engine_mode: any
     provider: !KeyOf radarr-provider
     icon: https://raw.githubusercontent.com/Radarr/Radarr/develop/Logo/512.png
@@ -246,7 +246,7 @@ entries:
     - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
     - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-offline_access]]
     name: paperless-ngx-oauth2
-    redirect_uris: https://paperless.wahoo.li/accounts/oidc/authentik/login/callback/
+    redirect_uris: https://paperless.${domain_wahoo_li:=wahoo.li}/accounts/oidc/authentik/login/callback/
     refresh_token_validity: days=30
     signing_key: !KeyOf self-signed-cert
     sub_mode: user_username
@@ -258,7 +258,7 @@ entries:
 - model: authentik_core.application
   state: present
   attrs:
-    meta_launch_url: https://paperless.wahoo.li/accounts/oidc/authentik/login/?process=&next=%2F
+    meta_launch_url: https://paperless.${domain_wahoo_li:=wahoo.li}/accounts/oidc/authentik/login/?process=&next=%2F
     name: Paperless-ngx
     policy_engine_mode: any
     provider: !KeyOf paperless-ngx-provider
@@ -303,7 +303,7 @@ entries:
 
 - model: authentik_core.application
   attrs:
-    meta_launch_url: https://jellyfin.wahoo.li/
+    meta_launch_url: https://jellyfin.${domain_wahoo_li:=wahoo.li}/
     meta_description: Media streaming service. You need to set password for your account to login
     name: Jellyfin
     policy_engine_mode: any
@@ -332,7 +332,7 @@ entries:
     - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
     - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-offline_access]]
     name: overseerr-oauth2
-    redirect_uris: https://overseerr.wahoo.li/api/v1/auth/oidc-callback
+    redirect_uris: https://overseerr.${domain_wahoo_li:=wahoo.li}/api/v1/auth/oidc-callback
     refresh_token_validity: days=30
     signing_key: !KeyOf self-signed-cert
     sub_mode: user_username
@@ -345,7 +345,7 @@ entries:
   state: present
   attrs:
     meta_description: Media request system, like Ombi
-    meta_launch_url: https://overseerr.wahoo.li
+    meta_launch_url: https://overseerr.${domain_wahoo_li:=wahoo.li}
     name: Overseerr
     policy_engine_mode: any
     provider: !KeyOf overseerr-provider
@@ -391,7 +391,7 @@ entries:
     basic_auth_enabled: true
     basic_auth_password_attribute: tautulli_password
     basic_auth_user_attribute: tautulli_username
-    external_host: https://tautulli.wahoo.li
+    external_host: https://tautulli.${domain_wahoo_li:=wahoo.li}
     internal_host: http://tautulli:8181
     mode: proxy
     name: tautulli-proxy
@@ -405,7 +405,7 @@ entries:
   attrs:
     name: tautulli
     meta_description: Media request system
-    meta_launch_url: https://tautulli-admin.wahoo.li
+    meta_launch_url: https://tautulli-admin.${domain_wahoo_li:=wahoo.li}
     policy_engine_mode: any
     provider: !KeyOf tautulli-provider
     icon: https://raw.githubusercontent.com/Tautulli/tautulli.github.io/master/images/logo.png

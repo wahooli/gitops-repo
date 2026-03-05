@@ -13,8 +13,6 @@ if [[ -z "$CLUSTER_NAME" ]]; then
   exit 1
 fi
 
-K3D_CONFIG="$REPO_ROOT/local-clusters/$CLUSTER_NAME/k3d-config.yaml"
-
 # Delete the k3d cluster
 if k3d cluster get "$CLUSTER_NAME" >/dev/null 2>&1; then
   echo "Deleting cluster $CLUSTER_NAME..."

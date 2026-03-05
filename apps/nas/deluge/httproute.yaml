@@ -4,14 +4,14 @@ metadata:
   name: deluge
   namespace: default
   annotations:
-    external-dns.alpha.kubernetes.io/target: gw.nas.absolutist.it
+    external-dns.alpha.kubernetes.io/target: gw.nas.${domain_absolutist_it:=absolutist.it}
 spec:
   parentRefs:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "deluge.absolutist.it"
-  - "deluge.wahoo.li"
+  - "deluge.${domain_absolutist_it:=absolutist.it}"
+  - "deluge.${domain_wahoo_li:=wahoo.li}"
   rules:
   - backendRefs:
     - name: deluge

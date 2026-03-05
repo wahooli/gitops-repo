@@ -18,9 +18,9 @@ spec:
     name: ${certificate_cluster_issuer:=letsencrypt-production}
     kind: ClusterIssuer
   dnsNames:
-  - ns1.wahoo.li
-  - ns2.absolutist.it
-  - ns.wahoo.li
-  - ns.absolutist.it
-  - dns.wahoo.li
-  - dns.absolutist.it
+  - ns1.${domain_wahoo_li:=wahoo.li}
+  - ns2.${domain_absolutist_it:=absolutist.it}
+  - ns.${domain_wahoo_li:=wahoo.li}
+  - ns.${domain_absolutist_it:=absolutist.it}
+  - dns.${domain_wahoo_li:=wahoo.li}
+  - dns.${domain_absolutist_it:=absolutist.it}

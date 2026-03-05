@@ -4,13 +4,13 @@ metadata:
   name: bazarr
   namespace: default
   annotations:
-    external-dns.alpha.kubernetes.io/target: gw.nas.absolutist.it
+    external-dns.alpha.kubernetes.io/target: gw.nas.${domain_absolutist_it:=absolutist.it}
 spec:
   parentRefs:
   - name: internal-gw
     namespace: infrastructure
   hostnames:
-  - "bazarr.absolutist.it"
+  - "bazarr.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: bazarr

@@ -1,7 +1,7 @@
 logFormat: json
 domainFilters:
-- wahoo.li
-- absolutist.it
+- ${domain_wahoo_li:=wahoo.li}
+- ${domain_absolutist_it:=absolutist.it}
 - ${local_ip_reverse}
 - ${tpi_1_ip_reverse}
 sources:
@@ -19,8 +19,8 @@ extraArgs:
 - --annotation-filter=external-dns.alpha.kubernetes.io/exclude notin (true)
 - --rfc2136-port=53
 - --rfc2136-host=bind9-tpi-1.internal-dns.svc.cluster.local.
-- --rfc2136-zone=wahoo.li
-- --rfc2136-zone=absolutist.it
+- --rfc2136-zone=${domain_wahoo_li:=wahoo.li}
+- --rfc2136-zone=${domain_absolutist_it:=absolutist.it}
 - --rfc2136-zone=${local_ip_reverse}
 - --rfc2136-zone=${tpi_1_ip_reverse}
 - --rfc2136-tsig-secret-alg=hmac-sha256

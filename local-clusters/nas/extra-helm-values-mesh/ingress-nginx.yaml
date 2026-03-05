@@ -8,3 +8,5 @@ data:
     controller:
       admissionWebhooks:
         enabled: false
+      config:
+        use-proxy-protocol: "false"

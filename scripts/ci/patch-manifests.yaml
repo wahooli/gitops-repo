@@ -14,3 +14,31 @@ rules:
     del(.. | select(has("resources")).resources.requests | select(has("cpu") or has("memory"))) |
     del(.. | select(has("resources")).resources.limits | select(has("cpu") or has("memory")))
   error_tolerant: true
+
+# - description: Suspend HelmReleases in cluster-specific directories
+#   expression: |
+#     (select(.kind == "HelmRelease") | .spec.suspend) = true
+#   exclude_paths:
+#   - apps/base
+#   - infrastructure/base
+#   exclude_names:
+#   # Required by 00_infrastructure healthChecks
+#   - cert-manager--cert-manager
+#   - victoria-metrics--victoria-metrics-operator
+#   - metallb-system--metallb
+#   # Required by 02_monitoring healthChecks
+#   - monitoring--victoria-metrics-server-short-term
+#   # Required by 03_logging healthChecks
+#   - logging--vector-agent
+#   - logging--vector-global-write
+#   - logging--vector-lb
+#   - logging--victoria-logs-short-term
+#   # Required by 11_internal-dns healthChecks
+#   - internal-dns--bind9
+#   - internal-dns--unbound
+#   - internal-dns--blocky
+#   - internal-dns--client-lookup
+#   - prometheus-operator--prometheus-operator-crds
+#   # Cluster utilities
+#   - reloader--reloader
+#   - reflector--reflector

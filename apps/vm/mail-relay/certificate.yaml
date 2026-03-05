@@ -15,4 +15,4 @@ spec:
   - mail-relay
   - mail-relay.default
   - mail-relay.default.svc.cluster.local
-  - mail.absolutist.it
+  - mail.${domain_absolutist_it:=absolutist.it}
