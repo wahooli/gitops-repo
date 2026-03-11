@@ -97,7 +97,7 @@ persistence:
           storage: "10Gi"
   consume:
     name: consume
-    enabled: true
+    enabled: false
     mount:
     - path: /usr/src/paperless/consume
     spec:
@@ -105,7 +105,7 @@ persistence:
         path: ${paperless_nfs_consume_path}
         server: ${paperless_nfs_server}
   export:
-    enabled: true
+    enabled: false
     mount:
     - path: /usr/src/paperless/export
     spec:
