@@ -19,11 +19,26 @@ spec:
       expr: sum(increase(vm_persistentqueue_bytes_dropped_total[5m])) without (path) > 0
       for: 10m
       labels:
-        severity: critical
+        severity: warning
       annotations:
         dashboard: "https://grafana.${domain_wahoo_li:=wahoo.li}/d/G7Z9GzMGz?viewPanel=49&var-instance={{ $labels.instance }}"
         summary: "Instance {{ $labels.instance }} is dropping data from persistent queue"
         description: "Vmagent dropped {{ $value | humanize1024 }} from persistent queue on instance {{ $labels.instance }} for the last 10m."
+
+    - alert: AllRemoteWriteTargetsFailing
+      expr: |
+        (
+          count by (job, instance) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0)
+          ==
+          count by (job, instance) (vmagent_remotewrite_retries_count_total)
+        ) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        dashboard: "https://grafana.${domain_wahoo_li:=wahoo.li}/d/G7Z9GzMGz?viewPanel=61&var-instance={{ $labels.instance }}"
+        summary: "All remote write targets are failing for {{ $labels.job }} on {{ $labels.instance }}"
+        description: "All remote write destinations for vmagent {{ $labels.job }} on instance {{ $labels.instance }} are failing. Data loss is occurring."
 
     - alert: RejectedRemoteWriteDataBlocksAreDropped
       expr: sum(increase(vmagent_remotewrite_packets_dropped_total[5m])) without (url) > 0

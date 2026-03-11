@@ -34,6 +34,13 @@ spec:
       receiver: 'blackhole'
       group_interval: 5m
       repeat_interval: 12h
+    inhibit_rules:
+    - source_matchers:
+      - alertname="TooManyRemoteWriteErrors"
+      target_matchers:
+      - alertname=~"PersistentQueueIsDroppingData|RemoteWriteDroppingData|RemoteWriteErrors|TooManyMissedIterations|AlertmanagerErrors"
+      equal:
+      - clustername
     receivers:
     - name: 'blackhole'
   configNamespaceSelector:
