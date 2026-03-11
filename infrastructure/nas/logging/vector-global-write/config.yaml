@@ -42,6 +42,10 @@ sinks:
     compression: true
     healthcheck:
       enabled: ${vector_healthcheck:=true}
+    buffer:
+      type: disk
+      max_size: 268435488
+      when_full: drop_newest
   nas:
     type: vector
     inputs: [datadog_agent, fluent, logstash, splunk_hec, statsd, syslog, vector]

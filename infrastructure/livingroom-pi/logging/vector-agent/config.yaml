@@ -270,7 +270,7 @@ sinks:
   vlogs:
     type: vector
     inputs: [kube_log_parser, journald_parsed]
-    address: http://log-write.nas.${domain_absolutist_it:=absolutist.it}.:6000
+    address: http://vector-global-write-mesh.logging.svc.cluster.local.:6000
     compression: true
     healthcheck:
       enabled: true

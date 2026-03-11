@@ -32,6 +32,10 @@ sinks:
         VL-Msg-Field: message,msg,_msg
         AccountID: "0"
         ProjectID: "0"
+    buffer:
+      type: disk
+      max_size: 268435488
+      when_full: drop_newest
   long_term:
     type: elasticsearch
     inputs: [vector]
@@ -49,3 +53,7 @@ sinks:
         VL-Msg-Field: message,msg,_msg
         AccountID: "0"
         ProjectID: "0"
+    buffer:
+      type: disk
+      max_size: 268435488
+      when_full: drop_newest

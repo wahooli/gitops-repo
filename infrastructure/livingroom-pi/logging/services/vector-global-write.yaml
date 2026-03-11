@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.cilium.io/global: "true"
+    service.cilium.io/affinity: "remote"
+  name: vector-global-write-mesh
+  namespace: logging
+spec:
+  ports:
+  - name: vector
+    port: 6000
+    protocol: TCP
+    targetPort: 6000
+  type: ClusterIP
