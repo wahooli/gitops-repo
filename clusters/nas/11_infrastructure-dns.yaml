@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 5m0s
-  prune: false
+  prune: true
   dependsOn:
   - name: infrastructure-platform
   - name: infrastructure-monitoring
