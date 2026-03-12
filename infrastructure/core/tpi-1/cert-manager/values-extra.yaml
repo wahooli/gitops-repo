@@ -1,0 +1,9 @@
+webhook:
+  extraArgs:
+  - --logging-format=json
+extraArgs:
+- --enable-gateway-api
+- --logging-format=json
+cainjector:
+  extraArgs:
+  - --logging-format=json

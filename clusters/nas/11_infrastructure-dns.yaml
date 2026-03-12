@@ -1,0 +1,32 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infrastructure-dns
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: true
+  dependsOn:
+  - name: infrastructure-platform
+  - name: infrastructure-monitoring
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: unbound
+    namespace: internal-dns
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: blocky
+    namespace: internal-dns
+  path: ./infrastructure/internal-dns/nas
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: dns-vars
+      optional: false
+    - kind: Secret
+      name: cluster-vars
+      optional: true

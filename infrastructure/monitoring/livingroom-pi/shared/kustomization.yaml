@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base
+patches:
+- target:
+    kind: VMPodScrape
+    name: topolvm
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMPodScrape
+    metadata:
+      name: topolvm
+- target:
+    kind: VMServiceScrape
+    name: authentik
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMServiceScrape
+    metadata:
+      name: authentik
+- target:
+    kind: VMServiceScrape
+    name: ingress-nginx
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMServiceScrape
+    metadata:
+      name: ingress-nginx

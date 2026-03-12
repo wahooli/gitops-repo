@@ -7,8 +7,8 @@ spec:
   interval: 5m0s
   prune: true
   dependsOn:
-  - name: infrastructure-depends
-  - name: internal-dns
+  - name: infrastructure-platform
+  - name: infrastructure-dns
   suspend: false
   sourceRef:
     kind: GitRepository

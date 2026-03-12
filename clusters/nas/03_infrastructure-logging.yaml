@@ -1,0 +1,47 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infrastructure-logging
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: true
+  dependsOn:
+  - name: infrastructure-platform
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./infrastructure/logging/nas
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    name: vector-agent
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vector-global-write
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vector-lb-nas
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vlsingle-long-term-nas
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vlsingle-short-term-nas
+    namespace: logging
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmauth-read-proxy
+    namespace: logging
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-infrastructure-vars
+      optional: false
+    - kind: Secret
+      name: cluster-vars
+      optional: true

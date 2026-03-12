@@ -1,0 +1,50 @@
+certificates:
+  wildcard:
+    secretTemplate:
+      labels:
+        velero.io/exclude-from-backup: "true"
+    dnsNames:
+    - '*.${domain_wahoo_li:=wahoo.li}'
+    issuerRef:
+      kind: ClusterIssuer
+      name: letsencrypt-production
+    usages:
+    - digital signature
+    - key encipherment
+image:
+  tag: "3.2.13" # {"$imagepolicy": "flux-system:haproxy-3-2:tag"}
+service:
+  main:
+    externalTrafficPolicy: Local
+    type: LoadBalancer
+podAnnotations:
+  secret.reloader.stakater.com/reload: "haproxy-wildcard"
+initContainers:
+  combine-certs:
+    image: busybox:1.37
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      echo "Combining tls.key and tls.crt into a single .pem file...";
+      cat /mnt/secret/tls.key /mnt/secret/tls.crt > /mnt/certs/${domain_wahoo_li:=wahoo.li}.pem;
+      echo "Certificate prepared.";
+    volumeMounts:
+    - name: tls
+      mountPath: /mnt/secret # Mount the secret read-only
+      readOnly: true
+    - name: certs
+      mountPath: /mnt/certs # Mount the shared volume to write the .pem file
+persistence:
+  certs:
+    enabled: true
+    mount:
+    - path: /etc/haproxy/certs
+  tls:
+    enabled: true
+    spec:
+      useFromChart: false
+      secret:
+        defaultMode: 0400
+        name: haproxy-wildcard
+        optional: false

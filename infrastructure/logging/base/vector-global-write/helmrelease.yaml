@@ -1,0 +1,42 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: logging--vector-global-write
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: vector
+spec:
+  dependsOn:
+  - name: victoria-metrics--victoria-metrics-operator
+    namespace: flux-system
+  - name: logging--vector-lb
+    namespace: flux-system
+  releaseName: vector-global-write
+  targetNamespace: logging
+  interval: 10m
+  chart:
+    spec:
+      chart: vector
+      sourceRef:
+        kind: HelmRepository
+        name: vector
+        namespace: flux-system
+      interval: 24h
+      version: "0.50.0" # {"$imagepolicy": "flux-system:vector-helm-chart:tag"}
+  install:
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: vector-global-write-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: vector-global-write-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: vector-global-write-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml
+  values:
+    existingConfigMaps:
+    - vector-global-write-config

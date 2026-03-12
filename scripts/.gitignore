@@ -2,3 +2,5 @@
 !ci/
 !ci/*.sh
 !ci/patch-manifests.yaml
+!bootstrap-flux.sh.d/
+!create-cluster.sh.d/
