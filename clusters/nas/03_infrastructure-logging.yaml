@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 5m0s
-  prune: true
+  prune: false
   dependsOn:
   - name: infrastructure-platform
   sourceRef:
