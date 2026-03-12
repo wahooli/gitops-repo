@@ -15,8 +15,6 @@ on:
   push:
     branches:
     - '*'
-    - '!flux-image-updates'
-    - '!flux-system-update'
     tags-ignore:
     - '*'
     paths-ignore:
