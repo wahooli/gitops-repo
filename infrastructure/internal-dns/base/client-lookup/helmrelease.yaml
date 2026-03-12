@@ -13,6 +13,7 @@ spec:
     valuesKey: values-base.yaml
   - kind: ConfigMap
     name: client-lookup-values
+    optional: true
     valuesKey: values-shared.yaml
   - kind: ConfigMap
     name: client-lookup-values
