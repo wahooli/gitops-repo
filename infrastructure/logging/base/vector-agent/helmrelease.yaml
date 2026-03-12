@@ -3,8 +3,6 @@ kind: HelmRelease
 metadata:
   name: logging--vector-agent
   namespace: flux-system
-  annotations:
-    homelab.wahoo.li/base-helmrelease: vector
 spec:
   dependsOn:
   - name: victoria-metrics--victoria-metrics-operator
@@ -14,16 +12,7 @@ spec:
   interval: 10m
   chart:
     spec:
-      chart: vector
-      sourceRef:
-        kind: HelmRepository
-        name: vector
-        namespace: flux-system
-      interval: 24h
-      version: "0.50.0" # {"$imagepolicy": "flux-system:vector-helm-chart:tag"}
-  install:
-    remediation:
-      retries: -1
+      version: "0.51.0" # {"$imagepolicy": "flux-system:vector-helm-chart:tag"}
   valuesFrom:
   - kind: ConfigMap
     name: vector-agent-values

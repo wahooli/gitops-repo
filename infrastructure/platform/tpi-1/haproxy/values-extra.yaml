@@ -1,3 +1,18 @@
+certificates:
+  wildcard:
+    secretTemplate:
+      labels:
+        velero.io/exclude-from-backup: "true"
+    dnsNames:
+    - '*.${domain_wahoo_li:=wahoo.li}'
+    issuerRef:
+      kind: ClusterIssuer
+      name: letsencrypt-production
+    usages:
+    - digital signature
+    - key encipherment
+image:
+  tag: "3.2.14" # {"$imagepolicy": "flux-system:haproxy-3-2:tag"}
 service:
   main:
     annotations:
