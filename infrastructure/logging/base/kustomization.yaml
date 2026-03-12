@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- namespace.yaml
+- vmpodscrape-vector-agent.yaml
+- vmpodscrape-vector-aggregator.yaml
+- services/vector-global-write.yaml
+- services/vector-lb-nas.yaml
+- services/vector-lb-tpi.yaml
+- services/vlogs-long-term-nas.yaml
+- services/vlsingle-long-term-nas.yaml
+- services/vlsingle-short-term-nas.yaml

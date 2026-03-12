@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/vector-agent
+- ../../../base/vector/imagerepository.docker.yaml
+- ../../../base/vector/imagepolicy.debian.yaml
+patches:
+- target:
+    kind: HelmRelease
+    name: logging--vector-agent
+  patch: |-
+    - op: add
+      path: /spec/dependsOn/-
+      value:
+        name: logging--vector-global-write
+        namespace: flux-system
+configMapGenerator:
+- name: vector-agent-values
+  namespace: flux-system
+  files:
+  - values-base.yaml=../../../base/vector/values-base.yaml
+  - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
+- name: vector-agent-config
+  namespace: flux-system
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "logging"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "logging"
+  files:
+  - vector.yaml=config.yaml

@@ -1,0 +1,59 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infrastructure-monitoring
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: false
+  dependsOn:
+  - name: infrastructure-platform
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./infrastructure/monitoring/nas
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmagent-nas
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmauth-global-write
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vmauth-read-proxy
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vminsert-long-term
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: vminsert-short-term-nas
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vmselect-long-term
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vmselect-short-term-nas
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vmstorage-long-term
+    namespace: monitoring
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    name: vmstorage-short-term-nas
+    namespace: monitoring
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-infrastructure-vars
+      optional: false
+    - kind: Secret
+      name: cluster-vars
+      optional: true

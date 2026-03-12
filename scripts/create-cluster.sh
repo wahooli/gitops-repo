@@ -339,6 +339,14 @@ kubectl --context "$CONTEXT_NAME" create -f "$REPO_ROOT/clusters/$CLUSTER_NAME/f
 
 echo "FluxCD installed successfully in $CLUSTER_NAME"
 
+# Run drop-in scripts from create-cluster.sh.d/
+export CLUSTER_NAME CONTEXT_NAME REPO_ROOT SCRIPT_DIR
+for drop_in in "$SCRIPT_DIR/create-cluster.sh.d"/*.sh; do
+  [[ -x "$drop_in" ]] || continue
+  echo "Running drop-in: $(basename "$drop_in")"
+  "$drop_in"
+done
+
 # Wait for Cilium rollouts (disable with SKIP_WAIT=1)
 if [[ "${SKIP_WAIT:-0}" -ne 1 ]]; then
   echo "Waiting for Cilium rollouts in $CLUSTER_NAME..."

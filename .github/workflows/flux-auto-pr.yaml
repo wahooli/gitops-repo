@@ -14,6 +14,14 @@ on:
     - 'scripts/ci/**'
     - '.github/**'
 
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   pull-request:
     name: Open PR to main

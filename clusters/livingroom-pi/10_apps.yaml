@@ -7,8 +7,7 @@ spec:
   interval: 5m0s
   prune: false
   dependsOn:
-  - name: infrastructure-depends
-  - name: infrastructure
+  - name: infrastructure-platform
   suspend: false
   sourceRef:
     kind: GitRepository

@@ -1,0 +1,131 @@
+initContainers:
+- name: velero-plugin-for-aws
+  image: velero/velero-plugin-for-aws:v1.14.0 # {"$imagepolicy": "flux-system:velero-plugin-for-aws"}
+  imagePullPolicy: IfNotPresent
+  volumeMounts:
+  - mountPath: /target
+    name: plugins
+credentials:
+  existingSecret:
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=${velero_access_key_id}
+      aws_secret_access_key=${velero_access_key}
+dnsPolicy: ClusterFirstWithHostNet
+snapshotsEnabled: false
+schedules:
+  weekly:
+    disabled: false
+    labels:
+      schedule: weekly
+    schedule: "5 2 */7 * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: "720h" # month retain
+      storageLocation: seaweedfs-backups
+      labelSelector:
+        matchLabels:
+          backupWeekly: "true"
+      excludedResources: &excludedResources
+      - storageclasses.storage.k8s.io
+      - certificaterequests.cert-manager.io
+      - challenges.acme.cert-manager.io
+      - orders.acme.cert-manager.io
+      - ciliumendpoints.cilium.io
+      - ciliumnetworkpolicies.cilium.io
+      - ciliumidentities.cilium.io
+      - ciliumcidrgroups.cilium.io
+      - ciliumnodes.cilium.io
+      - gitrepositories.source.toolkit.fluxcd.io
+      - helmcharts.source.toolkit.fluxcd.io
+      - helmrepositories.source.toolkit.fluxcd.io
+      - helmreleases.helm.toolkit.fluxcd.io
+      - kustomizations.kustomize.toolkit.fluxcd.io
+      - ocirepositories.source.toolkit.fluxcd.io
+      - servicel2statuses.metallb.io
+      - apiservices.apiregistration.k8s.io
+      - csidrivers.storage.k8s.io
+      - csistoragecapacities.storage.k8s.io
+      - networkpolicy
+      - endpointslice
+      - endpoint
+      - replicasets
+      - controllerrevisions.apps
+      - events
+      - events.events.k8s.io
+      - nodes
+      - leases.coordination.k8s.io
+      - csinodes.storage.k8s.io
+      - volumeattachments.storage.k8s.io
+      excludedNamespaces: &excludedNamespaces
+      - kube-public
+      - kube-node-lease
+      # - flux-system  # required for configmapgenerator envs
+      - cert-manager
+      - cilium-secrets
+      - infrastructure
+      - ingress-nginx
+      - kube-system
+      - metallb-system
+      - reflector
+      - reloader
+      - topolvm-system
+      - velero
+  daily:
+    disabled: false
+    labels:
+      schedule: daily
+    schedule: "5 1 * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: "168h" # week retain
+      storageLocation: seaweedfs-backups
+      labelSelector:
+        matchLabels:
+          backupDaily: "true"
+      excludedResources: *excludedResources
+      excludedNamespaces: *excludedNamespaces
+  hourly:
+    disabled: true
+    labels:
+      schedule: hourly
+    annotations:
+      velero.io/csi-volumesnapshot-class_topolvm.io: topolvm-provisioner-thin
+    schedule: "10 * * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      labelSelector:
+        matchLabels:
+          backupHourly: "true"
+      ttl: "6h"
+      storageLocation: seaweedfs-backups
+      excludedResources: *excludedResources
+      excludedNamespaces: *excludedNamespaces
+nodeAgent:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
+configuration:
+  logFormat: json
+  defaultBackupStorageLocation: seaweedfs-backups
+  defaultBackupTTL: 72h
+  backupStorageLocation:
+  - name: seaweedfs-backups
+    provider: aws
+    bucket: ${velero_backup_bucket}
+    accessMode: ReadWrite
+    default: true
+    config:
+      region: ${velero_backup_bucket_region}
+      s3ForcePathStyle: true
+      checksumAlgorithm: ""
+      s3Url: ${velero_backup_bucket_url}
+      publicUrl: ${velero_backup_bucket_public_url}

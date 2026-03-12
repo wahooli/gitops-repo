@@ -1,0 +1,25 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infrastructure-platform
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: true
+  dependsOn:
+  - name: infrastructure-core
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./infrastructure/platform/nas
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-infrastructure-vars
+      optional: false
+    - kind: Secret
+      name: cluster-vars
+      optional: true
+    - kind: Secret
+      name: dns-vars
+      optional: true

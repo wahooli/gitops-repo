@@ -4,6 +4,14 @@ on:
   schedule:
   - cron: "0 * * * *"
 
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 env:
   BRANCH_NAME: flux-system-update
 
@@ -70,7 +78,7 @@ jobs:
           git config --global user.name "${{ github.actor }}[bot]"
           git config --global user.email "${{ github.actor_id }}+${{ github.actor }}[bot]@users.noreply.github.com"
 
-          git remote set-url --push origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}
+          git config url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
 
           git add -u
           git commit -m "Update FluxCD to version: $VERSION"

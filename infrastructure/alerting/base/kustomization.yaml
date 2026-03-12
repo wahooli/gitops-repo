@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- namespace.yaml
+- imagerepositories
+- templates
+- vmalertmanagerconfig/generic-alerts.yaml
+- vmalertmanagerconfig/systemd-alerts.yaml
+- rules/kubernetes/kubernetes-apps.yaml
+- rules/kubernetes/kubernetes-resources.yaml
+- rules/kubernetes/kubernetes-storage.yaml
+- rules/log-count.yaml
+- rules/nginx/nginx-logs.yaml
+- rules/victoriametrics/cluster.yaml
+- rules/victoriametrics/health.yaml
+- rules/victoriametrics/logs.yaml
+- rules/victoriametrics/vmagent.yaml
+- rules/victoriametrics/vmalert.yaml
+- rules/victoriametrics/vmauth.yaml

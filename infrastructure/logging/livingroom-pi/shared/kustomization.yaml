@@ -1,0 +1,70 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base
+patches:
+- target:
+    kind: VMPodScrape
+    name: vector-aggregator
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMPodScrape
+    metadata:
+      name: vector-aggregator
+- target:
+    kind: Service
+    name: vector-global-write-mesh
+  patch: |-
+    - op: replace
+      path: /metadata/annotations/service.cilium.io~1affinity
+      value: "remote"
+    - op: remove
+      path: /metadata/annotations/service.cilium.io~1shared
+    - op: remove
+      path: /spec/selector
+- target:
+    kind: Service
+    name: vector-lb-nas
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vector-lb-nas
+- target:
+    kind: Service
+    name: vector-lb-tpi
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vector-lb-tpi
+- target:
+    kind: Service
+    name: vlogs-long-term-nas
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vlogs-long-term-nas
+- target:
+    kind: Service
+    name: vlsingle-long-term-nas
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vlsingle-long-term-nas
+- target:
+    kind: Service
+    name: vlsingle-short-term-nas
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vlsingle-short-term-nas

@@ -1,9 +1,0 @@
-image:
-  tag: "v0.29.0" # {"$imagepolicy": "flux-system:blocky:tag"}
-service:
-  tpi-1:
-    annotations:
-      service.cilium.io/global: "true"
-      service.cilium.io/affinity: "local"
-    type: ClusterIP
-    portsFrom: main

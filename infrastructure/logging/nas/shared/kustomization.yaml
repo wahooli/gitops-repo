@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base
+patches:
+- target:
+    kind: Service
+    name: vector-lb-nas
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vector-lb-nas
+- target:
+    kind: Service
+    name: vlogs-long-term-nas
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vlogs-long-term-nas
+- target:
+    kind: Service
+    name: vlsingle-long-term-nas
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vlsingle-long-term-nas
+- target:
+    kind: Service
+    name: vlsingle-short-term-nas
+  patch: |-
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: vlsingle-short-term-nas

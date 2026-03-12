@@ -15,8 +15,6 @@ on:
   push:
     branches:
     - '*'
-    - '!flux-image-updates'
-    - '!flux-system-update'
     tags-ignore:
     - '*'
     paths-ignore:
@@ -25,6 +23,13 @@ on:
     - 'githooks/**'
     - '*.md'
     - 'LICENSE'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
