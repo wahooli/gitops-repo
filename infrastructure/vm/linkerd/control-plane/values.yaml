@@ -1,3 +1,0 @@
-proxyInit:
-  iptablesMode: nft
-cniEnabled: true

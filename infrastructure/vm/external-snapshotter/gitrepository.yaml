@@ -1,8 +1,0 @@
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: external-snapshotter-git
-  namespace: flux-system
-spec:
-  ref:
-    tag: v7.0.1
