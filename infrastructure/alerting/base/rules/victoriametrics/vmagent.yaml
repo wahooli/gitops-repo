@@ -28,9 +28,9 @@ spec:
     - alert: AllRemoteWriteTargetsFailing
       expr: |
         (
-          count by (job, instance) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0)
+          count by (job, instance, clustername) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0)
           ==
-          count by (job, instance) (vmagent_remotewrite_retries_count_total)
+          count by (job, instance, clustername) (vmagent_remotewrite_retries_count_total)
         ) > 0
       for: 5m
       labels:
@@ -73,19 +73,18 @@ spec:
         summary: "Vmagent responds with too many errors on data ingestion protocols"
         description: "Job \"{{ $labels.job }}\" on instance {{ $labels.instance }} responds with errors to write requests for last 15m."
 
-
     - alert: SomeRemoteWriteTargetsFailing
       expr: |
         (
-          count by (job, instance) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0) > 0
+          count by (job, instance, clustername) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0) > 0
         )
         and
         (
-          count by (job, instance) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0)
+          count by (job, instance, clustername) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0)
           <
-          count by (job, instance) (vmagent_remotewrite_retries_count_total)
+          count by (job, instance, clustername) (vmagent_remotewrite_retries_count_total)
         )
-      for: 1h
+      for: 30m
       labels:
         severity: info
       annotations:

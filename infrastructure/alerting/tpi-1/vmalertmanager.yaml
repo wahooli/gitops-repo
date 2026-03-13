@@ -30,6 +30,19 @@ spec:
       - alertname=~"PersistentQueueIsDroppingData|RemoteWriteDroppingData|RemoteWriteErrors|TooManyMissedIterations|AlertmanagerErrors"
       equal:
       - clustername
+    - source_matchers:
+      - alertname="SomeRemoteWriteTargetsFailing"
+      target_matchers:
+      - alertname="PersistentQueueIsDroppingData"
+      equal:
+      - job
+      - instance
+    - source_matchers:
+      - alertname="SomeRemoteWriteTargetsFailing"
+      target_matchers:
+      - alertname="RemoteWriteDroppingData"
+      equal:
+      - clustername
     receivers:
     - name: 'blackhole'
   configNamespaceSelector:

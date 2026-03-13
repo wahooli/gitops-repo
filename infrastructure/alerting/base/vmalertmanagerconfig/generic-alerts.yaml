@@ -7,7 +7,8 @@ spec:
   route:
     receiver: discord
     routes:
-    - matchers:
+    - receiver: discord
+      matchers:
       - alertname="SomeRemoteWriteTargetsFailing"
       repeat_interval: 24h
     matchers:
