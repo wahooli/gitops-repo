@@ -73,16 +73,25 @@ spec:
         summary: "Vmagent responds with too many errors on data ingestion protocols"
         description: "Job \"{{ $labels.job }}\" on instance {{ $labels.instance }} responds with errors to write requests for last 15m."
 
-    - alert: TooManyRemoteWriteErrors
-      expr: rate(vmagent_remotewrite_retries_count_total[5m]) > 0
-      for: 15m
+
+    - alert: SomeRemoteWriteTargetsFailing
+      expr: |
+        (
+          count by (job, instance) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0) > 0
+        )
+        and
+        (
+          count by (job, instance) (rate(vmagent_remotewrite_retries_count_total[5m]) > 0)
+          <
+          count by (job, instance) (vmagent_remotewrite_retries_count_total)
+        )
+      for: 1h
       labels:
-        severity: warning
+        severity: info
       annotations:
         dashboard: "https://grafana.${domain_wahoo_li:=wahoo.li}/d/G7Z9GzMGz?viewPanel=61&var-instance={{ $labels.instance }}"
-        summary: "Job \"{{ $labels.job }}\" on instance {{ $labels.instance }} fails to push to remote storage"
-        description: "Vmagent fails to push data via remote write protocol to destination \"{{ $labels.url }}\"\n
-          Ensure that destination is up and reachable."
+        summary: "Some remote write targets are failing for {{ $labels.job }} on {{ $labels.instance }}"
+        description: "{{ $value }} remote write target(s) for vmagent {{ $labels.job }} on instance {{ $labels.instance }} are unreachable, but not all targets are affected."
 
     - alert: RemoteWriteConnectionIsSaturated
       expr: |

@@ -36,7 +36,7 @@ spec:
       repeat_interval: 12h
     inhibit_rules:
     - source_matchers:
-      - alertname="TooManyRemoteWriteErrors"
+      - alertname="AllRemoteWriteTargetsFailing"
       target_matchers:
       - alertname=~"PersistentQueueIsDroppingData|RemoteWriteDroppingData|RemoteWriteErrors|TooManyMissedIterations|AlertmanagerErrors"
       equal:

@@ -6,7 +6,10 @@ metadata:
 spec:
   route:
     receiver: discord
-    # routes: child routes
+    routes:
+    - matchers:
+      - alertname="SomeRemoteWriteTargetsFailing"
+      repeat_interval: 24h
     matchers:
     - source_type != journald
     group_by:
