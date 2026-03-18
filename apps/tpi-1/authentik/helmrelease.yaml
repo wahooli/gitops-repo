@@ -15,14 +15,14 @@ spec:
   chart:
     spec:
       version: "2025.12.4"
-  values:
-    blueprints:
-      configMaps:
-      - authentik-blueprints
   valuesFrom:
   - kind: ConfigMap
     name: authentik-values
     valuesKey: values-base.yaml
   - kind: ConfigMap
     name: authentik-values
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: authentik-helmrelease-overrides
+    optional: true
     valuesKey: values.yaml

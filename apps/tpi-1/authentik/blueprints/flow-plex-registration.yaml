@@ -2,21 +2,38 @@
 version: 1
 metadata:
   name: Init - Plex registration
-  labels:
-    blueprints.goauthentik.io/instantiate: "true"
 context:
   group_name: Plex Users
 entries:
 - model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Init - Shared policies
   attrs:
+    identifiers:
+      name: Init - Shared policies
     required: false
 - model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Init - SSO registration
   attrs:
+    identifiers:
+      name: Init - SSO registration
     required: false
+- model: authentik_stages_user_login.userloginstage
+  state: created
+  identifiers:
+    name: sso-registration-login
+  id: ref-sso-registration-login
+- model: authentik_policies_expression.expressionpolicy
+  state: created
+  identifiers:
+    name: sso-registration-if-sso
+  id: ref-sso-registration-if-sso
+  attrs:
+    expression: "return True"
+- model: authentik_policies_expression.expressionpolicy
+  state: created
+  identifiers:
+    name: add-user-to-jellyfin-group
+  id: ref-add-user-to-jellyfin-group
+  attrs:
+    expression: "return True"
 - model: authentik_core.group
   state: present
   identifiers:
@@ -67,7 +84,7 @@ entries:
   model: authentik_flows.flowstagebinding
 - identifiers:
     order: 30
-    stage: !Find [authentik_stages_user_login.userloginstage, [name, sso-registration-login]]
+    stage: !KeyOf ref-sso-registration-login
     target: !KeyOf flow
   model: authentik_flows.flowstagebinding
 - identifiers:
@@ -79,7 +96,7 @@ entries:
   model: authentik_policies.policybinding
 - identifiers:
     order: 0
-    policy: !Find [authentik_policies_expression.expressionpolicy, [name, sso-registration-if-sso]]
+    policy: !KeyOf ref-sso-registration-if-sso
     target: !KeyOf flow
   model: authentik_policies.policybinding
 - model: authentik_policies.policybinding
@@ -88,4 +105,4 @@ entries:
   identifiers:
     order: 0
     target: !KeyOf write-binding
-    policy: !Find [authentik_policies_expression.expressionpolicy, [name, add-user-to-jellyfin-group]]
+    policy: !KeyOf ref-add-user-to-jellyfin-group

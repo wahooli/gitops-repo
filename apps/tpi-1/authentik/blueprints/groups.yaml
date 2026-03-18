@@ -2,8 +2,6 @@
 version: 1
 metadata:
   name: Init - Groups
-  # labels:
-  #   blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_core.group
   state: present
@@ -37,3 +35,35 @@ entries:
       tautulli_username: ${authentik_tautulli_username}
   identifiers:
     name: Tautulli Users
+- model: authentik_core.group
+  state: present
+  attrs:
+    attributes:
+      tautulli_password: ${authentik_tautulli_password}
+      tautulli_username: ${authentik_tautulli_username}
+  identifiers:
+    name: Tautulli Admins
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Grafana Admins
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Grafana Viewers
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Grafana Editors
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Gitti Admin
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Gitti Restricted
+- model: authentik_core.group
+  state: present
+  identifiers:
+    name: Gitti User

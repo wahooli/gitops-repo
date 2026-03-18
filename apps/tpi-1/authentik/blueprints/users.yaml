@@ -6,10 +6,15 @@ metadata:
     blueprints.goauthentik.io/system: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Init - Groups
   attrs:
-    required: true
+    identifiers:
+      name: Init - Groups
+    required: false
+- model: authentik_core.group
+  state: created
+  identifiers:
+    name: Jellyfin Users
+  id: ref-group-jellyfin-users
 - model: authentik_core.user
   identifiers:
     username: jellyfin-ldap-bind-user
@@ -18,7 +23,7 @@ entries:
     attributes:
       disable-normal-login: true
     groups:
-    - !Find [authentik_core.group, [name, Jellyfin Users]]
+    - !KeyOf ref-group-jellyfin-users
     is_active: true
     path: users
     type: service_account
