@@ -1,0 +1,19 @@
+title: GitOps Repository Documentation
+description: Auto-generated documentation for the multi-cluster Kubernetes GitOps repository
+remote_theme: just-the-docs/just-the-docs
+
+color_scheme: dark
+search_enabled: true
+
+# Apply default layout to all pages
+defaults:
+- scope:
+    path: ""
+  values:
+    layout: default
+
+# Exclude non-doc files from processing
+exclude:
+- _config.yml
+- Gemfile
+- Gemfile.lock
