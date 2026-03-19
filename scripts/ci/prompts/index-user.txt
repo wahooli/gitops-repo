@@ -1,0 +1,3 @@
+Organize the content clearly. Group infrastructure layers logically.
+Add a brief (1-2 sentence) overview section at the top describing the repository.
+Keep component descriptions to one line or omit them — the links speak for themselves.

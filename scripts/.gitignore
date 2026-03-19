@@ -1,6 +1,8 @@
 !*.sh
 !ci/
 !ci/*.sh
+!ci/prompts
+!ci/prompts/*.txt
 !ci/patch-manifests.yaml
 !bootstrap-flux.sh.d/
 !create-cluster.sh.d/

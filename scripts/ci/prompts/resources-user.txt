@@ -1,0 +1,9 @@
+Include these sections:
+
+## Overview
+Brief description of what these resources are and how they relate to each other.
+
+## Resource Glossary
+For each resource, describe its kind, name, namespace, purpose, and what it does in plain language.
+
+Keep it factual — only document what's in the manifests.

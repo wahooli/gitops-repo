@@ -1,0 +1,24 @@
+Generate documentation with these sections:
+
+## Overview
+Brief description of what this component does and its role in the cluster. If there are multiple HelmReleases, explain that this is a multi-component deployment.
+
+## Sub-components
+Only include this section if there are multiple HelmReleases. List each HelmRelease with its chart, version, target namespace, and what it provides.
+
+## Dependencies
+Only include this section if any HelmRelease has dependsOn entries. Show the dependency chain and explain what each dependency provides.
+
+## Helm Chart(s)
+For each HelmRelease: chart name, repository, version. For OCI repositories with floating versions (>=0.1.0-0), note the version as 'latest'. For public repos with exact versions, show the exact version.
+
+## Resource Glossary
+Describe the key Kubernetes resources this component creates. Group by purpose (networking, storage, security, etc.). Explain what each resource does in plain language — don't just restate the YAML. If helm template output is available, use it to describe the actual workload resources (Deployments, Services, ConfigMaps, etc.).
+
+## Configuration Highlights
+Notable settings: resource requests/limits, persistence, replica counts, important Helm values, environment variables. Don't exhaustively list everything — focus on what's operationally important.
+
+## Deployment
+Target namespace(s), release name(s), reconciliation interval, install/upgrade behavior.
+
+Keep it factual — only document what's in the manifests. Note Flux variables (${variable_name}) as configurable parameters.

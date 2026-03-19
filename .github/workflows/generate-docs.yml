@@ -1,0 +1,145 @@
+name: Generate Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - "apps/**"
+    - "infrastructure/**"
+    - "clusters/**"
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: "Branch/ref to generate docs from"
+        required: false
+        default: "main"
+        type: string
+      model:
+        description: "Model to use for generation"
+        required: false
+        default: "openai/gpt-4o-mini"
+        type: choice
+        options:
+        - openai/gpt-4o-mini
+        - openai/gpt-4o
+      mode:
+        description: "Generation mode"
+        required: false
+        default: "all"
+        type: choice
+        options:
+        - all
+        - missing
+      filter_paths:
+        description: "Space-separated paths to limit generation (empty = all)"
+        required: false
+        default: ""
+        type: string
+      batch_size:
+        description: "API calls per batch (0 = no batching)"
+        required: false
+        default: "0"
+        type: string
+      dry_run:
+        description: "Dry run (skip API calls)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  models: read
+  pages: write
+
+concurrency:
+  group: generate-docs
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.source_ref || github.ref }}
+        path: main
+        fetch-depth: 2
+
+    - name: Checkout gh-pages
+      id: gh-pages
+      uses: actions/checkout@v4
+      with:
+        ref: gh-pages
+        path: gh-pages
+      continue-on-error: true
+
+    - name: Create gh-pages branch if needed
+      if: steps.gh-pages.outcome == 'failure'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        mkdir -p gh-pages
+        cd gh-pages
+        git init
+        git checkout --orphan gh-pages
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git commit --allow-empty -m "Initialize gh-pages branch"
+        git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+        git push -u origin gh-pages
+
+    - name: Extract changed paths
+      if: github.event_name == 'push'
+      id: paths
+      working-directory: main
+      run: |
+        paths=$(git diff --name-only HEAD~1 HEAD -- 'apps/' 'infrastructure/' 'clusters/' | tr '\n' ' ')
+        echo "filter_paths=${paths}" >> "$GITHUB_OUTPUT"
+        echo "Changed paths: ${paths:-none}"
+
+    - name: Setup Flux CLI
+      uses: fluxcd/flux2/action@main
+
+    - name: Setup yq
+      uses: mikefarah/yq@master
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v4
+
+    - name: Setup crane
+      uses: imjasonh/setup-crane@v0.4
+
+    - name: Generate documentation
+      working-directory: main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MODEL: ${{ inputs.model || 'openai/gpt-4o-mini' }}
+        MODE: ${{ inputs.mode || 'all' }}
+        DOCS_DIR: ${{ github.workspace }}/gh-pages
+        FILTER_PATHS: ${{ steps.paths.outputs.filter_paths || inputs.filter_paths || '' }}
+        BATCH_SIZE: ${{ inputs.batch_size || '0' }}
+        DRY_RUN: ${{ inputs.dry_run || 'false' }}
+      run: scripts/ci/generate-docs.sh
+
+    - name: Commit and push to gh-pages
+      if: inputs.dry_run != 'true' && inputs.dry_run != true
+      working-directory: gh-pages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add -A
+        if git diff --staged --quiet; then
+          echo "No documentation changes to commit"
+          exit 0
+        fi
+        model="${{ inputs.model || 'openai/gpt-4o-mini' }}"
+        source_ref="${{ inputs.source_ref || github.ref_name }}"
+        if [ "${{ github.event_name }}" = "push" ]; then
+          git commit -m "docs: update documentation for $(echo '${{ steps.paths.outputs.filter_paths }}' | wc -w | xargs) changed paths [${model}]"
+        else
+          git commit -m "docs: regenerate documentation (${{ inputs.mode || 'all' }} mode) from ${source_ref} [${model}]"
+        fi
+        git push

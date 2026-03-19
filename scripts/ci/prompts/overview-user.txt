@@ -1,0 +1,15 @@
+Include these sections:
+
+## Overview
+Brief description of this cluster's role.
+
+## Dependency Chain
+Explain the numbered Kustomization ordering and dependencies.
+
+## Components
+List each infrastructure and app kustomization with its source path.
+
+## Variable Injection
+What Secrets/ConfigMaps are used for postBuild substitution.
+
+Keep it factual — only document what's in the manifests.
