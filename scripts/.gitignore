@@ -3,6 +3,8 @@
 !ci/*.sh
 !ci/prompts
 !ci/prompts/*.txt
+!ci/pages
+!ci/pages/**/*
 !ci/patch-manifests.yaml
 !bootstrap-flux.sh.d/
 !create-cluster.sh.d/

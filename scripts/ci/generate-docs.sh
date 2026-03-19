@@ -10,7 +10,7 @@
 #   GITHUB_TOKEN — GitHub token with models:read scope
 #
 # Optional environment variables:
-#   MODEL           — Model to use (default: openai/gpt-4o-mini)
+#   MODEL           — Model to use (default: gpt-4o-mini)
 #   DOCS_DIR        — Output directory (default: docs)
 #   MAX_TOKENS      — Max completion tokens per request (default: 4096)
 #   TEMPERATURE     — Model temperature (default: 0.2)
@@ -29,7 +29,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 DOCS_DIR="${DOCS_DIR:-${REPO_ROOT}/docs}"
-MODEL="${MODEL:-openai/gpt-4o-mini}"
+MODEL="${MODEL:-gpt-4o-mini}"
 MAX_TOKENS="${MAX_TOKENS:-4096}"
 TEMPERATURE="${TEMPERATURE:-0.2}"
 DRY_RUN="${DRY_RUN:-false}"
@@ -39,6 +39,8 @@ MODE="${MODE:-all}"
 FILTER_PATHS="${FILTER_PATHS:-}"
 BATCH_SIZE="${BATCH_SIZE:-0}"
 BATCH_PAUSE="${BATCH_PAUSE:-60}"
+# Budget for input prompt in characters (~4 chars/token, 8000 token limit, minus headroom)
+MAX_INPUT_CHARS="${MAX_INPUT_CHARS:-28000}"
 CLUSTERS_DIR="${REPO_ROOT}/clusters"
 
 request_count=0
@@ -51,6 +53,7 @@ declare -A REPO_URL_MAP
 declare -A FILTER_COMPONENTS  # resolved component paths to generate
 declare -A FILTER_CLUSTERS    # clusters that have matching components
 docs_generated=0
+skipped_too_large=()
 
 ###############################################################################
 # Output helpers
@@ -97,11 +100,17 @@ call_model() {
   fi
   request_count=$((request_count + 1))
 
-  local payload
-  payload=$(jq -n \
+  # Write prompts and payload to temp files to avoid shell ARG_MAX limits
+  local payload_file system_file user_file
+  payload_file=$(mktemp)
+  system_file=$(mktemp)
+  user_file=$(mktemp)
+  printf '%s' "$system_prompt" > "$system_file"
+  printf '%s' "$user_prompt" > "$user_file"
+  jq -n \
     --arg model "$MODEL" \
-    --arg system "$system_prompt" \
-    --arg user "$user_prompt" \
+    --rawfile system "$system_file" \
+    --rawfile user "$user_file" \
     --argjson max_tokens "$MAX_TOKENS" \
     --argjson temperature "$TEMPERATURE" \
     '{
@@ -112,19 +121,111 @@ call_model() {
       ],
       max_tokens: $max_tokens,
       temperature: $temperature
-    }')
+    }' > "$payload_file" || {
+    warn "Failed to build API payload" >&2
+    rm -f "$payload_file" "$system_file" "$user_file"
+    return 1
+  }
+  rm -f "$system_file" "$user_file"
 
-  local response
-  response=$(curl -s --fail-with-body \
+  local response_file
+  response_file=$(mktemp)
+  local http_code
+  http_code=$(curl -s -w '%{http_code}' -o "$response_file" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/json" \
-    -d "$payload" \
-    "$API_URL") || {
-      warn "API call failed (request #${request_count}): $(echo "$response" | head -5)"
-      return 1
-    }
+    -d "@${payload_file}" \
+    "$API_URL") || true
+  rm -f "$payload_file"
 
-  echo "$response" | jq -r '.choices[0].message.content // empty'
+  if [ "$http_code" -ge 400 ] 2>/dev/null || [ -z "$http_code" ]; then
+    warn "API call failed (request #${request_count}, HTTP ${http_code})" >&2
+    warn "Response: $(cat "$response_file")" >&2
+    # Return 2 for payload too large (HTTP 413 or tokens_limit_reached) — caller can skip
+    if [ "$http_code" = "413" ] || grep -q "tokens_limit_reached" "$response_file" 2>/dev/null; then
+      rm -f "$response_file"
+      return 2
+    fi
+    rm -f "$response_file"
+    return 1
+  fi
+
+  jq -r '.choices[0].message.content // empty' "$response_file"
+  rm -f "$response_file"
+}
+
+###############################################################################
+# Model call wrapper with error handling
+# On success: sets _model_result, returns 0
+# On payload too large (rc=2): warns, records skip, returns 1
+# On other errors: aborts the script
+###############################################################################
+_model_result=""
+
+call_model_or_abort() {
+  local name="$1"
+  local system_prompt="$2"
+  local user_prompt="$3"
+
+  _model_result=""
+  local rc=0
+  _model_result=$(call_model "$system_prompt" "$user_prompt") || rc=$?
+  if [ "$rc" -eq 2 ]; then
+    warn "Skipping ${name}: payload too large for model"
+    skipped_too_large+=("$name")
+    return 1
+  elif [ "$rc" -ne 0 ]; then
+    warn "API call failed for ${name}, aborting"
+    exit 1
+  fi
+}
+
+###############################################################################
+# Navigation / frontmatter helpers
+###############################################################################
+
+# Format a docs category path as a nav title
+# apps → Apps, infrastructure/core → Infrastructure / Core
+format_category_title() {
+  local path="$1"
+  local result=""
+  local IFS='/'
+  for part in $path; do
+    [ -n "$result" ] && result+=" / "
+    result+="${part^}"
+  done
+  echo "$result"
+}
+
+# Write a doc file with Jekyll frontmatter prepended
+# Usage: write_doc output_file content "key: value" "key: value" ...
+write_doc() {
+  local output_file="$1"
+  local content="$2"
+  shift 2
+  mkdir -p "$(dirname "$output_file")"
+  {
+    echo "---"
+    printf '%s\n' "$@"
+    echo "---"
+    echo ""
+    echo "$content"
+  } > "$output_file"
+}
+
+# Create a category index page for the nav hierarchy (idempotent)
+ensure_category_page() {
+  local cluster_name="$1"
+  local docs_category="$2"
+  local category_title="$3"
+
+  local page="${DOCS_DIR}/${cluster_name}/${docs_category}/index.md"
+  [ -f "$page" ] && return 0
+
+  write_doc "$page" "" \
+    "title: \"${category_title}\"" \
+    "parent: \"${cluster_name}\"" \
+    "has_children: true"
 }
 
 ###############################################################################
@@ -510,6 +611,7 @@ generate_component_doc() {
   local component_name="$4"
   local cluster_name="$5"
   local output_file="$6"
+  local category_title="${7:-}"
 
   log "  Building: ${component_path}"
 
@@ -537,7 +639,9 @@ generate_component_doc() {
   tmpdir=$(mktemp -d)
 
   # Build enrichment context per HelmRelease
-  local hr_context=""
+  # Split into metadata (small, always included) and helm templates (large, budget-dependent)
+  local hr_metadata=""
+  local hr_templates=""
   local dep_context=""
   local hr_count=0
 
@@ -552,19 +656,19 @@ generate_component_doc() {
       local repo_type="HTTP"
       [[ "$repo_url" == oci://* ]] && repo_type="OCI"
 
-      hr_context+="### HelmRelease: ${hr_name}"$'\n'
-      hr_context+="- Chart: ${chart}"$'\n'
-      hr_context+="- Version: ${display_version}"$'\n'
-      hr_context+="- Repository: ${repo_name} (${repo_url}) [${repo_type}]"$'\n'
-      hr_context+="- Release Name: ${release_name}"$'\n'
-      hr_context+="- Target Namespace: ${target_ns}"$'\n'
-      hr_context+="- Reconciliation Interval: ${interval}"$'\n'
+      hr_metadata+="### HelmRelease: ${hr_name}"$'\n'
+      hr_metadata+="- Chart: ${chart}"$'\n'
+      hr_metadata+="- Version: ${display_version}"$'\n'
+      hr_metadata+="- Repository: ${repo_name} (${repo_url}) [${repo_type}]"$'\n'
+      hr_metadata+="- Release Name: ${release_name}"$'\n'
+      hr_metadata+="- Target Namespace: ${target_ns}"$'\n'
+      hr_metadata+="- Reconciliation Interval: ${interval}"$'\n'
 
       if [ -n "$deps" ]; then
-        hr_context+="- Dependencies: ${deps}"$'\n'
+        hr_metadata+="- Dependencies: ${deps}"$'\n'
         dep_context+="- ${hr_name} depends on: ${deps}"$'\n'
       fi
-      hr_context+=$'\n'
+      hr_metadata+=$'\n'
 
       # Extract values and run helm template for public charts
       local values_file
@@ -575,32 +679,27 @@ generate_component_doc() {
         "$release_name" "$target_ns" "$values_file")
 
       if [ -n "$helm_output" ]; then
-        # Write helm output to temp file to avoid SIGPIPE with large outputs
         local helm_tmp="${tmpdir}/${hr_name}-helm-output.yaml"
         echo "$helm_output" > "$helm_tmp"
 
-        # Summarize the Kubernetes resources created by helm template
+        # Resource summary goes in metadata (small and useful)
         local resource_summary
         resource_summary=$(grep '^kind:' "$helm_tmp" | sed 's/kind: //' | sort | uniq -c | sort -rn | \
           awk '{print "  - " $2 " (" $1 ")"}')
+        hr_metadata+="#### Rendered Kubernetes Resources (via helm template):"$'\n'
+        hr_metadata+="${resource_summary}"$'\n\n'
 
-        hr_context+="#### Rendered Kubernetes Resources (via helm template):"$'\n'
-        hr_context+="${resource_summary}"$'\n'
-
-        # Include truncated helm template output (first 300 lines to avoid token limits)
+        # Full helm template output is separate (large, may be omitted)
         local template_lines
         template_lines=$(wc -l < "$helm_tmp")
-        if [ "$template_lines" -gt 300 ]; then
-          hr_context+=$'\n'"<helm-template-output lines=\"${template_lines}\" truncated=\"true\">"$'\n'
-          hr_context+="$(head -300 "$helm_tmp")"$'\n'
-          hr_context+="... (truncated, ${template_lines} total lines)"$'\n'
-          hr_context+="</helm-template-output>"$'\n'
+        hr_templates+="<helm-template-output release=\"${hr_name}\" lines=\"${template_lines}\">"$'\n'
+        if [ "$template_lines" -gt 200 ]; then
+          hr_templates+="$(head -200 "$helm_tmp")"$'\n'
+          hr_templates+="... (truncated, ${template_lines} total lines)"$'\n'
         else
-          hr_context+=$'\n'"<helm-template-output lines=\"${template_lines}\">"$'\n'
-          hr_context+="${helm_output}"$'\n'
-          hr_context+="</helm-template-output>"$'\n'
+          hr_templates+="${helm_output}"$'\n'
         fi
-        hr_context+=$'\n'
+        hr_templates+="</helm-template-output>"$'\n\n'
       fi
 
     done <<< "$hr_lines"
@@ -611,7 +710,12 @@ generate_component_doc() {
   all_kinds=$(echo "$rendered" | grep '^kind:' | sed 's/kind: //' | sort | uniq -c | sort -rn | \
     awk '{print $2 " (" $1 ")"}' | tr '\n' ', ' | sed 's/,$//')
 
-  # Build user prompt: data context + instructions from template
+  local system_prompt
+  system_prompt=$(load_prompt "component-system")
+  local instructions
+  instructions=$(load_prompt "component-user")
+
+  # Build user prompt: assemble core sections first, then add helm templates if within budget
   local user_prompt
   user_prompt="Generate documentation for component '${component_name}' deployed in cluster '${cluster_name}'.
 
@@ -620,9 +724,9 @@ ${rendered}
 
 "
 
-  if [ -n "$hr_context" ]; then
+  if [ -n "$hr_metadata" ]; then
     user_prompt+="=== HelmRelease Details (${hr_count} release(s)) ===
-${hr_context}
+${hr_metadata}
 "
   fi
 
@@ -635,24 +739,45 @@ ${dep_context}
   user_prompt+="=== Resource Summary ===
 All Kubernetes resource kinds in this component: ${all_kinds}
 
-"
+${instructions}"
 
-  user_prompt+="$(load_prompt "component-user")"
+  # Add helm template output if within token budget
+  if [ -n "$hr_templates" ]; then
+    local prompt_len=$(( ${#system_prompt} + ${#user_prompt} + 500 ))
+    local remaining=$((MAX_INPUT_CHARS - prompt_len))
+    if [ "$remaining" -gt 1000 ]; then
+      if [ "${#hr_templates}" -le "$remaining" ]; then
+        user_prompt+=$'\n\n'"=== Helm Template Output ==="$'\n'"${hr_templates}"
+      else
+        log "    Truncating helm template output to fit token limit"
+        user_prompt+=$'\n\n'"=== Helm Template Output (truncated) ==="$'\n'"${hr_templates:0:$remaining}"$'\n'"... (truncated to fit token limit)"
+      fi
+    else
+      log "    Omitting helm template output to fit within token limit"
+    fi
+  fi
 
-  local system_prompt
-  system_prompt=$(load_prompt "component-system")
+  # Final safety: truncate entire prompt if still over budget
+  local total_len=$(( ${#system_prompt} + ${#user_prompt} + 500 ))
+  if [ "$total_len" -gt "$MAX_INPUT_CHARS" ]; then
+    local budget=$((MAX_INPUT_CHARS - ${#system_prompt} - 500))
+    log "    Truncating prompt from ${#user_prompt} to ${budget} chars"
+    user_prompt="${user_prompt:0:$budget}"$'\n'"... (truncated to fit token limit)"
+  fi
 
-  local result
-  result=$(call_model "$system_prompt" "$user_prompt") || {
+  call_model_or_abort "$component_name" "$system_prompt" "$user_prompt" || {
     rm -rf "$tmpdir"
-    return 1
+    return 0
   }
 
   rm -rf "$tmpdir"
-  mkdir -p "$(dirname "$output_file")"
-  echo "$result" > "$output_file"
+  local fm_args=("title: \"${component_name}\"")
+  if [ -n "$category_title" ]; then
+    fm_args+=("parent: \"${category_title}\"" "grand_parent: \"${cluster_name}\"")
+  fi
+  write_doc "$output_file" "$_model_result" "${fm_args[@]}"
   docs_generated=$((docs_generated + 1))
-  log "  Generated: ${output_file#${REPO_ROOT}/}"
+  log "  Generated: ${output_file#"${REPO_ROOT}"/}"
 }
 
 # Generate doc for standalone resources (layer-level YAML files without kustomization.yaml)
@@ -661,6 +786,7 @@ generate_resources_doc() {
   local layer_name="$2"
   local cluster_name="$3"
   local output_file="$4"
+  local category_title="${5:-}"
 
   local context
   context=$(read_standalone_yamls "$layer_path")
@@ -678,13 +804,15 @@ ${context}
 
 $(load_prompt "resources-user")"
 
-  local result
-  result=$(call_model "$system_prompt" "$user_prompt") || return 1
+  call_model_or_abort "${layer_name} resources" "$system_prompt" "$user_prompt" || return 0
 
-  mkdir -p "$(dirname "$output_file")"
-  echo "$result" > "$output_file"
+  local fm_args=("title: \"${layer_name} resources\"")
+  if [ -n "$category_title" ]; then
+    fm_args+=("parent: \"${category_title}\"" "grand_parent: \"${cluster_name}\"")
+  fi
+  write_doc "$output_file" "$_model_result" "${fm_args[@]}"
   docs_generated=$((docs_generated + 1))
-  log "  Generated: ${output_file#${REPO_ROOT}/}"
+  log "  Generated: ${output_file#"${REPO_ROOT}"/}"
 }
 
 # Generate cluster overview from Flux Kustomization entrypoints
@@ -702,9 +830,15 @@ generate_cluster_overview() {
 
   local apps=""
   if [ -d "${REPO_ROOT}/apps/${cluster_name}" ]; then
-    apps=$(ls "${REPO_ROOT}/apps/${cluster_name}" 2>/dev/null \
-      | grep -v '\.config' | grep -v '^ci-excluded$' \
-      | tr '\n' ', ' | sed 's/,$//')
+    local app_list=()
+    for d in "${REPO_ROOT}/apps/${cluster_name}"/*/; do
+      [ -d "$d" ] || continue
+      local name
+      name=$(basename "$d")
+      case "$name" in *.config|ci-excluded) continue ;; esac
+      app_list+=("$name")
+    done
+    apps=$(IFS=,; echo "${app_list[*]}")
   fi
 
   local system_prompt
@@ -720,13 +854,13 @@ Applications deployed: ${apps:-none}
 
 $(load_prompt "overview-user")"
 
-  local result
-  result=$(call_model "$system_prompt" "$user_prompt") || return 1
+  call_model_or_abort "${cluster_name} overview" "$system_prompt" "$user_prompt" || return 0
 
-  mkdir -p "$(dirname "$output_file")"
-  echo "$result" > "$output_file"
+  write_doc "$output_file" "$_model_result" \
+    "title: \"${cluster_name}\"" \
+    "has_children: true"
   docs_generated=$((docs_generated + 1))
-  log "  Generated: ${output_file#${REPO_ROOT}/}"
+  log "  Generated: ${output_file#"${REPO_ROOT}"/}"
 }
 
 # Generate the index page from the generated docs tree
@@ -749,6 +883,7 @@ generate_index() {
       for f in "${cluster_dir}"/apps/*.md; do
         [ -f "$f" ] || continue
         name=$(basename "$f" .md)
+        [ "$name" = "index" ] && continue
         structure+="- [${name}](${cluster}/apps/${name}.md)"$'\n'
       done
     fi
@@ -763,6 +898,7 @@ generate_index() {
         for f in "${layer_dir}"/*.md; do
           [ -f "$f" ] || continue
           name=$(basename "$f" .md)
+          [ "$name" = "index" ] && continue
           structure+="- [${name}](${cluster}/infrastructure/${layer}/${name}.md)"$'\n'
         done
       done
@@ -784,12 +920,12 @@ ${structure}
 
 $(load_prompt "index-user")"
 
-  local result
-  result=$(call_model "$system_prompt" "$user_prompt") || return 1
+  call_model_or_abort "index" "$system_prompt" "$user_prompt" || return 0
 
-  mkdir -p "$(dirname "$output_file")"
-  echo "$result" > "$output_file"
-  log "  Generated: ${output_file#${REPO_ROOT}/}"
+  write_doc "$output_file" "$_model_result" \
+    "title: \"Home\"" \
+    "nav_order: 0"
+  log "  Generated: ${output_file#"${REPO_ROOT}"/}"
 }
 
 ###############################################################################
@@ -810,9 +946,15 @@ process_kustomization() {
 
   # Derive docs category: apps/nas → apps, infrastructure/core/nas → infrastructure/core
   local docs_category
-  docs_category=$(echo "$ks_path" | sed "s|/${cluster_name}$||")
+  docs_category="${ks_path%/"${cluster_name}"}"
 
-  log "Processing: ${ks_name} (${ks_path})"
+  local category_title
+  category_title=$(format_category_title "$docs_category")
+
+  log "Processing: ${ks_name} (${ks_path}) → ${category_title}"
+
+  # Ensure category nav page exists
+  ensure_category_page "$cluster_name" "$docs_category" "$category_title"
 
   # Find component subdirectories (have kustomization.yaml, are not support dirs)
   local has_components=false
@@ -833,7 +975,7 @@ process_kustomization() {
     fi
 
     generate_component_doc "$ks_name" "$ks_file" "$component_path" \
-      "$component_name" "$cluster_name" "$output_file"
+      "$component_name" "$cluster_name" "$output_file" "$category_title"
   done
 
   if [ "$has_components" = "true" ]; then
@@ -842,7 +984,7 @@ process_kustomization() {
     if should_generate "${ks_path}" "$resources_output"; then
       local layer_name
       layer_name=$(basename "$docs_category")
-      generate_resources_doc "$full_path" "$layer_name" "$cluster_name" "$resources_output"
+      generate_resources_doc "$full_path" "$layer_name" "$cluster_name" "$resources_output" "$category_title"
     fi
   else
     # No component subdirs — render the whole layer as one doc
@@ -852,7 +994,7 @@ process_kustomization() {
 
     if should_generate "${ks_path}" "$output_file"; then
       generate_component_doc "$ks_name" "$ks_file" "$ks_path" \
-        "$layer_name" "$cluster_name" "$output_file"
+        "$layer_name" "$cluster_name" "$output_file" "$category_title"
     fi
   fi
 }
@@ -876,31 +1018,12 @@ main() {
     fi
   done
 
-  # Write Jekyll config if not present (for GitHub Pages rendering)
+  # Copy Jekyll config and any other static pages assets
   mkdir -p "$DOCS_DIR"
-  if [ ! -f "${DOCS_DIR}/_config.yml" ]; then
-    log "Writing Jekyll _config.yml"
-    cat > "${DOCS_DIR}/_config.yml" << 'JEKYLL'
-title: GitOps Repository Documentation
-description: Auto-generated documentation for the multi-cluster Kubernetes GitOps repository
-remote_theme: just-the-docs/just-the-docs
-
-color_scheme: dark
-search_enabled: true
-
-# Apply default layout to all pages
-defaults:
-- scope:
-    path: ""
-  values:
-    layout: default
-
-# Exclude non-doc files from processing
-exclude:
-- _config.yml
-- Gemfile
-- Gemfile.lock
-JEKYLL
+  local pages_dir="${REPO_ROOT}/scripts/ci/pages"
+  if [ -d "$pages_dir" ]; then
+    cp -a "${pages_dir}/." "$DOCS_DIR/"
+    log "Copied pages assets from ${pages_dir#"${REPO_ROOT}"/}"
   fi
 
   # Resolve filter paths if provided
@@ -974,7 +1097,14 @@ JEKYLL
   local total
   total=$(find "${DOCS_DIR}" -name '*.md' 2>/dev/null | wc -l)
   log ""
-  log "Documentation generation complete: ${docs_generated} generated, ${total} total files in ${DOCS_DIR#${REPO_ROOT}/}"
+  log "Documentation generation complete: ${docs_generated} generated, ${total} total files in ${DOCS_DIR#"${REPO_ROOT}"/}"
+
+  if [ "${#skipped_too_large[@]}" -gt 0 ]; then
+    warn "Skipped ${#skipped_too_large[@]} component(s) due to payload size limits:"
+    for name in "${skipped_too_large[@]}"; do
+      warn "  - ${name}"
+    done
+  fi
 }
 
 main "$@"
