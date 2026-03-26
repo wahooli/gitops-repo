@@ -11,19 +11,28 @@ spec:
     labels:
       instance: gw01
       source: vps
+      clustername: vps
+      prometheus: monitoring/vps
     interval: 30s
     path: /metrics
+    honorLabels: true
   - targets:
     - 172.16.3.2:8405
     labels:
       instance: gw02
       source: vps
+      clustername: vps
+      prometheus: monitoring/vps
     interval: 30s
     path: /metrics
+    honorLabels: true
   - targets:
     - 172.16.3.3:8405
     labels:
       instance: gw03
       source: vps
+      clustername: vps
+      prometheus: monitoring/vps
     interval: 30s
     path: /metrics
+    honorLabels: true

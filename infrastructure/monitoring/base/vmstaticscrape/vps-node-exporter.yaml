@@ -11,8 +11,11 @@ spec:
     labels:
       instance: gw01
       source: vps
+      clustername: vps
+      prometheus: monitoring/vps
     interval: 30s
     path: /metrics
+    honorLabels: true
     metricRelabelConfigs: &node-exporter-relabel
     - action: drop
       regex: /snap/.+
@@ -43,14 +46,20 @@ spec:
     labels:
       instance: gw02
       source: vps
+      clustername: vps
+      prometheus: monitoring/vps
     interval: 30s
     path: /metrics
+    honorLabels: true
     metricRelabelConfigs: *node-exporter-relabel
   - targets:
     - 172.16.3.3:9100
     labels:
       instance: gw03
       source: vps
+      clustername: vps
+      prometheus: monitoring/vps
     interval: 30s
     path: /metrics
+    honorLabels: true
     metricRelabelConfigs: *node-exporter-relabel
