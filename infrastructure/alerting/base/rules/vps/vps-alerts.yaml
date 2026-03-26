@@ -1,0 +1,150 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: vps-alerts
+  namespace: alerting
+spec:
+  groups:
+  - name: vps-host
+    rules:
+    - alert: VPSHostDown
+      annotations:
+        description: "VPS host {{ $labels.instance }} is unreachable (node-exporter down)."
+        summary: VPS host is down.
+      expr: up{source="vps",job="node-exporter"} == 0
+      for: 2m
+      labels:
+        severity: critical
+    - alert: VPSHighIOWait
+      annotations:
+        description: "VPS host {{ $labels.instance }} has high IO wait ({{ $value | humanize }}%)."
+        summary: VPS host has high IO wait.
+      expr: |
+        avg by(instance) (
+          rate(node_cpu_seconds_total{source="vps",mode="iowait"}[5m])
+        ) * 100 > 50
+      for: 10m
+      labels:
+        severity: warning
+    - alert: VPSHighMemoryUsage
+      annotations:
+        description: "VPS host {{ $labels.instance }} memory usage is above 85% ({{ $value | humanize }}%)."
+        summary: VPS host memory usage is high.
+      expr: |
+        (1 - node_memory_MemAvailable_bytes{source="vps"}
+        / node_memory_MemTotal_bytes{source="vps"}) * 100 > 85
+      for: 10m
+      labels:
+        severity: warning
+    - alert: VPSDiskSpaceCritical
+      annotations:
+        description: "VPS host {{ $labels.instance }} disk {{ $labels.mountpoint }} is above 90% full."
+        summary: VPS disk space critical.
+      expr: |
+        (1 - node_filesystem_avail_bytes{source="vps",fstype!~"tmpfs|squashfs"}
+        / node_filesystem_size_bytes{source="vps",fstype!~"tmpfs|squashfs"}) * 100 > 90
+      for: 5m
+      labels:
+        severity: critical
+    - alert: VPSDiskSpaceWarning
+      annotations:
+        description: "VPS host {{ $labels.instance }} disk {{ $labels.mountpoint }} is above 80% full."
+        summary: VPS disk space warning.
+      expr: |
+        (1 - node_filesystem_avail_bytes{source="vps",fstype!~"tmpfs|squashfs"}
+        / node_filesystem_size_bytes{source="vps",fstype!~"tmpfs|squashfs"}) * 100 > 80
+      for: 10m
+      labels:
+        severity: warning
+
+  - name: vps-haproxy
+    rules:
+    - alert: VPSHAProxyDown
+      annotations:
+        description: "HAProxy on {{ $labels.instance }} is unreachable."
+        summary: HAProxy is down.
+      expr: up{source="vps",job="haproxy"} == 0
+      for: 2m
+      labels:
+        severity: critical
+    - alert: VPSHAProxyAllBackendsDown
+      annotations:
+        description: "All servers in backend {{ $labels.proxy }} on {{ $labels.instance }} are down."
+        summary: HAProxy backend has no servers available.
+      expr: |
+        sum by(instance, proxy) (
+          haproxy_server_status{source="vps",state="UP"}
+        ) == 0
+      for: 1m
+      labels:
+        severity: critical
+    - alert: VPSHAProxyBackendServerDown
+      annotations:
+        description: "Server {{ $labels.server }} in backend {{ $labels.proxy }} on {{ $labels.instance }} is down."
+        summary: HAProxy backend server is down.
+      expr: haproxy_server_status{source="vps",state="UP"} == 0
+      for: 5m
+      labels:
+        severity: warning
+    - alert: VPSHAProxyHighErrorRate
+      annotations:
+        description: "HAProxy on {{ $labels.instance }} has elevated 5xx error rate ({{ $value | humanize }}/s)."
+        summary: HAProxy high 5xx error rate.
+      expr: |
+        sum by(instance) (
+          rate(haproxy_frontend_http_responses_total{source="vps",code="5xx"}[5m])
+        ) > 1
+      for: 5m
+      labels:
+        severity: warning
+    - alert: VPSHAProxyProcessBusy
+      annotations:
+        description: "HAProxy on {{ $labels.instance }} is using more than 10% CPU (idle < 90%)."
+        summary: HAProxy process is busy.
+      expr: haproxy_process_idle_time_percent{source="vps"} < 90
+      for: 15m
+      labels:
+        severity: warning
+
+  - name: vps-certificates
+    rules:
+    - alert: VPSCertificateExpiringSoon
+      annotations:
+        description: "Certificate {{ $labels.domain }} on {{ $labels.instance }} expires in {{ $value }} days."
+        summary: SSL certificate expiring soon.
+      expr: cert_expiry_days_remaining{source="vps"} < 14
+      for: 1h
+      labels:
+        severity: critical
+    - alert: VPSCertificateExpiring
+      annotations:
+        description: "Certificate {{ $labels.domain }} on {{ $labels.instance }} expires in {{ $value }} days."
+        summary: SSL certificate expiring.
+      expr: cert_expiry_days_remaining{source="vps"} < 30
+      for: 1h
+      labels:
+        severity: warning
+    - alert: VPSCertificateInvalid
+      annotations:
+        description: "Certificate {{ $labels.domain }} on {{ $labels.instance }} is invalid."
+        summary: SSL certificate is invalid.
+      expr: cert_valid{source="vps"} == 0
+      for: 5m
+      labels:
+        severity: critical
+    - alert: VPSCertbotRenewalFailed
+      annotations:
+        description: "Certbot on {{ $labels.instance }} last exit status was {{ $value }}."
+        summary: Certbot renewal failed.
+      expr: certbot_last_exit_status{source="vps"} != 0
+      for: 10m
+      labels:
+        severity: warning
+    - alert: VPSCertbotTimerInactive
+      annotations:
+        description: "Certbot renewal timer on {{ $labels.instance }} is not active."
+        summary: Certbot timer is inactive.
+      expr: certbot_timer_active{source="vps"} == 0
+      for: 10m
+      labels:
+        severity: warning
