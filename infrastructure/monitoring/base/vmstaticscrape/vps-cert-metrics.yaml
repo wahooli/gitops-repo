@@ -14,6 +14,7 @@ spec:
       clustername: vps
       prometheus: monitoring/vps
     interval: 300s
+    scrapeTimeout: 15s
     path: /cert-metrics
     honorLabels: true
   - targets:
@@ -24,6 +25,7 @@ spec:
       clustername: vps
       prometheus: monitoring/vps
     interval: 300s
+    scrapeTimeout: 15s
     path: /cert-metrics
     honorLabels: true
   - targets:
@@ -34,5 +36,6 @@ spec:
       clustername: vps
       prometheus: monitoring/vps
     interval: 300s
+    scrapeTimeout: 15s
     path: /cert-metrics
     honorLabels: true
