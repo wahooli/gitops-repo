@@ -1,0 +1,17 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMStaticScrape
+metadata:
+  name: vps-cert-metrics
+  namespace: monitoring
+spec:
+  jobName: vps-cert-metrics
+  targetEndpoints:
+  - targets:
+    - 172.16.3.1:8405
+    - 172.16.3.2:8405
+    - 172.16.3.3:8405
+    labels:
+      job: cert-metrics
+      source: vps
+    interval: 300s
+    path: /cert-metrics

@@ -15,3 +15,6 @@ resources:
 - vmservicescrape/kube-dns.yaml
 - vmservicescrape/kube-state-metrics.yaml
 - vmservicescrape/victoria-metrics-operator.yaml
+- vmstaticscrape/vps-node-exporter.yaml
+- vmstaticscrape/vps-haproxy.yaml
+- vmstaticscrape/vps-cert-metrics.yaml

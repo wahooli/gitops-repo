@@ -12,6 +12,7 @@ help:
 	@echo "  make down [cluster]                Delete k3d cluster (all if omitted)"
 	@echo "  make artifact                      Push manifests to OCI registry"
 	@echo "  make verify <cluster>              Verify kustomizations and helmreleases"
+	@echo "  make verify mesh                   Deploy mesh and verify all clusters"
 	@echo "  make verify-kustomization <cluster> Verify Flux kustomization reconciliation"
 	@echo "  make verify-helmrelease <cluster>   Verify HelmRelease reconciliation"
 	@echo "  make verify-workload <cluster>      Verify all workloads are healthy"
@@ -51,10 +52,25 @@ artifact:
 lint:
 	@yamllint .
 
-verify: _require-cluster _ensure-cluster
+verify: $(if $(filter mesh,$(CLUSTER)),,_require-cluster _ensure-cluster)
+ifeq ($(CLUSTER),mesh)
+	@$(MAKE) deploy mesh
+	@for dir in local-clusters/*/; do \
+		[ -d "$$dir" ] || continue; \
+		name=$$(basename "$$dir"); \
+		[ "$${name#_}" = "$$name" ] && [ "$${name#.}" = "$$name" ] || continue; \
+		[ -f "$$dir/k3d-config.yaml" ] || continue; \
+		[ -d "clusters/$$name" ] || continue; \
+		echo "Verifying $$name..."; \
+		CONTEXT=k3d-$$name $(SCRIPTS_DIR)/verify-kustomizations.sh $$name || exit 1; \
+		CONTEXT=k3d-$$name $(SCRIPTS_DIR)/verify-helmreleases.sh $$name || exit 1; \
+		CONTEXT=k3d-$$name $(SCRIPTS_DIR)/verify-workloads.sh $$name || exit 1; \
+	done
+else
 	@CONTEXT=k3d-$(CLUSTER) $(SCRIPTS_DIR)/verify-kustomizations.sh $(CLUSTER)
 	@CONTEXT=k3d-$(CLUSTER) $(SCRIPTS_DIR)/verify-helmreleases.sh $(CLUSTER)
 	@CONTEXT=k3d-$(CLUSTER) $(SCRIPTS_DIR)/verify-workloads.sh $(CLUSTER)
+endif
 
 verify-kustomization: _require-cluster
 	@CONTEXT=k3d-$(CLUSTER) $(SCRIPTS_DIR)/verify-kustomizations.sh $(CLUSTER)

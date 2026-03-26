@@ -287,29 +287,27 @@ MOUNTSCRIPT
   '
 done
 
-# Install Cilium via Helm
+# Install Cilium via cilium CLI (uses same field manager as clustermesh connect)
 echo "Installing Cilium in cluster $CLUSTER_NAME"
 
 CILIUM_BASE_VALUES="$REPO_ROOT/local-clusters/cilium-base-values.yaml"
 CILIUM_CLUSTER_VALUES="$REPO_ROOT/local-clusters/$CLUSTER_NAME/cilium-values.yaml"
 
-HELM_ARGS=(
-  upgrade --install cilium cilium
-  --repo https://helm.cilium.io
-  --namespace kube-system
+CILIUM_ARGS=(
+  install
   --version "$CILIUM_VERSION"
-  --kube-context "$CONTEXT_NAME"
+  --context "$CONTEXT_NAME"
 )
 
 if [[ -f "$CILIUM_BASE_VALUES" ]]; then
-  HELM_ARGS+=(-f "$CILIUM_BASE_VALUES")
+  CILIUM_ARGS+=(-f "$CILIUM_BASE_VALUES")
 fi
 
 if [[ -f "$CILIUM_CLUSTER_VALUES" ]]; then
-  HELM_ARGS+=(-f "$CILIUM_CLUSTER_VALUES")
+  CILIUM_ARGS+=(-f "$CILIUM_CLUSTER_VALUES")
 fi
 
-helm "${HELM_ARGS[@]}"
+cilium "${CILIUM_ARGS[@]}"
 
 echo "Cilium installed successfully in $CLUSTER_NAME"
 

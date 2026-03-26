@@ -27,6 +27,20 @@ fi
 
 echo "Clusters to deploy: ${clusters[*]}"
 
+# --- Exit early if all clusters are already running ---
+all_up=true
+for cluster in "${clusters[@]}"; do
+  if ! k3d cluster list -o json | jq -e ".[] | select(.name==\"$cluster\")" >/dev/null 2>&1; then
+    all_up=false
+    break
+  fi
+done
+
+if [[ "$all_up" == true ]]; then
+  echo "All clusters are already running"
+  exit 0
+fi
+
 # --- Create all clusters in parallel ---
 declare -A create_pids=()
 echo "Creating clusters in parallel..."

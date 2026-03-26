@@ -1,0 +1,17 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMStaticScrape
+metadata:
+  name: vps-haproxy
+  namespace: monitoring
+spec:
+  jobName: vps-haproxy
+  targetEndpoints:
+  - targets:
+    - 172.16.3.1:8405
+    - 172.16.3.2:8405
+    - 172.16.3.3:8405
+    labels:
+      job: haproxy
+      source: vps
+    interval: 30s
+    path: /metrics
