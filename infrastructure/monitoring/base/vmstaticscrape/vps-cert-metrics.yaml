@@ -4,14 +4,26 @@ metadata:
   name: vps-cert-metrics
   namespace: monitoring
 spec:
-  jobName: vps-cert-metrics
+  jobName: cert-metrics
   targetEndpoints:
   - targets:
     - 172.16.3.1:8405
+    labels:
+      instance: gw01
+      source: vps
+    interval: 300s
+    path: /cert-metrics
+  - targets:
     - 172.16.3.2:8405
+    labels:
+      instance: gw02
+      source: vps
+    interval: 300s
+    path: /cert-metrics
+  - targets:
     - 172.16.3.3:8405
     labels:
-      job: cert-metrics
+      instance: gw03
       source: vps
     interval: 300s
     path: /cert-metrics

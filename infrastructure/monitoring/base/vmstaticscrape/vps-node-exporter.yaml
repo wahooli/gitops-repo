@@ -4,14 +4,53 @@ metadata:
   name: vps-node-exporter
   namespace: monitoring
 spec:
-  jobName: vps-node-exporter
+  jobName: node-exporter
   targetEndpoints:
   - targets:
     - 172.16.3.1:9100
-    - 172.16.3.2:9100
-    - 172.16.3.3:9100
     labels:
-      job: node-exporter
+      instance: gw01
       source: vps
     interval: 30s
     path: /metrics
+    metricRelabelConfigs: &node-exporter-relabel
+    - action: drop
+      regex: /snap/.+
+      source_labels:
+      - mountpoint
+    - action: drop
+      regex: /run/user/.+
+      source_labels:
+      - mountpoint
+    - action: drop
+      regex: tmpfs
+      source_labels:
+      - device
+    - action: drop
+      regex: shm
+      source_labels:
+      - device
+    - action: drop
+      regex: loop\d+
+      source_labels:
+      - device
+    - action: drop
+      regex: dm-\d+
+      source_labels:
+      - device
+  - targets:
+    - 172.16.3.2:9100
+    labels:
+      instance: gw02
+      source: vps
+    interval: 30s
+    path: /metrics
+    metricRelabelConfigs: *node-exporter-relabel
+  - targets:
+    - 172.16.3.3:9100
+    labels:
+      instance: gw03
+      source: vps
+    interval: 30s
+    path: /metrics
+    metricRelabelConfigs: *node-exporter-relabel
