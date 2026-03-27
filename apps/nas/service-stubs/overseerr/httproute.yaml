@@ -5,9 +5,8 @@ metadata:
   namespace: default
 spec:
   parentRefs:
-  - name: envoy-gw
+  - name: envoy-gw-private
     namespace: envoy-gateway-system
-    sectionName: wahooli-https
   hostnames:
   - "overseerr.${domain_wahoo_li:=wahoo.li}"
   rules:

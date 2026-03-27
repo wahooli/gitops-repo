@@ -10,6 +10,9 @@ spec:
   - name: envoy-gw
     namespace: envoy-gateway-system
     sectionName: wahooli-https
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
   hostnames:
   - "vault.${domain_wahoo_li:=wahoo.li}"
   rules:
@@ -31,6 +34,9 @@ metadata:
 spec:
   parentRefs:
   - name: envoy-gw
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
+  - name: envoy-gw-private
     namespace: envoy-gateway-system
     sectionName: wahooli-https
   hostnames:
@@ -56,6 +62,9 @@ spec:
   - name: envoy-gw
     namespace: envoy-gateway-system
     sectionName: wahooli-https
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
   hostnames:
   - "jellyfin.${domain_wahoo_li:=wahoo.li}"
   rules:
@@ -77,6 +86,9 @@ metadata:
 spec:
   parentRefs:
   - name: envoy-gw
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
+  - name: envoy-gw-private
     namespace: envoy-gateway-system
     sectionName: wahooli-https
   hostnames:

@@ -8,6 +8,9 @@ spec:
   - name: envoy-gw
     namespace: envoy-gateway-system
     sectionName: wahooli-https
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
   hostnames:
   - "ombi.${domain_wahoo_li:=wahoo.li}"
   rules:
