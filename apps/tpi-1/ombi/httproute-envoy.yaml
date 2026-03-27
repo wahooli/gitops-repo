@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: ombi-envoy
+  name: ombi
   namespace: default
 spec:
   parentRefs:
@@ -34,7 +34,7 @@ spec:
   targetRefs:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
-    name: ombi-envoy
+    name: ombi
   extAuth:
     failOpen: false
     headersToExtAuth:

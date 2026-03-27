@@ -1,14 +1,13 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: ombi-envoy
+  name: ombi
   namespace: default
 spec:
   parentRefs:
   - name: envoy-gw-private
     namespace: envoy-gateway-system
   hostnames:
-  - "ombi.${domain_absolutist_it:=absolutist.it}"
   - "ombi.${domain_wahoo_li:=wahoo.li}"
   rules:
   - matches:
@@ -22,6 +21,22 @@ spec:
     - name: ombi
       port: 3579
 ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ombi-private
+  namespace: default
+spec:
+  parentRefs:
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+  hostnames:
+  - "ombi.${domain_absolutist_it:=absolutist.it}"
+  rules:
+  - backendRefs:
+    - name: ombi
+      port: 3579
+---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
@@ -31,7 +46,7 @@ spec:
   targetRefs:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
-    name: ombi-envoy
+    name: ombi
   extAuth:
     failOpen: false
     headersToExtAuth:

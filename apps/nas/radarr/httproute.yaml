@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: radarr
+  name: radarr-private
   namespace: default
   annotations:
     external-dns.alpha.kubernetes.io/target: gw.${domain_absolutist_it:=absolutist.it}
