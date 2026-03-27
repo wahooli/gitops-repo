@@ -5,6 +5,7 @@ metadata:
   namespace: authentik
   annotations:
     service.cilium.io/global: "true"
+    service.cilium.io/global-sync-endpoint-slices: "true"
 spec:
   internalTrafficPolicy: Cluster
   ports:

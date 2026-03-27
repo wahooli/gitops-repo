@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: authentik-envoy
+  namespace: authentik
+spec:
+  parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+  hostnames:
+  - "auth.${domain_wahoo_li:=wahoo.li}"
+  - "auth.${domain_absolutist_it:=absolutist.it}"
+  - "authentik.${domain_wahoo_li:=wahoo.li}"
+  - "authentik.${domain_absolutist_it:=absolutist.it}"
+  rules:
+  - backendRefs:
+    - name: authentik-server
+      port: 80
