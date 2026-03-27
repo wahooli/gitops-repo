@@ -39,6 +39,11 @@ persistence:
       #     useFromChart: false
       #     configMap:
       #       name: ombi-database-json
+service:
+  main:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
 ingress:
   main:
     className: nginx

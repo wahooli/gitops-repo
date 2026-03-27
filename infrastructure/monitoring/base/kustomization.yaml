@@ -10,7 +10,9 @@ resources:
 - vmpodscrape/fluxcd.yaml
 - vmpodscrape/node-exporter.yaml
 - vmpodscrape/topolvm.yaml
+- vmpodscrape/envoy-gateway-proxy.yaml
 - vmservicescrape/authentik.yaml
+- vmservicescrape/envoy-gateway.yaml
 - vmservicescrape/ingress-nginx.yaml
 - vmservicescrape/kube-dns.yaml
 - vmservicescrape/kube-state-metrics.yaml

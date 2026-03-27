@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: sonarr-envoy
+  namespace: default
+spec:
+  parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
+  hostnames:
+  - "sonarr.${domain_wahoo_li:=wahoo.li}"
+  rules:
+  - backendRefs:
+    - name: ak-outpost-proxy-default
+      port: 9000

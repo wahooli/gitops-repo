@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: vaultwarden-envoy
+  namespace: default
+spec:
+  parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
+  hostnames:
+  - "vault.${domain_wahoo_li:=wahoo.li}"
+  rules:
+  - backendRefs:
+    - name: vaultwarden
+      port: 80

@@ -112,6 +112,11 @@ persistence:
       nfs:
         path: ${paperless_nfs_export_path}
         server: ${paperless_nfs_server}
+service:
+  main:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
 ingress:
   main:
     enabled: true

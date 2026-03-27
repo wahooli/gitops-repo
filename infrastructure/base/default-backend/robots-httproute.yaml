@@ -1,0 +1,36 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: robots-txt
+  namespace: infrastructure
+  annotations:
+    external-dns.alpha.kubernetes.io/exclude: "true"
+spec:
+  parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
+  hostnames:
+  - "auth.${domain_wahoo_li:=wahoo.li}"
+  - "ombi.${domain_wahoo_li:=wahoo.li}"
+  - "paperless.${domain_wahoo_li:=wahoo.li}"
+  - "tautulli.${domain_wahoo_li:=wahoo.li}"
+  - "sonarr.${domain_wahoo_li:=wahoo.li}"
+  - "radarr.${domain_wahoo_li:=wahoo.li}"
+  - "bazarr.${domain_wahoo_li:=wahoo.li}"
+  - "grafana.${domain_wahoo_li:=wahoo.li}"
+  - "overseerr.${domain_wahoo_li:=wahoo.li}"
+  - "jellyfin.${domain_wahoo_li:=wahoo.li}"
+  - "plex.${domain_wahoo_li:=wahoo.li}"
+  - "vault.${domain_wahoo_li:=wahoo.li}"
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /robots.txt
+    - path:
+        type: Exact
+        value: /ads.txt
+    backendRefs:
+    - name: default-backend
+      port: 80
