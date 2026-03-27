@@ -5,9 +5,13 @@ metadata:
   namespace: default
 spec:
   parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
   - name: envoy-gw-private
     namespace: envoy-gateway-system
   hostnames:
+  - "vault.${domain_absolutist_it:=absolutist.it}"
   - "vault.${domain_wahoo_li:=wahoo.li}"
   rules:
   - backendRefs:

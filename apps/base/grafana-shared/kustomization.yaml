@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - namespace.yaml
 - ../grafana
+- httproute.yaml
 - vmservicescrape.yaml
 patches:
 - path: helmrelease.yaml
