@@ -9,7 +9,7 @@ spec:
   targetNamespace: internal-dns
   chart:
     spec:
-      version: "1.15.0"
+      version: "1.20.0"
   valuesFrom:
   - kind: ConfigMap
     name: tpi-1-external-dns-values

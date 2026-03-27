@@ -17,10 +17,7 @@ spec:
   connection:
     connectionLimit:
       value: 10000
-  proxyProtocol:
-    supportedVersions:
-    - V1
-    - V2
+  proxyProtocol: {}
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: ClientTrafficPolicy
