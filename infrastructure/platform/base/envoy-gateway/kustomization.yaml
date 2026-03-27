@@ -6,3 +6,4 @@ resources:
 - gateway.yaml
 - gateway-private.yaml
 - http-https-redirect.yaml
+- referencegrant.yaml
