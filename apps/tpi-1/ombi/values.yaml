@@ -44,6 +44,7 @@ service:
     annotations:
       service.cilium.io/global: "true"
       service.cilium.io/affinity: "local"
+      service.cilium.io/global-sync-endpoint-slices: "true"
 ingress:
   main:
     className: nginx
@@ -79,10 +80,3 @@ ingress:
           name: ak-outpost-proxy-default
           port:
             number: 9000
-dnsEndpoints:
-  main:
-    dnsName: ombi.${domain_wahoo_li:=wahoo.li}
-    recordTTL: 180
-    recordType: CNAME
-    targets:
-    - haproxy.tpi-1.${domain_wahoo_li:=wahoo.li}

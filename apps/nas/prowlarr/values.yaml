@@ -94,10 +94,3 @@ ingress:
     - secretName: tls-prowlarr-ingress
       hosts:
       - prowlarr.${domain_wahoo_li:=wahoo.li}
-dnsEndpoints:
-  main:
-    dnsName: prowlarr.${domain_wahoo_li:=wahoo.li}
-    recordTTL: 180
-    recordType: CNAME
-    targets:
-    - haproxy.nas.${domain_wahoo_li:=wahoo.li}

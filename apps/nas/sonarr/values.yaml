@@ -99,10 +99,3 @@ ingress:
           name: ak-outpost-nasse-proxy
           port:
             number: 9000
-dnsEndpoints:
-  main:
-    dnsName: sonarr.${domain_wahoo_li:=wahoo.li}
-    recordTTL: 180
-    recordType: CNAME
-    targets:
-    - haproxy.nas.${domain_wahoo_li:=wahoo.li}

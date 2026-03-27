@@ -1,0 +1,37 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: envoy-gw-public-policy
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: envoy-gw
+  http3: {}
+  clientIPDetection:
+    xForwardedFor:
+      numTrustedHops: 1
+  headers:
+    enableEnvoyHeaders: false
+  connection:
+    connectionLimit:
+      value: 10000
+  proxyProtocol:
+    supportedVersions:
+    - V1
+    - V2
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: envoy-gw-private-policy
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: envoy-gw-private
+  http3: {}
+  headers:
+    enableEnvoyHeaders: false

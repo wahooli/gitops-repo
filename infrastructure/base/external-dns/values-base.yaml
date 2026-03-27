@@ -1,5 +1,5 @@
 serviceMonitor:
-  enabled: false  # will be added manually after prometheus install
+  enabled: false
 logLevel: error
 image:
   pullPolicy: IfNotPresent

@@ -14,7 +14,6 @@ spec:
       name: envoy-proxy-config
     annotations:
       lbipam.cilium.io/ips: "${envoy_gw_lb_ip}"
-      external-dns.alpha.kubernetes.io/hostname: egw.${domain_wahoo_li:=wahoo.li}
   listeners:
   - name: wahooli-http
     protocol: HTTP

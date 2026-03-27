@@ -7,3 +7,5 @@ resources:
 - gateway-private.yaml
 - http-https-redirect.yaml
 - referencegrant.yaml
+- clienttrafficpolicy.yaml
+- backendtrafficpolicy.yaml

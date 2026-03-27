@@ -5,8 +5,8 @@ metadata:
   namespace: default
 spec:
   parentRefs:
-  - name: internal-gw
-    namespace: infrastructure
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
   hostnames:
   - "vault.${domain_absolutist_it:=absolutist.it}"
   - "vault.${domain_wahoo_li:=wahoo.li}"

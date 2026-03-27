@@ -4,8 +4,7 @@ metadata:
   name: static-backend
   namespace: infrastructure
   annotations:
-    external-dns.alpha.kubernetes.io/target: gw.${domain_wahoo_li:=wahoo.li}
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
+    # external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
 spec:
   parentRefs:
   - name: envoy-gw

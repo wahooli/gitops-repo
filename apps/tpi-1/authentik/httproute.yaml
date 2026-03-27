@@ -5,8 +5,8 @@ metadata:
   namespace: authentik
 spec:
   parentRefs:
-  - name: internal-gw
-    namespace: infrastructure
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
   hostnames:
   - "auth.${domain_wahoo_li:=wahoo.li}"
   - "auth.${domain_absolutist_it:=absolutist.it}"

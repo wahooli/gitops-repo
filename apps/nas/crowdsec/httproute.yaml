@@ -5,8 +5,8 @@ metadata:
   namespace: crowdsec
 spec:
   parentRefs:
-  - name: internal-gw
-    namespace: infrastructure
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
   hostnames:
   - "crowdsec-api.${domain_absolutist_it:=absolutist.it}"
   rules:

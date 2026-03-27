@@ -5,8 +5,8 @@ metadata:
   namespace: internal-dns
 spec:
   parentRefs:
-  - name: internal-gw
-    namespace: infrastructure
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
   hostnames:
   - "blocky-api.${domain_wahoo_li:=wahoo.li}"
   - "blocky-api.${domain_absolutist_it:=absolutist.it}"

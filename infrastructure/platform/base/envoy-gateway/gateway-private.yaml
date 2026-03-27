@@ -3,6 +3,8 @@ kind: Gateway
 metadata:
   name: envoy-gw-private
   namespace: envoy-gateway-system
+  labels:
+    dns-visibility: internal
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
@@ -14,7 +16,7 @@ spec:
       name: envoy-proxy-config
     annotations:
       lbipam.cilium.io/ips: "${envoy_gw_private_lb_ip}"
-      external-dns.alpha.kubernetes.io/hostname: egw.${domain_absolutist_it:=absolutist.it}
+      external-dns.alpha.kubernetes.io/hostname: gw.${domain_wahoo_li:=wahoo.li},gw.${domain_absolutist_it:=absolutist.it}
   listeners:
   - name: wahooli-http
     protocol: HTTP
