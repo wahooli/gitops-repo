@@ -4,5 +4,6 @@ resources:
 - cilium-bgp-advertisement.yaml
 - cilium-bgp-cluster-config.yaml
 - cilium-bgp-peer-config-tor.yaml
-- cilium-ippool-internal-dns.yaml
 - cilium-ippool.yaml
+- cilium-ippool-internal-dns.yaml
+- cilium-ippool-envoy-gateway.yaml
