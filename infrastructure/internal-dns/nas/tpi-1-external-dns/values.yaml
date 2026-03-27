@@ -29,4 +29,4 @@ extraArgs:
 - --rfc2136-tsig-axfr
 - --rfc2136-tsig-secret=${tpi_1_external_dns_key}
 - --rfc2136-create-ptr
-tolerations: {}
+tolerations: []
