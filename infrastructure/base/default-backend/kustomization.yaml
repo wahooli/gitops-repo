@@ -9,6 +9,7 @@ resources:
 - overrides-httproute.yaml
 - robots-httproute.yaml
 - static-httproute.yaml
+- default-httproute.yaml
 configMapGenerator:
 - name: nginx-html
   namespace: infrastructure
