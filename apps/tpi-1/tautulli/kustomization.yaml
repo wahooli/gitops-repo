@@ -4,6 +4,7 @@ resources:
 - ../../base/tautulli
 - certificate.yaml
 - httproute.yaml
+- httproute-private.yaml
 - imagepolicy.yaml
 patches:
 - path: helmrelease.yaml

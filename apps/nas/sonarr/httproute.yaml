@@ -3,15 +3,16 @@ kind: HTTPRoute
 metadata:
   name: sonarr
   namespace: default
-  annotations:
-    external-dns.alpha.kubernetes.io/target: gw.nas.${domain_absolutist_it:=absolutist.it}
 spec:
   parentRefs:
-  - name: internal-gw
-    namespace: infrastructure
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
   hostnames:
-  - "sonarr.${domain_absolutist_it:=absolutist.it}"
+  - "sonarr.${domain_wahoo_li:=wahoo.li}"
   rules:
   - backendRefs:
-    - name: sonarr
-      port: 8989
+    - name: ak-outpost-nasse-proxy
+      port: 9000

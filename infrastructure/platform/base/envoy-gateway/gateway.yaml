@@ -1,0 +1,37 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: envoy-gw
+  namespace: envoy-gateway-system
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+spec:
+  gatewayClassName: envoy-gateway
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: envoy-proxy-config
+    annotations:
+      lbipam.cilium.io/ips: "${envoy_gw_lb_ip}"
+  listeners:
+  - name: wahooli-http
+    protocol: HTTP
+    port: 80
+    hostname: "*.${domain_wahoo_li:=wahoo.li}"
+    allowedRoutes:
+      namespaces:
+        from: All
+  - name: wahooli-https
+    protocol: HTTPS
+    port: 443
+    hostname: "*.${domain_wahoo_li:=wahoo.li}"
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: wahooli-wildcard-tls
+        kind: Secret
+        namespace: infrastructure
+    allowedRoutes:
+      namespaces:
+        from: All

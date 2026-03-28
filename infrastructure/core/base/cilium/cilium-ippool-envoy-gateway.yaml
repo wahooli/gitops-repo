@@ -1,0 +1,11 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "envoy-gateway-ip-pool"
+spec:
+  blocks:
+  - start: "${envoy_gw_lb_ip}"
+  - start: "${envoy_gw_private_lb_ip}"
+  serviceSelector:
+    matchLabels:
+      "io.kubernetes.service.namespace": "envoy-gateway-system"

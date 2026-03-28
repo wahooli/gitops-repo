@@ -1,0 +1,16 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: envoy-gw-compression
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: envoy-gw
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: envoy-gw-private
+  compression:
+  - type: Gzip
+  - type: Brotli

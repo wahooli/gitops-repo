@@ -30,3 +30,48 @@ patches:
     kind: VMServiceScrape
     metadata:
       name: ingress-nginx
+- target:
+    kind: VMStaticScrape
+    name: vps-node-exporter
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMStaticScrape
+    metadata:
+      name: vps-node-exporter
+- target:
+    kind: VMStaticScrape
+    name: vps-haproxy
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMStaticScrape
+    metadata:
+      name: vps-haproxy
+- target:
+    kind: VMStaticScrape
+    name: vps-cert-metrics
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMStaticScrape
+    metadata:
+      name: vps-cert-metrics
+- target:
+    kind: VMServiceScrape
+    name: envoy-gateway-controller
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMServiceScrape
+    metadata:
+      name: envoy-gateway-controller
+- target:
+    kind: VMPodScrape
+    name: envoy-gateway-proxy
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMPodScrape
+    metadata:
+      name: envoy-gateway-proxy

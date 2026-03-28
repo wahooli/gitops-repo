@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ombi-private
+  namespace: default
+spec:
+  parentRefs:
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+  hostnames:
+  - "ombi.${domain_absolutist_it:=absolutist.it}"
+  rules:
+  - backendRefs:
+    - name: ombi
+      port: 3579

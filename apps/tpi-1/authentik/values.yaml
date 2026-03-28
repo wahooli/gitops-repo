@@ -98,21 +98,9 @@ server:
     annotations:
       service.cilium.io/global: "true"
       service.cilium.io/affinity: "local"
+      service.cilium.io/global-sync-endpoint-slices: "true"
   ingress:
-    enabled: true
-    ingressClassName: nginx
-    labels:
-      velero.io/exclude-from-backup: "true"
-    annotations:
-      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/service-upstream: "true"
-      external-dns.alpha.kubernetes.io/target: gw.${domain_wahoo_li:=wahoo.li}
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-      nginx.ingress.kubernetes.io/custom-http-errors: "404"
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: "false"
-    hosts:
-    - auth.${domain_wahoo_li:=wahoo.li}
+    enabled: false
 postgresql:
   enabled: false
   auth:

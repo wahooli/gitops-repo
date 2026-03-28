@@ -4,9 +4,10 @@ image:
 
 agent:
   acquisition:
-  - namespace: ingress-nginx
-    podName: ingress-nginx-controller-*
-    program: ingress-nginx
+  - namespace: envoy-gateway-system
+    podName: envoy-envoy-gateway-system-envoy-gw-*
+    program: envoy-gateway
+    container_name: envoy
     poll_without_inotify: true
   - namespace: authentik
     podName: authentik-server-*
@@ -28,6 +29,10 @@ agent:
     name: postgres-tls
 
 lapi:
+  service:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
   extraVolumes: *extraVolumes
   extraVolumeMounts: *extraVolumeMounts
   replicas: 1
@@ -61,109 +66,92 @@ config:
     share_custom: false
   parsers:
     s01-parse:
-      wahooli-nginx-json-access-log.yaml: |
-        name: wahooli/nginx_json_access_log
-        description: "Parse custom nginx access log"
+      wahooli-envoy-access-log.yaml: |
+        name: wahooli/envoy_access_log
+        description: "Parse envoy gateway JSON access log"
         onsuccess: next_stage
-        filter: "Upper(evt.Line.Labels.program) == 'INGRESS-NGINX' && Upper(evt.Parsed.stream) == 'STDOUT'"
+        filter: "Upper(evt.Line.Labels.program) == 'ENVOY-GATEWAY' && Upper(evt.Parsed.stream) == 'STDOUT'"
         statics:
         - meta: service
           value: http
         - meta: log_type
           value: http_access-log
         - meta: source_ip
-          expression: JsonExtractUnescape(evt.Parsed.message, "remote_addr")
+          expression: JsonExtractUnescape(evt.Parsed.message, "client_ip")
         - meta: target_fqdn
           expression: JsonExtractUnescape(evt.Parsed.message, "vhost")
         - meta: http_verb
           expression: JsonExtractUnescape(evt.Parsed.message, "method")
-        - parsed: http_args
-          expression: JsonExtractUnescape(evt.Parsed.message, "request_query")
         - meta: http_status
           expression: JsonExtract(evt.Parsed.message, "status")
-        - parsed: request
-          expression: JsonExtractUnescape(evt.Parsed.message, "path")
         - meta: http_path
-          expression: 'evt.Parsed.request + (evt.Parsed.http_args != "" ? "?" + evt.Parsed.http_args : "")'
+          expression: JsonExtractUnescape(evt.Parsed.message, "path")
         - meta: program
           expression: Lower(evt.Line.Labels.program)
         - parsed: http_user_agent
           expression: JsonExtractUnescape(evt.Parsed.message, "user_agent")
   scenarios:
-    wahooli-block-wp-scanners-nginx.yaml: |
-      type: leaky
-      name: wahooli/block-wp-scanners-nginx
-      description: "Detect WordPress scan: vuln hunting"
-      groupby: evt.Meta.source_ip
-      distinct: evt.Meta.http_path
-      leakspeed: "30s"
-      blackhole: 600m
-      capacity: 3
-      filter: |
-        evt.Meta.program == 'ingress-nginx' and
-        evt.Meta.http_status matches "^[34]" and
-        (
-          Lower(evt.Meta.http_path) contains "/filemanager" or
-          Lower(evt.Meta.http_path) contains "/ini" or
-          Lower(evt.Meta.http_path) contains "/install" or
-          Lower(evt.Meta.http_path) contains "/epinyins" or
-          Lower(evt.Meta.http_path) contains "/autoload" or
-          Lower(evt.Meta.http_path) contains "/database" or
-          Lower(evt.Meta.http_path) contains "/xhell" or
-          Lower(evt.Meta.http_path) contains "/alfa" or
-          Lower(evt.Meta.http_path) contains "/shell" or
-          Lower(evt.Meta.http_path) contains "/vuln" or
-          Lower(evt.Meta.http_path) contains "/wp-" or
-          Lower(evt.Meta.http_path) contains "/class" or
-          Lower(evt.Meta.http_path) contains "/phpinfo" or
-          Lower(evt.Meta.http_path) contains "/adminer" or
-          Lower(evt.Meta.http_path) contains "/composer"
-        ) and
-        Lower(evt.Meta.http_path) endsWith ".php"
-      labels:
-        remediation: true
-        behavior: "http:scan"
-        label: "WordPress Vuln Hunting"
-        confidence: 3
-    wahooli-secret-scanners-nginx.yaml: |
+    wahooli-secret-scanners.yaml: |
       type: trigger
-      name: wahooli/block-secret-scanners-nginx
-      description: "Detect vulnerability scanners"
+      name: wahooli/block-secret-scanners
+      description: "Instant ban on access to sensitive files"
       groupby: evt.Meta.source_ip
-      blackhole: 600m
+      blackhole: 24h
       filter: |
-        evt.Meta.program == 'ingress-nginx' and
-        evt.Meta.http_status matches "^[34]" and
+        evt.Meta.program == 'envoy-gateway' and
         (
-          Lower(evt.Meta.http_path) startsWith ".env" or
+          Lower(evt.Meta.http_path) startsWith "/.env" or
+          Lower(evt.Meta.http_path) startsWith "/.git" or
+          Lower(evt.Meta.http_path) startsWith "/.ssh" or
+          Lower(evt.Meta.http_path) startsWith "/.aws" or
+          Lower(evt.Meta.http_path) startsWith "/.docker" or
+          Lower(evt.Meta.http_path) startsWith "/.kube" or
           Lower(evt.Meta.http_path) startsWith "/admin/.env" or
           Lower(evt.Meta.http_path) startsWith "/backend/.env" or
-          Lower(evt.Meta.http_path) startsWith "/.git" or
-          Lower(evt.Meta.http_path) startsWith "/.well-known" or
-          Lower(evt.Meta.http_path) startsWith "/.ssh" or
-          Lower(evt.Meta.http_path) startsWith "/admin/upload"
+          Lower(evt.Meta.http_path) startsWith "/admin/upload" or
+          Lower(evt.Meta.http_path) contains "/wp-config" or
+          Lower(evt.Meta.http_path) contains "/phpinfo" or
+          Lower(evt.Meta.http_path) contains "/adminer" or
+          Lower(evt.Meta.http_path) contains "/phpmyadmin"
         )
       labels:
         remediation: true
         behavior: "http:scan"
-        label: "WordPress Vuln Hunting"
+        label: "Sensitive File Access"
         confidence: 3
-    wahooli-generic-php-scanner.yaml: |
+    wahooli-php-scanner.yaml: |
       type: leaky
-      name: wahooli/generic-php-scanner
-      description: "Detect generic php scanners"
+      name: wahooli/php-scanner
+      description: "Detect PHP file enumeration"
       groupby: evt.Meta.source_ip
-      leakspeed: "60s"
-      blackhole: 600m
-      capacity: 4
+      distinct: evt.Meta.http_path
+      leakspeed: "10s"
+      blackhole: 24h
+      capacity: 3
       filter: |
-        evt.Meta.program == 'ingress-nginx' and
-        evt.Meta.http_status matches "^[34]" and
-        Lower(evt.Parsed.request) endsWith ".php"
+        evt.Meta.program == 'envoy-gateway' and
+        Lower(evt.Meta.http_path) endsWith ".php"
       labels:
         remediation: true
         behavior: "http:scan"
-        label: "Generic PHP Scan"
+        label: "PHP File Enumeration"
+        confidence: 3
+    wahooli-rapid-scan.yaml: |
+      type: leaky
+      name: wahooli/rapid-scan
+      description: "Detect rapid URL scanning (many distinct paths in short time)"
+      groupby: evt.Meta.source_ip
+      distinct: evt.Meta.http_path
+      leakspeed: "5s"
+      blackhole: 24h
+      capacity: 15
+      filter: |
+        evt.Meta.program == 'envoy-gateway' and
+        evt.Meta.http_status matches "^[34]"
+      labels:
+        remediation: true
+        behavior: "http:scan"
+        label: "Rapid URL Scanning"
         confidence: 2
   config.yaml.local: |
     common:

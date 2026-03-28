@@ -1,0 +1,78 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ombi
+  namespace: default
+  annotations:
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+spec:
+  parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+  hostnames:
+  - "ombi.${domain_wahoo_li:=wahoo.li}"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /outpost.goauthentik.io
+    backendRefs:
+    - name: ak-outpost-nasse-proxy
+      port: 9000
+  - backendRefs:
+    - name: ombi
+      port: 3579
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ombi-private
+  namespace: default
+spec:
+  parentRefs:
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+  hostnames:
+  - "ombi.${domain_absolutist_it:=absolutist.it}"
+  rules:
+  - backendRefs:
+    - name: ombi
+      port: 3579
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: ombi-auth
+  namespace: default
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: ombi
+  extAuth:
+    failOpen: false
+    headersToExtAuth:
+    - cookie
+    - authorization
+    - proxy-authorization
+    - x-forwarded-for
+    - x-forwarded-proto
+    - x-real-ip
+    - accept
+    http:
+      backendRefs:
+      - name: ak-outpost-nasse-proxy
+        namespace: default
+        port: 9000
+      path: /outpost.goauthentik.io/auth/envoy
+      headersToBackend:
+      - set-cookie
+      - x-authentik-username
+      - x-authentik-uid
+      - x-authentik-name
+      - x-authentik-email
+      - x-authentik-groups
+      - x-authentik-entitlements
+      - x-authentik-jwt

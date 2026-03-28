@@ -871,88 +871,115 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "blue",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
-          "unit": "s"
+          "unit": "bytes"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 6,
         "x": 12,
         "y": 12
       },
-      "id": 11,
+      "id": 50,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
       },
       "pluginVersion": "11.4.0",
       "targets": [
         {
-          "expr": "haproxy_backend_response_time_average_seconds{source=\"vps\",instance=~\"$instance\",proxy!~\"crowdsec_api\"}",
-          "legendFormat": "{{instance}} / {{proxy}}",
+          "expr": "sum(increase(haproxy_frontend_bytes_in_total{source=\"vps\",instance=~\"$instance\",proxy!~\"metrics|local_proxy\"}[$__range]))",
+          "legendFormat": "bytes in",
           "refId": "A"
         }
       ],
-      "title": "Backend Response Time",
-      "type": "timeseries"
+      "title": "Total Bytes In",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 12
+      },
+      "id": 51,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "expr": "sum(increase(haproxy_frontend_bytes_out_total{source=\"vps\",instance=~\"$instance\",proxy!~\"metrics|local_proxy\"}[$__range]))",
+          "legendFormat": "bytes out",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Bytes Out",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -1163,7 +1190,7 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -1173,7 +1200,7 @@
         "x": 12,
         "y": 20
       },
-      "id": 13,
+      "id": 11,
       "options": {
         "legend": {
           "calcs": [],
@@ -1189,12 +1216,12 @@
       "pluginVersion": "11.4.0",
       "targets": [
         {
-          "expr": "haproxy_backend_current_sessions{source=\"vps\",instance=~\"$instance\",proxy!~\"crowdsec_api\"}",
+          "expr": "haproxy_backend_response_time_average_seconds{source=\"vps\",instance=~\"$instance\",proxy!~\"crowdsec_api\"}",
           "legendFormat": "{{instance}} / {{proxy}}",
           "refId": "A"
         }
       ],
-      "title": "Active Sessions by Backend",
+      "title": "Backend Response Time",
       "type": "timeseries"
     },
     {
@@ -1345,7 +1372,7 @@
               }
             ]
           },
-          "unit": "Bps"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -1355,7 +1382,7 @@
         "x": 12,
         "y": 28
       },
-      "id": 15,
+      "id": 13,
       "options": {
         "legend": {
           "calcs": [],
@@ -1371,17 +1398,12 @@
       "pluginVersion": "11.4.0",
       "targets": [
         {
-          "expr": "sum by(instance) (rate(haproxy_frontend_bytes_in_total{source=\"vps\",instance=~\"$instance\",proxy!~\"metrics|local_proxy\"}[$__rate_interval]))",
-          "legendFormat": "{{instance}} in",
+          "expr": "haproxy_backend_current_sessions{source=\"vps\",instance=~\"$instance\",proxy!~\"crowdsec_api\"}",
+          "legendFormat": "{{instance}} / {{proxy}}",
           "refId": "A"
-        },
-        {
-          "expr": "sum by(instance) (rate(haproxy_frontend_bytes_out_total{source=\"vps\",instance=~\"$instance\",proxy!~\"metrics|local_proxy\"}[$__rate_interval])) * -1",
-          "legendFormat": "{{instance}} out",
-          "refId": "B"
         }
       ],
-      "title": "Network Throughput by Frontend",
+      "title": "Active Sessions by Backend",
       "type": "timeseries"
     },
     {
@@ -1483,6 +1505,102 @@
         }
       ],
       "title": "Connection Errors",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 36
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "expr": "sum by(instance) (rate(haproxy_frontend_bytes_in_total{source=\"vps\",instance=~\"$instance\",proxy!~\"metrics|local_proxy\"}[$__rate_interval]))",
+          "legendFormat": "{{instance}} in",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by(instance) (rate(haproxy_frontend_bytes_out_total{source=\"vps\",instance=~\"$instance\",proxy!~\"metrics|local_proxy\"}[$__rate_interval])) * -1",
+          "legendFormat": "{{instance}} out",
+          "refId": "B"
+        }
+      ],
+      "title": "Network Throughput by Frontend",
       "type": "timeseries"
     },
     {
@@ -2312,8 +2430,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
+                "color": "red"
               },
               {
                 "color": "orange",
@@ -2402,8 +2519,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
+                "color": "red"
               },
               {
                 "color": "green",
@@ -2483,8 +2599,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
+                "color": "red"
               },
               {
                 "color": "green",
@@ -2549,8 +2664,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -2568,8 +2682,7 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "red",
-                      "value": null
+                      "color": "red"
                     },
                     {
                       "color": "orange",
@@ -2734,8 +2847,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           }
@@ -2765,8 +2877,7 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "green",
-                      "value": null
+                      "color": "green"
                     },
                     {
                       "color": "red",
@@ -2904,7 +3015,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "HAProxy - VPS Gateways",
-  "uid": "haproxy-vps-gateways",
-  "version": 24,
+  "uid": "bfh9hlj2q1hc0a",
+  "version": 1,
   "weekStart": ""
 }

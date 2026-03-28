@@ -59,15 +59,3 @@ persistence:
 ingress:
   main:
     enabled: false
-    className: nginx
-    labels:
-      velero.io/exclude-from-backup: "true"
-    hosts:
-    - host: transmission.${domain_wahoo_li:=wahoo.li}
-      paths:
-      - path: "/"
-        pathType: "Prefix"
-    tls:
-    - secretName: tls-transmission-ingress
-      hosts:
-      - transmission.${domain_wahoo_li:=wahoo.li}

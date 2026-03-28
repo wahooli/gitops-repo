@@ -5,10 +5,10 @@ metadata:
 servers: 1
 network: k3d-multicluster-net
 ports:
-- port: 8082:80
+- port: 8082:8080
   nodeFilters:
   - loadbalancer
-- port: 8092:8080
+- port: 8092:8081
   nodeFilters:
   - loadbalancer
 - port: 32400:32400

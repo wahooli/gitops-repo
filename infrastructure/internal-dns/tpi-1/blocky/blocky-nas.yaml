@@ -3,6 +3,8 @@ kind: Service
 metadata:
   annotations:
     service.cilium.io/global: "true"
+    service.cilium.io/affinity: "remote"
+    service.cilium.io/global-sync-endpoint-slices: "true"
   name: blocky-nas
   namespace: internal-dns
 spec:

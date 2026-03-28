@@ -1,0 +1,31 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-envoy-gateway
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: envoy-gateway
+spec:
+  releaseName: base-envoy-gateway
+  targetNamespace: envoy-gateway-system
+  chart:
+    spec:
+      chart: gateway-helm
+      sourceRef:
+        kind: HelmRepository
+        name: envoy-gateway
+        namespace: flux-system
+      interval: 24h
+  install:
+    timeout: 10m
+    crds: CreateReplace
+    remediation:
+      retries: -1
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      remediateLastFailure: true
+  valuesFrom:
+  - kind: ConfigMap
+    name: envoy-gateway-values
+    valuesKey: values-base.yaml

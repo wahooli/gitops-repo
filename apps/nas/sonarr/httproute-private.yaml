@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: sonarr-private
+  namespace: default
+  annotations:
+    external-dns.alpha.kubernetes.io/target: gw.${domain_absolutist_it:=absolutist.it}
+spec:
+  parentRefs:
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+  hostnames:
+  - "sonarr.${domain_absolutist_it:=absolutist.it}"
+  rules:
+  - backendRefs:
+    - name: sonarr
+      port: 8989

@@ -4,6 +4,7 @@ resources:
 - ../../base/ombi
 - certificate.yaml
 - httproute.yaml
+- httproute-private.yaml
 - imagepolicy.yaml
 - mariadb
 patches:

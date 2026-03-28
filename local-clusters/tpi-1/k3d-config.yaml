@@ -6,10 +6,10 @@ servers: 1
 agents: 3
 network: k3d-multicluster-net
 ports:
-- port: 8081:80
+- port: 8081:8080
   nodeFilters:
   - loadbalancer
-- port: 8091:8080
+- port: 8091:8081
   nodeFilters:
   - loadbalancer
 env:

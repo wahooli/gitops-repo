@@ -3,9 +3,10 @@ kind: Kustomization
 resources:
 - service.yaml
 - deployment.yaml
-- overrides-ingress.yaml
-- robots-ingress.yaml
-- static-ingress.yaml
+- overrides-httproute.yaml
+- robots-httproute.yaml
+- static-httproute.yaml
+- default-httproute.yaml
 configMapGenerator:
 - name: nginx-html
   namespace: infrastructure

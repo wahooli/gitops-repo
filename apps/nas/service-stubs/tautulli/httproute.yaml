@@ -1,0 +1,33 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tautulli
+  namespace: default
+spec:
+  parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+  hostnames:
+  - "tautulli.${domain_wahoo_li:=wahoo.li}"
+  rules:
+  - backendRefs:
+    - name: ak-outpost-nasse-proxy
+      port: 9000
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tautulli-private
+  namespace: default
+spec:
+  parentRefs:
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+  hostnames:
+  - "tautulli.${domain_absolutist_it:=absolutist.it}"
+  rules:
+  - backendRefs:
+    - name: tautulli
+      port: 8181

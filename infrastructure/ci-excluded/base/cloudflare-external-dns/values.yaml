@@ -1,0 +1,25 @@
+logFormat: json
+domainFilters:
+- ${domain_wahoo_li:=wahoo.li}
+sources:
+- ingress
+- gateway-httproute
+provider:
+  name: ${wahooli_extenal_dns_provider:=cloudflare}
+txtOwnerId: cloudflare
+txtPrefix: cloudflare-dns-
+extraArgs:
+- --txt-encrypt-enabled
+- --txt-encrypt-aes-key=${external_dns_encryption_key}
+- --annotation-filter=external-dns.alpha.kubernetes.io/exclude notin (true)
+- --cloudflare-dns-records-per-page=5000
+- --gateway-name=envoy-gw
+- --gateway-namespace=envoy-gateway-system
+- --default-targets=gw.${domain_wahoo_li:=wahoo.li}
+- --force-default-targets
+env:
+- name: CF_API_TOKEN
+  valueFrom:
+    secretKeyRef:
+      key: cloudflare_api_token
+      name: ${external_dns_app_secret_name}

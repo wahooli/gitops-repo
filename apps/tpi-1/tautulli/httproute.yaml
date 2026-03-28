@@ -5,11 +5,14 @@ metadata:
   namespace: default
 spec:
   parentRefs:
-  - name: internal-gw
-    namespace: infrastructure
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
   hostnames:
-  - "tautulli.${domain_absolutist_it:=absolutist.it}"
+  - "tautulli.${domain_wahoo_li:=wahoo.li}"
   rules:
   - backendRefs:
-    - name: tautulli
-      port: 8181
+    - name: ak-outpost-proxy-default
+      port: 9000

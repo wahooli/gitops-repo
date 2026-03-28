@@ -5,8 +5,8 @@ metadata:
   namespace: monitoring
 spec:
   parentRefs:
-  - name: internal-gw
-    namespace: infrastructure
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
   hostnames:
   - "vm-write.${domain_wahoo_li:=wahoo.li}"
   - "vm-write.${domain_absolutist_it:=absolutist.it}"

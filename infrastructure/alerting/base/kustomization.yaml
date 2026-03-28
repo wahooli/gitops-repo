@@ -6,6 +6,7 @@ resources:
 - templates
 - vmalertmanagerconfig/generic-alerts.yaml
 - vmalertmanagerconfig/systemd-alerts.yaml
+- rules/authentik/outpost-health.yaml
 - rules/kubernetes/kubernetes-apps.yaml
 - rules/kubernetes/kubernetes-resources.yaml
 - rules/kubernetes/kubernetes-storage.yaml

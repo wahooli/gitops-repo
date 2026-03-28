@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- gatewayclass.yaml
+- envoy-proxy.yaml
+- gateway.yaml
+- gateway-private.yaml
+- http-https-redirect.yaml
+- referencegrant.yaml
+- clienttrafficpolicy.yaml
+- backendtrafficpolicy.yaml
+- media-streaming-policy.yaml
