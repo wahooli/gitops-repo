@@ -7,31 +7,29 @@ spec:
   telemetry:
     accessLog:
       settings:
-      - format:
+      - matches:
+        - "request.host != 'crowdsec-api.absolutist.it'"
+        format:
           type: JSON
           json:
             timestamp: "%START_TIME%"
+            message: "%REQ(:METHOD)% %REQ(:AUTHORITY)%%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL% %RESPONSE_CODE%"
+            vhost: "%REQ(:AUTHORITY)%"
             method: "%REQ(:METHOD)%"
             path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
             protocol: "%PROTOCOL%"
             status: "%RESPONSE_CODE%"
-            response_code_details: "%RESPONSE_CODE_DETAILS%"
-            response_flags: "%RESPONSE_FLAGS%"
             bytes_received: "%BYTES_RECEIVED%"
             bytes_sent: "%BYTES_SENT%"
-            duration: "%DURATION%"
-            request_duration: "%REQUEST_DURATION%"
-            response_duration: "%RESPONSE_DURATION%"
+            duration_ms: "%DURATION%"
             upstream_host: "%UPSTREAM_HOST%"
             upstream_cluster: "%UPSTREAM_CLUSTER%"
-            upstream_request_attempt_count: "%UPSTREAM_REQUEST_ATTEMPT_COUNT%"
-            downstream_remote_address: "%DOWNSTREAM_REMOTE_ADDRESS%"
+            client_ip: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
             x_forwarded_for: "%REQ(X-FORWARDED-FOR)%"
             user_agent: "%REQ(USER-AGENT)%"
             request_id: "%REQ(X-REQUEST-ID)%"
-            authority: "%REQ(:AUTHORITY)%"
             route_name: "%ROUTE_NAME%"
-            requested_server_name: "%REQUESTED_SERVER_NAME%"
+            proxy_name: "%REQ(X-PROXY-NAME)%"
         sinks:
         - type: File
           file:
