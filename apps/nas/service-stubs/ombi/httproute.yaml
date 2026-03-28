@@ -5,6 +5,8 @@ metadata:
   namespace: default
 spec:
   parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
   - name: envoy-gw-private
     namespace: envoy-gateway-system
   hostnames:
