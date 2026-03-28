@@ -1,5 +1,0 @@
-controller:
-  service:
-    annotations:
-      external-dns.alpha.kubernetes.io/hostname: nginx.tpi-1.${domain_absolutist_it:=absolutist.it},nginx.tpi-1.${domain_wahoo_li:=wahoo.li}
-      lbipam.cilium.io/ips: ${nginx_lb_ip}

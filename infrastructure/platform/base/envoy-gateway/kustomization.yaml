@@ -9,3 +9,4 @@ resources:
 - referencegrant.yaml
 - clienttrafficpolicy.yaml
 - backendtrafficpolicy.yaml
+- media-streaming-policy.yaml

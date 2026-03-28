@@ -13,7 +13,6 @@ resources:
 - vmpodscrape/envoy-gateway-proxy.yaml
 - vmservicescrape/authentik.yaml
 - vmservicescrape/envoy-gateway.yaml
-- vmservicescrape/ingress-nginx.yaml
 - vmservicescrape/kube-dns.yaml
 - vmservicescrape/kube-state-metrics.yaml
 - vmservicescrape/victoria-metrics-operator.yaml
