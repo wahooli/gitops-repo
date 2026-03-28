@@ -12,7 +12,6 @@ spec:
     namespace: envoy-gateway-system
   hostnames:
   - "grafana.${domain_wahoo_li:=wahoo.li}"
-  - "grafana.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: grafana

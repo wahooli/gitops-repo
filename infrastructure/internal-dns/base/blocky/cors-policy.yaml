@@ -1,0 +1,25 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: blocky-api-cors
+  namespace: internal-dns
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: blocky-api
+  cors:
+    allowOrigins:
+    - "https://grafana.${domain_wahoo_li:=wahoo.li}"
+    - "https://grafana.${domain_absolutist_it:=absolutist.it}"
+    allowMethods:
+    - GET
+    - POST
+    - OPTIONS
+    allowHeaders:
+    - content-type
+    - authorization
+    - accept
+    exposeHeaders:
+    - content-length
+    maxAge: 86400s

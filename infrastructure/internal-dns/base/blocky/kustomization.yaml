@@ -4,6 +4,7 @@ resources:
 - ../../../base/blocky
 - imagepolicy.yaml
 - certificate.yaml
+- cors-policy.yaml
 patches:
 - path: helmrelease.yaml
   target:
