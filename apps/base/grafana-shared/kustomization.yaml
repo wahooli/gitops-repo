@@ -269,5 +269,14 @@ configMapGenerator:
       grafana_dashboard: "1"
     annotations:
       kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: envoy-gateway-dashboard
+  namespace: grafana
+  files:
+  - envoy-gateway.json=dashboards/envoy-gateway.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
 configurations:
 - ../../.config/valuesFrom.yaml

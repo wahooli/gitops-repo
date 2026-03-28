@@ -7,6 +7,9 @@ spec:
   podMetricsEndpoints:
   - port: metrics
     path: /stats/prometheus
+    relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_pod_label_gateway_envoyproxy_io_owning_gateway_name]
+      targetLabel: gateway
     metricRelabelConfigs:
     - action: labeldrop
       regex: (pod|container)
