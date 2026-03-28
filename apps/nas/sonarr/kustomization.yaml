@@ -5,7 +5,7 @@ resources:
 - certificate.yaml
 - imagepolicy.yaml
 - httproute.yaml
-- httproute-envoy.yaml
+- httproute-private.yaml
 patches:
 - path: helmrelease.yaml
   target:

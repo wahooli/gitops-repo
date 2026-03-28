@@ -1,18 +1,15 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: radarr
+  name: ombi-private
   namespace: default
 spec:
   parentRefs:
-  - name: envoy-gw
-    namespace: envoy-gateway-system
   - name: envoy-gw-private
     namespace: envoy-gateway-system
-    sectionName: wahooli-https
   hostnames:
-  - "radarr.${domain_wahoo_li:=wahoo.li}"
+  - "ombi.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
-    - name: ak-outpost-nasse-proxy
-      port: 9000
+    - name: ombi
+      port: 3579
