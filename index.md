@@ -5,22 +5,17 @@ nav_order: 0
 
 # GitOps Repository Documentation
 
-This repository manages multiple Kubernetes clusters using GitOps principles with Flux CD, Cilium, Kustomize, and Helm. It provides a structured approach to deploying and managing applications and infrastructure across clusters.
+This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kustomize, and Helm. It provides a structured approach to deploying and managing applications and infrastructure across different environments.
 
----
-
-## Documentation Index
-
-### **livingroom-pi**
+### livingroom-pi
 - [Cluster overview](livingroom-pi/overview.md)
 
-#### Apps
+**Apps:**
 - [authentik](livingroom-pi/apps/authentik.md)
 - [etcd](livingroom-pi/apps/etcd.md)
 - [sources](livingroom-pi/apps/sources.md)
 
-#### Infrastructure
-**Core:**
+**Infrastructure / core:**
 - [cert-manager](livingroom-pi/infrastructure/core/cert-manager.md)
 - [gateway-api](livingroom-pi/infrastructure/core/gateway-api.md)
 - [multus](livingroom-pi/infrastructure/core/multus.md)
@@ -29,13 +24,13 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [sources](livingroom-pi/infrastructure/core/sources.md)
 - [victoria-metrics](livingroom-pi/infrastructure/core/victoria-metrics.md)
 
-**Logging:**
+**Infrastructure / logging:**
 - [vector-agent](livingroom-pi/infrastructure/logging/vector-agent.md)
 
-**Monitoring:**
+**Infrastructure / monitoring:**
 - [monitoring](livingroom-pi/infrastructure/monitoring/monitoring.md)
 
-**Platform:**
+**Infrastructure / platform:**
 - [cert-manager-issuers](livingroom-pi/infrastructure/platform/cert-manager-issuers.md)
 - [kube-state-metrics](livingroom-pi/infrastructure/platform/kube-state-metrics.md)
 - [multus-networks](livingroom-pi/infrastructure/platform/multus-networks.md)
@@ -46,12 +41,10 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [resources](livingroom-pi/infrastructure/platform/resources.md)
 - [velero](livingroom-pi/infrastructure/platform/velero.md)
 
----
-
-### **nas**
+### nas
 - [Cluster overview](nas/overview.md)
 
-#### Apps
+**Apps:**
 - [authentik](nas/apps/authentik.md)
 - [bazarr](nas/apps/bazarr.md)
 - [crowdsec](nas/apps/crowdsec.md)
@@ -69,11 +62,10 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [transmission-old](nas/apps/transmission-old.md)
 - [transmission](nas/apps/transmission.md)
 
-#### Infrastructure
-**Alerting:**
+**Infrastructure / alerting:**
 - [alerting](nas/infrastructure/alerting/alerting.md)
 
-**Core:**
+**Infrastructure / core:**
 - [cert-manager](nas/infrastructure/core/cert-manager.md)
 - [gateway-api](nas/infrastructure/core/gateway-api.md)
 - [namespaces](nas/infrastructure/core/namespaces.md)
@@ -82,7 +74,7 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [topolvm](nas/infrastructure/core/topolvm.md)
 - [victoria-metrics](nas/infrastructure/core/victoria-metrics.md)
 
-**Internal DNS:**
+**Infrastructure / internal-dns:**
 - [bind9](nas/infrastructure/internal-dns/bind9.md)
 - [blocky](nas/infrastructure/internal-dns/blocky.md)
 - [client-lookup](nas/infrastructure/internal-dns/client-lookup.md)
@@ -91,19 +83,19 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [tpi-1-external-dns](nas/infrastructure/internal-dns/tpi-1-external-dns.md)
 - [unbound](nas/infrastructure/internal-dns/unbound.md)
 
-**Kube DNS:**
+**Infrastructure / kube-dns:**
 - [kube-dns](nas/infrastructure/kube-dns/kube-dns.md)
 
-**Logging:**
+**Infrastructure / logging:**
 - [resources](nas/infrastructure/logging/resources.md)
 - [vector-agent](nas/infrastructure/logging/vector-agent.md)
 - [vector-global-write](nas/infrastructure/logging/vector-global-write.md)
 - [vector-lb](nas/infrastructure/logging/vector-lb.md)
 
-**Monitoring:**
+**Infrastructure / monitoring:**
 - [monitoring](nas/infrastructure/monitoring/monitoring.md)
 
-**Platform:**
+**Infrastructure / platform:**
 - [cert-manager-issuers](nas/infrastructure/platform/cert-manager-issuers.md)
 - [cilium](nas/infrastructure/platform/cilium.md)
 - [default-backend](nas/infrastructure/platform/default-backend.md)
@@ -119,12 +111,10 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [smartctl-exporter](nas/infrastructure/platform/smartctl-exporter.md)
 - [velero](nas/infrastructure/platform/velero.md)
 
----
-
-### **tpi-1**
+### tpi-1
 - [Cluster overview](tpi-1/overview.md)
 
-#### Apps
+**Apps:**
 - [authentik](tpi-1/apps/authentik.md)
 - [crowdsec](tpi-1/apps/crowdsec.md)
 - [etcd](tpi-1/apps/etcd.md)
@@ -137,11 +127,10 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [tautulli](tpi-1/apps/tautulli.md)
 - [vaultwarden](tpi-1/apps/vaultwarden.md)
 
-#### Infrastructure
-**Alerting:**
+**Infrastructure / alerting:**
 - [alerting](tpi-1/infrastructure/alerting/alerting.md)
 
-**Core:**
+**Infrastructure / core:**
 - [cert-manager](tpi-1/infrastructure/core/cert-manager.md)
 - [gateway-api](tpi-1/infrastructure/core/gateway-api.md)
 - [namespaces](tpi-1/infrastructure/core/namespaces.md)
@@ -150,7 +139,7 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [topolvm](tpi-1/infrastructure/core/topolvm.md)
 - [victoria-metrics](tpi-1/infrastructure/core/victoria-metrics.md)
 
-**Internal DNS:**
+**Infrastructure / internal-dns:**
 - [bind9](tpi-1/infrastructure/internal-dns/bind9.md)
 - [blocky](tpi-1/infrastructure/internal-dns/blocky.md)
 - [client-lookup](tpi-1/infrastructure/internal-dns/client-lookup.md)
@@ -159,21 +148,21 @@ This repository manages multiple Kubernetes clusters using GitOps principles wit
 - [tpi-1-external-dns](tpi-1/infrastructure/internal-dns/tpi-1-external-dns.md)
 - [unbound](tpi-1/infrastructure/internal-dns/unbound.md)
 
-**Kube DNS:**
+**Infrastructure / kube-dns:**
 - [kube-dns](tpi-1/infrastructure/kube-dns/kube-dns.md)
 
-**Logging:**
+**Infrastructure / logging:**
 - [resources](tpi-1/infrastructure/logging/resources.md)
 - [vector-agent](tpi-1/infrastructure/logging/vector-agent.md)
 - [vector-global-write](tpi-1/infrastructure/logging/vector-global-write.md)
 - [vector-lb](tpi-1/infrastructure/logging/vector-lb.md)
 - [vlogs-short-term](tpi-1/infrastructure/logging/vlogs-short-term.md)
 
-**Monitoring:**
+**Infrastructure / monitoring:**
 - [resources](tpi-1/infrastructure/monitoring/resources.md)
 - [vm-short-term-server-cluster](tpi-1/infrastructure/monitoring/vm-short-term-server-cluster.md)
 
-**Platform:**
+**Infrastructure / platform:**
 - [cert-manager-issuers](tpi-1/infrastructure/platform/cert-manager-issuers.md)
 - [cilium](tpi-1/infrastructure/platform/cilium.md)
 - [default-backend](tpi-1/infrastructure/platform/default-backend.md)
