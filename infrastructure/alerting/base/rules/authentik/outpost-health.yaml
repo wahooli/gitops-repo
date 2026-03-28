@@ -1,0 +1,32 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: authentik-outpost-health
+  namespace: alerting
+spec:
+  groups:
+  - name: authentik-outpost
+    rules:
+    - alert: AuthentikOutpostDown
+      expr: up{job="authentik", namespace="default"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Authentik outpost {{ $labels.pod }} is down"
+        description: >
+          Authentik outpost {{ $labels.pod }} in namespace {{ $labels.namespace }}
+          has been unreachable for more than 5 minutes. This means authentication
+          via forward auth will not work for protected services.
+    - alert: AuthentikOutpostMetricsDown
+      expr: |
+        absent(authentik_outpost_connection{namespace="default"}) == 1
+        and on() count(up{job="authentik", namespace="default"}) > 0
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Authentik outpost metrics not reporting"
+        description: >
+          Authentik outpost is up but not reporting metrics.
+          The outpost may have failed to connect to the authentik server.
