@@ -7,7 +7,6 @@ spec:
   parentRefs:
   - name: envoy-gw
     namespace: envoy-gateway-system
-    sectionName: wahooli-https
   - name: envoy-gw-private
     namespace: envoy-gateway-system
   hostnames:
