@@ -1087,12 +1087,10 @@ main() {
     endgroup
   done
 
-  # Generate index from the docs tree (only if docs were generated)
-  if [ "$docs_generated" -gt 0 ]; then
-    group "Generating index"
-    generate_index
-    endgroup
-  fi
+  # Always regenerate the index so it reflects the current docs tree
+  group "Generating index"
+  generate_index
+  endgroup
 
   local total
   total=$(find "${DOCS_DIR}" -name '*.md' 2>/dev/null | wc -l)
