@@ -84,7 +84,7 @@ while [ -s "$phase1_pending" ] && [ "$phase1_attempt" -le "$max_phase1_attempts"
       method="POST"
     fi
 
-    parse_resp "$(curl -sS -w '\n%{http_code}' --connect-timeout 5 --max-time 480 \
+    parse_resp "$(curl -sS -w '\n%{http_code}' --connect-timeout 5 --max-time 900 \
       -X "$method" "$url" \
       -H "$${AUTH}" -H "Content-Type: application/json" \
       --data-binary "@$tmp")"
@@ -166,7 +166,7 @@ while [ -s "$disable_pending" ] && [ "$disable_attempt" -le "$max_disable_attemp
   disable_retry=$(mktemp)
   while IFS="$TAB" read -r pk file name; do
     jq -n --rawfile content "$file" '{content: $content, enabled: false}' > "$tmp"
-    parse_resp "$(curl -sS -w '\n%{http_code}' --connect-timeout 5 --max-time 30 \
+    parse_resp "$(curl -sS -w '\n%{http_code}' --connect-timeout 5 --max-time 240 \
       -X PATCH "$${API}/managed/blueprints/$${pk}/" \
       -H "$${AUTH}" -H "Content-Type: application/json" \
       --data-binary "@$tmp")"
