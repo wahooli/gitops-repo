@@ -6,86 +6,71 @@ grand_parent: "tpi-1"
 
 # authentik
 
+The `authentik` component is deployed in the `tpi-1` cluster and consists of multiple sub-components, including the main authentik application, Redis, and Patroni for PostgreSQL management.
+
 ## Overview
-The `authentik` component is deployed in the `tpi-1` cluster and is responsible for providing authentication services. It is managed using Flux and consists of multiple Helm releases, including the main `authentik` service and its dependencies.
 
-## Namespace
-The component is deployed in the `authentik` namespace.
+- **Namespace**: `authentik`
+- **Helm Repository**: [goauthentik](https://charts.goauthentik.io/)
+- **Main Chart Version**: `2025.12.4`
+- **Patroni Chart Version**: `>=0.1.0-0`
+- **Remote Cluster Chart Version**: `2.0.0`
 
-## Helm Repository
-The Helm charts for `authentik` are sourced from the following repository:
-- **Name**: goauthentik
-- **URL**: [https://charts.goauthentik.io/](https://charts.goauthentik.io/)
-- **Update Interval**: 24 hours
+## Components
 
-## Helm Releases
-### 1. authentik
-- **Release Name**: authentik
-- **Chart Version**: 2025.12.4
+### 1. Authentik
+
+- **HelmRelease Name**: `authentik--authentik`
+- **Release Name**: `authentik`
 - **Interval**: 5 minutes
-- **Target Namespace**: authentik
-- **Dependencies**:
-  - authentik--authentik-redis
-  - authentik--authentik-patroni
 - **Values**:
-  - Configurations for logging, database connections, and Redis settings.
-  - TLS settings for Redis and PostgreSQL.
-  - Email configuration for notifications.
+  - Log level set to `warn`
+  - PostgreSQL and Redis configurations with TLS enabled
+  - Email settings configured for sending emails
 
-### 2. authentik-remote-cluster
-- **Release Name**: authentik-remote-cluster-default
-- **Chart Version**: 2.0.0
+### 2. Patroni
+
+- **HelmRelease Name**: `authentik--authentik-patroni`
+- **Release Name**: `authentik-patroni`
 - **Interval**: 5 minutes
-- **Target Namespace**: default
-- **Dependencies**:
-  - authentik--authentik
 - **Values**:
-  - Cluster role settings and service account configurations.
+  - PostgreSQL user and database configurations
+  - Backup scripts and annotations for Velero integration
+  - Cilium network policies for secure communication
 
-### 3. authentik--authentik-patroni
-- **Release Name**: authentik-patroni
-- **Chart Version**: >=0.1.0-0
+### 3. Redis
+
+- **HelmRelease Name**: `authentik--authentik-redis`
+- **Release Name**: `authentik-redis`
 - **Interval**: 5 minutes
-- **Target Namespace**: authentik
-- **Dependencies**:
-  - cert-manager
-  - reflector
-  - etcd
 - **Values**:
-  - PostgreSQL settings, including user credentials and backup configurations.
-  - HAProxy settings for load balancing.
+  - Redis configurations are set to be disabled in this deployment.
 
-## Deployments
-### authentik-apply-blueprints
-- **Deployment Name**: authentik-apply-blueprints
-- **Replicas**: 1
-- **Container**: Uses a pause container for initialization.
-- **Init Container**: Applies blueprints using a script.
+### 4. Remote Cluster
+
+- **HelmRelease Name**: `default--authentik-remote-cluster`
+- **Release Name**: `authentik-remote-cluster-default`
+- **Interval**: 5 minutes
+- **Post Renderers**: Kustomize patches to modify RoleBinding for the authentik namespace.
 
 ## Networking
-### HTTPRoute
-- **Name**: authentik
-- **Hostnames**:
-  - auth.wahoo.li
-  - authentik.wahoo.li
-- **Backend Reference**: authentik-server on port 80
-- **Timeouts**: 60 seconds for backend requests.
+
+- **HTTPRoute**: Configured to route traffic to the authentik service based on specified hostnames.
+- **Ingress**: Not enabled for the main authentik service; however, HTTP routing is managed through the Envoy gateway.
 
 ## Image Repositories
-- **authentik-server**: `ghcr.io/goauthentik/server`
-- **patroni-17**: `ghcr.io/wahooli/docker/patroni-17`
 
-## Image Policies
-- **authentik**: Policy for managing image versions.
-- **patroni-17**: Policy for managing image versions.
+- **Authentik Server**: `ghcr.io/goauthentik/server`
+- **Patroni**: `ghcr.io/wahooli/docker/patroni-17`
 
 ## Configuration Management
-Configuration values for `authentik` are sourced from ConfigMaps, which include base values and environment-specific overrides.
 
-## Security
-- **Service Accounts**: Managed for both the main authentik service and the patroni database.
-- **TLS**: Configured for secure communication between services.
+- **ConfigMaps**: Used to manage values for both authentik and patroni deployments.
+- **Secrets**: Environment variables for sensitive data such as database passwords are sourced from Kubernetes secrets.
 
 ## Notes
-- Ensure that environment variables for database passwords and other sensitive information are set appropriately in your Kubernetes secrets.
-- Regularly check the Helm repository for updates to the charts used in this deployment.
+
+- The deployment includes various annotations for monitoring and backup purposes.
+- Ensure that the necessary secrets and ConfigMaps are created and updated as required for the application to function correctly.
+
+This documentation provides a high-level overview of the `authentik` deployment in the `tpi-1` cluster, detailing its components, configurations, and networking setup.
