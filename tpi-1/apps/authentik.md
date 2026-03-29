@@ -4,114 +4,72 @@ parent: "Apps"
 grand_parent: "tpi-1"
 ---
 
-# Authentik
+# authentik
 
-Authentik is deployed in the `tpi-1` cluster to provide identity and access management services. This documentation outlines the configuration and deployment details for the Authentik component and its sub-components.
+## Overview
+The `authentik` component is deployed in the `tpi-1` cluster and provides identity management and authentication services. It is configured using Helm charts and Flux for GitOps.
 
 ## Namespace
+The component is deployed in the `authentik` namespace.
 
-Authentik is deployed in the `authentik` namespace. The namespace is labeled for internal services and managed by Flux.
+## Helm Releases
+### authentik
+- **Chart**: `authentik`
+- **Version**: `2025.12.4`
+- **Source**: [goauthentik](https://charts.goauthentik.io/)
+- **Interval**: 5 minutes
+- **Values**: Configured using multiple ConfigMaps, including `authentik-values-gdhg2f68bm`.
 
-## HelmRepository
+### authentik-remote-cluster
+- **Chart**: `authentik-remote-cluster`
+- **Version**: `2.0.0`
+- **Source**: [goauthentik](https://charts.goauthentik.io/)
+- **Interval**: 5 minutes
+- **Post Renderers**: Includes a Kustomize patch for RoleBinding.
 
-The Authentik Helm charts are sourced from the official repository:
+### authentik-patroni
+- **Chart**: `patroni`
+- **Version**: `>=0.1.0-0`
+- **Source**: wahooli
+- **Interval**: 5 minutes
+- **Values**: Configured using ConfigMaps, including `authentik-patroni-values-fctf8ct669`.
 
-- **Name:** `goauthentik`
-- **URL:** [https://charts.goauthentik.io/](https://charts.goauthentik.io/)
-- **Update Interval:** 24 hours
+## Image Repositories
+- **authentik-server**: `ghcr.io/goauthentik/server`
+- **patroni-17**: `ghcr.io/wahooli/docker/patroni-17`
 
-## HelmReleases
+## Deployments
+### authentik-apply-blueprints
+- **Replicas**: 1
+- **Container**: Uses `registry.k8s.io/pause:3.10` for a pause container.
+- **Init Container**: Runs a script to apply blueprints using the `authentik` API.
 
-### Authentik Core
+## HTTP Routes
+The `authentik` service is exposed via an `HTTPRoute` with the following hostnames:
+- `auth.wahoo.li`
+- `auth.absolutist.it`
+- `authentik.wahoo.li`
+- `authentik.absolutist.it`
 
-- **Name:** `authentik--authentik`
-- **Chart:** `authentik`
-- **Version:** `2025.12.4`
-- **Release Name:** `authentik`
-- **Namespace:** `authentik`
-- **Update Interval:** 5 minutes
-- **Dependencies:**
-  - `authentik--authentik-redis`
-  - `authentik--authentik-patroni`
-- **Values Configuration:**
-  - Configured via `authentik-values-c8k44fhg7f` ConfigMap.
-  - Includes base values (`values-base.yaml`) and additional overrides (`values.yaml`).
-  - Key configurations:
-    - **Log Level:** `warn`
-    - **PostgreSQL:** Uses Patroni for database management with TLS enabled.
-    - **Redis:** Configured with TLS for caching.
-    - **Ingress:** Enabled with `nginx` ingress class and SSL redirection.
-    - **Email:** Configured for SMTP relay.
+## Configuration
+### Values Configuration
+The configuration for `authentik` includes:
+- Logging settings
+- Database connection details for PostgreSQL and Redis
+- Email settings for notifications
+- Security context and volume mounts for TLS certificates
 
-### Authentik Remote Cluster
+### Patroni Configuration
+The `patroni` configuration includes:
+- PostgreSQL settings
+- High availability settings
+- Backup scripts and policies
 
-- **Name:** `default--authentik-remote-cluster`
-- **Chart:** `authentik-remote-cluster`
-- **Version:** `2.0.0`
-- **Release Name:** `authentik-remote-cluster-default`
-- **Namespace:** `default`
-- **Update Interval:** 5 minutes
-- **Dependencies:** `authentik--authentik`
-- **Values Configuration:**
-  - Cluster role enabled.
-  - Service account secret disabled.
+## Dependencies
+The `authentik` HelmRelease depends on:
+- `authentik--authentik-redis`
+- `authentik--authentik-patroni`
 
-### Patroni (PostgreSQL)
-
-- **Name:** `authentik--authentik-patroni`
-- **Chart:** `patroni`
-- **Version:** Floating (`>=0.1.0-0`)
-- **Release Name:** `authentik-patroni`
-- **Namespace:** `authentik`
-- **Update Interval:** 5 minutes
-- **Dependencies:**
-  - `cert-manager--cert-manager`
-  - `reflector--reflector`
-  - `etcd--etcd`
-- **Values Configuration:**
-  - PostgreSQL database `authentik` with user `authentik`.
-  - Patroni cluster with 2 replicas and TLS enabled.
-  - Pgbouncer enabled for connection pooling.
-  - Backup scripts and persistence configured.
-
-### Redis
-
-- **Name:** `authentik--authentik-redis`
-- **Chart:** Redis (details truncated in input)
-- **Namespace:** `authentik`
-- **Purpose:** Provides caching services for Authentik.
-
-## Image Management
-
-### Authentik Server
-
-- **Image Repository:** `ghcr.io/goauthentik/server`
-- **Policy:** Semantic versioning (`x.x.x`)
-- **Update Interval:** 24 hours
-
-### Patroni
-
-- **Image Repository:** `ghcr.io/wahooli/docker/patroni-17`
-- **Policy:** Semantic versioning (`x.x.x`)
-- **Update Interval:** 24 hours
-
-## HTTPRoute
-
-Authentik is exposed via HTTPRoute:
-
-- **Hostnames:**
-  - `auth.wahoo.li`
-  - `auth.absolutist.it`
-  - `authentik.wahoo.li`
-  - `authentik.absolutist.it`
-- **Parent Gateway:** `internal-gw` in the `infrastructure` namespace.
-- **Backend Service:** `authentik-server` on port `80`.
-
-## Additional Notes
-
-- **Monitoring:** Metrics are enabled for the Authentik server but disabled for PostgreSQL and Redis.
-- **Security:** TLS is enforced for database and caching connections.
-- **Backup:** Velero annotations are configured for backup and restore operations.
-- **Ingress Annotations:** Includes SSL redirection and custom HTTP error handling.
-
-For further details, refer to the Helm chart documentation at [Authentik Helm Charts](https://charts.goauthentik.io/).
+## Notes
+- The deployment uses Flux for continuous delivery and GitOps practices.
+- Ensure that the necessary secrets and ConfigMaps are created and available in the `authentik` namespace for the deployment to function correctly.
