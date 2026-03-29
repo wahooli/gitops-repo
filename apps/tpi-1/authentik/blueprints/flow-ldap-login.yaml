@@ -2,14 +2,33 @@
 version: 1
 metadata:
   name: Init - LDAP Authentication flow
-  labels:
-    blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Init - Authentication flow
   attrs:
+    identifiers:
+      name: Init - Authentication flow
     required: false
+- model: authentik_stages_identification.identificationstage
+  state: created
+  identifiers:
+    name: login-identification
+  id: ref-login-identification
+  attrs:
+    user_fields:
+    - username
+- model: authentik_stages_password.passwordstage
+  state: created
+  identifiers:
+    name: login-password
+  id: ref-login-password
+  attrs:
+    backends:
+    - authentik.core.auth.InbuiltBackend
+- model: authentik_stages_user_login.userloginstage
+  state: created
+  identifiers:
+    name: login-user-login
+  id: ref-login-user-login
 - attrs:
     authentication: require_outpost
     designation: authentication
@@ -21,12 +40,12 @@ entries:
   id: flow
 - identifiers:
     order: 10
-    stage: !Find [authentik_stages_identification.identificationstage, [name, login-identification]]
+    stage: !KeyOf ref-login-identification
     target: !KeyOf flow
   model: authentik_flows.flowstagebinding
 - identifiers:
     order: 20
-    stage: !Find [authentik_stages_password.passwordstage, [name, login-password]]
+    stage: !KeyOf ref-login-password
     target: !KeyOf flow
   attrs:
     re_evaluate_policies: true
@@ -35,16 +54,6 @@ entries:
   model: authentik_flows.flowstagebinding
 - identifiers:
     order: 100
-    stage: !Find [authentik_stages_user_login.userloginstage, [name, login-user-login]]
+    stage: !KeyOf ref-login-user-login
     target: !KeyOf flow
   model: authentik_flows.flowstagebinding
-# - model: authentik_policies.policybinding
-#   identifiers:
-#     order: 20
-#     target: !KeyOf default-authentication-flow-password-binding
-#     policy: !Find [authentik_policies_expression.expressionpolicy, [name, check-admin-ip-in-private-net]]
-# - model: authentik_policies.policybinding
-#   identifiers:
-#     order: 10
-#     target: !KeyOf ldap-login-flow-password-binding
-#     policy: !Find [authentik_policies_expression.expressionpolicy, [name, login-password-optional]]

@@ -1,0 +1,192 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Init - User settings flow
+entries:
+# Prompt fields
+- model: authentik_stages_prompt.prompt
+  state: present
+  identifiers:
+    name: default-user-settings-field-username
+  id: ref-field-username
+  attrs:
+    field_key: username
+    label: Username
+    order: 200
+    placeholder: Username
+    required: true
+    type: username
+    initial_value_expression: true
+    initial_value: |
+      try:
+          return user.username
+      except:
+          return ''
+
+- model: authentik_stages_prompt.prompt
+  state: present
+  identifiers:
+    name: default-user-settings-field-name
+  id: ref-field-name
+  attrs:
+    field_key: name
+    label: Name
+    order: 201
+    placeholder: Name
+    required: true
+    type: text
+    initial_value_expression: true
+    initial_value: |
+      try:
+          return user.name
+      except:
+          return ''
+
+- model: authentik_stages_prompt.prompt
+  state: present
+  identifiers:
+    name: default-user-settings-field-email
+  id: ref-field-email
+  attrs:
+    field_key: email
+    label: Email
+    order: 202
+    placeholder: Email
+    required: true
+    type: email
+    initial_value_expression: true
+    initial_value: |
+      try:
+          return user.email
+      except:
+          return ''
+
+- model: authentik_stages_prompt.prompt
+  state: present
+  identifiers:
+    name: default-user-settings-field-locale
+  id: ref-field-locale
+  attrs:
+    field_key: attributes.settings.locale
+    label: Locale
+    order: 203
+    placeholder: Locale
+    required: true
+    type: ak-locale
+    initial_value_expression: true
+    initial_value: |
+      try:
+          return user.attributes.get("settings", {}).get("locale", "")
+      except:
+          return ''
+
+- model: authentik_stages_prompt.prompt
+  state: present
+  identifiers:
+    name: default-user-settings-field-pubkey
+  id: ref-field-pubkey
+  attrs:
+    field_key: attributes.pubkey
+    label: SSH Public key
+    order: 210
+    sub_text: Add public key per line
+    type: text_area
+    initial_value_expression: true
+    initial_value: |
+      try:
+          return user.attributes.get("pubkey", "")
+      except:
+          return ''
+
+# Validation policy for the prompt stage
+- model: authentik_policies_expression.expressionpolicy
+  state: present
+  identifiers:
+    name: default-user-settings-authorization
+  id: ref-policy-user-settings-auth
+  attrs:
+    expression: |
+      from authentik.core.models import (
+          USER_ATTRIBUTE_CHANGE_EMAIL,
+          USER_ATTRIBUTE_CHANGE_NAME,
+          USER_ATTRIBUTE_CHANGE_USERNAME
+      )
+      prompt_data = request.context.get("prompt_data")
+
+      if not request.user.group_attributes(request.http_request).get(
+          USER_ATTRIBUTE_CHANGE_EMAIL, request.http_request.tenant.default_user_change_email
+      ):
+          if prompt_data.get("email") != request.user.email:
+              ak_message("Not allowed to change email address.")
+              return False
+
+      if not request.user.group_attributes(request.http_request).get(
+          USER_ATTRIBUTE_CHANGE_NAME, request.http_request.tenant.default_user_change_name
+      ):
+          if prompt_data.get("name") != request.user.name:
+              ak_message("Not allowed to change name.")
+              return False
+
+      if not request.user.group_attributes(request.http_request).get(
+          USER_ATTRIBUTE_CHANGE_USERNAME, request.http_request.tenant.default_user_change_username
+      ):
+          if prompt_data.get("username") != request.user.username:
+              ak_message("Not allowed to change username.")
+              return False
+
+      return True
+
+# Prompt stage with all fields including SSH pubkey
+- model: authentik_stages_prompt.promptstage
+  state: present
+  identifiers:
+    name: default-user-settings
+  id: ref-stage-prompt
+  attrs:
+    fields:
+    - !KeyOf ref-field-username
+    - !KeyOf ref-field-name
+    - !KeyOf ref-field-email
+    - !KeyOf ref-field-locale
+    - !KeyOf ref-field-pubkey
+    validation_policies:
+    - !KeyOf ref-policy-user-settings-auth
+
+# User write stage
+- model: authentik_stages_user_write.userwritestage
+  state: present
+  identifiers:
+    name: default-user-settings-write
+  id: ref-stage-write
+  attrs:
+    user_creation_mode: never_create
+
+# Flow
+- model: authentik_flows.flow
+  state: present
+  identifiers:
+    slug: default-user-settings-flow
+  id: ref-flow
+  attrs:
+    name: User settings
+    title: Update your info
+    authentication: require_authenticated
+    denied_action: message_continue
+    designation: stage_configuration
+    layout: stacked
+    policy_engine_mode: any
+
+# Flow stage bindings
+- model: authentik_flows.flowstagebinding
+  identifiers:
+    target: !KeyOf ref-flow
+    order: 20
+  attrs:
+    stage: !KeyOf ref-stage-prompt
+
+- model: authentik_flows.flowstagebinding
+  identifiers:
+    target: !KeyOf ref-flow
+    order: 100
+  attrs:
+    stage: !KeyOf ref-stage-write

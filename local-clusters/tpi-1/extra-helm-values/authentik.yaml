@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    global:
+      env:
+      - name: AUTHENTIK_BOOTSTRAP_TOKEN
+        value: local-bootstrap-token
+      - name: AUTHENTIK_BOOTSTRAP_PASSWORD
+        value: admin
+      - name: AUTHENTIK_BOOTSTRAP_EMAIL
+        value: admin@localhost

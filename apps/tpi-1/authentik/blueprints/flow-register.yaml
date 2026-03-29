@@ -2,16 +2,21 @@
 version: 1
 metadata:
   name: Init - Registration with invitation token
-  # labels:
-  #   blueprints.goauthentik.io/instantiate: "true"
 context:
   group_name: Invite Users
 entries:
 - model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Init - Shared policies
   attrs:
+    identifiers:
+      name: Init - Shared policies
     required: false
+- model: authentik_policies_expression.expressionpolicy
+  state: created
+  identifiers:
+    name: add-user-to-jellyfin-group
+  id: ref-add-user-to-jellyfin-group
+  attrs:
+    expression: "return True"
 - model: authentik_core.group
   state: present
   identifiers:
@@ -102,18 +107,6 @@ entries:
     placeholder_expression: false
     order: 0
 - identifiers:
-    name: register-field-name
-  id: prompt-field-name
-  model: authentik_stages_prompt.prompt
-  attrs:
-    field_key: name
-    label: Name
-    type: text
-    required: true
-    placeholder: Name
-    placeholder_expression: false
-    order: 0
-- identifiers:
     name: register-field-email
   id: prompt-field-email
   model: authentik_stages_prompt.prompt
@@ -130,7 +123,7 @@ entries:
   id: register-email-verification
   model: authentik_stages_email.emailstage
   attrs:
-    token_expiry: 60
+    token_expiry: "hours=1"
     use_global_settings: true
     template: email/account_confirmation.html
     activate_user_on_success: true
@@ -221,4 +214,4 @@ entries:
   identifiers:
     order: 0
     target: !KeyOf register-user-write-stage
-    policy: !Find [authentik_policies_expression.expressionpolicy, [name, add-user-to-jellyfin-group]]
+    policy: !KeyOf ref-add-user-to-jellyfin-group

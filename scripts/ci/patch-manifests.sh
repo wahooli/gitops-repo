@@ -5,6 +5,8 @@ set -euo pipefail
 # so workloads can schedule on a single CI node.
 # Rules are defined in patch-manifests.yaml.
 
+DRY_RUN="${DRY_RUN:-false}"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CONFIG="$SCRIPT_DIR/patch-manifests.yaml"
@@ -77,9 +79,34 @@ process_file() {
   before=$(yq eval "${YQ_OPTS[@]}" '... comments=""' "$file" 2>/dev/null) || return 0
 
   # Process rules through a temp file to handle error_tolerant rules individually
-  local tmpfile
+  # Protect blank lines and block scalars from yq reformatting.
+  # - Blank lines become marker comments (yq preserves comments through rules).
+  # - Block scalar content (| or >) is replaced with a quoted placeholder so yq
+  #   cannot reformat it; original content is saved to temp files and restored after.
+  local tmpfile block_dir
   tmpfile=$(mktemp)
-  cp "$file" "$tmpfile"
+  block_dir=$(mktemp -d)
+  awk -v bdir="$block_dir" '
+    BEGIN { in_block = 0; n = 0 }
+    {
+      match($0, /^[[:space:]]*/); indent = RLENGTH
+      if (in_block) {
+        if (/^[[:space:]]*$/ || indent >= block_indent) {
+          print >> bfile; next
+        }
+        in_block = 0
+      }
+      if (/: [|>][-+]?[0-9]*[[:space:]]*$/) {
+        n++; in_block = 1; block_indent = indent + 1
+        bfile = bdir "/b" n
+        print > bfile
+        sub(/: [|>][-+]?[0-9]*[[:space:]]*$/, ": \"__BLOCK_" n "__\"")
+        print; next
+      }
+      if (/^[[:space:]]*$/) print "# __BLANK_LINE__"
+      else print
+    }
+  ' "$file" > "$tmpfile"
 
   for (( i=0; i<rule_count; i++ )); do
     # Check if file matches any exclude_paths for this rule (bash string match)
@@ -120,13 +147,31 @@ process_file() {
     fi
   done
 
+  # Restore blank lines and block scalars
+  sed -i 's/^[[:space:]]*# __BLANK_LINE__$//' "$tmpfile"
+  for bfile in "$block_dir"/b*; do
+    [[ -f "$bfile" ]] || continue
+    local bn
+    bn=$(basename "$bfile" | sed 's/^b//')
+    local lnum
+    lnum=$(grep -n "\"__BLOCK_${bn}__\"" "$tmpfile" | head -1 | cut -d: -f1) || true
+    if [[ -n "$lnum" ]]; then
+      sed -i -e "${lnum}r ${bfile}" -e "${lnum}d" "$tmpfile"
+    fi
+  done
+  rm -rf "$block_dir"
+
   local after
   after=$(yq eval "${YQ_OPTS[@]}" '... comments=""' "$tmpfile")
   if [[ "$after" != "$before" ]]; then
-    cp "$tmpfile" "$file"
-    # Atomic signal: touch a uniquely-named file in the patch_dir
+    if [[ "$DRY_RUN" == "true" ]]; then
+      echo "Would patch: $rel_path"
+      diff --color=auto -u "$file" "$tmpfile" || true
+    else
+      cp "$tmpfile" "$file"
+      echo "Patched: $rel_path"
+    fi
     touch "$patch_dir/$(echo "$file" | md5sum | cut -d' ' -f1)"
-    echo "Patched: $rel_path"
   fi
   rm -f "$tmpfile"
 }
@@ -143,4 +188,8 @@ done
 wait
 
 patched=$(find "$patch_dir" -type f | wc -l)
-echo "Done. Patched $patched file(s)."
+if [[ "$DRY_RUN" == "true" ]]; then
+  echo "Dry run complete. Would patch $patched file(s)."
+else
+  echo "Done. Patched $patched file(s)."
+fi

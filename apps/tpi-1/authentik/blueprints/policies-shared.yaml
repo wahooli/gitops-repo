@@ -2,11 +2,8 @@
 version: 1
 metadata:
   name: Init - Shared policies
-  # labels:
-  #   blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_policies_expression.expressionpolicy
-  id: login-password-optional
   identifiers:
     name: login-password-optional
   attrs:
@@ -18,7 +15,6 @@ entries:
       # been authenticated yet and we need the password stage
       return not hasattr(flow_plan.context.get("pending_user"), "backend")
 - model: authentik_policies_expression.expressionpolicy
-  id: check-login-denied
   identifiers:
     name: check-login-denied
   attrs:
@@ -37,12 +33,11 @@ entries:
           return result.passing
       return True
 - model: authentik_policies_expression.expressionpolicy
-  id: check-ip-in-private-net
   identifiers:
     name: check-ip-in-private-net
   attrs:
     expression: |
-      return ak_client_ip in ip_network('172.16.2.0/24') or ak_client_ip in ip_network('192.168.251.0/24') or ak_client_ip in ip_network('192.168.255.0/24')
+      return ak_client_ip in ip_network('${authentik_admin_allowed_net_1:=172.16.2.0/24}') or ak_client_ip in ip_network('${authentik_admin_allowed_net_2:=192.168.251.0/24}') or ak_client_ip in ip_network('${authentik_admin_allowed_net_3:=192.168.255.0/24}')
 - model: authentik_policies_expression.expressionpolicy
   identifiers:
     name: add-user-to-jellyfin-group
@@ -54,4 +49,3 @@ entries:
       # ["groups"] *must* be set to an array of Group objects, names alone are not enough.
       request.context["flow_plan"].context["groups"] = [group]
       return True
-  id: add-user-to-jellyfin-group

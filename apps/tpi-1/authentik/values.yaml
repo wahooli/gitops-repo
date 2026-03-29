@@ -70,6 +70,8 @@ authentik:
 #     value: email@email.com
 #   - name: AUTHENTIK_BOOTSTRAP_PASSWORD
 #     value: password
+blueprints:
+  discovery: false
 worker:
   dnsConfig:
     options:

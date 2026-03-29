@@ -2,24 +2,117 @@
 version: 1
 metadata:
   name: Init - Outposts
-  labels:
-    blueprints.goauthentik.io/instantiate: "true"
 entries:
 - model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Init - Applications
   attrs:
+    identifiers:
+      name: Init - Applications
     required: false
+# Reference entries for flows
+- model: authentik_flows.flow
+  state: created
+  identifiers:
+    slug: default-provider-authorization-implicit-consent
+  id: ref-flow-authorization
+  attrs:
+    name: Authorize Application
+    title: Redirecting to %(app)s
+    designation: authorization
+- model: authentik_flows.flow
+  state: created
+  identifiers:
+    slug: default-invalidation-flow
+  id: ref-flow-invalidation
+  attrs:
+    name: Logout
+    title: Logout
+    designation: invalidation
+- model: authentik_flows.flow
+  state: created
+  identifiers:
+    slug: ldap-login
+  id: ref-flow-ldap-login
+  attrs:
+    name: LDAP Login
+    title: LDAP Login
+    designation: authentication
+# Reference entries for providers (created by applications blueprint)
+- model: authentik_providers_proxy.proxyprovider
+  state: created
+  identifiers:
+    name: ombi-proxy
+  id: ref-ombi-proxy
+  attrs:
+    authorization_flow: !KeyOf ref-flow-authorization
+    invalidation_flow: !KeyOf ref-flow-invalidation
+    external_host: https://ombi.${domain_wahoo_li:=wahoo.li}
+    mode: forward_single
+    name: ombi-proxy
+- model: authentik_providers_proxy.proxyprovider
+  state: created
+  identifiers:
+    name: sonarr-proxy
+  id: ref-sonarr-proxy
+  attrs:
+    authorization_flow: !KeyOf ref-flow-authorization
+    invalidation_flow: !KeyOf ref-flow-invalidation
+    external_host: https://sonarr.${domain_wahoo_li:=wahoo.li}
+    mode: forward_single
+    name: sonarr-proxy
+- model: authentik_providers_proxy.proxyprovider
+  state: created
+  identifiers:
+    name: radarr-proxy
+  id: ref-radarr-proxy
+  attrs:
+    authorization_flow: !KeyOf ref-flow-authorization
+    invalidation_flow: !KeyOf ref-flow-invalidation
+    external_host: https://radarr.${domain_wahoo_li:=wahoo.li}
+    mode: forward_single
+    name: radarr-proxy
+- model: authentik_providers_proxy.proxyprovider
+  state: created
+  identifiers:
+    name: bazarr-proxy
+  id: ref-bazarr-proxy
+  attrs:
+    authorization_flow: !KeyOf ref-flow-authorization
+    invalidation_flow: !KeyOf ref-flow-invalidation
+    external_host: https://bazarr.${domain_wahoo_li:=wahoo.li}
+    mode: forward_single
+    name: bazarr-proxy
+- model: authentik_providers_proxy.proxyprovider
+  state: created
+  identifiers:
+    name: tautulli-proxy
+  id: ref-tautulli-proxy
+  attrs:
+    authorization_flow: !KeyOf ref-flow-authorization
+    invalidation_flow: !KeyOf ref-flow-invalidation
+    external_host: https://tautulli.${domain_wahoo_li:=wahoo.li}
+    internal_host: http://tautulli:8181
+    mode: proxy
+    name: tautulli-proxy
+- model: authentik_providers_ldap.ldapprovider
+  state: created
+  identifiers:
+    name: jellyfin-ldap-provider
+  id: ref-jellyfin-ldap
+  attrs:
+    authorization_flow: !KeyOf ref-flow-ldap-login
+    invalidation_flow: !KeyOf ref-flow-invalidation
+    name: jellyfin-ldap-provider
+
 - model: authentik_outposts.kubernetesserviceconnection
   identifiers:
     name: local-kube
+  id: ref-local-kube
   state: present
   attrs:
     kubeconfig: {}
     local: true
     name: local-kube
     verify_ssl: false
-  id: local-kube-connection
 
 - model: authentik_outposts.outpost
   identifiers:
@@ -51,14 +144,13 @@ entries:
       object_naming_template: ak-outpost-%(name)s
     name: Proxy default
     providers:
-    - !Find [authentik_providers_proxy.proxyprovider, [name, ombi-proxy]]
-    - !Find [authentik_providers_proxy.proxyprovider, [name, sonarr-proxy]]
-    - !Find [authentik_providers_proxy.proxyprovider, [name, radarr-proxy]]
-    - !Find [authentik_providers_proxy.proxyprovider, [name, bazarr-proxy]]
-    - !Find [authentik_providers_proxy.proxyprovider, [name, tautulli-proxy]]
-    service_connection: !KeyOf local-kube-connection
+    - !KeyOf ref-ombi-proxy
+    - !KeyOf ref-sonarr-proxy
+    - !KeyOf ref-radarr-proxy
+    - !KeyOf ref-bazarr-proxy
+    - !KeyOf ref-tautulli-proxy
+    service_connection: !KeyOf ref-local-kube
     type: proxy
-  id: authentik-embedded-outpost
 
 - model: authentik_outposts.outpost
   identifiers:
@@ -91,7 +183,6 @@ entries:
     managed: null
     name: authentik LDAP Outpost
     providers:
-    - !Find [authentik_providers_ldap.ldapprovider, [name, jellyfin-ldap-provider]]
-    service_connection: !KeyOf local-kube-connection
+    - !KeyOf ref-jellyfin-ldap
+    service_connection: !KeyOf ref-local-kube
     type: ldap
-  id: authentik-ldap-outpost

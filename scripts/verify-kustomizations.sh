@@ -48,6 +48,47 @@ is_kustomization_ready() {
   [[ "$status" == "True" ]]
 }
 
+declare -A _dep_visited=()
+
+ensure_dependencies_ready() {
+  local name="$1"
+  local namespace="$2"
+  local key="${namespace}/${name}"
+
+  # Cycle detection
+  if [[ -n "${_dep_visited[$key]:-}" ]]; then
+    return 0
+  fi
+  _dep_visited[$key]=1
+
+  # Get dependsOn from the cluster
+  local dep_json
+  dep_json=$(kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" get kustomization "$name" \
+    -o jsonpath='{range .spec.dependsOn[*]}{.name}{"|"}{.namespace}{"\n"}{end}' 2>/dev/null) || return 0
+
+  while IFS='|' read -r dep_name dep_ns; do
+    [[ -z "$dep_name" ]] && continue
+    dep_ns="${dep_ns:-$namespace}"
+
+    if is_kustomization_ready "$dep_name" "$dep_ns"; then
+      continue
+    fi
+
+    echo "Dependency $dep_name (namespace: $dep_ns) is not ready, reconciling..."
+    ensure_dependencies_ready "$dep_name" "$dep_ns" || return 1
+
+    flux reconcile kustomization "$dep_name" \
+      -n "$dep_ns" \
+      --timeout="${KUSTOMIZATION_TIMEOUT}" \
+      "${CONTEXT_ARGS[@]}" || return 1
+
+    kubectl "${CONTEXT_ARGS[@]}" -n "$dep_ns" \
+      wait kustomization/"$dep_name" \
+      --for=condition=ready \
+      --timeout="${KUSTOMIZATION_TIMEOUT}" || return 1
+  done <<< "$dep_json"
+}
+
 build_kustomization() {
   local name="$1"
   local file="$2"
@@ -73,6 +114,9 @@ reconcile_kustomization() {
 
   group_start "Kustomization $name"
   echo "kustomization file path: $file"
+
+  # Ensure dependsOn kustomizations are ready before reconciling
+  ensure_dependencies_ready "$name" "$namespace" || return 1
 
   if [[ "$RECONCILE_READY" != "true" ]] && is_kustomization_ready "$name" "$namespace"; then
     echo "kustomization $name is already ready, skipping reconcile"

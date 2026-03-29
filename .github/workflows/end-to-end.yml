@@ -165,6 +165,12 @@ jobs:
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
         RECONCILE_READY: "false"
       run: scripts/verify-helmreleases.sh
+    - name: Verify blueprint apply
+      if: steps.create-cluster.outcome == 'success'
+      continue-on-error: true
+      env:
+        CONTEXT: "k3d-${{ matrix.test.tenant }}"
+      run: scripts/verify-blueprint-apply.sh
     - name: Debug failure
       if: failure() && steps.create-cluster.outcome == 'success'
       env:

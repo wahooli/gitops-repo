@@ -1,31 +1,40 @@
 # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
 metadata:
   name: Init - Brand
-  labels:
-    blueprints.goauthentik.io/instantiate: "true"
 version: 1
 entries:
 - model: authentik_blueprints.metaapplyblueprint
   attrs:
-    required: false
-  identifiers:
-    name: Init - Authentication flow
-- model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Init - Recovery with email verification
-  attrs:
+    identifiers:
+      name: Init - Authentication flow
     required: false
 - model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Default - Invalidation flow
   attrs:
+    identifiers:
+      name: Init - Recovery with email verification
     required: false
 - model: authentik_blueprints.metaapplyblueprint
-  identifiers:
-    name: Default - User settings flow
   attrs:
+    identifiers:
+      name: Default - Invalidation flow
     required: false
-- attrs:
+- model: authentik_blueprints.metaapplyblueprint
+  attrs:
+    identifiers:
+      name: Init - User settings flow
+    required: false
+- model: authentik_brands.brand
+  state: present
+  identifiers:
+    domain: authentik-default
+  attrs:
+    default: false
+- model: authentik_brands.brand
+  state: present
+  identifiers:
+    domain: auth-wahooli
+  attrs:
+    default: true
     flow_authentication:
       !Find [authentik_flows.flow, [slug, login]]
     flow_invalidation:
@@ -37,8 +46,3 @@ entries:
     branding_title: auth.${domain_wahoo_li:=wahoo.li}
     branding_favicon: /static/dist/assets/icons/icon.png
     branding_logo: /static/dist/assets/icons/icon_left_brand.svg
-  identifiers:
-    domain: auth-wahooli
-    default: false
-  state: created
-  model: authentik_brands.brand

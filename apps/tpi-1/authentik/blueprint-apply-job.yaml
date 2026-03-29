@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-apply-blueprints
+  namespace: authentik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-apply-blueprints
+  template:
+    metadata:
+      labels:
+        app: authentik-apply-blueprints
+    spec:
+      terminationGracePeriodSeconds: 5
+      initContainers:
+      - name: apply-blueprints
+        image: alpine:3.21
+        command: ["/bin/sh", "/scripts/blueprint-apply.sh"]
+        env:
+        - name: AUTHENTIK_URL
+          value: http://authentik-server.authentik.svc.cluster.local
+        - name: AUTHENTIK_TOKEN
+          value: ${authentik_token}
+        - name: BLUEPRINT_APPLY_WAIT
+          value: "480"
+
+        volumeMounts:
+        - name: blueprints
+          mountPath: /blueprints
+          readOnly: true
+        - name: scripts
+          mountPath: /scripts
+          readOnly: true
+      containers:
+      - name: pause
+        image: registry.k8s.io/pause:3.10
+        resources:
+          requests:
+            cpu: 1m
+            memory: 4Mi
+          limits:
+            cpu: 1m
+            memory: 4Mi
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+        - name: edns0
+      volumes:
+      - name: blueprints
+        configMap:
+          name: authentik-blueprints
+      - name: scripts
+        configMap:
+          name: authentik-blueprint-apply-script
+          defaultMode: 0555

@@ -15,6 +15,13 @@ rules:
     del(.. | select(has("resources")).resources.limits | select(has("cpu") or has("memory")))
   error_tolerant: true
 
+- description: Disable blueprint-apply error sleep in CI
+  expression: |
+    with(select(.metadata.name == "authentik-apply-blueprints");
+      .spec.template.spec.initContainers[] |= with(select(.name == "apply-blueprints");
+        .env += [{"name": "BLUEPRINT_ERROR_SLEEP", "value": "0"}]))
+  error_tolerant: true
+
 # - description: Suspend HelmReleases in cluster-specific directories
 #   expression: |
 #     (select(.kind == "HelmRelease") | .spec.suspend) = true
