@@ -4,114 +4,63 @@ parent: "Apps"
 grand_parent: "tpi-1"
 ---
 
-# Mail Relay
+# mail-relay
 
 ## Overview
-The `mail-relay` component provides email relay functionality within the `tpi-1` cluster. It is a multi-component deployment consisting of two HelmReleases: `default--mail-relay` for the mail relay service and `default--mail-relay-openldap` for LDAP-based user authentication and configuration. Together, these sub-components enable secure email relay and user management.
+The `mail-relay` component is a mail server deployment that utilizes Docker Mailserver and OpenLDAP to provide email relay services within the Kubernetes cluster `tpi-1`. This deployment consists of two Helm releases, enabling both the mail server functionality and the LDAP directory service for user authentication.
 
 ## Sub-components
-### Mail Relay (`default--mail-relay`)
-- **Chart**: `docker-mailserver`
+### HelmRelease: default--mail-relay
+- **Chart**: docker-mailserver
 - **Version**: latest (floating: >=0.1.1-0)
-- **Target Namespace**: `default`
-- **Description**: Provides the core mail relay service, including SMTP, submission, and metrics endpoints. It integrates with LDAP for user authentication and configuration.
+- **Target Namespace**: default
+- **Provides**: A mail relay service that handles SMTP requests and integrates with LDAP for user management.
 
-### OpenLDAP (`default--mail-relay-openldap`)
-- **Chart**: `openldap`
+### HelmRelease: default--mail-relay-openldap
+- **Chart**: openldap
 - **Version**: latest (floating: >=0.1.1-0)
-- **Target Namespace**: `default`
-- **Description**: Manages LDAP-based user authentication and stores configuration data for the mail relay service.
+- **Target Namespace**: default
+- **Provides**: An LDAP service for user authentication and management, supporting the mail relay functionality.
 
 ## Dependencies
-The `mail-relay` deployment has the following dependency chain:
-1. **`cert-manager--cert-manager`**: Provides certificate management for secure communication.
-2. **`default--mail-relay-openldap`**: Depends on `cert-manager` for TLS certificates and provides LDAP services for user authentication.
-3. **`default--mail-relay`**: Depends on `default--mail-relay-openldap` for LDAP-based user authentication and configuration.
+- `default--mail-relay` depends on `default--mail-relay-openldap`, which provides the LDAP service necessary for user authentication.
+- `default--mail-relay-openldap` depends on `cert-manager--cert-manager`, which is responsible for managing TLS certificates for secure communication.
 
 ## Helm Chart(s)
-### Mail Relay (`default--mail-relay`)
-- **Chart**: `docker-mailserver`
-- **Repository**: `wahooli` (oci://ghcr.io/wahooli/charts)
-- **Version**: latest (floating: >=0.1.1-0)
+- **docker-mailserver**
+  - **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+  - **Version**: latest (floating: >=0.1.1-0)
 
-### OpenLDAP (`default--mail-relay-openldap`)
-- **Chart**: `openldap`
-- **Repository**: `wahooli` (oci://ghcr.io/wahooli/charts)
-- **Version**: latest (floating: >=0.1.1-0)
+- **openldap**
+  - **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+  - **Version**: latest (floating: >=0.1.1-0)
 
 ## Resource Glossary
 ### Networking
-- **Service (`mail-relay`)**: Exposes the mail relay service with the following ports:
-  - `smtp` (TCP/25): Standard SMTP port for email relay.
-  - `submissions` (TCP/465): SMTP over SSL.
-  - `submission` (TCP/587): SMTP with STARTTLS.
-  - `metrics` (TCP/9154): Exposes metrics for monitoring.
-
-### Workloads
-- **Deployment (`mail-relay`)**: Runs the mail relay application with one replica. Includes resource limits and requests for memory, CPU, and ephemeral storage. Utilizes init containers for configuration setup and log file creation. A sidecar container (`postfix-exporter`) is included for metrics collection.
-
-- **Deployment (`mail-relay-openldap`)**: Runs the OpenLDAP service with one replica. Includes resource limits and requests for memory and CPU. Utilizes init containers for configuration setup.
+- **Service**: Exposes the mail relay and OpenLDAP services, allowing communication over SMTP (ports 25, 465, 587) and metrics (port 9154).
+- **ServiceAccount**: Provides an identity for the mail relay and OpenLDAP deployments to interact with the Kubernetes API.
 
 ### Storage
-- **ConfigMaps**:
-  - `docker-mailserver-values-t7kt2hmg4k`: Contains Helm values for the mail relay service.
-  - `mail-relay-env-fbh87h9kg9`: Provides environment variables for the mail relay service.
-  - `mail-relay-config-d7248ht69b`: Contains configuration files for the mail relay service.
-  - `mail-relay-ldap-ldifs-4ftdbd86b8`: Stores LDAP LDIF files for user provisioning.
-  - `mail-relay-ldap-schemas-67f2b99k4h`: Contains LDAP schema definitions.
-
-- **Persistent Volumes**:
-  - `data`: Stores mail logs, state, and configuration files for the mail relay service.
-  - `custom-ldif`: Stores custom LDIF files for OpenLDAP.
-  - `custom-schemas`: Stores custom LDAP schemas for OpenLDAP.
+- **ConfigMap**: Stores configuration data for both the mail relay and OpenLDAP, including environment variables and LDAP schemas.
 
 ### Security
-- **Certificates**:
-  - `mail-relay-certificate`: TLS certificate for the mail relay service.
-  - `mail-relay-ldap-certificate`: TLS certificate for the OpenLDAP service.
+- **Certificate**: Manages TLS certificates for secure communication with the mail relay and OpenLDAP services.
 
-### Images
-- **Mail Relay**:
-  - `ghcr.io/docker-mailserver/docker-mailserver:15.1.0`
-  - Sidecar: `ghcr.io/wahooli/docker/postfix_exporter:latest`
-- **OpenLDAP**:
-  - `ghcr.io/wahooli/docker/openldap:2.6.10`
+### Workload
+- **Deployment**: Manages the lifecycle of the mail relay and OpenLDAP pods, ensuring the desired number of replicas are running and handling updates.
 
 ## Configuration Highlights
-### Mail Relay
-- **Environment Variables**:
-  - `OVERRIDE_HOSTNAME`: `mail-relay.default.svc.cluster.local`
-  - `SMTP_ONLY`: `"1"` (disables IMAP/POP3)
-  - `LDAP_BIND_DN`: `cn=mailserver,ou=users,dc=wahooli,dc=homelab`
-  - `LOG_LEVEL`: `warn`
-
-- **Resource Requests and Limits**:
-  - Memory: 128Mi (request), 256Mi (limit)
-  - CPU: 160m (request)
-  - Ephemeral Storage: 200Mi (request), 2048Mi (limit)
-
-- **Persistence**:
-  - Configurations and logs are stored in persistent volumes.
-
-### OpenLDAP
-- **Environment Variables**:
-  - `LDAP_ADMIN_USERNAME` and `LDAP_ADMIN_PASSWORD`: Retrieved from secrets.
-  - `LDAP_ROOT`: `dc=wahooli,dc=homelab`
-  - TLS settings for secure LDAP communication.
-
-- **Resource Requests and Limits**:
-  - Memory: 32Mi (request), 64Mi (limit)
-  - CPU: 40m (request)
-
-- **Persistence**:
-  - LDIF files and schemas are stored in persistent volumes.
+- **Resource Requests/Limits**: 
+  - Mail relay: Requests 160m CPU and 128Mi memory; limits 2048Mi ephemeral storage and 256Mi memory.
+  - OpenLDAP: Requests 100m CPU and 64Mi memory; limits 64Mi memory.
+- **Persistence**: Both components have persistent storage enabled for configuration and data.
+- **Replica Counts**: Both deployments are configured to run a single replica.
+- **Important Helm Values**:
+  - Mail relay environment variables include `OVERRIDE_HOSTNAME`, `LDAP_SERVER_HOST`, and `SASLAUTHD_LDAP_BIND_DN`.
+  - OpenLDAP environment variables include `LDAP_ADMIN_USERNAME` and `LDAP_ADMIN_PASSWORD`.
 
 ## Deployment
-- **Target Namespace**: `default`
-- **Release Names**:
-  - Mail Relay: `mail-relay`
-  - OpenLDAP: `mail-relay-openldap`
-- **Reconciliation Interval**: 5 minutes
-- **Install/Upgrade Behavior**:
-  - Automatic remediation of failed installations.
-  - Unlimited retries for installation.
+- **Target Namespace(s)**: default
+- **Release Name(s)**: mail-relay, mail-relay-openldap
+- **Reconciliation Interval**: 5 minutes for both releases.
+- **Install/Upgrade Behavior**: The deployments are configured to remediate last failures and retry indefinitely on failure.

@@ -4,74 +4,49 @@ parent: "Apps"
 grand_parent: "nas"
 ---
 
-# Radarr
+# radarr
 
 ## Overview
+Radarr is a movie collection manager for Usenet and BitTorrent users, allowing for automated downloading and organization of movies. In this deployment, Radarr is configured to run in the Kubernetes cluster named 'nas', utilizing Flux for GitOps management.
 
-Radarr is a movie collection manager for Usenet and BitTorrent users. It automates the process of downloading, organizing, and managing movies. In this Kubernetes deployment, Radarr is configured to run as a HelmRelease managed by Flux, ensuring continuous delivery and automated updates. The deployment includes additional resources for monitoring, ingress routing, and certificate management.
+## Sub-components
+This deployment consists of a single HelmRelease:
+- **HelmRelease**: `default--radarr`
+  - **Chart**: radarr
+  - **Version**: latest (floating: >=0.1.1-0)
+  - **Target Namespace**: default
+  - **Provides**: Deployment, Service, PersistentVolumeClaim, and ServiceAccount for the Radarr application.
+
+## Dependencies
+There are no explicit dependencies defined for this HelmRelease.
 
 ## Helm Chart(s)
-
-### HelmRelease: `default--radarr`
-- **Chart Name**: `radarr`
-- **Repository**: `wahooli` (OCI: `oci://ghcr.io/wahooli/charts`)
-- **Version**: `latest` (floating: `>=0.1.1-0`)
-- **Release Name**: `radarr`
-- **Target Namespace**: `default`
-- **Reconciliation Interval**: `5m`
+- **Chart Name**: radarr
+- **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+- **Version**: latest (floating: >=0.1.1-0)
 
 ## Resource Glossary
-
 ### Networking
-- **Service**: A ClusterIP service named `radarr` exposes the application on port `7878` for HTTP traffic and port `9707` for metrics. It includes annotations for Cilium service discovery.
-- **Ingress**: Configured with the `nginx` ingress class, the ingress routes traffic to `radarr.${domain_wahoo_li:=wahoo.li}`. It includes annotations for SSL redirection, custom HTTP error handling, and external DNS configuration.
-- **HTTPRoute**: Provides routing for `radarr.${domain_absolutist_it:=absolutist.it}` via the `internal-gw` gateway in the `infrastructure` namespace.
+- **HTTPRoute**: Two HTTPRoute resources are created to manage traffic routing for Radarr. They define the hostnames and backend services for both public and private access.
+- **Service**: A ClusterIP service is created to expose Radarr on port 7878 for HTTP traffic and port 9707 for metrics.
 
 ### Storage
-- **PersistentVolumeClaim**: A PVC named `config-radarr` is created with a storage request of `2Gi` and `ReadWriteOnce` access mode. It is used to persist configuration data.
+- **PersistentVolumeClaim**: A PVC named `config-radarr` is created to provide persistent storage for Radarr's configuration, requesting 2Gi of storage.
 
 ### Security
-- **ServiceAccount**: A ServiceAccount named `radarr` is created for the deployment. It is configured to automatically mount the service account token.
-- **Certificate**: A certificate named `radarr-ingress` is issued using the `letsencrypt-production` ClusterIssuer. It secures the ingress with a TLS secret named `tls-radarr-ingress`.
+- **ServiceAccount**: A service account named `radarr` is created to manage permissions for the Radarr deployment.
 
 ### Workload
-- **Deployment**: A single-replica Deployment named `radarr` is created. It includes:
-  - A main container running the `ghcr.io/linuxserver/radarr:6.0.4` image.
-  - A sidecar container running the `ghcr.io/onedr0p/exportarr:v2.0.1` image for metrics export.
-  - Liveness, readiness, and startup probes for both containers.
-  - Resource limits for the metrics exporter container: `150m` CPU and `60Mi` memory.
-  - Persistent volume mounts for configuration (`/config`) and data (`/data/`).
-
-### Monitoring
-- **ServiceMonitor**: Configured to scrape metrics from the metrics endpoint (`/metrics`) every `300s` with a scrape timeout of `60s`. Includes relabeling configurations for Prometheus.
-
-### Image Management
-- **ImageRepository**: Tracks the `ghcr.io/linuxserver/radarr` image with an update interval of `24h`.
-- **ImagePolicy**: Ensures the image tag follows a semantic versioning range (`x.x.x`).
-
-### Configuration
-- **ConfigMaps**:
-  - `radarr-values-m8tf252d82`: Contains Helm values, including image tag, pod annotations, DNS configuration, metrics settings, and persistence configuration.
-  - `radarr-env-gk9dgb4gfb`: Provides environment variables such as `PGID`, `PUID`, and `TZ`.
+- **Deployment**: A deployment named `radarr` is created to manage the application pods, ensuring that one replica is always running. It includes liveness, readiness, and startup probes for health checks.
 
 ## Configuration Highlights
-
-- **Image**: `ghcr.io/linuxserver/radarr:6.0.4`
-- **Persistence**:
-  - Configuration data is stored in a PVC with `2Gi` of storage.
-  - Movie data is stored in a hostPath volume at `${radarr_data_host_path}`.
-- **Probes**:
-  - Liveness, readiness, and startup probes are configured for both the main container and the metrics exporter.
-- **Metrics**:
-  - Metrics are exposed on port `9707` via the `radarr-exporter` sidecar container.
-  - ServiceMonitor is enabled for Prometheus integration.
-- **Ingress**:
-  - Configured with SSL termination using a Let's Encrypt certificate.
-  - Routes traffic to `radarr.${domain_wahoo_li:=wahoo.li}` and `radarr.${domain_absolutist_it:=absolutist.it}`.
+- **Image**: The Radarr container uses the image `ghcr.io/linuxserver/radarr:6.0.4`.
+- **Resource Requests/Limits**: The Radarr container has CPU limits set to 150m and memory limits set to 60Mi.
+- **Persistence**: Configuration data is stored in a persistent volume, with a request for 2Gi of storage.
+- **Environment Variables**: Key environment variables include `PGID`, `PUID`, and `TZ` for user and timezone configuration.
 
 ## Deployment
-
-- **Target Namespace**: `default`
-- **Release Name**: `radarr`
-- **Reconciliation Interval**: `5m`
-- **Install/Upgrade Behavior**: Unlimited retries on installation failure (`retries: -1`).
+- **Target Namespace**: default
+- **Release Name**: radarr
+- **Reconciliation Interval**: 5m
+- **Install/Upgrade Behavior**: The HelmRelease is configured to retry indefinitely on failure.
