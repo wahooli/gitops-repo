@@ -3,6 +3,9 @@ kind: Certificate
 metadata:
   name: mail-relay-ldap-certificate
   namespace: default
+  labels:
+    backupDaily: "true"
+    backupWeekly: "true"
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
 spec:

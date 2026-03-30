@@ -1,0 +1,45 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: velero-backup-health
+  namespace: alerting
+spec:
+  groups:
+  - name: velero-backup-health
+    rules:
+    - alert: VeleroBackupFailed
+      annotations:
+        summary: Velero backup {{ $labels.schedule }} failed.
+        description: Velero backup {{ $labels.schedule }} has status {{ $labels.status }}.
+      expr: |-
+        increase(velero_backup_failure_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+    - alert: VeleroBackupPartialFailure
+      annotations:
+        summary: Velero backup {{ $labels.schedule }} partially failed.
+        description: Velero backup {{ $labels.schedule }} completed with errors.
+      expr: |-
+        increase(velero_backup_partial_failure_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: warning
+    - alert: VeleroBackupValidationFailed
+      annotations:
+        summary: Velero backup {{ $labels.schedule }} failed validation.
+        description: Velero backup {{ $labels.schedule }} failed validation, check BackupStorageLocation availability.
+      expr: |-
+        increase(velero_backup_validation_failure_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+    - alert: VeleroBackupNotRunRecently
+      annotations:
+        summary: Velero backup schedule {{ $labels.schedule }} has not completed recently.
+        description: No successful backup for schedule {{ $labels.schedule }} in the last 26 hours.
+      expr: |-
+        time() - velero_backup_last_successful_timestamp{schedule!=""} > 93600
+      for: 0m
+      labels:
+        severity: critical

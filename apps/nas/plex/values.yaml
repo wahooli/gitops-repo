@@ -74,11 +74,32 @@ global:
     backupDaily: "true"
     app.kubernetes.io/part-of: plex
 configMaps:
+- name: nvidia-plex-fix
+  data:
+    fix-nvidia-libs.sh: |
+      #!/bin/sh
+      # Plex Transcoder searches RPATH (XORIGIN/../lib) which resolves to
+      # /usr/lib/plexmediaserver/lib/ but NVIDIA runtime puts libs in /lib/
+      PLEX_LIB="/usr/lib/plexmediaserver/lib"
+      for lib in /lib/libnvidia*.so.1 /lib/libcuda*.so.1 /lib/libnvcuvid.so.1; do
+        [ -e "$lib" ] || continue
+        name=$(basename "$lib")
+        if [ ! -e "$PLEX_LIB/$name" ]; then
+          ln -sf "$lib" "$PLEX_LIB/$name"
+          echo "Symlinked $name into Plex lib directory"
+        fi
+      done
 - name: library-import-initscript
   data:
     import-config.sh: |
       #!/bin/sh
       echo "waiting for pre-existing pms database to uploaded..."
+
+      PREFS="/config/Library/Application Support/Plex Media Server/Preferences.xml"
+      if [ -f "$PREFS" ]; then
+        echo "Clearing stale HardwareDevicePath to force GPU auto-detection..."
+        sed -i 's/HardwareDevicePath="[^"]*"/HardwareDevicePath=""/' "$PREFS"
+      fi
 
       if [ "$PLEX_SKIP_INIT_WAIT" == "1" ]; then
         mkdir -p /config/Library
@@ -182,6 +203,15 @@ initContainers:
 #     memory: "3072Mi"
 #     cpu: "1000m"
 persistence:
+  nvidia-plex-fix:
+    enabled: true
+    mount:
+    - path: /custom-cont-init.d/fix-nvidia-libs.sh
+      subPath: fix-nvidia-libs.sh
+    spec:
+      configMap:
+        name: nvidia-plex-fix
+        defaultMode: 0777
   initcontainer-entrypoint:
     enabled: true
     spec:
@@ -199,7 +229,7 @@ persistence:
       - "ReadWriteOnce"
       resources:
         requests:
-          storage: "60Gi"
+          storage: "70Gi"
           # spec:
           #   persistentVolumeClaim:
           #     claimName: config-plex

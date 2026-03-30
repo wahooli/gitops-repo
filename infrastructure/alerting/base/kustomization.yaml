@@ -18,4 +18,5 @@ resources:
 - rules/victoriametrics/vmagent.yaml
 - rules/victoriametrics/vmalert.yaml
 - rules/victoriametrics/vmauth.yaml
+- rules/velero/backup-health.yaml
 - rules/vps/vps-alerts.yaml
