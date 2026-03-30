@@ -6,82 +6,66 @@ grand_parent: "tpi-1"
 
 # authentik
 
-The `authentik` component is deployed in the `tpi-1` cluster and consists of multiple sub-components, including the main authentik service, a Redis instance, and a Patroni-managed PostgreSQL database. Below is the detailed documentation for the deployment.
+## Overview
+The `authentik` component is deployed in the `tpi-1` cluster and is responsible for providing authentication services. It utilizes Helm for deployment and is managed through Flux CD.
 
 ## Namespace
-- **Namespace**: `authentik`
-
-## Helm Repository
-- **Name**: `goauthentik`
-- **URL**: [https://charts.goauthentik.io/](https://charts.goauthentik.io/)
-- **Update Interval**: 24 hours
+The component is deployed in the `authentik` namespace.
 
 ## Helm Releases
 ### authentik
-- **Release Name**: `authentik`
-- **Chart Version**: `2025.12.4`
+- **Chart**: `authentik`
+- **Version**: `2025.12.4`
+- **Source**: [goauthentik](https://charts.goauthentik.io/)
 - **Interval**: 5 minutes
-- **Target Namespace**: `authentik`
-- **Values**: Loaded from ConfigMaps `authentik-values-gdhg2f68bm` (base and custom values)
+- **Dependencies**:
+  - `authentik--authentik-redis`
+  - `authentik--authentik-patroni`
+- **Values**: Configurations are sourced from multiple ConfigMaps, including `authentik-values-gdhg2f68bm` and `authentik-helmrelease-overrides`.
 
 ### authentik-remote-cluster
-- **Release Name**: `authentik-remote-cluster-default`
-- **Chart Version**: `2.0.0`
+- **Chart**: `authentik-remote-cluster`
+- **Version**: `2.0.0`
+- **Source**: [goauthentik](https://charts.goauthentik.io/)
 - **Interval**: 5 minutes
-- **Target Namespace**: `default`
-- **Values**: Custom values defined inline
+- **Dependencies**:
+  - `authentik--authentik`
+- **Values**: Custom configurations for the remote cluster deployment.
 
-### authentik-patroni
-- **Release Name**: `authentik-patroni`
-- **Chart Version**: `>=0.1.0-0`
+### authentik--authentik-patroni
+- **Chart**: `patroni`
+- **Version**: `>=0.1.0-0`
+- **Source**: [wahooli](https://charts.wahooli.io/)
 - **Interval**: 5 minutes
-- **Target Namespace**: `authentik`
-- **Values**: Loaded from ConfigMaps `authentik-patroni-values-fctf8ct669` (base and custom values)
-
-## Deployments
-### authentik-apply-blueprints
-- **Replicas**: 1
-- **Container**: 
-  - **Image**: `registry.k8s.io/pause:3.10`
-  - **Init Container**: `apply-blueprints` using `alpine:3.21` to apply blueprints.
+- **Dependencies**: 
+  - `cert-manager--cert-manager`
+  - `reflector--reflector`
+  - `etcd--etcd`
+- **Values**: Configurations are sourced from ConfigMaps, including `authentik-patroni-values-fctf8ct669` and `authentik-patroni-helmrelease-overrides`.
 
 ## Image Repositories
 - **authentik-server**: `ghcr.io/goauthentik/server`
 - **patroni-17**: `ghcr.io/wahooli/docker/patroni-17`
 
 ## HTTP Routes
-- **Route Name**: `authentik`
-- **Hostnames**: 
-  - `auth.wahoo.li`
-  - `auth.absolutist.it`
-  - `authentik.wahoo.li`
-  - `authentik.absolutist.it`
-- **Backend Reference**: `authentik-server` on port 80
+The `authentik` service is exposed through HTTP routes with the following hostnames:
+- `auth.wahoo.li`
+- `auth.absolutist.it`
+- `authentik.wahoo.li`
+- `authentik.absolutist.it`
 
-## Configurations
-### Values Overview
-- **Logging**: 
-  - Log level set to `warn`
-  - Error reporting disabled
-- **PostgreSQL Configuration**: 
-  - Database: `authentik`
-  - User: `authentik`
-  - Password: `${authentik_database_password}`
-- **Redis Configuration**: 
-  - Host: `authentik-redis-proxy.authentik.svc.cluster.local`
-  - TLS enabled
-- **Email Configuration**: 
-  - SMTP settings for sending emails
+## Deployments
+### authentik-apply-blueprints
+- **Replicas**: 1
+- **Init Container**: Runs a script to apply blueprints using the `authentik` API.
 
-### Patroni Configuration
-- **PostgreSQL**: Managed by Patroni with replication and backup configurations.
-- **Persistence**: Enabled for PostgreSQL data.
-
-## Dependencies
-- The `authentik` release depends on:
-  - `authentik--authentik-redis`
-  - `authentik--authentik-patroni`
+## Configuration
+The configuration for `authentik` includes:
+- Logging settings
+- Database connection details for PostgreSQL and Redis
+- Email server configurations
+- TLS settings for secure connections
 
 ## Notes
-- Ensure that all referenced secrets and ConfigMaps are created and properly configured before deploying the `authentik` component.
-- The deployment includes configurations for metrics, DNS settings, and network policies to ensure secure communication between components.
+- The deployment is managed using Flux CD, ensuring that the desired state is maintained.
+- The `authentik` component is designed to be resilient, with automatic remediation for failures and configurable timeouts for installations.

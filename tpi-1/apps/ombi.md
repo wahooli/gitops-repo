@@ -7,23 +7,23 @@ grand_parent: "tpi-1"
 # ombi
 
 ## Overview
-Ombi is a self-hosted web application that allows users to request media content. It integrates with various media servers and provides a user-friendly interface for managing requests. This deployment consists of two Helm releases: `ombi` and `ombi-mariadb`, which work together to provide the full functionality of the application.
+Ombi is a self-hosted application that allows users to request media content and manage their media library. In this deployment, Ombi is configured to work with a MariaDB database for data persistence. This is a multi-component deployment consisting of Ombi and its database backend.
 
 ## Sub-components
 ### HelmRelease: default--ombi
 - **Chart**: ombi
 - **Version**: latest (floating: >=0.1.1-0)
 - **Target Namespace**: default
-- **Provides**: The main application deployment, including a service and a deployment for the Ombi application.
+- **Provides**: Ombi application deployment, including a service and deployment resources.
 
 ### HelmRelease: default--ombi-mariadb
 - **Chart**: mariadb
 - **Version**: 16.5.0
 - **Target Namespace**: default
-- **Provides**: A MariaDB database instance that Ombi uses for data storage, including a StatefulSet and associated services.
+- **Provides**: MariaDB database deployment, including a StatefulSet, service, and necessary configuration.
 
 ## Dependencies
-- `default--ombi` depends on `default--ombi-mariadb`, which provides the database required for Ombi to function.
+- **default--ombi** depends on **default--ombi-mariadb**. The MariaDB deployment provides the database backend required for Ombi to function correctly.
 
 ## Helm Chart(s)
 - **Ombi**
@@ -36,36 +36,33 @@ Ombi is a self-hosted web application that allows users to request media content
 
 ## Resource Glossary
 ### Networking
-- **Service**: Exposes the Ombi application on a ClusterIP, allowing internal access to the application on port 3579.
-- **HTTPRoute**: Defines routing rules for incoming traffic to the Ombi service, allowing it to be accessed via specific hostnames.
+- **Service**: The Ombi service exposes the application on port 3579, allowing access to the Ombi application within the cluster.
+- **HTTPRoute**: Defines routing rules for incoming HTTP traffic to the Ombi application, enabling access via specified hostnames.
 
 ### Storage
-- **StatefulSet**: Manages the deployment of the MariaDB database, ensuring persistent storage and stable network identities.
-- **ConfigMap**: Stores configuration data for both Ombi and MariaDB, including database connection strings and application settings.
+- **ConfigMap**: Several ConfigMaps are created to store configuration data for both Ombi and MariaDB, including database connection strings and application settings.
 
 ### Security
-- **NetworkPolicy**: Controls the traffic flow to and from the MariaDB pods, ensuring that only allowed traffic can reach the database.
-- **ServiceAccount**: Provides an identity for the Ombi and MariaDB applications to interact with the Kubernetes API.
+- **ServiceAccount**: Service accounts for both Ombi and MariaDB are created to manage permissions for the applications.
+- **NetworkPolicy**: Ensures that only allowed traffic can reach the MariaDB database, enhancing security.
+
+### Workload
+- **Deployment**: The Ombi application is deployed as a single replica, ensuring high availability and easy management.
+- **StatefulSet**: The MariaDB database is deployed as a StatefulSet to manage its persistent storage and ensure stable network identities.
 
 ## Configuration Highlights
 - **Ombi**:
   - **Image**: `lscr.io/linuxserver/ombi:4.53.4`
-  - **Environment Variables**: 
-    - `TZ`: Europe/Helsinki
-    - `PGID`: 1000
-    - `PUID`: 1000
-  - **Persistence**: Enabled with a ConfigMap for JSON configuration.
+  - **Environment Variables**: Configured with timezone (`TZ: Europe/Helsinki`) and user/group IDs (`PGID: 1000`, `PUID: 1000`).
+  - **Persistence**: Enabled with a ConfigMap for configuration data.
   
 - **MariaDB**:
   - **Image**: `ghcr.io/wahooli/docker/mariadb:11.2.3`
-  - **Database Name**: Ombi
+  - **Database Configuration**: Uses environment variables for database credentials and settings.
   - **Persistence**: Enabled with a size of 4Gi.
-  - **Backup Configuration**: Daily and weekly backups are configured.
 
 ## Deployment
 - **Target Namespace**: default
-- **Release Names**: ombi, ombi-mariadb
-- **Reconciliation Interval**: 
-  - Ombi: 5m
-  - Ombi-MariaDB: 5m
-- **Install/Upgrade Behavior**: Both releases are set to retry indefinitely on failure.
+- **Release Name(s)**: ombi, ombi-mariadb
+- **Reconciliation Interval**: 5m for both releases
+- **Install/Upgrade Behavior**: Both releases are set to retry indefinitely on failure, ensuring resilience during deployment.

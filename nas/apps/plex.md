@@ -7,7 +7,7 @@ grand_parent: "nas"
 # plex
 
 ## Overview
-The `plex` component deploys a Plex Media Server in the Kubernetes cluster, enabling users to stream media content. This deployment includes necessary configurations for metrics, environment variables, and persistent storage for media files and server configurations.
+The `plex` component deploys a Plex Media Server in the Kubernetes cluster, allowing users to manage and stream their media collections. It utilizes a Helm chart to manage its deployment and configuration, ensuring that the application is easily updatable and maintainable.
 
 ## Sub-components
 This deployment consists of a single HelmRelease:
@@ -15,7 +15,7 @@ This deployment consists of a single HelmRelease:
   - **Chart**: `plex`
   - **Version**: latest (floating: >=0.1.0-0)
   - **Target Namespace**: `default`
-  - **Provides**: Deployment of Plex Media Server with associated configurations and services.
+  - **Provides**: Deployment of the Plex Media Server along with necessary configurations and resources.
 
 ## Dependencies
 No dependencies are specified for this HelmRelease.
@@ -27,28 +27,26 @@ No dependencies are specified for this HelmRelease.
 
 ## Resource Glossary
 ### Networking
-- **Service**: Exposes the Plex Media Server on port `32400` for HTTP traffic and `1900` for DLNA UDP traffic, allowing clients to connect and stream media.
-- **HTTPRoute**: Configures routing for the Plex service, enabling access via specified hostnames.
+- **HTTPRoute**: Manages HTTP traffic routing to the Plex service, allowing access via specified hostnames.
+- **Service**: Exposes the Plex Media Server on port 32400 for HTTP traffic and port 1900 for DLNA UDP traffic.
 
 ### Storage
-- **PersistentVolumeClaim**: Requests a `70Gi` storage volume for storing Plex configurations and media library data, ensuring data persistence across pod restarts.
+- **PersistentVolumeClaim**: Requests a persistent volume for storing Plex configuration and media data, with a storage request of 70Gi.
 
 ### Security
-- **ServiceAccount**: Provides a service account for the Plex deployment, allowing it to interact with the Kubernetes API.
+- **ServiceAccount**: Provides an identity for the Plex application to interact with the Kubernetes API.
 
 ### Configuration
-- **ConfigMap**: Contains various configuration scripts and environment variables necessary for initializing and running the Plex Media Server, including:
-  - `import-config.sh`: Script for importing existing Plex configurations.
-  - `fix-nvidia-libs.sh`: Script to create symlinks for NVIDIA libraries required by the Plex transcoder.
+- **ConfigMap**: Contains various configuration scripts and environment variables necessary for the Plex Media Server operation, including initialization scripts and NVIDIA library fixes.
 
 ## Configuration Highlights
-- **Resource Requests/Limits**: The deployment specifies resource limits for CPU and memory for containers, ensuring efficient resource usage.
-- **Persistence**: Configurations for persistent storage are set up to ensure that media libraries and server settings are retained.
-- **Environment Variables**: Key environment variables such as `PGID`, `PUID`, and `TZ` are configured to manage user permissions and timezone settings.
-- **Metrics**: Metrics collection is enabled for monitoring the Plex server's performance.
+- **Resource Requests/Limits**: The Plex Media Server is configured with CPU and memory limits of 100m and 100Mi, respectively.
+- **Persistence**: The configuration is stored in a PersistentVolumeClaim with a request for 70Gi of storage.
+- **Environment Variables**: Configures NVIDIA driver capabilities and timezone settings via a ConfigMap.
+- **Init Containers**: Includes an init container for importing existing Plex configurations from a tarball.
 
 ## Deployment
 - **Target Namespace**: `default`
 - **Release Name**: `plex`
 - **Reconciliation Interval**: 5 minutes
-- **Install/Upgrade Behavior**: The HelmRelease is configured with a timeout of 15 minutes for installation and allows for unlimited retries on failure.
+- **Install/Upgrade Behavior**: The HelmRelease is set to retry indefinitely on failure with a timeout of 15 minutes for installation.

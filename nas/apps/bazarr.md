@@ -7,7 +7,7 @@ grand_parent: "nas"
 # bazarr
 
 ## Overview
-Bazarr is a companion application for managing and downloading subtitles for media files. It integrates with various media servers and provides a web interface for users to configure subtitle preferences. In the Kubernetes cluster 'nas', Bazarr is deployed using Flux for GitOps management, ensuring that the application is consistently maintained and updated.
+Bazarr is a companion application for managing and automating the downloading of subtitles for your media library. It integrates with various media servers and allows users to configure subtitle languages and download preferences. In the cluster, it serves as a deployment that interacts with other services to provide subtitle management functionalities.
 
 ## Sub-components
 This deployment consists of a single HelmRelease:
@@ -15,10 +15,10 @@ This deployment consists of a single HelmRelease:
   - **Chart**: bazarr
   - **Version**: latest (floating: >=0.1.0-0)
   - **Target Namespace**: default
-  - **Provides**: Deployment, Service, PersistentVolumeClaim, and ConfigMap for Bazarr.
+  - **Provides**: Deployment, Service, PersistentVolumeClaim, and ConfigMap for the Bazarr application.
 
 ## Dependencies
-No dependencies are defined for this HelmRelease.
+No dependencies are specified for this HelmRelease.
 
 ## Helm Chart(s)
 - **Chart Name**: bazarr
@@ -27,26 +27,26 @@ No dependencies are defined for this HelmRelease.
 
 ## Resource Glossary
 ### Networking
-- **HTTPRoute**: Defines routing rules for incoming HTTP requests to the Bazarr service. Two routes are configured, one for public access and another for private access.
-- **Service**: Exposes the Bazarr application on port 6767 for internal communication within the cluster.
+- **HTTPRoute**: Defines routing rules for HTTP traffic to the Bazarr service, allowing it to be accessed via specified hostnames.
+- **Service**: Exposes the Bazarr application on port 6767 for HTTP traffic and port 9707 for metrics.
 
 ### Storage
-- **PersistentVolumeClaim**: Requests persistent storage for Bazarr's configuration data, ensuring that data persists across pod restarts. It requests 1Gi of storage.
+- **PersistentVolumeClaim**: Requests persistent storage for Bazarr's configuration data, ensuring data is retained across pod restarts.
 
 ### Security
-- **SecurityPolicy**: Configures external authentication for Bazarr, ensuring that requests are authenticated before reaching the application.
+- **SecurityPolicy**: Manages external authentication for the Bazarr application, ensuring secure access to the service.
 
 ### Miscellaneous
 - **ConfigMap**: Stores configuration data for Bazarr, including environment variables and application settings.
 
 ## Configuration Highlights
-- **Resource Requests/Limits**: The deployment specifies resource limits for the Bazarr application, ensuring it does not exceed 150m CPU and 60Mi memory.
-- **Persistence**: Configures persistent storage for Bazarr's configuration, with a 1Gi storage request.
-- **Environment Variables**: Key environment variables include `API_KEY_FILE`, `ENABLE_ADDITIONAL_METRICS`, and `URL`, which are essential for the application's operation.
-- **Service Annotations**: The service is annotated for Cilium networking, enabling local affinity.
+- **Resource Requests/Limits**: The deployment specifies resource limits for CPU (150m) and memory (60Mi).
+- **Persistence**: Configures persistent storage for Bazarr's configuration with a request of 1Gi.
+- **Environment Variables**: Key environment variables include `PGID`, `PUID`, and `TZ` for user and timezone configuration.
+- **Service Annotations**: The service is annotated for Cilium networking with global affinity settings.
 
 ## Deployment
 - **Target Namespace**: default
 - **Release Name**: bazarr
 - **Reconciliation Interval**: 5m
-- **Install/Upgrade Behavior**: The HelmRelease is configured to retry indefinitely on failure, ensuring resilience during deployment.
+- **Install/Upgrade Behavior**: The deployment is set to retry indefinitely on failure.
