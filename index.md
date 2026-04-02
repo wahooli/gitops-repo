@@ -15,7 +15,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [etcd](livingroom-pi/apps/etcd.md)
 - [sources](livingroom-pi/apps/sources.md)
 
-**Infrastructure / core:**
+**Infrastructure / Core:**
 - [cert-manager](livingroom-pi/infrastructure/core/cert-manager.md)
 - [gateway-api](livingroom-pi/infrastructure/core/gateway-api.md)
 - [multus](livingroom-pi/infrastructure/core/multus.md)
@@ -24,13 +24,13 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [sources](livingroom-pi/infrastructure/core/sources.md)
 - [victoria-metrics](livingroom-pi/infrastructure/core/victoria-metrics.md)
 
-**Infrastructure / logging:**
+**Infrastructure / Logging:**
 - [vector-agent](livingroom-pi/infrastructure/logging/vector-agent.md)
 
-**Infrastructure / monitoring:**
+**Infrastructure / Monitoring:**
 - [monitoring](livingroom-pi/infrastructure/monitoring/monitoring.md)
 
-**Infrastructure / platform:**
+**Infrastructure / Platform:**
 - [cert-manager-issuers](livingroom-pi/infrastructure/platform/cert-manager-issuers.md)
 - [kube-state-metrics](livingroom-pi/infrastructure/platform/kube-state-metrics.md)
 - [multus-networks](livingroom-pi/infrastructure/platform/multus-networks.md)
@@ -62,10 +62,10 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [transmission-old](nas/apps/transmission-old.md)
 - [transmission](nas/apps/transmission.md)
 
-**Infrastructure / alerting:**
+**Infrastructure / Alerting:**
 - [alerting](nas/infrastructure/alerting/alerting.md)
 
-**Infrastructure / core:**
+**Infrastructure / Core:**
 - [cert-manager](nas/infrastructure/core/cert-manager.md)
 - [cilium](nas/infrastructure/core/cilium.md)
 - [envoy-gateway](nas/infrastructure/core/envoy-gateway.md)
@@ -76,7 +76,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [topolvm](nas/infrastructure/core/topolvm.md)
 - [victoria-metrics](nas/infrastructure/core/victoria-metrics.md)
 
-**Infrastructure / internal-dns:**
+**Infrastructure / Internal DNS:**
 - [bind9](nas/infrastructure/internal-dns/bind9.md)
 - [blocky](nas/infrastructure/internal-dns/blocky.md)
 - [client-lookup](nas/infrastructure/internal-dns/client-lookup.md)
@@ -85,19 +85,19 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [tpi-1-external-dns](nas/infrastructure/internal-dns/tpi-1-external-dns.md)
 - [unbound](nas/infrastructure/internal-dns/unbound.md)
 
-**Infrastructure / kube-dns:**
+**Infrastructure / Kube DNS:**
 - [kube-dns](nas/infrastructure/kube-dns/kube-dns.md)
 
-**Infrastructure / logging:**
+**Infrastructure / Logging:**
 - [resources](nas/infrastructure/logging/resources.md)
 - [vector-agent](nas/infrastructure/logging/vector-agent.md)
 - [vector-global-write](nas/infrastructure/logging/vector-global-write.md)
 - [vector-lb](nas/infrastructure/logging/vector-lb.md)
 
-**Infrastructure / monitoring:**
+**Infrastructure / Monitoring:**
 - [monitoring](nas/infrastructure/monitoring/monitoring.md)
 
-**Infrastructure / platform:**
+**Infrastructure / Platform:**
 - [cert-manager-issuers](nas/infrastructure/platform/cert-manager-issuers.md)
 - [cilium](nas/infrastructure/platform/cilium.md)
 - [default-backend](nas/infrastructure/platform/default-backend.md)
@@ -130,10 +130,10 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [tautulli](tpi-1/apps/tautulli.md)
 - [vaultwarden](tpi-1/apps/vaultwarden.md)
 
-**Infrastructure / alerting:**
+**Infrastructure / Alerting:**
 - [alerting](tpi-1/infrastructure/alerting/alerting.md)
 
-**Infrastructure / core:**
+**Infrastructure / Core:**
 - [cert-manager](tpi-1/infrastructure/core/cert-manager.md)
 - [cilium](tpi-1/infrastructure/core/cilium.md)
 - [envoy-gateway](tpi-1/infrastructure/core/envoy-gateway.md)
@@ -144,7 +144,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [topolvm](tpi-1/infrastructure/core/topolvm.md)
 - [victoria-metrics](tpi-1/infrastructure/core/victoria-metrics.md)
 
-**Infrastructure / internal-dns:**
+**Infrastructure / Internal DNS:**
 - [bind9](tpi-1/infrastructure/internal-dns/bind9.md)
 - [blocky](tpi-1/infrastructure/internal-dns/blocky.md)
 - [client-lookup](tpi-1/infrastructure/internal-dns/client-lookup.md)
@@ -153,21 +153,21 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [tpi-1-external-dns](tpi-1/infrastructure/internal-dns/tpi-1-external-dns.md)
 - [unbound](tpi-1/infrastructure/internal-dns/unbound.md)
 
-**Infrastructure / kube-dns:**
+**Infrastructure / Kube DNS:**
 - [kube-dns](tpi-1/infrastructure/kube-dns/kube-dns.md)
 
-**Infrastructure / logging:**
+**Infrastructure / Logging:**
 - [resources](tpi-1/infrastructure/logging/resources.md)
 - [vector-agent](tpi-1/infrastructure/logging/vector-agent.md)
 - [vector-global-write](tpi-1/infrastructure/logging/vector-global-write.md)
 - [vector-lb](tpi-1/infrastructure/logging/vector-lb.md)
 - [vlogs-short-term](tpi-1/infrastructure/logging/vlogs-short-term.md)
 
-**Infrastructure / monitoring:**
+**Infrastructure / Monitoring:**
 - [resources](tpi-1/infrastructure/monitoring/resources.md)
 - [vm-short-term-server-cluster](tpi-1/infrastructure/monitoring/vm-short-term-server-cluster.md)
 
-**Infrastructure / platform:**
+**Infrastructure / Platform:**
 - [cert-manager-issuers](tpi-1/infrastructure/platform/cert-manager-issuers.md)
 - [cilium](tpi-1/infrastructure/platform/cilium.md)
 - [default-backend](tpi-1/infrastructure/platform/default-backend.md)
