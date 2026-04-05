@@ -4,76 +4,52 @@ parent: "Infrastructure / Platform"
 grand_parent: "nas"
 ---
 
-# Velero
+# velero
 
 ## Overview
+Velero is a backup and recovery tool for Kubernetes clusters, enabling users to back up their cluster resources and persistent volumes. It provides disaster recovery capabilities and allows for the migration of workloads between clusters. In this deployment, Velero is configured to use AWS as the backup storage provider.
 
-Velero is a backup and recovery solution for Kubernetes clusters and persistent volumes. It provides disaster recovery and data migration capabilities, allowing you to back up your cluster resources and persistent volumes, restore them in case of failure, and migrate resources to other clusters. In the `nas` cluster, Velero is deployed using a HelmRelease managed by Flux.
+## Sub-components
+This deployment consists of a single HelmRelease:
+- **HelmRelease: velero--velero**
+  - **Chart:** velero
+  - **Version:** 12.0.0
+  - **Target Namespace:** velero
+  - **Provides:** Backup and recovery functionality for Kubernetes resources and persistent volumes.
+
+## Dependencies
+This deployment does not have any explicit dependencies listed in the HelmRelease.
 
 ## Helm Chart(s)
-
-### velero--velero
-- **Chart Name**: `velero`
-- **Repository**: [vmware-tanzu](https://vmware-tanzu.github.io/helm-charts)
-- **Version**: `11.4.0`
-- **Release Name**: `velero`
-- **Target Namespace**: `velero`
-- **Reconciliation Interval**: 10 minutes
+- **Chart Name:** velero
+- **Repository:** vmware-tanzu (https://vmware-tanzu.github.io/helm-charts)
+- **Version:** 12.0.0
 
 ## Resource Glossary
-
-The Velero deployment creates the following Kubernetes resources:
-
-### Core Resources
-- **Namespace (`velero`)**: Dedicated namespace for Velero resources.
-- **Deployment (`velero`)**: The main Velero server responsible for managing backups and restores.
-- **DaemonSet (`node-agent`)**: Runs the Velero node agent on each node for handling volume snapshots and backups.
-
 ### Networking
-- **Service (`velero`)**: Exposes the Velero server for monitoring purposes on port `8085`.
+- **Service:** A ClusterIP service named `velero` that exposes the Velero API for monitoring on port 8085.
 
 ### Security
-- **ServiceAccount (`velero-server`)**: Service account used by the Velero server and node agent.
-- **Role (`velero-server`)**: Provides permissions for Velero operations within the `velero` namespace.
-- **RoleBinding (`velero-server`)**: Binds the `velero-server` Role to the `velero-server` ServiceAccount.
-- **ClusterRoleBinding (`velero-server`)**: Grants cluster-wide permissions to the Velero server.
+- **ServiceAccount:** A service account named `velero-server` that allows Velero to interact with the Kubernetes API.
+- **Role & RoleBinding:** A role and role binding named `velero-server` that grants the service account permissions to perform all actions on all resources within the `velero` namespace.
+- **ClusterRoleBinding:** A cluster role binding named `velero-server` that grants the service account cluster-wide permissions.
 
-### Configuration
-- **ConfigMap (`velero-repo-maintenance`)**: Contains configuration for repository maintenance, such as the number of maintenance jobs to keep.
-- **Secret (`velero`)**: Stores cloud provider credentials for accessing backup storage.
+### Storage
+- **Secret:** A secret named `velero` that stores cloud credentials for accessing the backup storage.
+- **ConfigMap:** A config map named `velero-repo-maintenance` that contains configuration for maintaining Velero's backup repository.
 
-### Backup and Restore
-- **BackupStorageLocation (`seaweedfs-backups`)**: Configures the backup storage location using an S3-compatible storage backend.
-- **Schedule**: Predefined backup schedules:
-  - **Daily**: Retains backups for 7 days.
-  - **Weekly**: Retains backups for 30 days.
+### Workload
+- **Deployment:** A deployment for the Velero server that manages the Velero API and backup operations.
+- **DaemonSet:** A daemon set named `node-agent` that runs on each node, allowing Velero to manage backups of persistent volumes.
 
 ## Configuration Highlights
-
-- **Backup Storage**: Configured to use an S3-compatible storage backend (`seaweedfs-backups`) with customizable parameters:
-  - `bucket`: `${velero_backup_bucket}`
-  - `region`: `${velero_backup_bucket_region}`
-  - `s3Url`: `${velero_backup_bucket_url}`
-  - `publicUrl`: `${velero_backup_bucket_public_url}`
-- **Plugins**:
-  - Velero Plugin for AWS (`velero/velero-plugin-for-aws:v1.14.0`)
-  - Velero Plugin for CSI (`velero/velero-plugin-for-csi:v0.7.0`)
-- **Snapshots**: Enabled by default.
-- **Backup Schedules**:
-  - **Daily**: Runs at `1:05 AM` and retains backups for 7 days.
-  - **Weekly**: Runs every 7 days at `2:05 AM` and retains backups for 30 days.
-  - **Hourly**: Disabled by default.
-- **Excluded Resources**: Specific Kubernetes resources (e.g., `storageclasses.storage.k8s.io`, `certificaterequests.cert-manager.io`) and namespaces (e.g., `kube-system`, `cert-manager`) are excluded from backups.
-- **Node Agent**: Deployed to manage volume snapshots, with a `dnsPolicy` set to `ClusterFirst`.
+- **Backup Storage Location:** Configured to use AWS with parameters such as bucket name and region specified via Flux variables (`${velero_backup_bucket}`, `${velero_backup_bucket_region}`).
+- **Scheduling:** Configured schedules for daily and weekly backups with specific retention times.
+- **Init Containers:** Includes init containers for plugins, such as `velero-plugin-for-aws` and `velero-plugin-for-csi`, with specific image versions.
+- **Node Agent:** The node agent runs with a security context that allows it to access host paths for managing Kubernetes pods and plugins.
 
 ## Deployment
-
-- **Target Namespace**: `velero`
-- **Release Name**: `velero`
-- **Reconciliation Interval**: 10 minutes
-- **Install/Upgrade Behavior**:
-  - **Install Timeout**: 15 minutes
-  - **Upgrade Hooks**: Disabled
-  - **Remediation**: Automatic retries for failed installations and upgrades (`remediateLastFailure: true`).
-
-This deployment is managed by Flux, with configuration values sourced from multiple ConfigMaps (`velero-values-2tmfhddtk8`). Key parameters, such as storage backend details and credentials, are dynamically populated using Flux variables.
+- **Target Namespace:** velero
+- **Release Name:** velero
+- **Reconciliation Interval:** 10 minutes
+- **Install/Upgrade Behavior:** The installation has a timeout of 15 minutes and retries indefinitely on failure. Hooks are disabled during upgrades.

@@ -7,57 +7,48 @@ grand_parent: "tpi-1"
 # tautulli
 
 ## Overview
-Tautulli is a web application that monitors and provides statistics for Plex Media Server. It allows users to track their media consumption, manage their libraries, and receive notifications about their Plex server activities. In this deployment, Tautulli is managed using Flux and Helm, ensuring automated updates and configuration management.
+Tautulli is a web application that monitors and provides insights into your Plex Media Server. It tracks various statistics and provides notifications for events related to your Plex server. This deployment consists of a single HelmRelease that manages the application and its associated resources.
 
 ## Sub-components
-This deployment consists of a single HelmRelease:
-- **HelmRelease**: `default--tautulli`
-  - **Chart**: tautulli
-  - **Version**: latest (floating: >=0.1.1-0)
-  - **Target Namespace**: default
-  - **Provides**: A web application for monitoring Plex Media Server.
-
-## Dependencies
-There are no dependencies specified in this deployment.
+- **HelmRelease: default--tautulli**
+  - **Chart:** tautulli
+  - **Version:** latest (floating: >=0.1.1-0)
+  - **Target Namespace:** default
+  - **Provides:** Deployment, Service, PersistentVolumeClaim, and ServiceAccount for the Tautulli application.
 
 ## Helm Chart(s)
-- **Chart Name**: tautulli
-- **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
-- **Version**: latest (floating: >=0.1.1-0)
+- **Chart Name:** tautulli
+- **Repository:** wahooli (oci://ghcr.io/wahooli/charts) [OCI]
+- **Version:** latest (floating: >=0.1.1-0)
 
 ## Resource Glossary
 ### Networking
-- **HTTPRoute**: 
-  - `tautulli`: Routes traffic to the Tautulli service on port 9000 for the hostname `tautulli.wahoo.li`.
-  - `tautulli-private`: Routes traffic to the Tautulli service on port 8181 for the hostname `tautulli.absolutist.it`.
+- **HTTPRoute:** Manages HTTP routing for Tautulli, allowing access via specified hostnames. Two routes are defined:
+  - `tautulli`: Routes traffic to the backend service on port 9000.
+  - `tautulli-private`: Routes traffic to the Tautulli service on port 8181.
 
 ### Storage
-- **PersistentVolumeClaim**: 
-  - `config-tautulli`: Requests 2Gi of storage for Tautulli's configuration data, ensuring persistence across pod restarts.
+- **PersistentVolumeClaim:** Requests a persistent volume for storing Tautulli's configuration data, ensuring data persistence across pod restarts.
 
 ### Security
-- **ServiceAccount**: 
-  - `tautulli`: Provides an identity for Tautulli pods to interact with the Kubernetes API.
+- **ServiceAccount:** Provides an identity for Tautulli to interact with the Kubernetes API, enabling it to manage resources securely.
 
 ### Workload
-- **Deployment**: 
-  - `tautulli`: Manages the Tautulli application, ensuring it runs with a single replica. It includes liveness, readiness, and startup probes for health checks.
-
-### Other
-- **ImageRepository**: 
-  - `tautulli`: Tracks the Tautulli Docker image from `ghcr.io/linuxserver/tautulli`.
-- **ImagePolicy**: 
-  - `tautulli`: Enforces a policy to use images from the 2.x.x version range.
+- **Deployment:** Manages the Tautulli application, ensuring it runs with the specified configuration. It includes:
+  - **Replicas:** 1 (ensures a single instance is running).
+  - **Container:** Runs the Tautulli application using the image `ghcr.io/linuxserver/tautulli:2.17.0`.
+  - **Probes:** Liveness, readiness, and startup probes to monitor the health of the application.
 
 ## Configuration Highlights
-- **Image Tag**: `2.16.1`
-- **Environment Variables**:
-  - `TZ`: Set to `Europe/Helsinki` for timezone configuration.
-- **Persistence**: Enabled with a PersistentVolumeClaim for configuration storage.
-- **Service Annotations**: Includes Cilium-specific annotations for network policies.
+- **Image Tag:** `2.17.0`
+- **Environment Variables:**
+  - `TZ`: Europe/Helsinki
+- **Persistence:** Enabled with a 2Gi storage request for the configuration.
+- **Service Annotations:** Configured for Cilium networking with global sync and affinity settings.
+- **Backup Annotations:** Configured for Velero backup with daily and weekly backup settings.
 
 ## Deployment
-- **Target Namespace**: default
-- **Release Name**: tautulli
-- **Reconciliation Interval**: 5 minutes
-- **Install/Upgrade Behavior**: Remediation retries are set to unlimited, ensuring resilience during deployment.
+- **Target Namespace:** default
+- **Release Name:** tautulli
+- **Reconciliation Interval:** 5m
+- **Install Behavior:** Remediation retries are set to unlimited (-1), ensuring that the deployment will attempt to recover from failures.

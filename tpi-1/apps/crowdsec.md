@@ -7,7 +7,7 @@ grand_parent: "tpi-1"
 # crowdsec
 
 ## Overview
-The `crowdsec` component is deployed in the `tpi-1` cluster using Flux for GitOps. It consists of two main Helm releases: `crowdsec` and `crowdsec-patroni`, which work together to provide security monitoring and database management functionalities.
+The `crowdsec` component is deployed in the `tpi-1` cluster using Flux for GitOps. It consists of two main Helm releases: `crowdsec` and `crowdsec-patroni`, which work together to provide security and database management functionalities.
 
 ## Helm Releases
 
@@ -17,7 +17,7 @@ The `crowdsec` component is deployed in the `tpi-1` cluster using Flux for GitOp
 - **Repository**: [crowdsec](https://crowdsecurity.github.io/helm-charts)
 - **Release Name**: crowdsec
 - **Target Namespace**: crowdsec
-- **Reconciliation Interval**: 5m
+- **Reconciliation Interval**: 5 minutes
 - **Dependencies**: 
   - `crowdsec--crowdsec-patroni`
 
@@ -34,7 +34,7 @@ The `crowdsec` component is deployed in the `tpi-1` cluster using Flux for GitOp
 - **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
 - **Release Name**: crowdsec-patroni
 - **Target Namespace**: crowdsec
-- **Reconciliation Interval**: 5m
+- **Reconciliation Interval**: 5 minutes
 - **Dependencies**: 
   - `cert-manager--cert-manager`
   - `reflector--reflector`
@@ -47,24 +47,26 @@ The `crowdsec` component is deployed in the `tpi-1` cluster using Flux for GitOp
 - Deployment: 1
 
 ## Configuration
-The configuration for `crowdsec` is managed through several ConfigMaps that define various parameters, including database connections, logging settings, and security policies.
+The configuration for the `crowdsec` component is primarily managed through ConfigMaps, which include various YAML files for base and shared values. Key configurations include:
 
-### Key Configurations
-- **Base Values**: Configures the container runtime and application security settings.
-- **Shared Values**: Defines image repository, agent environment variables, and resource limits.
-- **Patroni Values**: Manages PostgreSQL settings, including user credentials and replication configurations.
+- **Container Runtime**: `containerd`
+- **LAPI Dashboard**: Disabled by default
+- **Agent Configuration**: Includes environment variables for collections and database connection.
+- **Database Configuration**: Uses PostgreSQL with SSL settings.
 
 ## Networking
-The `crowdsec` component exposes its API through an HTTPRoute, allowing access via the hostname `crowdsec-api.${domain_absolutist_it:=absolutist.it}`. This route is managed by the Envoy gateway.
+The `crowdsec` component exposes an HTTP route for the API:
+- **HTTPRoute Name**: crowdsec-api
+- **Hostnames**: crowdsec-api.${domain_absolutist_it:=absolutist.it}
+- **Backend**: crowdsec-service on port 8080
 
 ## Image Management
-The component utilizes Flux's image management capabilities to track the `crowdsecurity/crowdsec` image, with a reconciliation interval of 24 hours.
+- **Image Repository**: crowdsecurity/crowdsec
+- **Image Policy**: Managed with a semver range.
 
 ## Dependencies
-- The `crowdsec` release depends on the `crowdsec-patroni` release, which in turn depends on several other components such as `cert-manager`, `reflector`, and `etcd`.
+The `crowdsec` release depends on the `crowdsec-patroni` release, which in turn depends on several other components including `cert-manager`, `reflector`, and `etcd`. This hierarchical dependency ensures that the database and other services are available for the `crowdsec` application to function correctly.
 
-## Namespace
-All resources are deployed in the `crowdsec` namespace, which is specifically created for this component.
-
-## Conclusion
-The `crowdsec` component is a robust solution for security monitoring in Kubernetes, leveraging GitOps practices for deployment and management. It integrates with PostgreSQL through Patroni for database management and utilizes Envoy for API routing.
+## Notes
+- The deployment is configured to automatically reconcile every 5 minutes.
+- The `crowdsec` component is designed to enhance security by monitoring and responding to threats in real-time.

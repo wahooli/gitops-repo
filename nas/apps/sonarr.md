@@ -7,58 +7,68 @@ grand_parent: "nas"
 # sonarr
 
 ## Overview
-Sonarr is a TV series management tool that automates the downloading, sorting, and renaming of TV shows. It runs in the Kubernetes cluster 'nas' and is deployed using Flux CD for GitOps management. This deployment includes a HelmRelease that manages the Sonarr application and its associated resources.
+Sonarr is a TV series management tool that automates the downloading, sorting, and renaming of TV shows. It integrates with various download clients and provides a web interface for managing your media library. In this deployment, Sonarr is configured to run in the `default` namespace of the Kubernetes cluster named `nas`.
 
 ## Sub-components
-- **HelmRelease: default--sonarr**
-  - **Chart:** sonarr
-  - **Version:** latest (floating: >=0.1.1-0)
-  - **Target Namespace:** default
-  - **Provides:** Manages the deployment of the Sonarr application, including its service, persistent storage, and associated configurations.
+This deployment consists of a single HelmRelease:
+- **HelmRelease**: `default--sonarr`
+  - **Chart**: sonarr
+  - **Version**: latest (floating: >=0.1.1-0)
+  - **Target Namespace**: default
+  - **Provides**: Deployment, Service, PersistentVolumeClaim, and ServiceAccount for running the Sonarr application.
 
 ## Dependencies
-This component does not have any defined dependencies.
+There are no dependencies specified for this HelmRelease.
 
 ## Helm Chart(s)
-- **Chart Name:** sonarr
-- **Repository:** wahooli (oci://ghcr.io/wahooli/charts)
-- **Version:** latest (floating: >=0.1.1-0)
+- **Chart Name**: sonarr
+- **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+- **Version**: latest (floating: >=0.1.1-0)
 
 ## Resource Glossary
 ### Networking
-- **HTTPRoute:** Defines routing rules for HTTP traffic to the Sonarr application. Two routes are created:
-  - `sonarr`: Routes traffic to the service on port 9000.
-  - `sonarr-private`: Routes traffic to the Sonarr service on port 8989.
+- **HTTPRoute**: Defines routing rules for accessing the Sonarr service. Two routes are created:
+  - `sonarr`: Routes traffic to the Sonarr service on port 9000.
+  - `sonarr-private`: Routes traffic to the Sonarr service on port 8989 for private access.
 
 ### Storage
-- **PersistentVolumeClaim:** Requests a persistent volume for storing Sonarr's configuration data, ensuring data is retained across pod restarts. It requests 2Gi of storage.
+- **PersistentVolumeClaim**: `config-sonarr`
+  - Requests 2Gi of storage for Sonarr's configuration data, ensuring that the data persists across pod restarts.
 
 ### Security
-- **ServiceAccount:** A dedicated service account for the Sonarr application, allowing it to interact with the Kubernetes API securely.
+- **ServiceAccount**: `sonarr`
+  - Provides an identity for the Sonarr application to interact with the Kubernetes API.
 
 ### Workload
-- **Deployment:** Manages the Sonarr application pods, ensuring the desired state is maintained. It specifies:
-  - **Replicas:** 1
-  - **Strategy:** Recreate
-  - **Container:** Runs the Sonarr application using the image `ghcr.io/linuxserver/sonarr:4.0.16`.
+- **Deployment**: `sonarr`
+  - Manages the Sonarr application pods, ensuring that one instance is always running. It includes:
+    - **Containers**: 
+      - `sonarr`: The main application container running the Sonarr service.
+      - `sonarr-exporter`: A metrics exporter for monitoring Sonarr's performance.
+    - **Probes**: Liveness, readiness, and startup probes to ensure the application is healthy and ready to serve traffic.
 
-### Monitoring
-- **ConfigMap:** Contains configuration settings for Sonarr, including environment variables and resource limits for metrics collection.
+### Services
+- **Service**: `sonarr`
+  - Exposes the Sonarr application on port 8989 for HTTP traffic and port 9707 for metrics.
 
 ## Configuration Highlights
-- **Resource Requests/Limits:** 
+- **Resource Requests/Limits**: 
   - CPU limit: 200m
   - Memory limit: 60Mi
-- **Persistence:** 
-  - Config persistence is enabled with a PVC requesting 2Gi of storage.
-- **Environment Variables:** 
+- **Persistence**: 
+  - Configuration data is stored in a PersistentVolumeClaim with a request for 2Gi of storage.
+- **Environment Variables**: 
   - `PGID`: 2003
   - `PUID`: 2001
   - `TZ`: Europe/Helsinki
-- **Service Monitor:** Enabled for metrics scraping with a scrape interval of 300 seconds.
+- **Service Annotations**: 
+  - `service.cilium.io/global`: "true"
+  - `service.cilium.io/affinity`: "local"
+- **Metrics**: 
+  - Metrics collection is enabled with additional environment variables for the metrics exporter.
 
 ## Deployment
-- **Target Namespace:** default
-- **Release Name:** sonarr
-- **Reconciliation Interval:** 5m
-- **Install/Upgrade Behavior:** The deployment is configured to retry indefinitely on failure.
+- **Target Namespace**: default
+- **Release Name**: sonarr
+- **Reconciliation Interval**: 5m
+- **Install Behavior**: The HelmRelease is set to retry indefinitely on failure.

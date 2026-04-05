@@ -7,93 +7,46 @@ grand_parent: "livingroom-pi"
 # etcd
 
 ## Overview
+The `etcd` component provides a distributed key-value store that is used for storing critical data in a Kubernetes cluster. It is essential for maintaining the state of the cluster and is often used by various Kubernetes components for configuration and service discovery.
 
-The `etcd` component provides a distributed key-value store that is used as a backend for service discovery and configuration management in the `livingroom-pi` Kubernetes cluster. It is deployed using a HelmRelease managed by Flux and includes a gateway for external access. This deployment ensures high availability and fault tolerance by running multiple replicas of the etcd service.
+## Sub-components
+This deployment consists of a single HelmRelease:
+- **HelmRelease: etcd--etcd**
+  - **Chart**: etcd
+  - **Version**: latest (floating: >=0.1.0-0)
+  - **Target Namespace**: etcd
+  - **Provides**: A distributed key-value store with features such as high availability, data persistence, and secure communication.
 
 ## Dependencies
-
-The `etcd` HelmRelease depends on the `cert-manager--cert-manager` HelmRelease. The `cert-manager` is used to manage SSL/TLS certificates for secure communication between etcd instances and clients.
+The `etcd--etcd` HelmRelease has a dependency on:
+- **cert-manager--cert-manager**: This component is responsible for managing SSL/TLS certificates, which are crucial for securing communication between etcd instances.
 
 ## Helm Chart(s)
-
-### etcd--etcd
-- **Chart Name:** `etcd`
-- **Repository:** `wahooli` (OCI: `oci://ghcr.io/wahooli/charts`)
-- **Version:** `latest` (floating: `>=0.1.0-0`)
-- **Release Name:** `etcd`
-- **Target Namespace:** `etcd`
-- **Reconciliation Interval:** 5 minutes
+- **Chart Name**: etcd
+- **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+- **Version**: latest (floating: >=0.1.0-0)
 
 ## Resource Glossary
+### Networking
+- **Service**: 
+  - `etcd`: Exposes the etcd instances for client communication on port 2379 (client), 2380 (server), and 8080 (metrics). It uses a ClusterIP type, allowing internal communication within the cluster.
+  - `etcd-gateway`: Provides a gateway for accessing etcd, allowing clients to connect to the etcd cluster through a single endpoint.
 
-### Namespace
-- **Name:** `etcd`
-- **Purpose:** Provides an isolated namespace for the etcd resources within the cluster.
-
-### ImageRepository
-- **Name:** `etcd`
-- **Purpose:** Tracks the `quay.io/coreos/etcd` container image for the etcd deployment.
-
-### ImagePolicy
-- **Name:** `etcd`
-- **Purpose:** Ensures that the etcd deployment uses the latest image version matching the semantic versioning range `vx.x.x`.
-
-### HelmRelease
-- **Name:** `etcd--etcd`
-- **Purpose:** Manages the deployment of the etcd Helm chart, including its configuration and lifecycle.
-
-### ConfigMap
-- **Name:** `etcd-values-b8c67gkkdd`
-- **Purpose:** Provides custom configuration values for the etcd Helm chart, including settings for replicas, persistence, SSL, and networking.
-
-### Services
-1. **etcd Service**
-   - **Type:** ClusterIP
-   - **Ports:**
-     - `2379` (etcd-client)
-     - `2380` (etcd-server)
-     - `8080` (etcd-metrics)
-   - **Purpose:** Exposes the etcd cluster for internal communication and metrics collection.
-   - **Annotations:** Configured for global service discovery with Cilium.
-
-2. **etcd-gateway Service**
-   - **Type:** ClusterIP
-   - **Port:** `2379` (gateway)
-   - **Purpose:** Provides a gateway for external access to the etcd cluster.
-
-### StatefulSet
-- **Name:** `etcd`
-- **Purpose:** Manages the main etcd cluster with persistent storage and high availability.
-
-### Deployment
-- **Name:** `etcd-gateway`
-- **Purpose:** Deploys the etcd gateway for external access to the etcd cluster.
+### Storage
+- **StatefulSet**: Manages the deployment of etcd instances, ensuring that they are started in a specific order and maintain their identities across restarts. It is configured to have a replica count of 3 for high availability.
+  
+### Security
+- **ConfigMap**: Contains configuration values for etcd, including global settings, SSL configurations, and backup policies. This is crucial for defining how etcd operates and interacts with other components.
 
 ## Configuration Highlights
-
-- **Image Version:** `quay.io/coreos/etcd:v3.6.8`
-- **Replica Count:** 3 for the main etcd cluster, 1 for the gateway.
-- **Persistence:** Enabled with `2Gi` of storage per replica, using `ReadWriteOnce` access mode.
-- **SSL Configuration:**
-  - SSL is enabled for secure communication.
-  - Certificates are managed by `cert-manager` using a `ClusterIssuer` named `clustermesh-issuer`.
-- **Environment Variables:**
-  - `ETCD_QUOTA_BACKEND_BYTES`: Set to `6442450944` (6 GiB).
-- **Networking:**
-  - Cilium Network Policies are configured to allow secure communication between etcd instances and the gateway.
-  - DNS options include `ndots:1` and `edns0`.
-- **Extra Arguments:**
-  - `--snapshot-count=100000`
-  - `--auto-compaction-mode=periodic`
-  - `--auto-compaction-retention=1h`
-  - `--logger=zap`
-  - `--log-outputs=stderr`
+- **Image**: Uses `quay.io/coreos/etcd:v3.6.10`.
+- **Replica Count**: Configured to have 3 replicas for high availability.
+- **Persistence**: Enabled with a storage request of 2Gi.
+- **SSL**: SSL is enabled with a reference to a ClusterIssuer for certificate management.
+- **Environment Variables**: Includes settings for etcd client certificates and connection parameters.
 
 ## Deployment
-
-- **Target Namespace:** `etcd`
-- **Release Name:** `etcd`
-- **Reconciliation Interval:** 5 minutes
-- **Install/Upgrade Behavior:** Unlimited retries for remediation in case of failures.
-
-This deployment ensures a secure, highly available, and scalable etcd cluster with robust configuration options for persistence, networking, and SSL.
+- **Target Namespace**: etcd
+- **Release Name**: etcd
+- **Reconciliation Interval**: 5 minutes
+- **Install/Upgrade Behavior**: The installation is set to retry indefinitely on failure.

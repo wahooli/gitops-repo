@@ -4,72 +4,49 @@ parent: "Apps"
 grand_parent: "nas"
 ---
 
-# Jellyfin
+# jellyfin
 
 ## Overview
-Jellyfin is an open-source media server designed to organize, stream, and manage multimedia content such as movies, TV shows, and music. In this deployment, Jellyfin is configured to run in the `nas` cluster, providing media streaming services accessible via HTTP and HTTPS. The deployment leverages GPU acceleration through NVIDIA runtime and includes persistent storage for configuration, cache, and media libraries.
+Jellyfin is an open-source media server software that allows users to organize, manage, and stream their media collections. In this Kubernetes cluster, it serves as a media streaming solution, providing access to movies, TV shows, and other media content.
+
+## Sub-components
+This deployment consists of a single HelmRelease:
+- **HelmRelease**: `default--jellyfin`
+  - **Chart**: jellyfin
+  - **Version**: latest (floating: >=0.1.1-0)
+  - **Target Namespace**: default
+  - **Provides**: Media server deployment with necessary configurations and resources.
+
+## Dependencies
+No dependencies are specified for this HelmRelease.
 
 ## Helm Chart(s)
-### HelmRelease: `default--jellyfin`
-- **Chart Name**: `jellyfin`
-- **Repository**: `wahooli` (OCI: `oci://ghcr.io/wahooli/charts`)
-- **Version**: `latest` (floating: `>=0.1.1-0`)
-- **Release Name**: `jellyfin`
-- **Target Namespace**: `default`
-- **Reconciliation Interval**: `5m`
+- **Chart Name**: jellyfin
+- **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+- **Version**: latest (floating: >=0.1.1-0)
 
 ## Resource Glossary
 ### Networking
-- **Service**: Provides internal cluster access to Jellyfin via multiple ports:
-  - `8096` (HTTP)
-  - `8920` (HTTPS)
-  - `1900` (Service Discovery via UDP)
-  - `7359` (Client Discovery via UDP)
-  - Type: `ClusterIP`
-  - Annotations for Cilium global service affinity.
-- **Ingress**: Configures external access to Jellyfin via the hostname `jellyfin.wahoo.li`. Includes annotations for SSL redirection, proxy settings, and external DNS configuration.
-- **HTTPRoute**: Defines routing rules for Jellyfin, mapping requests to the backend service on port `8096`. Supports multiple hostnames (`jellyfin.absolutist.it` and `jellyfin.wahoo.li`).
+- **Service**: Exposes the Jellyfin application on multiple ports (8096 for HTTP, 8920 for HTTPS, 1900 for service discovery, and 7359 for client discovery) within the cluster, allowing other services and users to access it.
+- **HTTPRoute**: Manages incoming HTTP traffic, routing requests to the Jellyfin service based on specified hostnames.
 
 ### Storage
-- **Persistent Volumes**:
-  - **Configuration**: Mounted at `/config` and `/config/config/logging.json`.
-  - **Cache**: Mounted at `/cache`.
-  - **Movies**: HostPath-mounted at `/data/Movies` using `${jellyfin_movies_host_path}`.
-  - **TV Shows**: HostPath-mounted at `/data/Series` using `${jellyfin_tv_host_path}`.
-  - **Transcoding**: Memory-backed `emptyDir` mounted at `/transcode` with a size limit of `20Gi`.
+- **ConfigMap**: Stores configuration data for Jellyfin, including logging settings and environment variables. It is mounted into the Jellyfin deployment to provide necessary configurations at runtime.
 
 ### Security
-- **ServiceAccount**: A dedicated service account named `jellyfin` for managing permissions.
-- **Runtime**: Configured to use NVIDIA GPU acceleration (`runtimeClassName: nvidia`).
-
-### Application Configuration
-- **ConfigMaps**:
-  - `jellyfin-env-b9gk6bg9gg`: Provides environment variables for NVIDIA GPU capabilities (`NVIDIA_DRIVER_CAPABILITIES` and `NVIDIA_VISIBLE_DEVICES`).
-  - `jellyfin-config-m2hmfgm9c9`: Contains application-specific configuration, including logging settings.
-  - `jellyfin-values-g897h75f99`: Supplies Helm values, including persistence settings, ingress configuration, and resource strategies.
+- **ServiceAccount**: Provides an identity for the Jellyfin application to interact with the Kubernetes API.
 
 ### Workload
-- **Deployment**:
-  - **Replicas**: `1`
-  - **Strategy**: `Recreate`
-  - **Image**: `jellyfin/jellyfin:10.11.6`
-  - **Probes**: Configured for liveness, readiness, and startup checks on `/health`.
-  - **Annotations**: Velero backup annotations for persistent volumes.
-  - **DNS Configuration**: Custom DNS options (`ndots: 1`, `edns0`).
-
-### Image Management
-- **ImageRepository**: Tracks the `jellyfin/jellyfin` image with an update interval of `24h`.
-- **ImagePolicy**: Ensures image updates follow semantic versioning (`x.x.x`).
+- **Deployment**: Manages the lifecycle of the Jellyfin application, ensuring that the specified number of replicas (1) is running. It includes settings for resource management, liveness/readiness probes, and container specifications.
 
 ## Configuration Highlights
-- **GPU Acceleration**: Enabled via NVIDIA runtime and environment variables.
-- **Persistence**: Configured for media libraries, application cache, and configuration files.
-- **Ingress**: SSL redirection and proxy settings for secure external access.
-- **Resource Management**: Includes memory-backed storage for transcoding and Velero backup annotations for data volumes.
-- **Image Version**: Uses `jellyfin/jellyfin:10.11.6` as specified by the ImagePolicy.
+- **Image**: Uses the Jellyfin image version `10.11.7`.
+- **Persistence**: Configures persistent storage for data, including movies and TV shows, with a request for 60Gi of storage.
+- **Environment Variables**: Configured through a ConfigMap to set up necessary environment settings for Jellyfin.
+- **Resource Requests/Limits**: Not explicitly defined in the manifests, but can be configured through the Helm values.
 
 ## Deployment
-- **Target Namespace**: `default`
-- **Release Name**: `jellyfin`
-- **Reconciliation Interval**: `5m`
-- **Install/Upgrade Behavior**: Unlimited retries on installation failures (`remediation.retries: -1`).
+- **Target Namespace**: default
+- **Release Name**: jellyfin
+- **Reconciliation Interval**: 5m
+- **Install/Upgrade Behavior**: The HelmRelease is set to retry indefinitely on failure, ensuring resilience during installation or upgrades.
