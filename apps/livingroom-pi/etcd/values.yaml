@@ -3,7 +3,7 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
 image:
-  tag: v3.6.8 # {"$imagepolicy": "flux-system:etcd:tag"}
+  tag: v3.6.10 # {"$imagepolicy": "flux-system:etcd:tag"}
 cluster:
   ordinals:
     start: 0
@@ -159,16 +159,6 @@ ciliumNetworkPolicies:
       - ports:
         - port: "2379"
           protocol: TCP
-    # - fromEndpoints:
-    #   - matchLabels:
-    #       # allow patroni in authentik namespace to access
-    #       io.kubernetes.pod.namespace: authentik
-    #       app.kubernetes.io/instance: authentik-patroni
-    #       app.kubernetes.io/name: patroni
-    #   toPorts:
-    #   - ports:
-    #     - port: "2379"
-    #       protocol: TCP
 certificates:
   server:
     secretTemplate:

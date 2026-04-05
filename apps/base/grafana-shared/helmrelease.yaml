@@ -9,7 +9,7 @@ spec:
   targetNamespace: grafana
   chart:
     spec:
-      version: "8.8.2"
+      version: "10.5.15"
   valuesFrom:
   - kind: ConfigMap
     name: grafana-values
