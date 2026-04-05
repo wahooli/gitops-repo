@@ -1,0 +1,61 @@
+image:
+  repository: chrislusf/seaweedfs
+  tag: "4.13"
+
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0
+
+volume:
+  ingress:
+    main:
+      enabled: false
+  args:
+  - -dir=/data
+  - -max=0
+  - -compactionMBps=50
+  - -readMode=proxy
+  - -publicUrl=$(POD_FQDN)
+  - -minFreeSpacePercent=1
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - seaweedfs-volume
+        topologyKey: "kubernetes.io/hostname"
+
+filer:
+  ingress:
+    main:
+      enabled: false
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - seaweedfs-filer
+        topologyKey: "kubernetes.io/hostname"
+
+master:
+  ingress:
+    main:
+      enabled: false
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - seaweedfs-masters
+        topologyKey: "kubernetes.io/hostname"

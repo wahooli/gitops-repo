@@ -1,0 +1,55 @@
+image:
+  repository: chrislusf/seaweedfs
+  tag: "4.17" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
+
+fullNameOverride: seaweedfs-backup
+
+master:
+  replicaCount: 1
+
+volume:
+  replicaCount: 1
+  args:
+  - -dir=/data
+  - -max=0
+  - -compactionMBps=50
+  - -readMode=proxy
+  - -minFreeSpacePercent=7
+  persistence:
+    data:
+      spec:
+        isPersistentVolumeClaim: true
+        storageClassName: ""
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Ti
+
+filer:
+  replicaCount: 1
+  args:
+  - -dirListLimit=100000
+  - -s3
+  - -s3.config=/etc/seaweedfs/s3.json
+  service:
+    lb:
+      annotations:
+        service.cilium.io/global: "true"
+  persistence:
+    s3-config:
+      mount:
+      - path: /etc/seaweedfs/s3.json
+        subPath: seaweedfs_s3_config
+      spec:
+        secret:
+          secretName: seaweedfs-s3-secret
+          defaultMode: 0444
+    data:
+      spec:
+        isPersistentVolumeClaim: true
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi

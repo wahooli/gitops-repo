@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: seaweedfs-volume-data
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: ${seaweedfs_hostpath_prefix}/seaweedfs/volume
+    type: DirectoryOrCreate
+  claimRef:
+    name: data-seaweedfs-volume-4
+    namespace: seaweedfs

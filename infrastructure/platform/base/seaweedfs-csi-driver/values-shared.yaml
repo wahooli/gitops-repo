@@ -1,0 +1,14 @@
+tls:
+  enabled: true
+  existingSecret: seaweedfs-shared
+seaweedfs:
+  dataLocality: none
+  filerAddress: seaweedfs-filer-lb.seaweedfs.svc.cluster.local:8888
+podAnnotations:
+  secret.reloader.stakater.com/reload: "seaweedfs-shared"
+  configmap.reloader.stakater.com/reload: "seaweedfs-csi-driver-shared-config"
+nodeGc:
+  image:
+    repository: ghcr.io/wahooli/docker/kubectl
+    tag: 0.0.1
+  enabled: true

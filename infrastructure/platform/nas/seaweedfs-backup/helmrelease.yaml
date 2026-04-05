@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: seaweedfs-backup--seaweedfs
+  namespace: flux-system
+spec:
+  releaseName: seaweedfs-backup
+  targetNamespace: seaweedfs-backup
+  valuesFrom:
+  - kind: ConfigMap
+    name: seaweedfs-backup-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: seaweedfs-backup-values
+    valuesKey: values.yaml

@@ -6,6 +6,9 @@
 !*/bootstrap/configmaps
 !*/bootstrap/namespaces
 !*/bootstrap/secrets
+!*/bootstrap/secrets/**/
+!*/bootstrap/secrets/**/*.yaml
+!*/bootstrap/secrets/**/*.json
 !*/bootstrap/*.yaml
 !*/extra-helm-values
 !*/extra-helm-values/*.yaml

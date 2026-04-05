@@ -1,0 +1,51 @@
+rack: tpi-1
+
+master:
+  configMaps:
+    config:
+      data:
+        master.toml: |-
+          [master.maintenance]
+          scripts = """
+            lock
+            ec.encode -fullPercent=95 -quietFor=1h -collection=immich-data
+            ec.rebuild -force -collection=immich-data
+            ec.balance -force -collection=immich-data
+            volume.configure.replication -collectionPattern "forgejo-s3-data" -replication 001
+            volume.deleteEmpty -quietFor=72h -force
+            volume.balance -force
+            volume.fix.replication -force
+            s3.clean.uploads -timeAgo=24h
+            unlock
+          """
+          sleep_minutes = 17
+
+          [master.sequencer]
+          type = "raft"
+          sequencer_snowflake_id = 0
+  persistence:
+    master-config:
+      mount:
+      - path: /etc/seaweedfs/master.toml
+        subPath: master.toml
+      spec:
+        useFromChart: true
+        configMap:
+          name: config
+          defaultMode: 0444
+
+volume:
+  replicaCount: 4
+  ordinals:
+    start: 0
+
+filer:
+  service:
+    nas:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "remote"
+    tpi-1:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "local"

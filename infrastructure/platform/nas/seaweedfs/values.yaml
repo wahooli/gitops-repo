@@ -1,0 +1,88 @@
+rack: nas
+
+volume:
+  replicaCount: 1
+  ordinals:
+    start: 4
+  persistence:
+    data:
+      spec:
+        isPersistentVolumeClaim: true
+        storageClassName: ""
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Ti
+
+filer:
+  service:
+    nas:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "local"
+    tpi-1:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "remote"
+
+filerSync:
+  forgejo-s3-data:
+    enabled: true
+    args:
+    - -a.collection=forgejo-s3-data
+    - -b.collection=forgejo-s3-data
+    - -b.replication=001
+  __base__:
+    initContainers:
+      wait-for-nas:
+        image: ghcr.io/wahooli/docker/wait-for-it:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - seaweedfs-filer-tpi-1.seaweedfs.svc.cluster.local:8888
+        - -t
+        - "300"
+      wait-for-local:
+        image: ghcr.io/wahooli/docker/wait-for-it:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - seaweedfs-filer-lb.seaweedfs.svc.cluster.local:8888
+        - -t
+        - "300"
+    env:
+      TARGET_FILER: "seaweedfs-filer-tpi-1.seaweedfs.svc.cluster.local:8888"
+
+
+postUp:
+  enabled: true
+  collections:
+  - name: forgejo-s3-data
+    replication: "001"
+  - name: immich-data
+  - name: test-data
+    replication: "002"
+
+resticBackup:
+  enabled: true
+  schedule: "15 * * * *" # every hour past 15 minutes
+  restoreHook:
+    enabled: false
+    deletePolicy: before-hook-creation,hook-succeeded
+  retentionPolicy:
+    keepLast: 4
+    keepDaily: 7
+    keepWeekly: 4
+    keepMonthly: 6
+  image:
+    repository: ghcr.io/restic/restic
+    tag: "0.18.1"
+    pullPolicy: IfNotPresent
+  initContainers:
+    wait-for-filer:
+      enabled: true
+    wait-for-master:
+      enabled: true
+  envFrom:
+    backup-credentials:
+      type: secret
+      name: restic-backup-credentials

@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: seaweedfs--seaweedfs-csi-driver
+  namespace: flux-system
+spec:
+  releaseName: seaweedfs-csi-driver
+  targetNamespace: seaweedfs
+  valuesFrom:
+  - kind: ConfigMap
+    name: seaweedfs-csi-driver-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: seaweedfs-csi-driver-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: seaweedfs-csi-driver-values
+    optional: true
+    valuesKey: values.yaml

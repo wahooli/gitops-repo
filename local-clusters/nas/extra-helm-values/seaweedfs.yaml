@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seaweedfs-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    filerSync:
+      forgejo-s3-data:
+        enabled: false

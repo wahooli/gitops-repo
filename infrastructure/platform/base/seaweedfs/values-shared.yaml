@@ -1,0 +1,78 @@
+image:
+  repository: chrislusf/seaweedfs
+  tag: "4.17" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
+
+podAnnotations:
+  secret.reloader.stakater.com/reload: "seaweedfs-shared"
+  configmap.reloader.stakater.com/reload: "seaweedfs-shared-config"
+
+defaultReplication: "000"
+tls:
+  enabled: true
+  generateCertificates: true
+  issuerRef:
+    name: selfsigned
+    kind: ClusterIssuer
+
+master:
+  replicaCount: 1
+
+volume:
+  podManagementPolicy: Parallel
+  cluster:
+    ordinals:
+      start: 0
+    replicaCount: 5
+  service:
+    main:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/global-sync-endpoint-slices: "true"
+  persistence:
+    data:
+      spec:
+        isPersistentVolumeClaim: true
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "5Gi"
+
+filer:
+  replicaCount: 1
+  service:
+    lb:
+      portsFrom: main
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "local"
+    nas:
+      portsFrom: main
+      annotations:
+        service.cilium.io/global: "true"
+        # service.cilium.io/affinity: "remote"
+    tpi-1:
+      portsFrom: main
+      annotations:
+        service.cilium.io/global: "true"
+        # service.cilium.io/affinity: "local"
+  args:
+  - -dirListLimit=100000
+  - -s3.config=/etc/seaweedfs/s3.json
+  persistence:
+    s3Config:
+      mount:
+      - path: /etc/seaweedfs/s3.json
+        subPath: s3.json
+      spec:
+        configMap:
+          name: seaweedfs-s3-config
+          defaultMode: 0444
+    data:
+      spec:
+        isPersistentVolumeClaim: true
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "6Gi"
