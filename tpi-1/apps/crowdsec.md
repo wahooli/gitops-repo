@@ -6,7 +6,8 @@ grand_parent: "tpi-1"
 
 # crowdsec
 
-The `crowdsec` component is deployed in the `tpi-1` cluster and consists of two Helm releases: `crowdsec` and `crowdsec-patroni`. This deployment utilizes the CrowdSec security automation tool and is configured to monitor and respond to potential threats.
+## Overview
+The `crowdsec` component is deployed in the `tpi-1` cluster using Flux for GitOps. It consists of two main Helm releases: `crowdsec` and `crowdsec-patroni`, which work together to provide security monitoring and database management functionalities.
 
 ## Helm Releases
 
@@ -16,9 +17,9 @@ The `crowdsec` component is deployed in the `tpi-1` cluster and consists of two 
 - **Repository**: [crowdsec](https://crowdsecurity.github.io/helm-charts)
 - **Release Name**: crowdsec
 - **Target Namespace**: crowdsec
-- **Reconciliation Interval**: 5 minutes
+- **Reconciliation Interval**: 5m
 - **Dependencies**: 
-  - crowdsec--crowdsec-patroni
+  - `crowdsec--crowdsec-patroni`
 
 #### Rendered Kubernetes Resources
 - ConfigMap: 6
@@ -33,11 +34,11 @@ The `crowdsec` component is deployed in the `tpi-1` cluster and consists of two 
 - **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
 - **Release Name**: crowdsec-patroni
 - **Target Namespace**: crowdsec
-- **Reconciliation Interval**: 5 minutes
+- **Reconciliation Interval**: 5m
 - **Dependencies**: 
-  - cert-manager--cert-manager
-  - reflector--reflector
-  - etcd--etcd
+  - `cert-manager--cert-manager`
+  - `reflector--reflector`
+  - `etcd--etcd`
 
 #### Rendered Kubernetes Resources
 - ConfigMap: 5
@@ -46,64 +47,24 @@ The `crowdsec` component is deployed in the `tpi-1` cluster and consists of two 
 - Deployment: 1
 
 ## Configuration
+The configuration for `crowdsec` is managed through several ConfigMaps that define various parameters, including database connections, logging settings, and security policies.
 
-### Namespace
-The `crowdsec` component is deployed in its own namespace:
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: crowdsec
-```
+### Key Configurations
+- **Base Values**: Configures the container runtime and application security settings.
+- **Shared Values**: Defines image repository, agent environment variables, and resource limits.
+- **Patroni Values**: Manages PostgreSQL settings, including user credentials and replication configurations.
 
-### Helm Repository
-The Helm repository for CrowdSec charts is defined as follows:
-```yaml
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: crowdsec
-  namespace: flux-system
-spec:
-  interval: 24h
-  url: https://crowdsecurity.github.io/helm-charts
-```
+## Networking
+The `crowdsec` component exposes its API through an HTTPRoute, allowing access via the hostname `crowdsec-api.${domain_absolutist_it:=absolutist.it}`. This route is managed by the Envoy gateway.
 
-### Values Configuration
-The configuration for the `crowdsec` Helm release is sourced from multiple ConfigMaps, including:
-- `crowdsec-values-2dtt7f994d` (base and shared values)
-- `crowdsec-helmrelease-overrides` (optional overrides)
+## Image Management
+The component utilizes Flux's image management capabilities to track the `crowdsecurity/crowdsec` image, with a reconciliation interval of 24 hours.
 
-#### Example Configuration Snippet
-```yaml
-values-base.yaml:
-  container_runtime: containerd
-  appsec:
-    enabled: false
-  lapi:
-    dashboard:
-      enabled: false
-```
+## Dependencies
+- The `crowdsec` release depends on the `crowdsec-patroni` release, which in turn depends on several other components such as `cert-manager`, `reflector`, and `etcd`.
 
-### HTTPRoute
-An HTTPRoute is configured to expose the CrowdSec API:
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: crowdsec-api
-  namespace: crowdsec
-spec:
-  hostnames:
-  - crowdsec-api.absolutist.it
-  parentRefs:
-  - name: envoy-gw-private
-    namespace: envoy-gateway-system
-  rules:
-  - backendRefs:
-    - name: crowdsec-service
-      port: 8080
-```
+## Namespace
+All resources are deployed in the `crowdsec` namespace, which is specifically created for this component.
 
-## Summary
-The `crowdsec` deployment in the `tpi-1` cluster is designed to enhance security by monitoring and responding to threats using the CrowdSec tool. It consists of a primary Helm release for the application and a secondary release for managing the PostgreSQL database with Patroni. The deployment is configured to ensure high availability and resilience through its various Kubernetes resources.
+## Conclusion
+The `crowdsec` component is a robust solution for security monitoring in Kubernetes, leveraging GitOps practices for deployment and management. It integrates with PostgreSQL through Patroni for database management and utilizes Envoy for API routing.

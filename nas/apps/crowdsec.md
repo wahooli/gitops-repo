@@ -7,7 +7,7 @@ grand_parent: "nas"
 # crowdsec
 
 ## Overview
-CrowdSec is a security automation tool that provides real-time protection against various threats by analyzing logs and blocking malicious actors. In this deployment, CrowdSec is integrated with a PostgreSQL database managed by Patroni for high availability. This is a multi-component deployment consisting of two HelmReleases: `crowdsec` and `crowdsec-patroni`.
+CrowdSec is a security automation tool designed to protect applications and services from various types of attacks. It leverages a collaborative approach to threat intelligence, allowing users to share and benefit from collective security insights. In this deployment, CrowdSec is integrated with a PostgreSQL database managed by Patroni for high availability and scalability. This is a multi-component deployment consisting of two HelmReleases: `crowdsec` and `crowdsec-patroni`.
 
 ## Sub-components
 
@@ -19,12 +19,13 @@ CrowdSec is a security automation tool that provides real-time protection agains
 - **Target Namespace**: crowdsec
 - **Reconciliation Interval**: 5m
 - **Dependencies**: crowdsec--crowdsec-patroni
-- **Resources Created**: 
-  - ConfigMap (6)
-  - Service (2)
-  - Secret (1)
-  - Deployment (1)
-  - DaemonSet (1)
+
+#### Rendered Kubernetes Resources
+- ConfigMap (6)
+- Service (2)
+- Secret (1)
+- Deployment (1)
+- DaemonSet (1)
 
 ### HelmRelease: crowdsec--crowdsec-patroni
 - **Chart**: patroni
@@ -34,11 +35,12 @@ CrowdSec is a security automation tool that provides real-time protection agains
 - **Target Namespace**: crowdsec
 - **Reconciliation Interval**: 5m
 - **Dependencies**: cert-manager--cert-manager, reflector--reflector, etcd--etcd
-- **Resources Created**: 
-  - ConfigMap (5)
-  - Service (2)
-  - StatefulSet (1)
-  - Deployment (1)
+
+#### Rendered Kubernetes Resources
+- ConfigMap (5)
+- Service (2)
+- StatefulSet (1)
+- Deployment (1)
 
 ## Resources Summary
 - **Total Kubernetes Resource Kinds**: 
