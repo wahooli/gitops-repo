@@ -4,131 +4,48 @@ parent: "Apps"
 grand_parent: "nas"
 ---
 
-# CrowdSec
+# crowdsec
 
-CrowdSec is deployed in the `nas` cluster using FluxCD and Helm. It consists of two HelmReleases: `crowdsec--crowdsec` and `crowdsec--crowdsec-patroni`, which together provide the main CrowdSec application and its PostgreSQL backend.
+## Overview
+CrowdSec is a security automation tool that provides real-time protection against various threats by analyzing logs and blocking malicious actors. In this deployment, CrowdSec is integrated with a PostgreSQL database managed by Patroni for high availability. This is a multi-component deployment consisting of two HelmReleases: `crowdsec` and `crowdsec-patroni`.
 
----
+## Sub-components
 
-## HelmRelease: `crowdsec--crowdsec`
+### HelmRelease: crowdsec--crowdsec
+- **Chart**: crowdsec
+- **Version**: 0.19.5
+- **Repository**: crowdsec (https://crowdsecurity.github.io/helm-charts)
+- **Release Name**: crowdsec
+- **Target Namespace**: crowdsec
+- **Reconciliation Interval**: 5m
+- **Dependencies**: crowdsec--crowdsec-patroni
+- **Resources Created**: 
+  - ConfigMap (6)
+  - Service (2)
+  - Secret (1)
+  - Deployment (1)
+  - DaemonSet (1)
 
-### Chart Information
-- **Chart Name:** `crowdsec`
-- **Version:** `0.19.5`
-- **Repository:** [CrowdSec Helm Charts](https://crowdsecurity.github.io/helm-charts)
-- **Release Name:** `crowdsec`
-- **Target Namespace:** `crowdsec`
-- **Reconciliation Interval:** 5 minutes
-- **Dependencies:** `crowdsec--crowdsec-patroni`
+### HelmRelease: crowdsec--crowdsec-patroni
+- **Chart**: patroni
+- **Version**: latest (floating: >=0.1.0-0)
+- **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+- **Release Name**: crowdsec-patroni
+- **Target Namespace**: crowdsec
+- **Reconciliation Interval**: 5m
+- **Dependencies**: cert-manager--cert-manager, reflector--reflector, etcd--etcd
+- **Resources Created**: 
+  - ConfigMap (5)
+  - Service (2)
+  - StatefulSet (1)
+  - Deployment (1)
 
-### Kubernetes Resources
-This HelmRelease creates the following Kubernetes resources:
-- **ConfigMaps:** 6
-- **Services:** 2
-- **Secrets:** 1
-- **Deployments:** 1
-- **DaemonSets:** 1
-
-### Configuration
-The deployment is configured using multiple ConfigMaps:
-- `crowdsec-values-fg7ffm5ctk`:
-  - Contains base, shared, and optional values for the CrowdSec application.
-  - Includes configurations for the agent, acquisition methods, and scenarios.
-- `crowdsec-helmrelease-overrides`:
-  - Provides optional overrides for Helm values.
-
-#### Key Features
-- **Container Runtime:** Configured for `containerd`.
-- **Agent Acquisition:** Monitors specific namespaces and pods for logs, including:
-  - `ingress-nginx-controller-*` in `ingress-nginx` namespace.
-  - `authentik-server-*` in `authentik` namespace.
-  - `mc-router-*` in `default` namespace.
-- **LAPI Configuration:**
-  - Dashboard disabled.
-  - Custom image tag `v0.55.9.4` for ARM64 compatibility.
-  - Environment variables for enrollment and database connection.
-- **Custom Scenarios and Parsers:** Includes custom YAML configurations for detecting WordPress scanners, secret scanners, and generic PHP scanners.
-
----
-
-## HelmRelease: `crowdsec--crowdsec-patroni`
-
-### Chart Information
-- **Chart Name:** `patroni`
-- **Version:** `latest` (floating version)
-- **Repository:** Wahooli Helm Charts
-- **Release Name:** `crowdsec-patroni`
-- **Target Namespace:** `crowdsec`
-- **Reconciliation Interval:** 5 minutes
-- **Dependencies:** 
-  - `cert-manager--cert-manager`
-  - `reflector--reflector`
-  - `etcd--etcd`
-
-### Kubernetes Resources
-This HelmRelease creates the following Kubernetes resources:
-- **ConfigMaps:** Multiple for backup scripts and environment variables.
-- **Secrets:** Includes TLS certificates and database credentials.
-- **Services:** Configured for Patroni and PgBouncer.
-- **Deployments:** Patroni and PgBouncer instances.
-- **Persistent Volumes:** For database storage and backups.
-
-### Configuration
-The deployment is configured using the `crowdsec-patroni-values-7m88ccffdf` ConfigMap:
-- **PostgreSQL Configuration:**
-  - Database: `crowdsec`
-  - User: `crowdsec`
-  - Password: `${crowdsec_database_password}`
-  - SSL enabled with certificates.
-- **Replication:** Configured with 2 replicas and Patroni settings for high availability.
-- **PgBouncer:** Connection pooling enabled with custom environment variables.
-- **Persistence:** Volumes for database data, backup scripts, and backups.
-
-#### Key Features
-- **TLS Support:** Certificates managed via `ClusterIssuer`.
-- **Etcd Integration:** Configured for high availability using Etcd.
-- **Backup and Restore:** Scripts for pre-backup and restore hooks integrated with Velero annotations.
-- **Cilium Network Policies:** Fine-grained network policies for Patroni and PgBouncer communication.
-
----
-
-## HTTPRoute: `crowdsec-api`
-
-### Configuration
-- **Hostname:** `crowdsec-api.${domain_absolutist_it:=absolutist.it}`
-- **Parent Gateway:** `internal-gw` in the `infrastructure` namespace.
-- **Backend Service:** `crowdsec-service` on port `8080`.
-
----
-
-## Image Management
-
-### ImageRepository: `crowdsec`
-- **Image:** `crowdsecurity/crowdsec`
-- **Interval:** 24 hours
-
-### ImagePolicy: `crowdsec`
-- **Policy:** Semantic versioning (`vx.x.x`)
-
----
-
-## Namespace: `crowdsec`
-
-The `crowdsec` namespace is created with the following annotations and labels:
-- **Annotations:**
-  - `kustomize.toolkit.fluxcd.io/prune: disabled`
-  - `kustomize.toolkit.fluxcd.io/ssa: merge`
-- **Labels:**
-  - `internal-services: true`
-  - `velero.io/exclude-from-backup: true`
-
----
-
-## Summary
-
-The CrowdSec deployment in the `nas` cluster provides a robust security solution with:
-- A main application (`crowdsec--crowdsec`) for log acquisition and threat detection.
-- A PostgreSQL backend (`crowdsec--crowdsec-patroni`) for data storage and high availability.
-- Custom scenarios and parsers for enhanced threat detection.
-- Secure communication using TLS and network policies.
-- Integration with Velero for backup and restore operations.
+## Resources Summary
+- **Total Kubernetes Resource Kinds**: 
+  - HelmRelease (2)
+  - ConfigMap (2)
+  - Namespace (1)
+  - ImageRepository (1)
+  - ImagePolicy (1)
+  - HelmRepository (1)
+  - HTTPRoute (1)

@@ -85,7 +85,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [tpi-1-external-dns](nas/infrastructure/internal-dns/tpi-1-external-dns.md)
 - [unbound](nas/infrastructure/internal-dns/unbound.md)
 
-**Infrastructure / Kube DNS:**
+**Infrastructure / Kube-DNS:**
 - [kube-dns](nas/infrastructure/kube-dns/kube-dns.md)
 
 **Infrastructure / Logging:**
@@ -153,7 +153,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [tpi-1-external-dns](tpi-1/infrastructure/internal-dns/tpi-1-external-dns.md)
 - [unbound](tpi-1/infrastructure/internal-dns/unbound.md)
 
-**Infrastructure / Kube DNS:**
+**Infrastructure / Kube-DNS:**
 - [kube-dns](tpi-1/infrastructure/kube-dns/kube-dns.md)
 
 **Infrastructure / Logging:**
