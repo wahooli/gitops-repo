@@ -4,8 +4,14 @@
 !*/bootstrap
 !*/bootstrap/**/*.yaml
 !*/bootstrap/configmaps
+!*/bootstrap/configmaps/**/
+!*/bootstrap/configmaps/**/*.yaml
+!*/bootstrap/configmaps/**/*.json
 !*/bootstrap/namespaces
 !*/bootstrap/secrets
+!*/bootstrap/secrets/**/
+!*/bootstrap/secrets/**/*.yaml
+!*/bootstrap/secrets/**/*.json
 !*/bootstrap/*.yaml
 !*/extra-helm-values
 !*/extra-helm-values/*.yaml

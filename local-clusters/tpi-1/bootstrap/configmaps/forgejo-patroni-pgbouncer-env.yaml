@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forgejo-pgbouncer-env
+  namespace: forgejo
+data:
+  POOL_MODE: session

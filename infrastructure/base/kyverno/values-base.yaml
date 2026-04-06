@@ -1,0 +1,49 @@
+crds:
+  install: true
+admissionController:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 384Mi
+  container:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 384Mi
+backgroundController:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+cleanupController:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+reportsController:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+# Start in Audit mode — policies log violations without blocking
+# Switch validationFailureAction to Enforce per-policy as ready
+config:
+  webhooks:
+  - failurePolicy: Ignore
+    timeoutSeconds: 10

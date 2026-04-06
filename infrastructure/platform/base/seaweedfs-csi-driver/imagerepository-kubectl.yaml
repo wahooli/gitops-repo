@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: kubectl-docker
+  namespace: flux-system
+spec:
+  image: ghcr.io/wahooli/docker/kubectl
+  interval: 24h

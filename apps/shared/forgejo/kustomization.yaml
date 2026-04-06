@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/forgejo
+- forgejo-ssh-svc.yaml
+- httproute-public.yaml
+- httproute-private.yaml
+- securitypolicy-private.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: forgejo-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values-shared.yaml=values-shared.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
+- name: anubis-config
+  namespace: forgejo
+  options:
+    disableNameSuffixHash: true
+  files:
+  - botPolicies.yaml=botPolicies.yaml
+- name: forgejo-ssh-proxy-config
+  namespace: forgejo
+  options:
+    disableNameSuffixHash: true
+  files:
+  - haproxy.cfg=haproxy.cfg
+- name: syncthing-config
+  namespace: forgejo
+  options:
+    disableNameSuffixHash: true
+  files:
+  - config.xml=syncthing-config.xml
+configurations:
+- ../../.config/valuesFrom.yaml

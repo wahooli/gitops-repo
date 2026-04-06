@@ -1,0 +1,93 @@
+image:
+  registry: code.forgejo.org
+  repository: forgejo/forgejo
+  tag: "14.0.3-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
+
+extraContainers:
+- name: syncthing
+  image: syncthing/syncthing:2.0.15 # {"$imagepolicy": "flux-system:syncthing"}
+  ports:
+  - containerPort: 22000
+    name: sync
+  - containerPort: 8384
+    name: st-gui
+  command:
+  - /bin/sh
+  - -c
+  - |
+    cp /syncthing-src/config.xml "$STHOMEDIR/config.xml"
+    cp /syncthing-src/cert.pem "$STHOMEDIR/cert.pem"
+    cp /syncthing-src/key.pem "$STHOMEDIR/key.pem"
+    exec /bin/entrypoint.sh /bin/syncthing serve
+  env:
+  - name: STGUIADDRESS
+    value: "0.0.0.0:8384"
+  - name: STHOMEDIR
+    value: /syncthing
+  volumeMounts:
+  - name: data
+    mountPath: /data
+  - name: syncthing-config
+    mountPath: /syncthing-src/config.xml
+    subPath: config.xml
+  - name: syncthing-keys
+    mountPath: /syncthing-src/cert.pem
+    subPath: cert.pem
+  - name: syncthing-keys
+    mountPath: /syncthing-src/key.pem
+    subPath: key.pem
+  - name: syncthing-data
+    mountPath: /syncthing
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+- name: anubis
+  image: ghcr.io/techarohq/anubis:v1.25.0 # {"$imagepolicy": "flux-system:anubis"}
+  env:
+  - name: ED25519_PRIVATE_KEY_HEX
+    valueFrom:
+      secretKeyRef:
+        name: anubis-secret
+        key: private-key
+  - name: REDIRECT_DOMAINS
+    value: "git.${domain_wahoo_li:=wahoo.li}"
+  - name: BIND
+    value: ":8923"
+  - name: TARGET
+    value: "http://localhost:3000"
+  - name: DIFFICULTY
+    value: "4"
+  - name: POLICY_FNAME
+    value: "/etc/anubis/botPolicies.yaml"
+  - name: SERVE_ROBOTS_TXT
+    value: "true"
+  - name: OG_PASSTHROUGH
+    value: "false"
+  ports:
+  - name: anubis
+    containerPort: 8923
+  volumeMounts:
+  - name: anubis-config
+    mountPath: /etc/anubis
+    readOnly: true
+- name: ssh-proxy
+  image: haproxy:lts-alpine
+  ports:
+  - containerPort: 22
+    name: ssh
+  volumeMounts:
+  - name: ssh-proxy-config
+    mountPath: /usr/local/etc/haproxy/haproxy.cfg
+    subPath: haproxy.cfg
+    readOnly: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi

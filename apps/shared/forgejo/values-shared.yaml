@@ -1,0 +1,314 @@
+service:
+  http:
+    type: ClusterIP
+    port: 3000
+    annotations:
+      service.cilium.io/affinity: "local"
+      service.cilium.io/global: "true"
+    extraPorts:
+    - name: anubis
+      port: 8923
+      targetPort: 8923
+  ssh:
+    type: ClusterIP
+    port: 22
+    annotations:
+      service.cilium.io/affinity: "local"
+      service.cilium.io/global: "true"
+
+ingress:
+  enabled: false
+
+httpRoute:
+  enabled: false
+
+replicaCount: 1
+
+serviceAccount:
+  create: false
+  automountServiceAccountToken: false
+
+persistence:
+  enabled: true
+  create: true
+  size: 10Gi
+  annotations:
+    helm.sh/resource-policy: keep
+
+extraInitVolumeMounts:
+- name: shared-keys
+  mountPath: /shared-keys
+  readOnly: true
+
+initPreScript: |
+  # Copy SSH host keys
+  mkdir -p /data/ssh
+  cp /shared-keys/ssh_host_ed25519_key /data/ssh/
+  cp /shared-keys/ssh_host_ed25519_key.pub /data/ssh/
+  cp /shared-keys/ssh_host_ecdsa_key /data/ssh/
+  cp /shared-keys/ssh_host_ecdsa_key.pub /data/ssh/
+  cp /shared-keys/ssh_host_rsa_key /data/ssh/
+  cp /shared-keys/ssh_host_rsa_key.pub /data/ssh/
+  chmod 600 /data/ssh/ssh_host_*_key
+  chmod 644 /data/ssh/ssh_host_*_key.pub
+
+  # Copy JWT key
+  mkdir -p /data/jwt
+  cp /shared-keys/jwt-secret /data/jwt/private.pem
+  chmod 600 /data/jwt/private.pem
+
+initContainers:
+  resources:
+    limits: {}
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+gitea:
+  podAnnotations:
+    secret.reloader.stakater.com/reload: "syncthing-keys,forgejo-app-secrets,forgejo-shared-keys,anubis-secret,forgejo-patroni-server"
+    configmap.reloader.stakater.com/reload: "syncthing-config,anubis-config,forgejo-ssh-proxy-config"
+    backup.velero.io/backup-volumes: data
+
+  admin:
+    existingSecret:
+
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
+
+  oauth:
+  - name: "authentik"
+    provider: "openidConnect"
+    key: "${authentik_forgejo_client_id}"
+    secret: "${authentik_forgejo_client_secret}"
+    autoDiscoverUrl: "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/forgejo/.well-known/openid-configuration"
+    iconUrl: "https://auth.${domain_wahoo_li:=wahoo.li}/static/dist/assets/icons/icon.png"
+    scopes: "email profile gitea ssh_keys"
+    requiredClaimName: "gitea"
+    adminGroup: "admin"
+    groupClaimName: "gitea"
+    restrictedGroup: "restricted"
+    attributeSshPublicKey: "ssh_public_keys"
+    groupTeamMap: '{"admin": {"homelab": ["Owners"], "the-backend": ["Owners"]}, "user": {"the-backend": ["Contributors"]}}'
+
+  additionalConfigFromEnvs:
+  - name: FORGEJO__SECURITY__SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: forgejo-app-secrets
+        key: secret-key
+  - name: FORGEJO__SECURITY__INTERNAL_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: forgejo-app-secrets
+        key: internal-token
+  - name: FORGEJO__OAUTH2__JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: forgejo-app-secrets
+        key: oauth2-jwt-secret
+  - name: FORGEJO__SERVER__LFS_JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: forgejo-app-secrets
+        key: lfs-jwt-secret
+
+  ssh:
+    logLevel: 'INFO'
+
+  config:
+    APP_NAME: 'Gitti: Toimii koneellani. Kovaa ajoa.'
+    RUN_MODE: prod
+
+    repository:
+      ENABLE_PUSH_CREATE_USER: true
+      DISABLE_HTTP_GIT: false
+      DISABLE_DOWNLOAD_SOURCE_ARCHIVES: true
+      pull-request:
+        DEFAULT_MERGE_STYLE: squash
+      upload:
+        ENABLED: true
+
+    ui:
+      SHOW_USER_EMAIL: false
+
+    server:
+      ROOT_URL: https://git.${domain_wahoo_li:=wahoo.li}
+      LFS_START_SERVER: true
+      SSH_PORT: 22
+      SSH_LISTEN_PORT: 2222
+      SSH_DOMAIN: ssh.git.${domain_wahoo_li:=wahoo.li}
+      SSH_SERVER_USE_PROXY_PROTOCOL: true
+
+    database:
+      DB_TYPE: postgres
+      HOST: forgejo-patroni-proxy.forgejo.svc.cluster.local
+      NAME: forgejo
+      USER: forgejo
+      PASSWD: ${forgejo_database_password}
+      SSL_MODE: require
+      LOG_SQL: false
+
+    admin:
+      USER_DISABLED_FEATURES: change_username,deletion,manage_mfa
+      EXTERNAL_USER_DISABLE_FEATURES: manage_credentials,manage_mfa,change_username,deletion
+
+    security:
+      INSTALL_LOCK: true
+
+    openid:
+      ENABLE_OPENID_SIGNIN: false
+      ENABLE_OPENID_SIGNUP: false
+
+    oauth2_client:
+      ENABLE_AUTO_REGISTRATION: true
+      REGISTER_EMAIL_CONFIRM: disabled
+      ACCOUNT_LINKING: disabled
+      UPDATE_AVATAR: true
+
+    service:
+      DISABLE_REGISTRATION: true
+      ENABLE_BASIC_AUTHENTICATION: false
+      ENABLE_PASSWORD_SIGNIN_FORM: false
+      DEFAULT_KEEP_EMAIL_PRIVATE: true
+      ENABLE_INTERNAL_SIGNIN: false
+      DEFAULT_ALLOW_CREATE_ORGANIZATION: false
+      SHOW_REGISTRATION_BUTTON: false
+      SHOW_MILESTONES_DASHBOARD_PAGE: false
+      DEFAULT_USER_VISIBILITY: limited
+      ALLOWED_USER_VISIBILITY_MODES: public,limited,private
+      DEFAULT_ORG_VISIBILITY: private
+      ALLOWED_ORG_VISIBILITY_MODES: limited,private
+      ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+
+    "service.explore":
+      REQUIRE_SIGNIN_VIEW: false
+      DISABLE_USERS_PAGE: true
+      DISABLE_ORGANIZATIONS_PAGE: false
+
+    queue:
+      TYPE: redis
+      CONN_STR: redis+sentinel://forgejo-redis-0.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-1.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-2.forgejo-redis.forgejo.svc.cluster.local:26379/0?mastername=forgejomaster
+
+    cache:
+      ADAPTER: redis
+      HOST: redis+sentinel://forgejo-redis-0.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-1.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-2.forgejo-redis.forgejo.svc.cluster.local:26379/1?mastername=forgejomaster
+
+    session:
+      PROVIDER: redis
+      PROVIDER_CONFIG: redis+sentinel://forgejo-redis-0.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-1.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-2.forgejo-redis.forgejo.svc.cluster.local:26379/2?mastername=forgejomaster
+      COOKIE_SECURE: true
+
+    global_lock:
+      SERVICE_TYPE: redis
+      SERVICE_CONN_STR: redis+sentinel://forgejo-redis-0.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-1.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-2.forgejo-redis.forgejo.svc.cluster.local:26379/2?mastername=forgejomaster
+
+    log:
+      MODE: console
+      LEVEL: info
+      LOGGER_ACCESS_MODE: ""
+      LOGGER_ROUTER_MODE: ""
+      LOGGER_XORM_MODE: ""
+      LOGGER_SSH_MODE: console
+    "log.console":
+      COLORIZE: false
+
+    metrics:
+      ENABLED: true
+
+    api:
+      ENABLE_SWAGGER: false
+
+    time:
+      DEFAULT_UI_LOCATION: Europe/Helsinki
+
+    storage:
+      STORAGE_TYPE: minio
+      MINIO_ENDPOINT: seaweedfs-filer-lb.seaweedfs.svc.cluster.local:8333
+      MINIO_ACCESS_KEY_ID: "${seaweedfs_forgejo_access_key}"
+      MINIO_SECRET_ACCESS_KEY: "${seaweedfs_forgejo_secret_key}"
+      MINIO_BUCKET: forgejo-s3-data
+      MINIO_LOCATION: us-east-1
+      MINIO_USE_SSL: false
+      MINIO_INSECURE_SKIP_VERIFY: true
+    lfs:
+      MINIO_BASE_PATH: lfs/
+    attachment:
+      MINIO_BASE_PATH: attachments/
+    avatar:
+      MINIO_BASE_PATH: avatars/
+    repo-avatar:
+      MINIO_BASE_PATH: repo-avatars/
+    packages:
+      MINIO_BASE_PATH: packages/
+    repo-archive:
+      MINIO_BASE_PATH: repo-archive/
+    "storage.actions_log":
+      MINIO_BASE_PATH: actions_log/
+    "actions.artifacts":
+      MINIO_BASE_PATH: actions_artifacts/
+
+    other:
+      SHOW_FOOTER_VERSION: false
+
+  livenessProbe:
+    enabled: true
+    tcpSocket:
+      port: http
+    initialDelaySeconds: 200
+    timeoutSeconds: 1
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 10
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /api/healthz
+      port: http
+    initialDelaySeconds: 5
+    timeoutSeconds: 1
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+
+  startupProbe:
+    enabled: false
+
+checkDeprecation: true
+test:
+  enabled: false
+
+extraContainerVolumeMounts:
+- name: shared-keys
+  mountPath: /shared-keys
+  readOnly: true
+- name: postgres-tls
+  mountPath: /certs/postgres
+  readOnly: true
+
+extraVolumes:
+- name: postgres-tls
+  secret:
+    secretName: forgejo-patroni-server
+    defaultMode: 0400
+- name: anubis-config
+  configMap:
+    name: anubis-config
+- name: syncthing-keys
+  secret:
+    secretName: syncthing-keys
+- name: syncthing-config
+  configMap:
+    name: syncthing-config
+- name: syncthing-data
+  emptyDir: {}
+- name: shared-keys
+  secret:
+    secretName: forgejo-shared-keys
+    defaultMode: 0600
+- name: ssh-proxy-config
+  configMap:
+    name: forgejo-ssh-proxy-config

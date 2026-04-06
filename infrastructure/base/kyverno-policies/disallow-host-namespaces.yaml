@@ -1,0 +1,35 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-host-namespaces
+  annotations:
+    policies.kyverno.io/title: Disallow Host Namespaces
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Host namespaces (Process ID, IPC, Network) allow access to shared
+      information and can be used to elevate privileges. Pods should not be
+      allowed access to host namespaces. This policy ensures fields
+      spec.hostNetwork, spec.hostIPC, and spec.hostPID are unset or set to false.
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+  - name: host-namespaces
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    exclude:
+      any:
+      - resources:
+          namespaces:
+          - kube-system
+    validate:
+      message: "Sharing host namespaces is disallowed."
+      pattern:
+        spec:
+          =(hostPID): false
+          =(hostIPC): false
+          =(hostNetwork): false

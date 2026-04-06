@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/seaweedfs/helmrelease.yaml
+- volume-pv.yaml
+- namespace.yaml
+- httproute-filer.yaml
+- httproute-master.yaml
+- httproute-s3.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: seaweedfs-backup-values
+  namespace: flux-system
+  files:
+  - values-base.yaml=../../../base/seaweedfs/values-base.yaml
+  - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
+configurations:
+- ../../../.config/valuesFrom.yaml

@@ -1,0 +1,16 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: seaweedfs-filer
+  namespace: seaweedfs
+spec:
+  endpoints:
+  - fqdn:
+      hostname: seaweedfs-filer-lb.seaweedfs.svc.cluster.local
+      port: 8888
+  tls:
+    insecureSkipVerify: true
+    clientCertificateRef:
+      kind: Secret
+      name: seaweedfs-shared
+      namespace: seaweedfs

@@ -127,5 +127,5 @@ configuration:
       region: ${velero_backup_bucket_region}
       s3ForcePathStyle: true
       checksumAlgorithm: ""
-      s3Url: ${velero_backup_bucket_url}
-      publicUrl: ${velero_backup_bucket_public_url}
+      s3Url: http://seaweedfs-backup-filer-lb.seaweedfs-backup.svc.cluster.local:8333
+      publicUrl: https://s3.seaweedfs-backup.${domain_wahoo_li:=wahoo.li}

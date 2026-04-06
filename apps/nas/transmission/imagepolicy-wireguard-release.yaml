@@ -7,7 +7,7 @@ spec:
   imageRepositoryRef:
     name: wireguard
   filterTags:
-    pattern: 'version-(?P<version>[1-9]+\.[0-9]+\.[0-9]+)-r(?P<release>[0-9]+)'
+    pattern: '^version-(?P<version>[1-9]+\.[0-9]+\.[0-9]+)-r(?P<release>[0-9]+)'
     extract: '$version-$release'
   policy:
     semver:

@@ -1,0 +1,26 @@
+bots:
+- name: trusted-ips
+  action: ALLOW
+  remote_addresses:
+  - 10.0.0.0/8
+  - 192.168.0.0/16
+
+- name: git-clients
+  action: ALLOW
+  user_agent_regex: "^git/"
+
+- name: api-calls
+  path_regex: "^/api/"
+  action: ALLOW
+
+- name: oauth-callback
+  path_regex: "^/user/oauth2/"
+  action: ALLOW
+
+- name: rss-feeds
+  path_regex: "\\.(rss|atom)$"
+  action: ALLOW
+
+- name: robots-txt
+  path_regex: "^/robots.txt$"
+  action: ALLOW

@@ -24,5 +24,11 @@ spec:
       name: wireguard-tunnel-credentials
       optional: true
     - kind: Secret
+      name: authentik-app-vars
+      optional: true
+    - kind: Secret
+      name: syncthing-devices
+      optional: true
+    - kind: Secret
       name: cluster-vars
       optional: true

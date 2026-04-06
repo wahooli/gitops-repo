@@ -7,3 +7,4 @@ resources:
 - cilium-ippool.yaml
 - cilium-ippool-internal-dns.yaml
 - cilium-ippool-envoy-gateway.yaml
+- cilium-ippool-forgejo-ssh.yaml

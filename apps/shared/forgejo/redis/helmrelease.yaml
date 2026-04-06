@@ -1,0 +1,24 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo--forgejo-redis
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
+  releaseName: forgejo-redis
+  interval: 5m
+  targetNamespace: forgejo
+  valuesFrom:
+  - kind: ConfigMap
+    name: forgejo-redis-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: forgejo-redis-values
+    optional: true
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: forgejo-redis-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml

@@ -1,0 +1,15 @@
+replicaCount: 1
+ordinals:
+  start: 2
+
+redis:
+  enabled: false
+
+haproxy:
+  enabled: false
+
+service:
+  sentinel:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"

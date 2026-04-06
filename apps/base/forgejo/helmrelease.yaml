@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-forgejo
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: forgejo
+spec:
+  releaseName: base-forgejo
+  targetNamespace: forgejo
+  chart:
+    spec:
+      chart: forgejo
+      sourceRef:
+        kind: HelmRepository
+        name: forgejo
+        namespace: flux-system
+      version: "16.2.1"
+      interval: 24h
+  interval: 5m
+  install:
+    timeout: 10m
+    remediation:
+      retries: -1
+  valuesFrom:
+  - kind: ConfigMap
+    name: forgejo-values
+    valuesKey: values-base.yaml

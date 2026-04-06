@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../shared/forgejo
+- redis
+- patroni
+- forgejo-syncthing-local.yaml
+- forgejo-syncthing-remote.yaml
+configMapGenerator:
+- name: forgejo-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
+configurations:
+- ../../.config/valuesFrom.yaml

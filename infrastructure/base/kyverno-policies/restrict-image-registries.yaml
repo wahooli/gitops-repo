@@ -1,0 +1,36 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-image-registries
+  annotations:
+    policies.kyverno.io/title: Restrict Image Registries
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Images from unknown registries may not be scanned and could contain
+      vulnerabilities or malicious code. This policy audits container images
+      to ensure they come from trusted registries.
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+  - name: validate-registries
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    exclude:
+      any:
+      - resources:
+          namespaces:
+          - kube-system
+          - kyverno
+    validate:
+      message: "Images must be from an allowed registry."
+      pattern:
+        spec:
+          containers:
+          - image: "docker.io/* | ghcr.io/* | quay.io/* | registry.k8s.io/* | lscr.io/*"
+          =(initContainers):
+          - image: "docker.io/* | ghcr.io/* | quay.io/* | registry.k8s.io/* | lscr.io/*"

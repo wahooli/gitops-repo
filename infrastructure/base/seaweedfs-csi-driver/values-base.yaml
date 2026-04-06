@@ -1,0 +1,7 @@
+# Base values for seaweedfs-csi-driver
+# Chart defaults are sufficient; override in platform overlays
+dnsConfig:
+  options:
+  - name: ndots
+    value: "1"
+  - name: edns0

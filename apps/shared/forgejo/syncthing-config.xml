@@ -1,0 +1,35 @@
+<configuration version="37">
+  <folder id="forgejo-data" label="Forgejo Data"
+          path="/data"
+          type="sendreceive"
+          fsWatcherEnabled="true"
+          fsWatcherDelayS="1"
+          rescanIntervalS="15">
+    <device id="${forgejo_syncthing_device_nas}" introducedBy=""/>
+    <device id="${forgejo_syncthing_device_tpi_1}" introducedBy=""/>
+    <minDiskFree unit="%">1</minDiskFree>
+    <ignorePattern>indexers/**</ignorePattern>
+    <ignorePattern>tmp/**</ignorePattern>
+    <ignorePattern>jwt/**</ignorePattern>
+    <ignorePattern>ssh/**</ignorePattern>
+    <ignorePattern>gitea/conf/**</ignorePattern>
+    <ignorePattern>git/.ssh/**</ignorePattern>
+    <ignorePattern>home/**</ignorePattern>
+  </folder>
+  <device id="${forgejo_syncthing_device_nas}" name="nas">
+    <address>tcp://forgejo-syncthing-nas.forgejo.svc.cluster.local:22000</address>
+  </device>
+  <device id="${forgejo_syncthing_device_tpi_1}" name="tpi-1">
+    <address>tcp://forgejo-syncthing-tpi-1.forgejo.svc.cluster.local:22000</address>
+  </device>
+  <gui enabled="false" tls="false">
+    <address>0.0.0.0:8384</address>
+  </gui>
+  <options>
+    <globalAnnounceEnabled>false</globalAnnounceEnabled>
+    <localAnnounceEnabled>false</localAnnounceEnabled>
+    <relaysEnabled>false</relaysEnabled>
+    <natEnabled>false</natEnabled>
+    <urAccepted>-1</urAccepted>
+  </options>
+</configuration>

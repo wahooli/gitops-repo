@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forgejo-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    gitea:
+      oauth: []
+      admin:
+        username: forgejo_admin
+        password: 'admin1234'
+        email: 'admin@localhost'
+        passwordMode: keepUpdated
+      config:
+        service:
+          ENABLE_BASIC_AUTHENTICATION: true
+          ENABLE_PASSWORD_SIGNIN_FORM: true
+          ENABLE_INTERNAL_SIGNIN: true
+          ALLOW_ONLY_EXTERNAL_REGISTRATION: false
+          DISABLE_REGISTRATION: false
