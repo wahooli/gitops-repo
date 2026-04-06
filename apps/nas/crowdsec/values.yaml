@@ -5,16 +5,19 @@ agent:
   - namespace: envoy-gateway-system
     podName: envoy-envoy-gateway-system-envoy-gw-*
     program: envoy-gateway
-    poll_without_inotify: false
+    poll_without_inotify: true
   - namespace: authentik
     podName: authentik-server-*
     program: authentik
-    poll_without_inotify: false
+    poll_without_inotify: true
   - namespace: default
     podName: mc-router-*
     program: mc-router
-    poll_without_inotify: false
-  - namespace: forgejo
-    podName: forgejo-*
-    program: forgejo-ssh
-    poll_without_inotify: false
+    poll_without_inotify: true
+  additionalAcquisition:
+  - source: file
+    filenames:
+    - /var/log/pods/forgejo_forgejo-*_*/forgejo/*.log
+    labels:
+      type: containerd
+      program: forgejo-ssh
