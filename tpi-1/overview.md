@@ -6,36 +6,44 @@ has_children: true
 # tpi-1
 
 ## Overview
-The `tpi-1` cluster is designed to manage and deploy core infrastructure, platform services, monitoring, logging, alerting, and DNS services using GitOps principles with Flux. It ensures the continuous delivery of applications and infrastructure components by leveraging Kustomizations.
+The `tpi-1` cluster is designed to manage and deploy a variety of infrastructure and application components using GitOps principles. It utilizes Flux for continuous delivery, ensuring that the cluster state is synchronized with the configurations stored in a Git repository.
 
 ## Dependency Chain
 The Kustomization entries are processed in the following order, with dependencies indicated:
 
-1. **infrastructure-core**: Base infrastructure setup.
-2. **infrastructure-platform**: Builds upon the core infrastructure.
-3. **infrastructure-monitoring**: Depends on the platform for monitoring services.
-4. **infrastructure-logging**: Also depends on the platform for logging services.
-5. **infrastructure-alerting**: Requires both monitoring and logging components.
-6. **infrastructure-dns**: Depends on the platform and monitoring for DNS services.
-7. **infrastructure-kube-dns**: Depends on the DNS infrastructure.
-8. **apps**: Deploys applications after the platform and DNS are set up.
+1. **infrastructure-core**: The foundational infrastructure components.
+2. **infrastructure-platform**: Depends on `infrastructure-core`.
+3. **infrastructure-monitoring**: Depends on `infrastructure-platform`.
+4. **infrastructure-logging**: Depends on `infrastructure-platform`.
+5. **infrastructure-alerting**: Depends on both `infrastructure-monitoring` and `infrastructure-logging`.
+6. **infrastructure-dns**: Depends on `infrastructure-platform`.
+7. **infrastructure-kube-dns**: Depends on `infrastructure-dns`.
+8. **apps**: Depends on both `infrastructure-platform` and `infrastructure-dns`.
 
 ## Components
-- **infrastructure-core**: `./infrastructure/core/tpi-1`
-- **infrastructure-platform**: `./infrastructure/platform/tpi-1`
-- **infrastructure-monitoring**: `./infrastructure/monitoring/tpi-1`
-- **infrastructure-logging**: `./infrastructure/logging/tpi-1`
-- **infrastructure-alerting**: `./infrastructure/alerting/tpi-1`
-- **infrastructure-dns**: `./infrastructure/internal-dns/tpi-1`
-- **infrastructure-kube-dns**: `./infrastructure/kube-dns/tpi-1`
-- **apps**: `./apps/tpi-1`
+- **Infrastructure Kustomizations**:
+  - `infrastructure-core`: `./infrastructure/core/tpi-1`
+  - `infrastructure-platform`: `./infrastructure/platform/tpi-1`
+  - `infrastructure-monitoring`: `./infrastructure/monitoring/tpi-1`
+  - `infrastructure-logging`: `./infrastructure/logging/tpi-1`
+  - `infrastructure-alerting`: `./infrastructure/alerting/tpi-1`
+  - `infrastructure-dns`: `./infrastructure/internal-dns/tpi-1`
+  - `infrastructure-kube-dns`: `./infrastructure/kube-dns/tpi-1`
+  
+- **Application Kustomization**:
+  - `apps`: `./apps/tpi-1`
 
 ## Variable Injection
 The following Secrets are used for postBuild substitution:
 
-- **cluster-infrastructure-vars**: Required for core infrastructure.
-- **cluster-vars**: Optional for various components.
-- **dns-vars**: Required for DNS-related components.
-- **cluster-app-vars**: Required for application deployment.
-- **authentik-app-vars**: Optional for the authentik application.
-- **wireguard-tunnel-credentials**: Optional for WireGuard configuration.
+- **Required**:
+  - `cluster-infrastructure-vars`
+  
+- **Optional**:
+  - `cluster-vars`
+  - `dns-vars`
+  - `authentik-app-vars`
+  - `wireguard-tunnel-credentials`
+  - `syncthing-devices`
+  
+The `coredns_replicas` variable is also substituted with a value of "4" in the `infrastructure-kube-dns` Kustomization.
