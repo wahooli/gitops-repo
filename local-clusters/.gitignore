@@ -4,6 +4,9 @@
 !*/bootstrap
 !*/bootstrap/**/*.yaml
 !*/bootstrap/configmaps
+!*/bootstrap/configmaps/**/
+!*/bootstrap/configmaps/**/*.yaml
+!*/bootstrap/configmaps/**/*.json
 !*/bootstrap/namespaces
 !*/bootstrap/secrets
 !*/bootstrap/secrets/**/

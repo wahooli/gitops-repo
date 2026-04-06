@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: forgejo-public
+  namespace: forgejo
+spec:
+  parentRefs:
+  - name: envoy-gw
+    namespace: envoy-gateway-system
+  hostnames:
+  - "git.${domain_wahoo_li:=wahoo.li}"
+  rules:
+  - backendRefs:
+    - name: forgejo-http
+      port: 8923

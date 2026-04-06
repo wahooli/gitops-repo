@@ -158,6 +158,10 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: authentik-patroni
           app.kubernetes.io/name: patroni
       - matchLabels:
+          io.kubernetes.pod.namespace: forgejo
+          app.kubernetes.io/instance: forgejo-patroni
+          app.kubernetes.io/name: patroni
+      - matchLabels:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd-gateway
           app.kubernetes.io/name: etcd-gateway
@@ -176,9 +180,9 @@ certificates:
         velero.io/exclude-from-backup: "true"
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik,crowdsec"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik,crowdsec,forgejo"
         reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "crowdsec"
+        reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "crowdsec,forgejo"
 dnsConfig:
   options:
   - name: ndots

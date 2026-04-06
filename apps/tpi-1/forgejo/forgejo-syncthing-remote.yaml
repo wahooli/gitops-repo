@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: forgejo-syncthing-nas
+  namespace: forgejo
+  annotations:
+    service.cilium.io/global: "true"
+    service.cilium.io/affinity: "remote"
+spec:
+  type: ClusterIP
+  ports:
+  - name: sync
+    port: 22000
+    targetPort: 22000

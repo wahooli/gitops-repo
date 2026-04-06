@@ -1,0 +1,6 @@
+replicaCount: 1
+ordinals:
+  start: 0
+
+redis:
+  initialMaster: 0

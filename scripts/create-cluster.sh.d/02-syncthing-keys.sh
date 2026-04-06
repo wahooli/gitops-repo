@@ -16,6 +16,22 @@ else
   echo "Using existing syncthing keys from local-clusters/$CLUSTER_NAME/bootstrap/syncthing-keys/"
 fi
 
+# Generate kustomization for syncthing-keys secret
+if [[ ! -f "$SYNCTHING_KEYS_DIR/kustomization.yaml" ]]; then
+  cat > "$SYNCTHING_KEYS_DIR/kustomization.yaml" <<'EOF'
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: forgejo
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: syncthing-keys
+  files:
+  - cert.pem
+  - key.pem
+EOF
+fi
+
 # Copy device ID to shared directory for cross-cluster reference
 SYNCTHING_DEVICES_DIR="$REPO_ROOT/local-clusters/.syncthing-devices"
 mkdir -p "$SYNCTHING_DEVICES_DIR"

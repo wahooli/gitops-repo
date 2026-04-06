@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - helmrelease.yaml
 - imagerepository.yaml
+- imagepolicy.yaml
 configMapGenerator:
 - name: seaweedfs-values
   namespace: flux-system

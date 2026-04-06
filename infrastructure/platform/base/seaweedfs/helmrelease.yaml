@@ -14,6 +14,9 @@ spec:
             useFromChart: false
             configMap:
               name: seaweedfs-s3-config
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
   targetNamespace: seaweedfs
   releaseName: seaweedfs
   valuesFrom:

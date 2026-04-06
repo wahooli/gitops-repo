@@ -1,6 +1,0 @@
-nameReference:
-- kind: ConfigMap
-  version: v1
-  fieldSpecs:
-  - path: spec/values/filer/persistence/s3Config/spec/configMap/name
-    kind: HelmRelease

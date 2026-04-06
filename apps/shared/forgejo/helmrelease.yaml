@@ -1,0 +1,31 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo--forgejo
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: forgejo--forgejo-redis
+    namespace: flux-system
+  - name: forgejo--forgejo-patroni
+    namespace: flux-system
+  - name: seaweedfs--seaweedfs
+    namespace: flux-system
+  releaseName: forgejo
+  interval: 5m
+  targetNamespace: forgejo
+  valuesFrom:
+  - kind: ConfigMap
+    name: forgejo-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: forgejo-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: forgejo-values
+    optional: true
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: forgejo-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml

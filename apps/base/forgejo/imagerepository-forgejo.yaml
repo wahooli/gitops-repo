@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: forgejo
+  namespace: flux-system
+spec:
+  image: code.forgejo.org/forgejo/forgejo
+  interval: 24h

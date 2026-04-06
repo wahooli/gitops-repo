@@ -21,7 +21,7 @@ cp "$SYNCTHING_DEVICES_SRC"/*.txt "$SYNCTHING_DEVICES_DIR/"
 FILES_YAML=""
 for f in "$SYNCTHING_DEVICES_DIR"/*.txt; do
   name=$(basename "$f" .txt)
-  key="syncthing_device_${name//-/_}"
+  key="forgejo_syncthing_device_${name//-/_}"
   FILES_YAML="${FILES_YAML}  - ${key}=$(basename "$f")"$'\n'
 done
 

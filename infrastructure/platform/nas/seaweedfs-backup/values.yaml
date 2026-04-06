@@ -1,6 +1,6 @@
 image:
   repository: chrislusf/seaweedfs
-  tag: "4.17" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
+  tag: "4.18" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
 
 fullNameOverride: seaweedfs-backup
 
@@ -26,8 +26,18 @@ volume:
           requests:
             storage: 1Ti
 
+postUp:
+  enabled: true
+  collections:
+  - name: seaweedfs-backups
+  - name: nas-backups
+  - name: tpi-1-backups
+  - name: livingroom-pi-backups
+
 filer:
   replicaCount: 1
+  podAnnotations:
+    secret.reloader.stakater.com/reload: "seaweedfs-s3-secret"
   args:
   - -dirListLimit=100000
   - -s3

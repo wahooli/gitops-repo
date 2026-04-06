@@ -30,8 +30,8 @@ filerSync:
   forgejo-s3-data:
     enabled: true
     args:
-    - -a.collection=forgejo-s3-data
-    - -b.collection=forgejo-s3-data
+    - -a.path=/buckets/forgejo-s3-data
+    - -b.path=/buckets/forgejo-s3-data
     - -b.replication=001
   __base__:
     initContainers:
@@ -52,15 +52,11 @@ filerSync:
     env:
       TARGET_FILER: "seaweedfs-filer-tpi-1.seaweedfs.svc.cluster.local:8888"
 
-
 postUp:
   enabled: true
   collections:
   - name: forgejo-s3-data
-    replication: "001"
   - name: immich-data
-  - name: test-data
-    replication: "002"
 
 resticBackup:
   enabled: true
@@ -75,7 +71,7 @@ resticBackup:
     keepMonthly: 6
   image:
     repository: ghcr.io/restic/restic
-    tag: "0.18.1"
+    tag: "0.18.1" # {"$imagepolicy": "flux-system:restic:tag"}
     pullPolicy: IfNotPresent
   initContainers:
     wait-for-filer:

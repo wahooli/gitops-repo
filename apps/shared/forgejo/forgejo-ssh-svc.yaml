@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: forgejo-ssh-lb
+  namespace: forgejo
+  annotations:
+    service.cilium.io/global: "true"
+    service.cilium.io/affinity: "local"
+    lbipam.cilium.io/ips: "${forgejo_ssh_lb_ip}"
+    external-dns.alpha.kubernetes.io/hostname: ssh.git.${domain_wahoo_li:=wahoo.li}
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+  - name: ssh
+    port: 22
+    targetPort: 22
+    protocol: TCP
+  - name: ssh-proxy-protocol
+    port: 2222
+    targetPort: 2222
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: forgejo
+    app.kubernetes.io/instance: forgejo

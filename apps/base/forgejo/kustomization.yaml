@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- helmrelease.yaml
+- helmrepository.yaml
+- imagerepository-forgejo.yaml
+- imagerepository-syncthing.yaml
+- imagerepository-anubis.yaml
+- imagepolicy-forgejo.yaml
+- imagepolicy-syncthing.yaml
+- imagepolicy-anubis.yaml
+configMapGenerator:
+- name: forgejo-values
+  namespace: flux-system
+  files:
+  - values-base.yaml=values-base.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"

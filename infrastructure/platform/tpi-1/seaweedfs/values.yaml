@@ -38,6 +38,21 @@ volume:
   replicaCount: 4
   ordinals:
     start: 0
+  persistence:
+    data:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+
+postUp:
+  enabled: true
+  collections:
+  - name: forgejo-s3-data
+    replication: "001"
+  - name: immich-data
 
 filer:
   service:

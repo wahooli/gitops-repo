@@ -1,3 +1,7 @@
+image:
+  repository: chrislusf/seaweedfs-csi-driver
+  tag: "v1.4.6" # {"$imagepolicy": "flux-system:seaweedfs-csi-driver:tag"}
+
 tls:
   enabled: true
   existingSecret: seaweedfs-shared
@@ -10,5 +14,5 @@ podAnnotations:
 nodeGc:
   image:
     repository: ghcr.io/wahooli/docker/kubectl
-    tag: 0.0.1
+    tag: 0.0.1 # {"$imagepolicy": "flux-system:kubectl-docker:tag"}
   enabled: true

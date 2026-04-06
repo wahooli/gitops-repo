@@ -2,4 +2,6 @@
 !*.yaml
 !**/.env
 !**/config/**
+!**/*.xml
+!**/*.cfg
 _*

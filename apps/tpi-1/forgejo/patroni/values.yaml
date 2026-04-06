@@ -1,0 +1,13 @@
+replicaCount: 1
+ordinals:
+  start: 0
+
+patroni:
+  config:
+    tags:
+      nosync: false
+      preferred: true
+      noloadbalance: false
+      clonefrom: true
+      nostream: false
+      preferred_leader: true

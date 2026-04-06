@@ -1,0 +1,28 @@
+{
+    "identities": [
+        {
+            "name": "forgejo",
+            "credentials": [
+                {
+                    "accessKey": "forgejo",
+                    "secretKey": "forgejoforgejoforgejoforthenow"
+                }
+            ],
+            "actions": [
+                "Admin",
+                "Read",
+                "Write",
+                "List",
+                "Tagging"
+            ]
+        }
+    ],
+    "buckets": [
+        {
+            "name": "forgejo-s3-data"
+        },
+        {
+            "name": "immich-data"
+        }
+    ]
+}
