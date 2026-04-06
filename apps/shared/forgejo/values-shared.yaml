@@ -312,4 +312,3 @@ extraVolumes:
 - name: ssh-proxy-config
   configMap:
     name: forgejo-ssh-proxy-config
-
