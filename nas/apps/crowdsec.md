@@ -6,66 +6,79 @@ grand_parent: "nas"
 
 # crowdsec
 
-## Overview
-The `crowdsec` component is deployed in the `nas` cluster using Flux and Helm. It provides security capabilities by leveraging CrowdSec's agent and API functionalities.
+The `crowdsec` component is deployed in the `nas` cluster using Flux for GitOps. It consists of two main Helm releases: `crowdsec` and `crowdsec-patroni`, which work together to provide security and database functionalities.
 
 ## Helm Releases
-This deployment consists of two Helm releases:
 
-### 1. crowdsec--crowdsec
+### crowdsec
+
 - **Chart**: crowdsec
 - **Version**: 0.19.5
 - **Repository**: [crowdsec](https://crowdsecurity.github.io/helm-charts)
-- **Namespace**: `flux-system`
-- **Target Namespace**: `crowdsec`
+- **Namespace**: `crowdsec`
+- **Release Name**: `crowdsec`
 - **Install Interval**: 5 minutes
 - **Upgrade Remediation**: Remediate last failure
-- **Values Sources**:
-  - ConfigMap: `crowdsec-values-9htmkf4mfb` (includes `values-base.yaml`, `values-shared.yaml`, and optional `values.yaml`)
-  - ConfigMap: `crowdsec-helmrelease-overrides` (optional)
 
-### 2. crowdsec--crowdsec-patroni
+#### Configuration Values
+
+The configuration for the `crowdsec` release is sourced from multiple ConfigMaps:
+
+1. **Base Values** (`values-base.yaml`):
+   - Container Runtime: `containerd`
+   - LAPI Dashboard: Disabled
+   - Logging Configuration: JSON format, warning level
+
+2. **Shared Values** (`values-shared.yaml`):
+   - Image Repository: `crowdsecurity/crowdsec`
+   - Agent Environment Variables: Includes `COLLECTIONS`, `CROWDSEC_BYPASS_DB_VOLUME_CHECK`, and database connection details.
+
+3. **Custom Values** (`values.yaml`):
+   - Image Tag: `v1.7.7`
+   - Agent Acquisition Configuration: Monitors various namespaces and pods for security events.
+
+### crowdsec-patroni
+
 - **Chart**: patroni
 - **Version**: `>=0.1.0-0`
-- **Repository**: wahooli
-- **Namespace**: `flux-system`
-- **Target Namespace**: `crowdsec`
+- **Namespace**: `crowdsec`
+- **Release Name**: `crowdsec-patroni`
 - **Install Interval**: 5 minutes
-- **Values Sources**:
-  - ConfigMap: `crowdsec-patroni-values-7m88ccffdf` (includes `values.yaml`)
-  - ConfigMap: `crowdsec-patroni-helmrelease-overrides` (optional)
 
-## Configuration
-The configuration for the `crowdsec` component is managed through several ConfigMaps, which define various parameters for the agent and API.
+#### Configuration Values
 
-### Key Configurations
-- **Container Runtime**: `containerd`
-- **LAPI Dashboard**: Disabled
-- **Agent Environment Variables**:
-  - `COLLECTIONS`: `"crowdsecurity/http-cve"`
-  - `DB_PASSWORD`: `${crowdsec_database_password}`
-- **Database Configuration**:
-  - Type: `postgresql`
+The configuration for the `crowdsec-patroni` release includes:
+
+- **Global Patroni Configuration**:
+  - PGBouncer enabled
+  - Cluster settings with replica count and database initialization parameters.
+
+- **PostgreSQL Configuration**:
+  - Database name: `crowdsec`
   - User: `crowdsec`
-  - Database Name: `crowdsec`
-  - Host: `crowdsec-patroni-proxy.crowdsec.svc.cluster.local`
-  - Port: `5432`
-  
-### HTTPRoute
-An `HTTPRoute` resource is defined to expose the CrowdSec API:
-- **Name**: `crowdsec-api`
-- **Hostnames**: `crowdsec-api.${domain_absolutist_it:=absolutist.it}`
-- **Backend Reference**: `crowdsec-service` on port `8080`
+  - Password: Configured via environment variable.
 
-## Dependencies
-The `crowdsec` Helm release depends on the `crowdsec--crowdsec-patroni` release, which manages the PostgreSQL database for CrowdSec.
+- **Persistence**:
+  - Persistent volume for PostgreSQL data is enabled with a storage request of 4Gi.
 
-## Namespace
-All resources are deployed in the `crowdsec` namespace, which is created with specific annotations to manage pruning and service accounts.
+## Networking
+
+An `HTTPRoute` resource is defined to expose the `crowdsec` API:
+
+- **Hostname**: `crowdsec-api.${domain_absolutist_it:=absolutist.it}`
+- **Backend Reference**: Points to the `crowdsec-service` on port `8080`.
 
 ## Image Management
-The component uses the `crowdsecurity/crowdsec` image, with an image policy defined to manage updates based on semantic versioning.
 
-## Notes
-- Ensure that the necessary environment variables are set for database connectivity and agent configuration.
-- The deployment includes specific configurations for security and logging, which should be reviewed and adjusted as necessary for your environment.
+- **Image Repository**: `crowdsecurity/crowdsec`
+- **Image Policy**: Managed with a semantic versioning policy.
+
+## Namespace
+
+The `crowdsec` component is deployed in its own namespace, ensuring isolation and management of resources specific to this application.
+
+## Dependencies
+
+The `crowdsec` release depends on the `crowdsec-patroni` release, which manages the PostgreSQL database necessary for the application to function.
+
+This documentation provides an overview of the `crowdsec` deployment, its configuration, and its operational context within the Kubernetes cluster.
