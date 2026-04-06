@@ -8,8 +8,8 @@ spec:
   - name: envoy-gw-private
     namespace: envoy-gateway-system
   hostnames:
-  - "s3.seaweedfs-backup.${domain_wahoo_li:=wahoo.li}"
-  - "s3.seaweedfs-backup.${domain_absolutist_it:=absolutist.it}"
+  - "s3-backup.${domain_wahoo_li:=wahoo.li}"
+  - "s3-backup.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
     - name: seaweedfs-backup-filer

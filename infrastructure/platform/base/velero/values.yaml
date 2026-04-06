@@ -128,4 +128,4 @@ configuration:
       s3ForcePathStyle: true
       checksumAlgorithm: ""
       s3Url: http://seaweedfs-backup-filer-lb.seaweedfs-backup.svc.cluster.local:8333
-      publicUrl: https://s3.seaweedfs-backup.${domain_wahoo_li:=wahoo.li}
+      publicUrl: https://s3-backup.${domain_wahoo_li:=wahoo.li}
