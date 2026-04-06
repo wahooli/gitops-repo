@@ -80,6 +80,23 @@ config:
           expression: Lower(evt.Line.Labels.program)
         - parsed: http_user_agent
           expression: JsonExtractUnescape(evt.Parsed.message, "user_agent")
+      wahooli-forgejo-ssh.yaml: |
+        name: wahooli/forgejo_ssh
+        description: "Parse Forgejo SSH failed authentication logs"
+        onsuccess: next_stage
+        filter: "Upper(evt.Line.Labels.program) == 'FORGEJO-SSH'"
+        grok:
+          pattern: ".*Failed authentication attempt from %{IP:source_ip}:%{NUMBER:source_port}.*"
+          apply_on: message
+        statics:
+        - meta: service
+          value: ssh
+        - meta: log_type
+          value: ssh_failed-auth
+        - meta: source_ip
+          expression: evt.Parsed.source_ip
+        - meta: program
+          expression: Lower(evt.Line.Labels.program)
   scenarios:
     wahooli-secret-scanners.yaml: |
       type: trigger
@@ -146,6 +163,23 @@ config:
         behavior: "http:scan"
         label: "Rapid URL Scanning"
         confidence: 2
+    wahooli-forgejo-ssh-bruteforce.yaml: |
+      type: leaky
+      name: wahooli/forgejo-ssh-bruteforce
+      description: "Detect SSH brute force on Forgejo"
+      groupby: evt.Meta.source_ip
+      leakspeed: "10s"
+      blackhole: 24h
+      duration: 24h
+      capacity: 5
+      filter: |
+        evt.Meta.program == 'forgejo-ssh' and
+        evt.Meta.log_type == 'ssh_failed-auth'
+      labels:
+        remediation: true
+        behavior: "ssh:bruteforce"
+        label: "Forgejo SSH Brute Force"
+        confidence: 3
   config.yaml.local: |
     common:
       log_media: stdout

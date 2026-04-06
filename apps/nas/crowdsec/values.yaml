@@ -14,3 +14,7 @@ agent:
     podName: mc-router-*
     program: mc-router
     poll_without_inotify: false
+  - namespace: forgejo
+    podName: forgejo-*
+    program: forgejo-ssh
+    poll_without_inotify: false
