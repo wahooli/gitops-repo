@@ -15,3 +15,21 @@ spec:
   claimRef:
     name: data-seaweedfs-backup-volume-0
     namespace: seaweedfs-backup
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: seaweedfs-backup-filer-data
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: ${seaweedfs_hostpath_prefix}/seaweedfs-backup/filer
+    type: DirectoryOrCreate
+  claimRef:
+    name: data-seaweedfs-backup-filer-0
+    namespace: seaweedfs-backup
