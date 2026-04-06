@@ -3,16 +3,6 @@ image:
   pullPolicy: IfNotPresent
 
 agent:
-  acquisition:
-  - namespace: envoy-gateway-system
-    podName: envoy-envoy-gateway-system-envoy-gw-*
-    program: envoy-gateway
-    container_name: envoy
-    poll_without_inotify: true
-  - namespace: authentik
-    podName: authentik-server-*
-    program: authentik
-    poll_without_inotify: true
   env:
   - name: COLLECTIONS
     value: "crowdsecurity/http-cve"
@@ -97,6 +87,7 @@ config:
       description: "Instant ban on access to sensitive files"
       groupby: evt.Meta.source_ip
       blackhole: 24h
+      duration: 24h
       filter: |
         evt.Meta.program == 'envoy-gateway' and
         (
@@ -127,6 +118,7 @@ config:
       distinct: evt.Meta.http_path
       leakspeed: "10s"
       blackhole: 24h
+      duration: 24h
       capacity: 3
       filter: |
         evt.Meta.program == 'envoy-gateway' and
@@ -144,6 +136,7 @@ config:
       distinct: evt.Meta.http_path
       leakspeed: "5s"
       blackhole: 24h
+      duration: 24h
       capacity: 15
       filter: |
         evt.Meta.program == 'envoy-gateway' and

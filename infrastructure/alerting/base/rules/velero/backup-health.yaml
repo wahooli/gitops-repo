@@ -39,7 +39,16 @@ spec:
         summary: Velero backup schedule {{ $labels.schedule }} has not completed recently.
         description: No successful backup for schedule {{ $labels.schedule }} in the last 26 hours.
       expr: |-
-        time() - velero_backup_last_successful_timestamp{schedule!=""} > 93600
+        time() - velero_backup_last_successful_timestamp{schedule=~".*daily.*"} > 93600
+      for: 0m
+      labels:
+        severity: critical
+    - alert: VeleroBackupNotRunRecently
+      annotations:
+        summary: Velero backup schedule {{ $labels.schedule }} has not completed recently.
+        description: No successful backup for schedule {{ $labels.schedule }} in the last 8 days.
+      expr: |-
+        time() - velero_backup_last_successful_timestamp{schedule=~".*weekly.*"} > 691200
       for: 0m
       labels:
         severity: critical

@@ -1,20 +1,20 @@
 image:
-  tag: "v1.7.6" # {"$imagepolicy": "flux-system:crowdsec:tag"}
+  tag: "v1.7.7" # {"$imagepolicy": "flux-system:crowdsec:tag"}
 agent:
   acquisition:
-  - namespace: ingress-nginx
-    podName: ingress-nginx-controller-*
-    program: ingress-nginx
-    poll_without_inotify: true
+  - namespace: envoy-gateway-system
+    podName: envoy-envoy-gateway-system-envoy-gw-*
+    program: envoy-gateway
+    poll_without_inotify: false
   - namespace: authentik
     podName: authentik-server-*
     program: authentik
-    poll_without_inotify: true
+    poll_without_inotify: false
   - namespace: default
     podName: vaultwarden-*
     program: vaultwarden
-    poll_without_inotify: true
+    poll_without_inotify: false
   - namespace: default
     podName: paperless-ngx-*
     program: paperless-ngx
-    poll_without_inotify: true
+    poll_without_inotify: false
