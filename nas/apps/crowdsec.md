@@ -7,47 +7,65 @@ grand_parent: "nas"
 # crowdsec
 
 ## Overview
-CrowdSec is a security automation tool designed to protect applications and services from various types of attacks. It leverages a collaborative approach to threat intelligence, allowing users to share and benefit from the collective knowledge of the community. In this deployment, CrowdSec is integrated with a PostgreSQL database managed by Patroni for high availability. This is a multi-component deployment consisting of two HelmReleases: `crowdsec` and `crowdsec-patroni`.
+The `crowdsec` component is deployed in the `nas` cluster using Flux and Helm. It provides security capabilities by leveraging CrowdSec's agent and API functionalities.
 
-## Sub-components
+## Helm Releases
+This deployment consists of two Helm releases:
 
-### HelmRelease: crowdsec--crowdsec
+### 1. crowdsec--crowdsec
 - **Chart**: crowdsec
 - **Version**: 0.19.5
-- **Repository**: [crowdsec](https://crowdsecurity.github.io/helm-charts) (HTTP)
-- **Release Name**: crowdsec
-- **Target Namespace**: crowdsec
-- **Reconciliation Interval**: 5m
-- **Dependencies**: crowdsec--crowdsec-patroni
+- **Repository**: [crowdsec](https://crowdsecurity.github.io/helm-charts)
+- **Namespace**: `flux-system`
+- **Target Namespace**: `crowdsec`
+- **Install Interval**: 5 minutes
+- **Upgrade Remediation**: Remediate last failure
+- **Values Sources**:
+  - ConfigMap: `crowdsec-values-9htmkf4mfb` (includes `values-base.yaml`, `values-shared.yaml`, and optional `values.yaml`)
+  - ConfigMap: `crowdsec-helmrelease-overrides` (optional)
 
-#### Rendered Kubernetes Resources
-- ConfigMap (6)
-- Service (2)
-- Secret (1)
-- Deployment (1)
-- DaemonSet (1)
-
-### HelmRelease: crowdsec--crowdsec-patroni
+### 2. crowdsec--crowdsec-patroni
 - **Chart**: patroni
-- **Version**: latest (floating: >=0.1.0-0)
-- **Repository**: wahooli (oci://ghcr.io/wahooli/charts) [OCI]
-- **Release Name**: crowdsec-patroni
-- **Target Namespace**: crowdsec
-- **Reconciliation Interval**: 5m
-- **Dependencies**: cert-manager--cert-manager, reflector--reflector, etcd--etcd
+- **Version**: `>=0.1.0-0`
+- **Repository**: wahooli
+- **Namespace**: `flux-system`
+- **Target Namespace**: `crowdsec`
+- **Install Interval**: 5 minutes
+- **Values Sources**:
+  - ConfigMap: `crowdsec-patroni-values-7m88ccffdf` (includes `values.yaml`)
+  - ConfigMap: `crowdsec-patroni-helmrelease-overrides` (optional)
 
-#### Rendered Kubernetes Resources
-- ConfigMap (5)
-- Service (2)
-- StatefulSet (1)
-- Deployment (1)
+## Configuration
+The configuration for the `crowdsec` component is managed through several ConfigMaps, which define various parameters for the agent and API.
 
-## Resource Summary
-All Kubernetes resource kinds in this component:
-- HelmRelease (2)
-- ConfigMap (2)
-- Namespace (1)
-- ImageRepository (1)
-- ImagePolicy (1)
-- HelmRepository (1)
-- HTTPRoute (1)
+### Key Configurations
+- **Container Runtime**: `containerd`
+- **LAPI Dashboard**: Disabled
+- **Agent Environment Variables**:
+  - `COLLECTIONS`: `"crowdsecurity/http-cve"`
+  - `DB_PASSWORD`: `${crowdsec_database_password}`
+- **Database Configuration**:
+  - Type: `postgresql`
+  - User: `crowdsec`
+  - Database Name: `crowdsec`
+  - Host: `crowdsec-patroni-proxy.crowdsec.svc.cluster.local`
+  - Port: `5432`
+  
+### HTTPRoute
+An `HTTPRoute` resource is defined to expose the CrowdSec API:
+- **Name**: `crowdsec-api`
+- **Hostnames**: `crowdsec-api.${domain_absolutist_it:=absolutist.it}`
+- **Backend Reference**: `crowdsec-service` on port `8080`
+
+## Dependencies
+The `crowdsec` Helm release depends on the `crowdsec--crowdsec-patroni` release, which manages the PostgreSQL database for CrowdSec.
+
+## Namespace
+All resources are deployed in the `crowdsec` namespace, which is created with specific annotations to manage pruning and service accounts.
+
+## Image Management
+The component uses the `crowdsecurity/crowdsec` image, with an image policy defined to manage updates based on semantic versioning.
+
+## Notes
+- Ensure that the necessary environment variables are set for database connectivity and agent configuration.
+- The deployment includes specific configurations for security and logging, which should be reviewed and adjusted as necessary for your environment.
