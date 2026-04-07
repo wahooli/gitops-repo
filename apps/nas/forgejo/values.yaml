@@ -60,7 +60,7 @@ extraContainers:
   - name: TARGET
     value: "http://localhost:3000"
   - name: DIFFICULTY
-    value: "4"
+    value: "5"
   - name: POLICY_FNAME
     value: "/etc/anubis/botPolicies.yaml"
   - name: SERVE_ROBOTS_TXT

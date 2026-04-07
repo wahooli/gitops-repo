@@ -1,9 +1,11 @@
 bots:
-- name: trusted-ips
-  action: ALLOW
-  remote_addresses:
-  - 10.0.0.0/8
-  - 192.168.0.0/16
+- name: deny-ai-crawlers
+  action: DENY
+  user_agent_regex: "Amazonbot|ChatGPT|GPTBot|ClaudeBot|Bytespider|CCBot"
+
+- name: challenge-bots
+  action: CHALLENGE
+  user_agent_regex: "[Bb]ot"
 
 - name: git-clients
   action: ALLOW
@@ -17,6 +19,10 @@ bots:
   path_regex: "^/user/oauth2/"
   action: ALLOW
 
+- name: well-known
+  path_regex: "^/\\.well-known/"
+  action: ALLOW
+
 - name: rss-feeds
   path_regex: "\\.(rss|atom)$"
   action: ALLOW
@@ -24,3 +30,7 @@ bots:
 - name: robots-txt
   path_regex: "^/robots.txt$"
   action: ALLOW
+
+- name: default-challenge
+  action: CHALLENGE
+  user_agent_regex: "."
