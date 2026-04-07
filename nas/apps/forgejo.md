@@ -7,65 +7,68 @@ grand_parent: "nas"
 # forgejo
 
 ## Overview
-Forgejo is a self-hosted Git service that provides a lightweight alternative to GitHub, GitLab, and Gitea. This deployment includes necessary components such as Redis for caching and Patroni for PostgreSQL high availability.
+Forgejo is a self-hosted Git service that provides a collaborative platform for version control and project management. This deployment includes additional components such as Redis for caching and Patroni for PostgreSQL clustering.
 
 ## Deployment Details
-The Forgejo deployment in the `nas` cluster consists of the following Helm releases:
+The Forgejo component is deployed in the `forgejo` namespace within the `nas` cluster using Flux CD for GitOps. The deployment consists of multiple Helm releases:
 
 ### 1. Forgejo
-- **Release Name:** `forgejo`
-- **Chart Version:** `16.2.1`
-- **Namespace:** `forgejo`
-- **Source Repository:** `oci://code.forgejo.org/forgejo-helm`
-- **Image:** `code.forgejo.org/forgejo/forgejo:14.0.3-rootless`
-- **Configuration:**
-  - **Service Type:** ClusterIP for HTTP and SSH services.
-  - **Persistence:** Enabled with a size of 10Gi.
-  - **OAuth Configuration:** Integrated with Authentik for OpenID Connect.
-  - **Database:** PostgreSQL via Patroni with SSL mode enabled.
-  - **Liveness and Readiness Probes:** Configured for health checks.
+- **Helm Chart Version**: 16.2.1
+- **Release Name**: `forgejo`
+- **Namespace**: `forgejo`
+- **Source**: OCI repository at `oci://code.forgejo.org/forgejo-helm`
+- **Values**: Configurations are sourced from multiple ConfigMaps, including base, shared, and optional values.
 
 ### 2. Redis
-- **Release Name:** `forgejo-redis`
-- **Chart Version:** `>=0.1.0-0`
-- **Namespace:** `forgejo`
-- **Configuration:**
-  - **Sentinel:** Enabled for high availability.
-  - **Persistence:** Enabled with a size of 1Gi.
+- **Helm Chart Version**: `>=0.1.0-0`
+- **Release Name**: `forgejo-redis`
+- **Namespace**: `forgejo`
+- **Source**: Helm repository `wahooli`
+- **Values**: Configurations include settings for Redis Sentinel and persistence.
 
 ### 3. Patroni
-- **Release Name:** `forgejo-patroni`
-- **Chart Version:** `>=0.1.0-0`
-- **Namespace:** `forgejo`
-- **Configuration:**
-  - **PostgreSQL Database:** Bootstrap with database name `forgejo` and user credentials sourced from secrets.
-  - **Replica Count:** 2 for high availability.
+- **Helm Chart Version**: `>=0.1.0-0`
+- **Release Name**: `forgejo-patroni`
+- **Namespace**: `forgejo`
+- **Source**: Helm repository `wahooli`
+- **Values**: Configurations include PostgreSQL settings and cluster management.
 
 ## Services
-- **SSH Load Balancer:**
-  - **Type:** LoadBalancer
-  - **Ports:** 
+- **SSH Load Balancer**: Exposes SSH access to Forgejo.
+  - **Type**: LoadBalancer
+  - **Ports**: 
     - 22 (SSH)
     - 2222 (SSH Proxy)
-  
-- **HTTP Routes:**
-  - **Public Route:** Exposes Forgejo on `git.${domain_wahoo_li:=wahoo.li}` for HTTP traffic.
-  - **Private Route:** Allows internal access to Forgejo.
+
+## Ingress
+- **HTTP Routes**:
+  - `forgejo-public`: Routes traffic to the Forgejo HTTP service on port 8923.
+  - `forgejo-private`: Routes traffic to the Forgejo HTTP service on port 3000 for internal access.
 
 ## Image Repositories
-- **Forgejo Image Repository:** `code.forgejo.org/forgejo/forgejo`
-- **Syncthing Image Repository:** `syncthing/syncthing:2.0.15`
-- **Anubis Image Repository:** `ghcr.io/techarohq/anubis:v1.25.0`
+- **Forgejo**: `code.forgejo.org/forgejo/forgejo`
+- **Syncthing**: `syncthing/syncthing:2.0.15`
+- **Anubis**: `ghcr.io/techarohq/anubis:v1.25.0`
 
-## Configuration Management
-Configuration values are sourced from multiple ConfigMaps:
-- `forgejo-values-hhd865hht2` for base and shared values.
-- `forgejo-redis-values-gfkgt5gh59` for Redis configuration.
-- `forgejo-patroni-values-t7c846kbfk` for Patroni configuration.
+## Configuration
+### Base Values
+- **Service Type**: ClusterIP for HTTP and SSH services.
+- **Persistence**: Enabled with a size of 10Gi.
+- **Init Containers**: Used for copying SSH keys and JWT secrets.
+
+### Shared Values
+- **Replica Count**: 1
+- **Metrics**: Disabled by default.
+- **OAuth Configuration**: Integrated with Authentik for OpenID Connect.
+
+### Additional Configurations
+- **Database**: PostgreSQL with Patroni for high availability.
+- **Caching**: Redis used for session management and caching.
+- **Storage**: MinIO configured for object storage.
 
 ## Security Policies
-- **Private IP Allow Policy:** Restricts access to the private HTTP route to specific CIDR ranges.
+- **HTTPRoute Security**: Policies are defined to restrict access based on client CIDR ranges.
 
 ## Notes
-- The deployment is configured to automatically update images and Helm charts every 24 hours.
-- Health checks are configured to ensure the application is running smoothly and can recover from failures.
+- The deployment is configured to allow for high availability and scalability.
+- Ensure that all secrets and sensitive configurations are managed securely within Kubernetes.
