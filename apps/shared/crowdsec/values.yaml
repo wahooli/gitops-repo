@@ -104,7 +104,6 @@ config:
       description: "Instant ban on access to sensitive files"
       groupby: evt.Meta.source_ip
       blackhole: 24h
-      duration: 24h
       filter: |
         evt.Meta.program == 'envoy-gateway' and
         (
@@ -135,7 +134,6 @@ config:
       distinct: evt.Meta.http_path
       leakspeed: "10s"
       blackhole: 24h
-      duration: 24h
       capacity: 3
       filter: |
         evt.Meta.program == 'envoy-gateway' and
@@ -151,13 +149,12 @@ config:
       description: "Detect rapid URL scanning (many distinct paths in short time)"
       groupby: evt.Meta.source_ip
       distinct: evt.Meta.http_path
-      leakspeed: "5s"
+      leakspeed: "8s"
       blackhole: 24h
-      duration: 24h
-      capacity: 15
+      capacity: 10
       filter: |
         evt.Meta.program == 'envoy-gateway' and
-        evt.Meta.http_status matches "^[34]"
+        evt.Meta.http_status matches "^(301|302|400|403|404|405|421)$"
       labels:
         remediation: true
         behavior: "http:scan"
@@ -170,7 +167,6 @@ config:
       groupby: evt.Meta.source_ip
       leakspeed: "10s"
       blackhole: 24h
-      duration: 24h
       capacity: 5
       filter: |
         evt.Meta.program == 'forgejo-ssh' and
@@ -180,6 +176,22 @@ config:
         behavior: "ssh:bruteforce"
         label: "Forgejo SSH Brute Force"
         confidence: 3
+  profiles.yaml: |
+    name: long_ban_scanners
+    filters:
+      - Alert.Remediation == true && Alert.GetScope() == "Ip" && Alert.GetScenario() in ["wahooli/block-secret-scanners", "wahooli/rapid-scan"]
+    decisions:
+      - type: ban
+        duration: 24h
+    on_success: break
+    ---
+    name: default_ip_remediation
+    filters:
+      - Alert.Remediation == true && Alert.GetScope() == "Ip"
+    decisions:
+      - type: ban
+        duration: 4h
+    on_success: break
   config.yaml.local: |
     common:
       log_media: stdout

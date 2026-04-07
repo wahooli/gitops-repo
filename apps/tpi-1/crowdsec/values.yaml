@@ -2,10 +2,6 @@ image:
   tag: "v1.7.7" # {"$imagepolicy": "flux-system:crowdsec:tag"}
 agent:
   acquisition:
-  - namespace: envoy-gateway-system
-    podName: envoy-envoy-gateway-system-envoy-gw-*
-    program: envoy-gateway
-    poll_without_inotify: true
   - namespace: authentik
     podName: authentik-server-*
     program: authentik
@@ -19,6 +15,12 @@ agent:
     program: paperless-ngx
     poll_without_inotify: true
   additionalAcquisition:
+  - source: file
+    filenames:
+    - /var/log/pods/envoy-gateway-system_envoy-envoy-gateway-system-envoy-gw-[^p]*_*/envoy/*.log
+    labels:
+      type: containerd
+      program: envoy-gateway
   - source: file
     filenames:
     - /var/log/pods/forgejo_forgejo-*_*/forgejo/*.log
