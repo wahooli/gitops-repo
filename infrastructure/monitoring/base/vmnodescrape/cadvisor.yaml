@@ -8,6 +8,7 @@ spec:
   honorLabels: true
   honorTimestamps: false
   interval: 30s
+  max_scrape_size: "67108864"
   metricRelabelConfigs:
   - action: labeldrop
     regex: (beta_kubernetes_.*|kubernetes_io_.*)
