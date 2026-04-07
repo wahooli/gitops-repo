@@ -7,80 +7,68 @@ grand_parent: "tpi-1"
 # crowdsec
 
 ## Overview
-The `crowdsec` component is deployed in the `tpi-1` cluster using Flux CD for GitOps management. It leverages a Helm chart to manage its lifecycle and configuration.
+The `crowdsec` component is deployed in the `tpi-1` cluster using Flux and Helm. It consists of two main Helm releases: `crowdsec` and `crowdsec-patroni`, which work together to provide security and database functionalities.
 
 ## Helm Repository
-- **Name**: crowdsec
+The `crowdsec` Helm chart is sourced from the official CrowdSec Helm repository:
 - **URL**: [https://crowdsecurity.github.io/helm-charts](https://crowdsecurity.github.io/helm-charts)
 - **Update Interval**: 24 hours
 
 ## Helm Releases
+
 ### crowdsec
-- **Release Name**: crowdsec
-- **Chart Version**: 0.19.5
-- **Namespace**: crowdsec
-- **Install Interval**: 5 minutes
-- **Timeout**: 5 minutes
-- **Remediation**: Retries indefinitely on failure
-- **Values**: Configurations are sourced from multiple ConfigMaps:
-  - `crowdsec-values-k6mhm75d8k` (base and shared values)
-  - `crowdsec-helmrelease-overrides` (optional)
+- **Release Name**: `crowdsec`
+- **Chart Version**: `0.19.5`
+- **Namespace**: `crowdsec`
+- **Update Interval**: 5 minutes
+- **Depends On**: 
+  - `crowdsec--crowdsec-patroni`
+- **Values Configuration**:
+  - Base values are loaded from `crowdsec-values-bc85gb942d` ConfigMap.
+  - Shared values are also loaded from the same ConfigMap.
+  - Optional values can be overridden using `crowdsec-helmrelease-overrides`.
 
 ### crowdsec-patroni
-- **Release Name**: crowdsec-patroni
-- **Chart Version**: latest (>=0.1.0-0)
-- **Namespace**: crowdsec
-- **Install Interval**: 5 minutes
-- **Remediation**: Retries indefinitely on failure
-- **Values**: Configurations are sourced from ConfigMaps:
-  - `crowdsec-patroni-values-7g4gm6hh48`
-  - `crowdsec-patroni-helmrelease-overrides` (optional)
+- **Release Name**: `crowdsec-patroni`
+- **Chart Version**: `>=0.1.0-0`
+- **Namespace**: `crowdsec`
+- **Depends On**: 
+  - `cert-manager--cert-manager`
+  - `reflector--reflector`
+  - `etcd--etcd`
+- **Values Configuration**:
+  - Loaded from `crowdsec-patroni-values-7g4gm6hh48` ConfigMap.
+  - Optional overrides can be applied using `crowdsec-patroni-helmrelease-overrides`.
 
 ## Kubernetes Resources
-### Namespace
-- **Name**: crowdsec
-- **Annotations**: 
-  - `kustomize.toolkit.fluxcd.io/prune`: disabled
-  - `kustomize.toolkit.fluxcd.io/ssa`: merge
+The deployment creates the following Kubernetes resources:
 
-### HTTPRoute
-- **Name**: crowdsec-api
-- **Namespace**: crowdsec
-- **Hostnames**: crowdsec-api.${domain_absolutist_it:=absolutist.it}
-- **Backend Reference**: crowdsec-service on port 8080
+- **Namespace**: `crowdsec`
+- **HTTPRoute**: `crowdsec-api` for routing traffic to the CrowdSec API.
+- **ConfigMaps**: 
+  - `crowdsec-values-bc85gb942d` for configuration values.
+  - `crowdsec-patroni-values-7g4gm6hh48` for Patroni configuration.
+- **ImageRepository**: `crowdsec` for managing the CrowdSec image.
+- **ImagePolicy**: `crowdsec` for versioning the CrowdSec image.
 
-### ConfigMaps
-- **crowdsec-values-k6mhm75d8k**: Contains base and shared configuration values for the `crowdsec` release.
-- **crowdsec-patroni-values-7g4gm6hh48**: Contains configuration values for the `crowdsec-patroni` release.
+## Configuration Details
+### crowdsec Configuration
+- **Container Runtime**: `containerd`
+- **LAPI Configuration**:
+  - Dashboard is disabled.
+  - Uses a specific image tag for compatibility with ARM architecture.
+- **Agent Configuration**:
+  - Collects logs from various applications and services.
+  - Configures environment variables for database access and enrollment.
 
-### Image Repository
-- **Name**: crowdsec
-- **Image**: crowdsecurity/crowdsec
-- **Update Interval**: 24 hours
+### crowdsec-patroni Configuration
+- **PostgreSQL Configuration**:
+  - Creates a database named `crowdsec` with a user `crowdsec`.
+  - Configures SSL for database connections.
+- **Replication and High Availability**:
+  - Uses Patroni for managing PostgreSQL clusters.
+  - Configures Cilium network policies for secure communication between instances.
 
-### Image Policy
-- **Name**: crowdsec
-- **Policy**: Semantic versioning range specified.
-
-## Configuration Highlights
-### crowdsec
-- **Container Runtime**: containerd
-- **LAPI Configuration**: 
-  - Dashboard disabled
-  - Replicas: 1
-  - Resource limits: 500Mi memory, 800m CPU
-- **Database Configuration**: Uses PostgreSQL with SSL.
-
-### crowdsec-patroni
-- **PostgreSQL Configuration**: 
-  - Database: crowdsec
-  - User: crowdsec
-  - Password: sourced from environment variables.
-- **Replication**: Enabled with specific user permissions.
-- **Backup Configuration**: Weekly and daily backups enabled.
-
-## Dependencies
-- The `crowdsec` HelmRelease depends on the `crowdsec-patroni` release for database management.
-- The `crowdsec-patroni` release has dependencies on other components like `cert-manager`, `reflector`, and `etcd`.
-
-This documentation provides a concise overview of the `crowdsec` component deployed in the `tpi-1` cluster, detailing its configuration, dependencies, and Kubernetes resources.
+## Notes
+- Ensure that the necessary secrets and environment variables are set for database access and enrollment keys.
+- Regularly check the Helm repository for updates to the `crowdsec` and `crowdsec-patroni` charts.

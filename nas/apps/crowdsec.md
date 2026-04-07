@@ -6,167 +6,95 @@ grand_parent: "nas"
 
 # crowdsec
 
-The `crowdsec` component is deployed in the `nas` cluster using Flux for GitOps management. It consists of multiple Helm releases that manage the deployment of the CrowdSec application and its dependencies.
+The `crowdsec` component is deployed in the `nas` cluster using Flux and Helm. It consists of two main Helm releases: `crowdsec` and `crowdsec-patroni`, which work together to provide security and database management functionalities.
 
 ## Helm Repository
 
-The Helm charts for CrowdSec are sourced from the official CrowdSec Helm repository:
+The Helm charts for `crowdsec` are sourced from the following repository:
 
-```yaml
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: crowdsec
-  namespace: flux-system
-spec:
-  interval: 24h
-  url: https://crowdsecurity.github.io/helm-charts
-```
+- **Name**: crowdsec
+- **URL**: [https://crowdsecurity.github.io/helm-charts](https://crowdsecurity.github.io/helm-charts)
+- **Update Interval**: 24 hours
 
 ## Helm Releases
 
 ### crowdsec
 
-The main CrowdSec application is deployed using the HelmRelease resource:
+- **Release Name**: crowdsec
+- **Chart Version**: 0.19.5
+- **Target Namespace**: crowdsec
+- **Update Interval**: 5 minutes
+- **Dependencies**: 
+  - `crowdsec--crowdsec-patroni`
+- **ConfigMaps Used for Values**:
+  - `crowdsec-values-fg8c96t495` (base and shared values)
+  - `crowdsec-helmrelease-overrides` (optional)
 
-```yaml
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: crowdsec--crowdsec
-  namespace: flux-system
-spec:
-  chart:
-    spec:
-      chart: crowdsec
-      version: 0.19.5
-      sourceRef:
-        kind: HelmRepository
-        name: crowdsec
-        namespace: flux-system
-  install:
-    timeout: 5m
-  interval: 5m
-  releaseName: crowdsec
-  targetNamespace: crowdsec
-  valuesFrom:
-  - kind: ConfigMap
-    name: crowdsec-values-m4khbh5fm2
-    valuesKey: values-base.yaml
-  - kind: ConfigMap
-    name: crowdsec-values-m4khbh5fm2
-    valuesKey: values-shared.yaml
-  - kind: ConfigMap
-    name: crowdsec-values-m4khbh5fm2
-    optional: true
-    valuesKey: values.yaml
-  - kind: ConfigMap
-    name: crowdsec-helmrelease-overrides
-    optional: true
-    valuesKey: values.yaml
-```
+#### Key Configuration Values
+
+- **Container Runtime**: containerd
+- **LAPI Dashboard**: Disabled
+- **Agent Environment Variables**:
+  - `COLLECTIONS`: crowdsecurity/http-cve
+  - `CROWDSEC_BYPASS_DB_VOLUME_CHECK`: TRUE
+- **Resource Limits**:
+  - Memory: 500Mi
+  - CPU: 800m
 
 ### crowdsec-patroni
 
-CrowdSec relies on a PostgreSQL database managed by Patroni, which is also deployed as a HelmRelease:
+- **Release Name**: crowdsec-patroni
+- **Chart Version**: >=0.1.0-0
+- **Target Namespace**: crowdsec
+- **Dependencies**:
+  - `cert-manager`
+  - `reflector`
+  - `etcd`
+- **ConfigMaps Used for Values**:
+  - `crowdsec-patroni-values-7m88ccffdf`
+  - `crowdsec-patroni-helmrelease-overrides` (optional)
 
-```yaml
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: crowdsec--crowdsec-patroni
-  namespace: flux-system
-spec:
-  chart:
-    spec:
-      chart: patroni
-      version: '>=0.1.0-0'
-      sourceRef:
-        kind: HelmRepository
-        name: wahooli
-        namespace: flux-system
-  install:
-    remediation:
-      retries: -1
-  interval: 5m
-  releaseName: crowdsec-patroni
-  targetNamespace: crowdsec
-  valuesFrom:
-  - kind: ConfigMap
-    name: crowdsec-patroni-values-7m88ccffdf
-    valuesKey: values.yaml
-  - kind: ConfigMap
-    name: crowdsec-patroni-helmrelease-overrides
-    optional: true
-    valuesKey: values.yaml
-```
+#### Key Configuration Values
 
-## Configuration
-
-The configuration for CrowdSec is managed through ConfigMaps, which include base values, shared values, and optional overrides. Key configurations include:
-
-- **Container Runtime**: Set to `containerd`.
-- **API Configuration**: The API server is configured to use forwarded headers and trusted proxies.
-- **Database Configuration**: PostgreSQL connection details are provided, including SSL certificates for secure connections.
-
-### Example ConfigMap Values
-
-```yaml
-data:
-  values-base.yaml: |
-    container_runtime: containerd
-    appsec:
-      enabled: false
-    lapi:
-      dashboard:
-        enabled: false
-        image:
-          tag: v0.55.9.4
-    config:
-      agent_config.yaml.local: |
-        common:
-          log_media: stdout
-          log_format: json
-          log_level: warn
-```
+- **PostgreSQL Configuration**:
+  - Database Name: crowdsec
+  - Username: crowdsec
+  - Password: `${crowdsec_database_password}`
+- **Patroni Settings**:
+  - Replica Count: 1
+  - SSL: Enabled
+  - Superuser Password: `${crowdsec_postgres_superuser_password}`
+  - Replication Password: `${crowdsec_postgres_replication_password}`
 
 ## Networking
 
-An HTTPRoute resource is defined to expose the CrowdSec API:
+### HTTPRoute
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: crowdsec-api
-  namespace: crowdsec
-spec:
-  hostnames:
-  - crowdsec-api.absolutist.it
-  parentRefs:
-  - name: envoy-gw-private
-    namespace: envoy-gateway-system
-  rules:
-  - backendRefs:
-    - name: crowdsec-service
-      port: 8080
-```
+An HTTPRoute is configured to expose the `crowdsec` API:
+
+- **Name**: crowdsec-api
+- **Hostnames**: crowdsec-api.absolutist.it
+- **Backend Reference**: crowdsec-service on port 8080
 
 ## Image Management
 
-The CrowdSec image is managed through Flux's ImageRepository and ImagePolicy resources:
+### Image Repository
 
-```yaml
-apiVersion: image.toolkit.fluxcd.io/v1
-kind: ImageRepository
-metadata:
-  name: crowdsec
-  namespace: flux-system
-spec:
-  image: crowdsecurity/crowdsec
-  interval: 24h
-```
+- **Name**: crowdsec
+- **Image**: crowdsecurity/crowdsec
+- **Update Interval**: 24 hours
 
-## Summary
+### Image Policy
 
-The `crowdsec` component is a critical part of the security infrastructure in the `nas` cluster, providing automated threat detection and response capabilities. It is deployed using Flux with a focus on GitOps principles, ensuring that the deployment is reproducible and manageable through version-controlled configurations.
+- **Name**: crowdsec
+- **Policy**: Semantic versioning range
+
+## Namespace
+
+The `crowdsec` component is deployed in its own namespace:
+
+- **Namespace Name**: crowdsec
+- **Annotations**: 
+  - `kustomize.toolkit.fluxcd.io/prune`: disabled
+
+This documentation provides a comprehensive overview of the `crowdsec` deployment in the `nas` cluster, detailing its configuration, dependencies, and networking setup.
