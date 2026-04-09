@@ -1,0 +1,3 @@
+image:
+  keda:
+    tag: 2.19.0 # {"$imagepolicy": "flux-system:keda:tag"}

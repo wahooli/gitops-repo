@@ -1,0 +1,7 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: forgejo-runner
+  namespace: forgejo-runners
+spec:
+  maxReplicaCount: 6

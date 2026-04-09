@@ -1,0 +1,114 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: forgejo-runner
+  namespace: forgejo-runners
+  labels:
+    app: forgejo-runner
+spec:
+  jobTargetRef:
+    activeDeadlineSeconds: 14400
+    backoffLimit: 0
+    template:
+      metadata:
+        labels:
+          app: forgejo-runner
+      spec:
+        serviceAccountName: forgejo-runner
+        restartPolicy: Never
+        shareProcessNamespace: true
+        volumes:
+        - name: runner-data
+          emptyDir: {}
+        - name: runner-config
+          secret:
+            secretName: forgejo-runner-config
+        - name: runner-registration
+          configMap:
+            name: forgejo-runner-registration
+        - name: docker-certs
+          emptyDir: {}
+        containers:
+        - name: runner
+          image: code.forgejo.org/forgejo/runner:6.3.1
+          command:
+          - sh
+          - -c
+          - |
+            while ! nc -z localhost 2376 </dev/null; do
+              echo 'waiting for docker daemon...'
+              sleep 5
+            done
+            cp /config/.runner /data/.runner
+            exec forgejo-runner -c /registration/registration.yaml one-job
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          env:
+          - name: DOCKER_HOST
+            value: tcp://localhost:2376
+          - name: DOCKER_CERT_PATH
+            value: /certs/client
+          - name: DOCKER_TLS_VERIFY
+            value: "1"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+          - name: docker-certs
+            mountPath: /certs
+          - name: runner-data
+            mountPath: /data
+          - name: runner-registration
+            mountPath: /registration
+          - name: runner-config
+            mountPath: /config
+        - name: daemon
+          image: docker:27.4.1-dind
+          command:
+          - sh
+          - -c
+          - |
+            dockerd-entrypoint.sh 2>&1 &
+            while kill -0 7 2>/dev/null; do
+              sleep 10
+            done
+            sleep 10
+            echo "runner exited, stopping dind"
+            exit 0
+          env:
+          - name: DOCKER_TLS_CERTDIR
+            value: /certs
+          - name: DOCKER_HOST
+            value: tcp://0.0.0.0:2376
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 16Gi
+          volumeMounts:
+          - name: docker-certs
+            mountPath: /certs
+  minReplicaCount: 0
+  pollingInterval: 30
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  maxReplicaCount: 4
+  triggers:
+  - type: forgejo-runner
+    metadata:
+      name: "forgejo-runner"
+      address: "http://forgejo-http.forgejo.svc.cluster.local:3000"
+      global: "true"
+      labels: "linux,java,dotnet,go,rust,js"
+    authenticationRef:
+      name: forgejo-runner-creds

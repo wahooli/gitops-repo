@@ -1,0 +1,18 @@
+image:
+  tag: v2.1.15 # {"$imagepolicy": "flux-system:zot:tag"}
+
+persistence: true
+pvc:
+  create: true
+  accessModes:
+  - ReadWriteOnce
+  storage: 10Gi
+
+externalSecrets:
+- secretName: zot-credentials
+  mountPath: /etc/zot/credentials
+
+extraVolumeMounts:
+- name: zot-config
+  mountPath: /etc/zot/config.json
+  subPath: config.json

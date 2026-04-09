@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-keda
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: keda
+spec:
+  releaseName: base-keda
+  targetNamespace: keda
+  chart:
+    spec:
+      chart: keda
+      sourceRef:
+        kind: HelmRepository
+        name: kedacore
+        namespace: flux-system
+      version: "2.19.0"
+      interval: 24h
+  install:
+    timeout: 10m
+    remediation:
+      retries: -1
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  valuesFrom:
+  - kind: ConfigMap
+    name: keda-values
+    valuesKey: values-base.yaml

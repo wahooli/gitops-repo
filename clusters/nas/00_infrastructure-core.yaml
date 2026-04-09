@@ -23,6 +23,14 @@ spec:
     kind: Deployment
     name: envoy-gateway
     namespace: envoy-gateway-system
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: keda-operator
+    namespace: keda
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: reflector
+    namespace: reflector
   postBuild:
     substituteFrom:
     - kind: Secret

@@ -1,0 +1,51 @@
+log:
+  level: info
+  job_level: info
+
+runner:
+  file: /data/.runner
+  capacity: 1
+  envs:
+    DOCKER_HOST: tcp://localhost:2376
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: /certs/client
+  env_file: .env
+  timeout: 3h
+  shutdown_timeout: 3h
+  insecure: false
+  fetch_timeout: 5s
+  fetch_interval: 2s
+  report_interval: 1s
+  labels:
+  - "linux-amd64:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+  - "linux:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+  - "java:docker://ghcr.io/catthehacker/ubuntu:java-tools-24.04"
+  - "dotnet:docker://ghcr.io/catthehacker/ubuntu:dotnet-24.04"
+  - "go:docker://ghcr.io/catthehacker/ubuntu:go-24.04"
+  - "rust:docker://ghcr.io/catthehacker/ubuntu:rust-24.04"
+  - "js:docker://ghcr.io/catthehacker/ubuntu:js-24.04"
+
+cache:
+  enabled: true
+  dir: ""
+  host: ""
+  port: 0
+  proxy_port: 0
+  external_server: ""
+  secret: ""
+  actions_cache_url_override: ""
+
+container:
+  network: host
+  enable_ipv6: false
+  privileged: false
+  options: -v /certs/client:/certs/client
+  workdir_parent:
+  valid_volumes:
+  - /certs/client
+  docker_host: "-"
+  force_pull: false
+  force_rebuild: false
+
+host:
+  workdir_parent:

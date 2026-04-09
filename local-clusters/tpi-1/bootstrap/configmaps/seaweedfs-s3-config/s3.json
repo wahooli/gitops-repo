@@ -15,6 +15,22 @@
                 "List",
                 "Tagging"
             ]
+        },
+        {
+            "name": "zot",
+            "credentials": [
+                {
+                    "accessKey": "zot-registry",
+                    "secretKey": "zot-registry-local-dev-secret"
+                }
+            ],
+            "actions": [
+                "Admin",
+                "Read",
+                "Write",
+                "List",
+                "Tagging"
+            ]
         }
     ],
     "buckets": [
@@ -23,6 +39,9 @@
         },
         {
             "name": "immich-data"
+        },
+        {
+            "name": "zot-registry"
         }
     ]
 }
