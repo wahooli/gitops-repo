@@ -27,6 +27,9 @@
     "address": "0.0.0.0",
     "port": "5000",
     "auth": {
+      "htpasswd": {
+        "path": "/secret/htpasswd"
+      },
       "openid": {
         "providers": {
           "oidc": {
@@ -90,6 +93,6 @@
     }
   },
   "log": {
-    "level": "debug"
+    "level": "warn"
   }
 }

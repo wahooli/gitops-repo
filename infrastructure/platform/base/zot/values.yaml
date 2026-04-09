@@ -8,6 +8,10 @@ pvc:
   - ReadWriteOnce
   storage: 10Gi
 
+mountSecret: true
+secretFiles:
+  htpasswd: ""
+
 externalSecrets:
 - secretName: zot-credentials
   mountPath: /etc/zot/credentials
