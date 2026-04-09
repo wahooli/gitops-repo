@@ -26,6 +26,7 @@
     "externalUrl": "https://registry.${domain_wahoo_li:=wahoo.li}",
     "address": "0.0.0.0",
     "port": "5000",
+    "compat": ["docker2s2"],
     "auth": {
       "htpasswd": {
         "path": "/etc/zot/credentials/htpasswd"

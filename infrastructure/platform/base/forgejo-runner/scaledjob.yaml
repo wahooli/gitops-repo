@@ -31,9 +31,11 @@ spec:
         - name: docker-auth
           secret:
             secretName: forgejo-runner-docker-config
+        - name: lifecycle
+          emptyDir: {}
         containers:
         - name: runner
-          image: code.forgejo.org/forgejo/runner:6.3.1
+          image: code.forgejo.org/forgejo/runner:12.8.2 # {"$imagepolicy": "flux-system:forgejo-runner"}
           command:
           - sh
           - -c
@@ -43,7 +45,8 @@ spec:
               sleep 5
             done
             cp /config/.runner /data/.runner
-            exec forgejo-runner -c /registration/registration.yaml one-job
+            forgejo-runner -c /registration/registration.yaml one-job
+            touch /tmp/runner-done
           securityContext:
             privileged: true
             runAsUser: 0
@@ -52,6 +55,8 @@ spec:
             value: tcp://localhost:2376
           - name: DOCKER_CERT_PATH
             value: /certs/client
+          - name: DOCKER_CONFIG
+            value: /root/.docker
           - name: DOCKER_TLS_VERIFY
             value: "1"
           resources:
@@ -70,17 +75,24 @@ spec:
             mountPath: /registration
           - name: runner-config
             mountPath: /config
+          - name: docker-auth
+            mountPath: /root/.docker/config.json
+            subPath: config.json
+          - name: lifecycle
+            mountPath: /tmp
         - name: daemon
           image: docker:27.4.1-dind
           command:
           - sh
           - -c
           - |
-            dockerd-entrypoint.sh 2>&1 &
-            while kill -0 7 2>/dev/null; do
-              sleep 10
+            mkdir -p /etc/docker
+            echo '{"insecure-registries":["zot.registry.svc:5000"]}' > /etc/docker/daemon.json
+            dockerd-entrypoint.sh &
+            while [ ! -f /tmp/runner-done ]; do
+              sleep 5
             done
-            sleep 10
+            sleep 5
             echo "runner exited, stopping dind"
             exit 0
           env:
@@ -104,8 +116,10 @@ spec:
           - name: docker-auth
             mountPath: /root/.docker/config.json
             subPath: config.json
+          - name: lifecycle
+            mountPath: /tmp
   minReplicaCount: 0
-  pollingInterval: 30
+  pollingInterval: 10
   successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 1
   maxReplicaCount: 4

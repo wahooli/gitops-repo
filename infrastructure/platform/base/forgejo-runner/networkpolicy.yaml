@@ -27,6 +27,16 @@ spec:
     - ports:
       - port: "3000"
         protocol: TCP
+  # Allow Forgejo via gateway (git.wahoo.li)
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: envoy-gateway-system
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      - port: "8443"
+        protocol: TCP
   # Allow Zot registry
   - toEndpoints:
     - matchLabels:

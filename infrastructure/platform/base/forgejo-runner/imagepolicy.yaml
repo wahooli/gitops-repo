@@ -1,0 +1,11 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: forgejo-runner
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: forgejo-runner
+  policy:
+    semver:
+      range: ">=12.0.0"

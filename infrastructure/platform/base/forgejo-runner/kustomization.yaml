@@ -6,3 +6,5 @@ resources:
 - triggerauthentication.yaml
 - scaledjob.yaml
 - networkpolicy.yaml
+- imagerepository.yaml
+- imagepolicy.yaml
