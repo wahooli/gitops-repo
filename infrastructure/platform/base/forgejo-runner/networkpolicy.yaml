@@ -30,6 +30,9 @@ spec:
   # Allow Forgejo via gateway (git.wahoo.li)
   - toCIDR:
     - "${envoy_gw_private_lb_ip}/32"
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: envoy-gateway-system
     toPorts:
     - ports:
       - port: "443"
