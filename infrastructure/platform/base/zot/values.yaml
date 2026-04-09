@@ -10,7 +10,8 @@ pvc:
 
 mountSecret: true
 secretFiles:
-  htpasswd: ""
+  htpasswd: |
+    nologin:$2y$05$vmiurPmJvHylk78HHFWuruFFVePlit9rZWGA/FbZfTEmNRneGJtha
 
 externalSecrets:
 - secretName: zot-credentials
