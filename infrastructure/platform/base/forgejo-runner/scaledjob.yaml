@@ -28,6 +28,9 @@ spec:
             name: forgejo-runner-registration
         - name: docker-certs
           emptyDir: {}
+        - name: docker-auth
+          secret:
+            secretName: forgejo-runner-docker-config
         containers:
         - name: runner
           image: code.forgejo.org/forgejo/runner:6.3.1
@@ -98,6 +101,9 @@ spec:
           volumeMounts:
           - name: docker-certs
             mountPath: /certs
+          - name: docker-auth
+            mountPath: /root/.docker/config.json
+            subPath: config.json
   minReplicaCount: 0
   pollingInterval: 30
   successfulJobsHistoryLimit: 0

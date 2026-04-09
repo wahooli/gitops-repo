@@ -28,7 +28,7 @@
     "port": "5000",
     "auth": {
       "htpasswd": {
-        "path": "/secret/htpasswd"
+        "path": "/etc/zot/credentials/htpasswd"
       },
       "openid": {
         "providers": {
@@ -44,15 +44,6 @@
     },
     "accessControl": {
       "repositories": {
-        "/docker/**": {
-          "anonymousPolicy": ["read"]
-        },
-        "/ghcr/**": {
-          "anonymousPolicy": ["read"]
-        },
-        "/quay/**": {
-          "anonymousPolicy": ["read"]
-        },
         "**": {
           "defaultPolicy": ["read"],
           "policies": [{

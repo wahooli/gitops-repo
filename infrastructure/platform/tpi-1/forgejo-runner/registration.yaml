@@ -17,13 +17,13 @@ runner:
   fetch_interval: 2s
   report_interval: 1s
   labels:
-  - "linux-arm64:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
-  - "linux:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
-  - "java:docker://ghcr.io/catthehacker/ubuntu:java-tools-24.04"
-  - "dotnet:docker://ghcr.io/catthehacker/ubuntu:dotnet-24.04"
-  - "go:docker://ghcr.io/catthehacker/ubuntu:go-24.04"
-  - "rust:docker://ghcr.io/catthehacker/ubuntu:rust-24.04"
-  - "js:docker://ghcr.io/catthehacker/ubuntu:js-24.04"
+  - "linux-arm64:docker://zot.registry.svc:5000/ghcr/catthehacker/ubuntu:act-24.04"
+  - "linux:docker://zot.registry.svc:5000/ghcr/catthehacker/ubuntu:act-24.04"
+  - "java:docker://zot.registry.svc:5000/ghcr/catthehacker/ubuntu:java-tools-24.04"
+  - "dotnet:docker://zot.registry.svc:5000/ghcr/catthehacker/ubuntu:dotnet-24.04"
+  - "go:docker://zot.registry.svc:5000/ghcr/catthehacker/ubuntu:go-24.04"
+  - "rust:docker://zot.registry.svc:5000/ghcr/catthehacker/ubuntu:rust-24.04"
+  - "js:docker://zot.registry.svc:5000/ghcr/catthehacker/ubuntu:js-24.04"
 
 cache:
   enabled: true
@@ -39,10 +39,11 @@ container:
   network: host
   enable_ipv6: false
   privileged: false
-  options: -v /certs/client:/certs/client
+  options: -v /certs/client:/certs/client -v /root/.docker/config.json:/root/.docker/config.json
   workdir_parent:
   valid_volumes:
   - /certs/client
+  - /root/.docker/config.json
   docker_host: "-"
   force_pull: false
   force_rebuild: false
