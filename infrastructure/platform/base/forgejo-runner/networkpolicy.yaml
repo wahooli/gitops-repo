@@ -28,8 +28,14 @@ spec:
       - port: "3000"
         protocol: TCP
   # Allow Forgejo via gateway (git.wahoo.li)
+  - toCIDR:
+    - "${envoy_gw_private_lb_ip}/32"
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
   - toFQDNs:
-    - matchName: "git.wahoo.li"
+    - matchName: "git.${domain_wahoo_li:=wahoo.li}"
     toPorts:
     - ports:
       - port: "443"
