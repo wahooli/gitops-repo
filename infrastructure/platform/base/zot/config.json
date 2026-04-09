@@ -90,6 +90,6 @@
     }
   },
   "log": {
-    "level": "warn"
+    "level": "debug"
   }
 }
