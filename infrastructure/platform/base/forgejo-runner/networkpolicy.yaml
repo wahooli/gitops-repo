@@ -27,18 +27,14 @@ spec:
     - ports:
       - port: "3000"
         protocol: TCP
-  # Allow Forgejo via gateway (git.wahoo.li)
-  - toCIDR:
-    - "${envoy_gw_private_lb_ip}/32"
+  # Allow Forgejo via gateway
   - toEndpoints:
     - matchLabels:
         io.kubernetes.pod.namespace: envoy-gateway-system
-    toPorts:
-    - ports:
-      - port: "443"
-        protocol: TCP
+        gateway.envoyproxy.io/owning-gateway-name: envoy-gw-private
+  # Allow Forgejo Actions catalog
   - toFQDNs:
-    - matchName: "git.${domain_wahoo_li:=wahoo.li}"
+    - matchName: "code.forgejo.org"
     toPorts:
     - ports:
       - port: "443"
