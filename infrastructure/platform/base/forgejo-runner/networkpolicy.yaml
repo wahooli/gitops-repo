@@ -49,9 +49,9 @@ spec:
         values:
         - nas
         - tpi-1
-  # Allow Forgejo Actions catalog
-  - toFQDNs:
-    - matchName: "code.forgejo.org"
+  # Allow external HTTPS (code.forgejo.org for actions, git.wahoo.li via LB)
+  - toEntities:
+    - world
     toPorts:
     - ports:
       - port: "443"
