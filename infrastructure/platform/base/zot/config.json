@@ -50,6 +50,10 @@
           "policies": [{
             "users": ["${zot_admin_user}"],
             "actions": ["read", "create", "update", "delete"]
+          },
+          {
+            "users": ["forgejorunner"],
+            "actions": ["read", "create", "update"]
           }]
         }
       },
