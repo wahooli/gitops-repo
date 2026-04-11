@@ -19,19 +19,36 @@ spec:
         protocol: UDP
       - port: "53"
         protocol: TCP
-  # Allow Forgejo
+  # Allow Forgejo (local and remote clusters)
   - toEndpoints:
     - matchLabels:
         io.kubernetes.pod.namespace: forgejo
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: forgejo
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
     toPorts:
     - ports:
       - port: "3000"
         protocol: TCP
-  # Allow Forgejo via gateway
+  # Allow Forgejo via gateway (local and remote clusters)
   - toEndpoints:
     - matchLabels:
         io.kubernetes.pod.namespace: envoy-gateway-system
         gateway.envoyproxy.io/owning-gateway-name: envoy-gw-private
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: envoy-gateway-system
+        k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-gw-private
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
   # Allow Forgejo Actions catalog
   - toFQDNs:
     - matchName: "code.forgejo.org"
@@ -39,10 +56,34 @@ spec:
     - ports:
       - port: "443"
         protocol: TCP
-  # Allow Zot registry
+  # Allow SeaweedFS (local and remote clusters)
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: seaweedfs
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: seaweedfs
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
+    toPorts:
+    - ports:
+      - port: "8333"
+        protocol: TCP
+  # Allow Zot registry (local and remote clusters)
   - toEndpoints:
     - matchLabels:
         io.kubernetes.pod.namespace: registry
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: registry
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
     toPorts:
     - ports:
       - port: "5000"

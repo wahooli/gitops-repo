@@ -60,6 +60,10 @@ postUp:
 
 filer:
   service:
+    lb:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "remote"
     nas:
       annotations:
         service.cilium.io/global: "true"

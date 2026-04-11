@@ -1,3 +1,10 @@
+service:
+  http:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/affinity: "remote"
+      service.cilium.io/global-sync-endpoint-slices: "true"
+
 image:
   registry: code.forgejo.org
   repository: forgejo/forgejo
