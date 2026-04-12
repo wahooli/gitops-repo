@@ -11,7 +11,9 @@
       "accesskey": "${seaweedfs_zot_access_key}",
       "secretkey": "${seaweedfs_zot_secret_key}",
       "secure": false,
-      "skipverify": true
+      "skipverify": true,
+      "v4auth": true,
+      "rootdirectory": "/"
     },
     "gc": true,
     "gcDelay": "1h",
