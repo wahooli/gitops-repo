@@ -11,5 +11,17 @@ configMapGenerator:
   options:
     labels:
       velero.io/exclude-from-backup: "true"
+- name: zot-config
+  namespace: flux-system
+  behavior: replace
+  files:
+  - config.json=config.json
+  options:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "registry"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "registry"
 configurations:
 - ../../../.config/valuesFrom.yaml
+- ../../base/zot/configMapRef.yaml

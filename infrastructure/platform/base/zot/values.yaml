@@ -1,6 +1,12 @@
 image:
   tag: v2.1.15 # {"$imagepolicy": "flux-system:zot:tag"}
 
+service:
+  annotations:
+    service.cilium.io/global: "true"
+    service.cilium.io/affinity: "local"
+    service.cilium.io/global-sync-endpoint-slices: "true"
+
 persistence: true
 pvc:
   create: true

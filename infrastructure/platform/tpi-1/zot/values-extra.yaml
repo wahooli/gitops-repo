@@ -1,1 +1,3 @@
-# Per-cluster overrides for tpi-1
+service:
+  annotations:
+    service.cilium.io/affinity: "remote"

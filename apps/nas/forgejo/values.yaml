@@ -1,3 +1,8 @@
+gitea:
+  config:
+    storage:
+      MINIO_ENDPOINT: seaweedfs-filer-nas.seaweedfs.svc.cluster.local:8333
+
 image:
   registry: code.forgejo.org
   repository: forgejo/forgejo
