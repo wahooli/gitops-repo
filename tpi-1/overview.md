@@ -6,12 +6,12 @@ has_children: true
 # tpi-1
 
 ## Overview
-The `tpi-1` cluster is designed to manage and deploy a variety of infrastructure and application components using GitOps principles. It utilizes Flux for continuous delivery, ensuring that the cluster state is synchronized with the configurations stored in a Git repository.
+The `tpi-1` cluster is designed to manage infrastructure, monitoring, logging, alerting, DNS, and application deployments using GitOps principles with Flux. It automates the deployment and management of various components essential for a robust Kubernetes environment.
 
 ## Dependency Chain
 The Kustomization entries are processed in the following order, with dependencies indicated:
 
-1. **infrastructure-core**: The foundational infrastructure components.
+1. **infrastructure-core**: Base infrastructure components.
 2. **infrastructure-platform**: Depends on `infrastructure-core`.
 3. **infrastructure-monitoring**: Depends on `infrastructure-platform`.
 4. **infrastructure-logging**: Depends on `infrastructure-platform`.
@@ -21,29 +21,22 @@ The Kustomization entries are processed in the following order, with dependencie
 8. **apps**: Depends on both `infrastructure-platform` and `infrastructure-dns`.
 
 ## Components
-- **Infrastructure Kustomizations**:
-  - `infrastructure-core`: `./infrastructure/core/tpi-1`
-  - `infrastructure-platform`: `./infrastructure/platform/tpi-1`
-  - `infrastructure-monitoring`: `./infrastructure/monitoring/tpi-1`
-  - `infrastructure-logging`: `./infrastructure/logging/tpi-1`
-  - `infrastructure-alerting`: `./infrastructure/alerting/tpi-1`
-  - `infrastructure-dns`: `./infrastructure/internal-dns/tpi-1`
-  - `infrastructure-kube-dns`: `./infrastructure/kube-dns/tpi-1`
-  
-- **Application Kustomization**:
-  - `apps`: `./apps/tpi-1`
+- **infrastructure-core**: `./infrastructure/core/tpi-1`
+- **infrastructure-platform**: `./infrastructure/platform/tpi-1`
+- **infrastructure-monitoring**: `./infrastructure/monitoring/tpi-1`
+- **infrastructure-logging**: `./infrastructure/logging/tpi-1`
+- **infrastructure-alerting**: `./infrastructure/alerting/tpi-1`
+- **infrastructure-dns**: `./infrastructure/internal-dns/tpi-1`
+- **infrastructure-kube-dns**: `./infrastructure/kube-dns/tpi-1`
+- **apps**: `./apps/tpi-1`
 
 ## Variable Injection
 The following Secrets are used for postBuild substitution:
 
-- **Required**:
-  - `cluster-infrastructure-vars`
-  
-- **Optional**:
-  - `cluster-vars`
-  - `dns-vars`
-  - `authentik-app-vars`
-  - `wireguard-tunnel-credentials`
-  - `syncthing-devices`
-  
-The `coredns_replicas` variable is also substituted with a value of "4" in the `infrastructure-kube-dns` Kustomization.
+- **cluster-infrastructure-vars**: Required
+- **cluster-vars**: Optional
+- **dns-vars**: Optional
+- **cluster-app-vars**: Required for apps
+- **authentik-app-vars**: Optional for apps
+- **wireguard-tunnel-credentials**: Optional for apps
+- **syncthing-devices**: Optional for apps

@@ -5,7 +5,7 @@ nav_order: 0
 
 # GitOps Repository Documentation
 
-This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kustomize, and Helm. It provides a structured approach to deploying and managing applications and infrastructure across different environments.
+This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kustomize, and Helm. It provides a structured approach to deploying applications and managing infrastructure across different environments.
 
 ### livingroom-pi
 - [Cluster overview](livingroom-pi/overview.md)
@@ -71,8 +71,10 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [cilium](nas/infrastructure/core/cilium.md)
 - [envoy-gateway](nas/infrastructure/core/envoy-gateway.md)
 - [gateway-api](nas/infrastructure/core/gateway-api.md)
+- [keda](nas/infrastructure/core/keda.md)
 - [namespaces](nas/infrastructure/core/namespaces.md)
 - [prometheus-operator-crds](nas/infrastructure/core/prometheus-operator-crds.md)
+- [reflector](nas/infrastructure/core/reflector.md)
 - [sources](nas/infrastructure/core/sources.md)
 - [topolvm](nas/infrastructure/core/topolvm.md)
 - [victoria-metrics](nas/infrastructure/core/victoria-metrics.md)
@@ -103,6 +105,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [cilium](nas/infrastructure/platform/cilium.md)
 - [default-backend](nas/infrastructure/platform/default-backend.md)
 - [envoy-gateway](nas/infrastructure/platform/envoy-gateway.md)
+- [forgejo-runner](nas/infrastructure/platform/forgejo-runner.md)
 - [gateway](nas/infrastructure/platform/gateway.md)
 - [gpu-exporter](nas/infrastructure/platform/gpu-exporter.md)
 - [haproxy](nas/infrastructure/platform/haproxy.md)
@@ -113,8 +116,10 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [reloader](nas/infrastructure/platform/reloader.md)
 - [resources](nas/infrastructure/platform/resources.md)
 - [seaweedfs-backup](nas/infrastructure/platform/seaweedfs-backup.md)
+- [seaweedfs](nas/infrastructure/platform/seaweedfs.md)
 - [smartctl-exporter](nas/infrastructure/platform/smartctl-exporter.md)
 - [velero](nas/infrastructure/platform/velero.md)
+- [zot](nas/infrastructure/platform/zot.md)
 
 ### tpi-1
 - [Cluster overview](tpi-1/overview.md)
