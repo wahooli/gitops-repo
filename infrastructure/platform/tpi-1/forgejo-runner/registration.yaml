@@ -39,11 +39,12 @@ container:
   network: host
   enable_ipv6: false
   privileged: false
-  options: -v /certs/client:/certs/client -v /root/.docker/config.json:/root/.docker/config.json
+  options: -v /certs/client:/certs/client -v /home/docker:/root/.docker
   workdir_parent:
   valid_volumes:
   - /certs/client
-  - /root/.docker/config.json
+  - /home/docker
+  - /root/.docker
   docker_host: "-"
   force_pull: false
   force_rebuild: false

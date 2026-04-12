@@ -44,6 +44,8 @@ spec:
               echo 'waiting for docker daemon...'
               sleep 5
             done
+            mkdir -p /home/docker
+            cp /docker-auth-ro/config.json /home/docker/config.json
             cp /config/.runner /data/.runner
             forgejo-runner -c /registration/registration.yaml one-job
             touch /tmp/runner-done
@@ -56,7 +58,7 @@ spec:
           - name: DOCKER_CERT_PATH
             value: /certs/client
           - name: DOCKER_CONFIG
-            value: /root/.docker
+            value: /home/docker
           - name: DOCKER_TLS_VERIFY
             value: "1"
           resources:
@@ -76,8 +78,7 @@ spec:
           - name: runner-config
             mountPath: /config
           - name: docker-auth
-            mountPath: /root/.docker/config.json
-            subPath: config.json
+            mountPath: /docker-auth-ro
           - name: lifecycle
             mountPath: /tmp
         - name: daemon
@@ -86,8 +87,9 @@ spec:
           - sh
           - -c
           - |
-            mkdir -p /etc/docker
+            mkdir -p /etc/docker /home/docker
             echo '{"insecure-registries":["zot.registry.svc:5000"]}' > /etc/docker/daemon.json
+            cp /docker-auth-ro/config.json /home/docker/config.json
             dockerd-entrypoint.sh &
             while [ ! -f /tmp/runner-done ]; do
               sleep 5
@@ -100,6 +102,8 @@ spec:
             value: /certs
           - name: DOCKER_HOST
             value: tcp://0.0.0.0:2376
+          - name: DOCKER_CONFIG
+            value: /home/docker
           securityContext:
             privileged: true
             runAsUser: 0
@@ -114,8 +118,7 @@ spec:
           - name: docker-certs
             mountPath: /certs
           - name: docker-auth
-            mountPath: /root/.docker/config.json
-            subPath: config.json
+            mountPath: /docker-auth-ro
           - name: lifecycle
             mountPath: /tmp
   minReplicaCount: 0
