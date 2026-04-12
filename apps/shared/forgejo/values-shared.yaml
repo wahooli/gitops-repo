@@ -245,6 +245,10 @@ gitea:
       MINIO_BASE_PATH: packages/
     repo-archive:
       MINIO_BASE_PATH: repo-archive/
+    actions:
+      ENABLED: true
+      DEFAULT_ACTIONS_URL: https://code.forgejo.org
+
     "storage.actions_log":
       MINIO_BASE_PATH: actions_log/
     "actions.artifacts":

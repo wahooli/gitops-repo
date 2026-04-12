@@ -182,6 +182,7 @@ patroni:
         postgresql:
           parameters:
             wal_level: logical
+            max_slot_wal_keep_size: 2GB
     watchdog:
       mode: off # yamllint disable-line rule:truthy
     etcd3:
@@ -200,6 +201,7 @@ patroni:
         max_prepared_transactions: 0
         max_worker_processes: 8
         max_connections: 100
+        max_slot_wal_keep_size: 2GB
         wal_compression: on # yamllint disable-line rule:truthy
         log_destination: stderr
         logging_collector: off # yamllint disable-line rule:truthy

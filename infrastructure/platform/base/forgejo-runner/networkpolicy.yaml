@@ -1,0 +1,90 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: forgejo-runner-restrict
+  namespace: forgejo-runners
+spec:
+  endpointSelector:
+    matchLabels:
+      app: forgejo-runner
+  egress:
+  # Allow DNS
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  # Allow Forgejo (local and remote clusters)
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: forgejo
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: forgejo
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
+    toPorts:
+    - ports:
+      - port: "3000"
+        protocol: TCP
+  # Allow Forgejo via gateway (local and remote clusters)
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: envoy-gateway-system
+        gateway.envoyproxy.io/owning-gateway-name: envoy-gw-private
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: envoy-gateway-system
+        k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-gw-private
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
+  # Allow external HTTPS (code.forgejo.org for actions, git.wahoo.li via LB)
+  - toEntities:
+    - world
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+  # Allow SeaweedFS (local and remote clusters)
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: seaweedfs
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: seaweedfs
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
+    toPorts:
+    - ports:
+      - port: "8333"
+        protocol: TCP
+  # Allow Zot registry (local and remote clusters)
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: registry
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: registry
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
+    toPorts:
+    - ports:
+      - port: "5000"
+        protocol: TCP

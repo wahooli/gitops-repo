@@ -33,6 +33,13 @@ filerSync:
     - -a.path=/buckets/forgejo-s3-data
     - -b.path=/buckets/forgejo-s3-data
     - -b.replication=001
+    - -isActivePassive
+  zot-registry:
+    enabled: true
+    args:
+    - -a.path=/buckets/zot-registry
+    - -b.path=/buckets/zot-registry
+    - -isActivePassive
   __base__:
     initContainers:
       wait-for-nas:
@@ -57,6 +64,7 @@ postUp:
   collections:
   - name: forgejo-s3-data
   - name: immich-data
+  - name: zot-registry
 
 resticBackup:
   enabled: true

@@ -6,7 +6,6 @@ resources:
 - gateway.yaml
 - gateway-private.yaml
 - http-https-redirect.yaml
-- referencegrant.yaml
 - clienttrafficpolicy.yaml
 - backendtrafficpolicy.yaml
 - media-streaming-policy.yaml

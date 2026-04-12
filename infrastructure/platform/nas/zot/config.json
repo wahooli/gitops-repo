@@ -1,0 +1,95 @@
+{
+  "distSpecVersion": "1.1.0",
+  "storage": {
+    "dedupe": false,
+    "rootDirectory": "/var/lib/registry",
+    "storageDriver": {
+      "name": "s3",
+      "regionendpoint": "http://seaweedfs-filer-nas.seaweedfs.svc.cluster.local:8333",
+      "region": "us-east-1",
+      "bucket": "zot-registry",
+      "accesskey": "${seaweedfs_zot_access_key}",
+      "secretkey": "${seaweedfs_zot_secret_key}",
+      "secure": false,
+      "skipverify": true,
+      "v4auth": true
+    },
+    "gc": true,
+    "gcDelay": "1h",
+    "gcInterval": "24h",
+    "subPaths": {
+      "/docker": { "rootDirectory": "/var/lib/registry/cache/docker" },
+      "/ghcr": { "rootDirectory": "/var/lib/registry/cache/ghcr" },
+      "/quay": { "rootDirectory": "/var/lib/registry/cache/quay" }
+    }
+  },
+  "http": {
+    "externalUrl": "https://registry.${domain_wahoo_li:=wahoo.li}",
+    "address": "0.0.0.0",
+    "port": "5000",
+    "compat": ["docker2s2"],
+    "auth": {
+      "htpasswd": {
+        "path": "/etc/zot/credentials/htpasswd"
+      },
+      "openid": {
+        "providers": {
+          "oidc": {
+            "issuer": "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/zot/",
+            "keypath": "",
+            "credentialsFile": "/etc/zot/credentials/oidc-credentials.json",
+            "scopes": ["openid", "profile", "email"]
+          }
+        }
+      },
+      "apikey": true
+    },
+    "accessControl": {
+      "repositories": {
+        "**": {
+          "defaultPolicy": ["read"],
+          "policies": [{
+            "users": ["${zot_admin_user}"],
+            "actions": ["read", "create", "update", "delete"]
+          },
+          {
+            "users": ["forgejorunner"],
+            "actions": ["read", "create", "update"]
+          }]
+        }
+      },
+      "adminPolicy": {
+        "users": ["${zot_admin_user}"],
+        "actions": ["read", "create", "update", "delete"]
+      }
+    }
+  },
+  "extensions": {
+    "search": { "enable": true },
+    "ui": { "enable": true },
+    "sync": {
+      "downloadDir": "/tmp/zot-sync",
+      "credentialsFile": "/etc/zot/credentials/sync-credentials.json",
+      "registries": [
+        {
+          "urls": ["https://registry-1.docker.io"],
+          "content": [{ "prefix": "**", "destination": "/docker" }],
+          "onDemand": true
+        },
+        {
+          "urls": ["https://ghcr.io"],
+          "content": [{ "prefix": "**", "destination": "/ghcr" }],
+          "onDemand": true
+        },
+        {
+          "urls": ["https://quay.io"],
+          "content": [{ "prefix": "**", "destination": "/quay" }],
+          "onDemand": true
+        }
+      ]
+    }
+  },
+  "log": {
+    "level": "warn"
+  }
+}

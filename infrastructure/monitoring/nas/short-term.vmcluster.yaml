@@ -51,10 +51,13 @@ spec:
       repository: victoriametrics/vmselect
       tag: v1.136.0-cluster # {"$imagepolicy": "flux-system:vmselect-cluster:tag"}
       pullPolicy: IfNotPresent
-    # resources:
-    #   limits:
-    #     cpu: "1"
-    #     memory: "500Mi"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 300Mi
+      limits:
+        cpu: 700m
+        memory: 1000Mi
     serviceSpec:
       useAsDefault: true
       spec:

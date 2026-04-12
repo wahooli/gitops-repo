@@ -31,7 +31,6 @@ spec:
       certificateRefs:
       - name: wahooli-wildcard-tls
         kind: Secret
-        namespace: infrastructure
     allowedRoutes:
       namespaces:
         from: All

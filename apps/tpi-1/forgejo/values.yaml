@@ -1,3 +1,8 @@
+service:
+  http:
+    annotations:
+      service.cilium.io/affinity: "remote"
+
 image:
   registry: code.forgejo.org
   repository: forgejo/forgejo

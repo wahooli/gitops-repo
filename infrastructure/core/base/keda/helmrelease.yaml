@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: keda--keda
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: keda
+  chart:
+    spec:
+      version: "2.19.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: keda-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: keda-values
+    valuesKey: values.yaml
+    optional: true
+  - kind: ConfigMap
+    name: keda-values
+    valuesKey: values-extra.yaml
+    optional: true
