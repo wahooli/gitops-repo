@@ -4,3 +4,13 @@ resources:
 - ../../shared/authentik
 - patroni
 - redis
+patches:
+- target:
+    kind: Deployment
+    name: authentik-apply-blueprints
+  patch: |
+    $patch: delete
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: authentik-apply-blueprints
