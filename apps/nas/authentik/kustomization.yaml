@@ -1,21 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../../base/authentik/helmrepository.yaml
-- ../../base/authentik/namespace.yaml
-- ../../base/authentik/helmrelease-remote-cluster.yaml
-- service.yaml
+- ../../shared/authentik
 - patroni
 - redis
-patches:
-- path: helmrelease-remote-cluster.yaml
-  target:
-    kind: HelmRelease
-    name: base-authentik-remote-cluster
-  options:
-    allowNameChange: true
-- path: namespace.yaml
-  target:
-    kind: Namespace
-  options:
-    allowNameChange: true

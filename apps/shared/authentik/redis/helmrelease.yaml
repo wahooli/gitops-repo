@@ -13,6 +13,10 @@ spec:
   valuesFrom:
   - kind: ConfigMap
     name: authentik-redis-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: authentik-redis-values
+    optional: true
     valuesKey: values.yaml
   - kind: ConfigMap
     name: authentik-redis-helmrelease-overrides
