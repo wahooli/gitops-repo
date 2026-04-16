@@ -1,12 +1,9 @@
 image:
   repository: chrislusf/seaweedfs
-  tag: "4.19" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
-
+  tag: "4.20" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
 fullNameOverride: seaweedfs-backup
-
 master:
   replicaCount: 1
-
 volume:
   replicaCount: 1
   args:
@@ -25,7 +22,6 @@ volume:
         resources:
           requests:
             storage: 1Ti
-
 postUp:
   enabled: true
   collections:
@@ -33,7 +29,6 @@ postUp:
   - name: nas-backups
   - name: tpi-1-backups
   - name: livingroom-pi-backups
-
 filer:
   replicaCount: 1
   podAnnotations:
