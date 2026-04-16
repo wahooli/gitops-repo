@@ -13,6 +13,40 @@ spec:
   - "jellyfin.${domain_absolutist_it:=absolutist.it}"
   - "jellyfin.${domain_wahoo_li:=wahoo.li}"
   rules:
+  # Root — no cache
+  - backendRefs:
+    - name: jellyfin
+      port: 8096
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "no-cache, no-store, must-revalidate"
+        - name: Pragma
+          value: "no-cache"
+    matches:
+    - path:
+        type: Exact
+        value: /
+    - path:
+        type: Exact
+        value: /web/index.html
+  # Static web assets — cached 30 days
+  - backendRefs:
+    - name: jellyfin
+      port: 8096
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "public, max-age=2592000"
+    matches:
+    - path:
+        type: PathPrefix
+        value: /web
+  # Everything else — default
   - backendRefs:
     - name: jellyfin
       port: 8096

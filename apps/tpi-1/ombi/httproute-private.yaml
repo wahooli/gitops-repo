@@ -32,7 +32,7 @@ spec:
     - path:
         type: PathPrefix
         value: /api
-  # Images & translations — explicitly cached
+  # Static assets — explicitly cached
   - backendRefs:
     - group: ""
       kind: Service
@@ -52,6 +52,12 @@ spec:
     - path:
         type: PathPrefix
         value: /translations
+    - path:
+        type: PathPrefix
+        value: /dist
+    - path:
+        type: PathPrefix
+        value: /assets
   # Everything else — default
   - backendRefs:
     - group: ""

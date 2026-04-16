@@ -13,6 +13,23 @@ spec:
   - "plex.${domain_absolutist_it:=absolutist.it}"
   - "plex.${domain_wahoo_li:=wahoo.li}"
   rules:
+  # Root — no cache
+  - backendRefs:
+    - name: plex
+      port: 32400
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "no-cache, no-store, must-revalidate"
+        - name: Pragma
+          value: "no-cache"
+    matches:
+    - path:
+        type: Exact
+        value: /
+  # Everything else — default
   - backendRefs:
     - name: plex
       port: 32400

@@ -15,6 +15,37 @@ spec:
   - "authentik.${domain_wahoo_li:=wahoo.li}"
   - "authentik.${domain_absolutist_it:=absolutist.it}"
   rules:
+  # Root — no cache
+  - backendRefs:
+    - name: authentik-server
+      port: 80
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "no-cache, no-store, must-revalidate"
+        - name: Pragma
+          value: "no-cache"
+    matches:
+    - path:
+        type: Exact
+        value: /
+  # Static assets — cached 1 year (content-hashed filenames)
+  - backendRefs:
+    - name: authentik-server
+      port: 80
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+    matches:
+    - path:
+        type: PathPrefix
+        value: /static
+  # Everything else — default
   - backendRefs:
     - name: authentik-server
       port: 80
