@@ -7,65 +7,63 @@ grand_parent: "tpi-1"
 # authentik
 
 ## Overview
-The `authentik` component is deployed in the `tpi-1` cluster and is responsible for providing authentication services. It utilizes Helm for deployment and is managed through Flux CD.
+`authentik` is an open-source identity provider designed to manage user authentication and authorization. It is deployed in the `authentik` namespace of the Kubernetes cluster `tpi-1`.
 
-## Namespace
-The component is deployed in the `authentik` namespace.
+## Deployment Details
 
-## Helm Releases
-### authentik
-- **Chart**: `authentik`
-- **Version**: `2025.12.4`
-- **Source**: [goauthentik](https://charts.goauthentik.io/)
-- **Interval**: 5 minutes
-- **Dependencies**:
-  - `authentik--authentik-redis`
-  - `authentik--authentik-patroni`
-- **Values**: Configurations are sourced from multiple ConfigMaps, including `authentik-values-gdhg2f68bm` and `authentik-helmrelease-overrides`.
+### Namespace
+- **Name**: `authentik`
 
-### authentik-remote-cluster
-- **Chart**: `authentik-remote-cluster`
-- **Version**: `2.0.0`
-- **Source**: [goauthentik](https://charts.goauthentik.io/)
-- **Interval**: 5 minutes
-- **Dependencies**:
-  - `authentik--authentik`
-- **Values**: Custom configurations for the remote cluster deployment.
+### Helm Repository
+- **Name**: `goauthentik`
+- **URL**: [https://charts.goauthentik.io/](https://charts.goauthentik.io/)
+- **Update Interval**: 24 hours
 
-### authentik--authentik-patroni
-- **Chart**: `patroni`
-- **Version**: `>=0.1.0-0`
-- **Source**: [wahooli](https://charts.wahooli.io/)
-- **Interval**: 5 minutes
-- **Dependencies**: 
-  - `cert-manager--cert-manager`
-  - `reflector--reflector`
-  - `etcd--etcd`
-- **Values**: Configurations are sourced from ConfigMaps, including `authentik-patroni-values-fctf8ct669` and `authentik-patroni-helmrelease-overrides`.
+### Helm Releases
+#### authentik--authentik
+- **Chart Version**: `2025.12.4`
+- **Release Name**: `authentik`
+- **Target Namespace**: `authentik`
+- **Update Interval**: 5 minutes
+- **Install Timeout**: 10 minutes
+- **Remediation**: Automatically retries on failure
 
-## Image Repositories
-- **authentik-server**: `ghcr.io/goauthentik/server`
-- **patroni-17**: `ghcr.io/wahooli/docker/patroni-17`
+### Dependencies
+- `authentik--authentik-redis`
+- `authentik--authentik-patroni`
 
-## HTTP Routes
-The `authentik` service is exposed through HTTP routes with the following hostnames:
-- `auth.wahoo.li`
-- `auth.absolutist.it`
-- `authentik.wahoo.li`
-- `authentik.absolutist.it`
+### Configuration
+The deployment uses several ConfigMaps for configuration values:
+- **Base Values**: `values-base.yaml`
+- **Shared Values**: `values-shared.yaml`
+- **Optional Values**: `values.yaml` (from `authentik-helmrelease-overrides`)
 
-## Deployments
-### authentik-apply-blueprints
-- **Replicas**: 1
-- **Init Container**: Runs a script to apply blueprints using the `authentik` API.
+### Image Repository
+- **Name**: `authentik-server`
+- **Image**: `ghcr.io/goauthentik/server`
+- **Update Interval**: 24 hours
 
-## Configuration
-The configuration for `authentik` includes:
-- Logging settings
-- Database connection details for PostgreSQL and Redis
-- Email server configurations
-- TLS settings for secure connections
+### HTTP Routes
+- **Hostnames**:
+  - `auth.wahoo.li`
+  - `auth.absolutist.it`
+  - `authentik.wahoo.li`
+  - `authentik.absolutist.it`
+- **Backend Reference**: `authentik-server` on port 80
+
+## RBAC Configuration
+- **Service Account**: `authentik` in the `default` namespace
+- **Cluster Role**: `authentik-outpost`
+- **Role Bindings**: 
+  - `authentik-outpost` in both `default` and `authentik` namespaces
+
+## Scripts and Blueprints
+- A ConfigMap contains a script for applying blueprints to the authentik instance, ensuring that the application is ready before executing further tasks.
+- Blueprints for initializing groups and policies are defined in separate YAML files within a ConfigMap.
 
 ## Notes
-- The deployment is managed using Flux CD, ensuring that the desired state is maintained.
-- The `authentik` component is designed to be resilient, with automatic remediation for failures and configurable timeouts for installations.
+- The deployment is configured to use TLS for Redis and PostgreSQL connections.
+- Email settings are configured for sending notifications.
+- The deployment includes metrics collection for monitoring purposes.
+
+This documentation provides a comprehensive overview of the `authentik` deployment in the Kubernetes cluster, detailing its configuration, dependencies, and operational aspects.

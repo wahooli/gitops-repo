@@ -5,7 +5,7 @@ nav_order: 0
 
 # GitOps Repository Documentation
 
-This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kustomize, and Helm. It provides a structured approach to deploying applications and managing infrastructure across different environments.
+This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kustomize, and Helm. It provides a structured approach to deploying and managing applications and infrastructure across different environments.
 
 ### livingroom-pi
 - [Cluster overview](livingroom-pi/overview.md)
