@@ -7,7 +7,7 @@ grand_parent: "nas"
 # zot
 
 ## Overview
-Zot is a container image registry that provides a reliable and efficient way to store and manage container images. Deployed in the `nas` cluster, it facilitates image storage with features such as caching, access control, and external authentication. This deployment utilizes a Helm chart to manage its lifecycle and configuration.
+Zot is a container image registry that provides a secure and efficient way to store and manage container images. Deployed in the `nas` cluster, it serves as a private registry for storing images, with features such as caching, access control, and synchronization with public registries.
 
 ## Sub-components
 This deployment consists of a single HelmRelease:
@@ -15,10 +15,7 @@ This deployment consists of a single HelmRelease:
   - **Chart**: `zot`
   - **Version**: `0.1.104`
   - **Target Namespace**: `registry`
-  - **Provides**: A StatefulSet for managing the Zot application, a Service for exposing it, and a ServiceAccount for permissions.
-
-## Dependencies
-No dependencies are specified for this HelmRelease.
+  - **Provides**: A StatefulSet for managing the Zot registry application, a Service for accessing it, and a ServiceAccount for permissions.
 
 ## Helm Chart(s)
 - **Chart Name**: `zot`
@@ -27,25 +24,25 @@ No dependencies are specified for this HelmRelease.
 
 ## Resource Glossary
 ### Networking
-- **Service**: Exposes the Zot application on port 5000, allowing access to the registry. It is configured with annotations for Cilium networking to manage traffic affinity and global access.
-  
+- **Service**: A NodePort service named `zot` that exposes the registry on port 5000, allowing external access to the registry.
+
 ### Storage
-- **StatefulSet**: Manages the deployment of the Zot application, ensuring that it maintains its state across restarts. It includes a volume claim template for persistent storage, requesting 10Gi of storage with ReadWriteOnce access mode.
+- **StatefulSet**: Manages the deployment of the Zot application, ensuring that it maintains state across restarts. It includes a volume claim template for persistent storage, requesting 10Gi of storage with ReadWriteOnce access mode.
 
 ### Security
-- **ServiceAccount**: Provides the necessary permissions for the Zot application to interact with the Kubernetes API.
+- **ServiceAccount**: A service account named `zot` that provides the necessary permissions for the Zot application to interact with the Kubernetes API.
 
 ### Configuration
-- **ConfigMap**: Stores configuration data for Zot, including the main configuration file (`config.json`) and additional Helm values. This allows for flexible configuration management.
+- **ConfigMap**: Contains configuration data for the Zot registry, including settings for storage, HTTP access, and authentication.
 
 ## Configuration Highlights
-- **Persistence**: Enabled with a persistent volume claim requesting 10Gi of storage.
-- **Service Type**: Configured as `NodePort` to expose the service externally.
-- **Access Control**: Configured with external secrets for credentials management and various authentication methods.
-- **Image Tag**: Uses `ghcr.io/project-zot/zot:v2.1.15` for the application image.
+- **Persistence**: The StatefulSet is configured to use a persistent volume with a size of 10Gi.
+- **Service Type**: The service is of type NodePort, allowing external access to the registry.
+- **Access Control**: The configuration includes settings for user permissions and authentication methods (e.g., htpasswd, OpenID).
+- **Environment Variables**: The configuration uses Flux variables for sensitive information such as access keys and user credentials.
 
 ## Deployment
 - **Target Namespace**: `registry`
 - **Release Name**: `zot`
-- **Reconciliation Interval**: `10m`
-- **Install/Upgrade Behavior**: The HelmRelease is set to retry indefinitely on failure with a timeout of 10 minutes for installation.
+- **Reconciliation Interval**: 10 minutes
+- **Install/Upgrade Behavior**: The HelmRelease is set to retry indefinitely on failure, with a timeout of 10 minutes for installation.
