@@ -5,6 +5,9 @@ runtimeClassName: nvidia
 strategy:
   type: Recreate
 hostNetwork: true
+probe:
+  startup:
+    failureThreshold: 300
 metrics:
   enabled: true
   # dockerModsUrl: ghcr.io/linuxserver/mods
