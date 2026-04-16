@@ -31,6 +31,9 @@ spec:
         value: /
     - path:
         type: Exact
+        value: /web/
+    - path:
+        type: Exact
         value: /web/index.html
   # Static web assets — cached 30 days
   - backendRefs:
