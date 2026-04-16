@@ -7,7 +7,7 @@ grand_parent: "nas"
 # plex
 
 ## Overview
-The `plex` component deploys a Plex Media Server in the Kubernetes cluster, allowing users to manage and stream their media collections. It utilizes a Helm chart to manage its deployment and configuration, ensuring that the application is easily updatable and maintainable.
+The `plex` component deploys the Plex Media Server in the Kubernetes cluster, enabling users to stream media content. It leverages a Helm chart to manage its deployment and configuration, ensuring that the application is easily maintainable and scalable.
 
 ## Sub-components
 This deployment consists of a single HelmRelease:
@@ -27,26 +27,26 @@ No dependencies are specified for this HelmRelease.
 
 ## Resource Glossary
 ### Networking
-- **HTTPRoute**: Manages HTTP traffic routing to the Plex service, allowing access via specified hostnames.
-- **Service**: Exposes the Plex Media Server on port 32400 for HTTP traffic and port 1900 for DLNA UDP traffic.
+- **HTTPRoute**: Manages routing for the Plex service, allowing access via specified hostnames. It directs traffic to the Plex service on port 32400.
 
 ### Storage
-- **PersistentVolumeClaim**: Requests a persistent volume for storing Plex configuration and media data, with a storage request of 70Gi.
+- **PersistentVolumeClaim**: Requests 70Gi of storage for the Plex configuration, ensuring that media library data persists across pod restarts.
 
 ### Security
 - **ServiceAccount**: Provides an identity for the Plex application to interact with the Kubernetes API.
 
-### Configuration
-- **ConfigMap**: Contains various configuration scripts and environment variables necessary for the Plex Media Server operation, including initialization scripts and NVIDIA library fixes.
+### Application Workload
+- **Deployment**: Manages the Plex Media Server application, ensuring it runs with the specified configuration, including resource limits and environment variables.
+- **ConfigMap**: Contains scripts and configuration data for initializing the Plex server and fixing NVIDIA library paths.
 
 ## Configuration Highlights
-- **Resource Requests/Limits**: The Plex Media Server is configured with CPU and memory limits of 100m and 100Mi, respectively.
-- **Persistence**: The configuration is stored in a PersistentVolumeClaim with a request for 70Gi of storage.
-- **Environment Variables**: Configures NVIDIA driver capabilities and timezone settings via a ConfigMap.
-- **Init Containers**: Includes an init container for importing existing Plex configurations from a tarball.
+- **Resource Requests/Limits**: The Plex deployment requests 100m CPU and 100Mi memory.
+- **Persistence**: A PersistentVolumeClaim is created to ensure that the Plex configuration is stored persistently.
+- **Environment Variables**: Configured through ConfigMaps, including settings for NVIDIA drivers and timezone.
+- **Custom Scripts**: Includes initialization scripts for importing existing media libraries and fixing NVIDIA library paths.
 
 ## Deployment
 - **Target Namespace**: `default`
 - **Release Name**: `plex`
 - **Reconciliation Interval**: 5 minutes
-- **Install/Upgrade Behavior**: The HelmRelease is set to retry indefinitely on failure with a timeout of 15 minutes for installation.
+- **Install/Upgrade Behavior**: The HelmRelease is set to retry indefinitely on failure, with a timeout of 15 minutes for installations.
