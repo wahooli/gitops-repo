@@ -1,4 +1,3 @@
-
 gitea:
   config:
     storage:
