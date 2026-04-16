@@ -6,79 +6,75 @@ grand_parent: "nas"
 
 # kube-state-metrics
 
-## Overview
-The `kube-state-metrics` component is deployed in the `nas` cluster to provide Kubernetes cluster state metrics for monitoring and observability. It is managed using FluxCD and HelmRelease resources.
+The `kube-state-metrics` component is deployed in the `kube-system` namespace of the `nas` cluster using Flux CD. This component provides metrics about the state of Kubernetes objects, which can be scraped by Prometheus.
 
-## Helm Chart Details
-- **Chart Name**: `kube-state-metrics`
-- **Version**: `7.2.0`
-- **Source Repository**: `prometheus-community`
+## Deployment Details
+
+- **Helm Chart**: `kube-state-metrics`
+- **Version**: 7.2.2
+- **Helm Repository**: `prometheus-community`
 - **Release Name**: `kube-state-metrics`
 - **Target Namespace**: `kube-system`
-
-## Dependencies
-This deployment depends on the following HelmRelease:
-- **Name**: `prometheus-operator--prometheus-operator-crds`
-- **Namespace**: `flux-system`
+- **Update Interval**: 10 minutes
+- **Dependencies**: 
+  - `prometheus-operator--prometheus-operator-crds`
 
 ## Configuration
+
 The deployment is configured using values from two ConfigMaps:
-- **ConfigMap Name**: `kube-state-metrics-values-52k4bbt862`
-  - **Key**: `values-base.yaml`
-  - **Key**: `values.yaml`
+- `kube-state-metrics-values-52k4bbt862` with keys:
+  - `values-base.yaml`
+  - `values.yaml`
 
-### Key Configuration Highlights
+### Key Configuration Options
+
 - **Prometheus Scrape**: Enabled (`prometheusScrape: true`)
-- **RBAC**: Enabled (`rbac.create: true`)
-- **Replicas**: `1`
-- **Service Type**: `ClusterIP`
-- **Pod Security Context**:
-  - `runAsUser`: `65534`
-  - `runAsGroup`: `65534`
-  - `fsGroup`: `65534`
-  - `runAsNonRoot`: `true`
-- **Collectors**: Metrics for various Kubernetes resources are enabled, including:
-  - Pods, Deployments, Services, Nodes, PersistentVolumes, etc.
+- **Replicas**: 1
+- **Service Type**: ClusterIP
+- **RBAC**: Enabled with a ClusterRole
+- **Service Account**: Created with automounting of API credentials enabled
 
-### Custom Resource State Metrics
-The deployment is configured to collect custom resource state metrics for FluxCD resources, including:
-- `Kustomization`
-- `HelmRelease`
-- `GitRepository`
-- `Bucket`
-- `HelmRepository`
-- `HelmChart`
+### Metrics Collection
 
-These metrics provide detailed insights into the state of GitOps Toolkit resources.
+The following Kubernetes resources are collected by `kube-state-metrics`:
+- Certificatesigningrequests
+- Configmaps
+- Cronjobs
+- Daemonsets
+- Deployments
+- Endpoints
+- Horizontalpodautoscalers
+- Ingresses
+- Jobs
+- Leases
+- Limitranges
+- Mutatingwebhookconfigurations
+- Namespaces
+- Networkpolicies
+- Nodes
+- Persistentvolumeclaims
+- Persistentvolumes
+- Poddisruptionbudgets
+- Pods
+- Replicasets
+- Replicationcontrollers
+- Resourcequotas
+- Secrets
+- Services
+- Statefulsets
+- Storageclasses
+- Validatingwebhookconfigurations
+- Volumeattachments
 
-## Image Management
-- **Image Repository**: `ghcr.io/prometheus-community/charts/kube-state-metrics`
-- **Image Policy**: SemVer range `x.x.x` for automatic updates.
+## Image Repository
 
-## Update Strategy
-- **Install Remediation**: Unlimited retries (`retries: -1`)
-- **Interval**: `10m`
-
-## Additional Features
-- **Custom Resource State**: Enabled with specific configurations for monitoring GitOps Toolkit resources.
-- **Pod Security Policy**: Disabled.
-- **Network Policy**: Disabled.
-- **Self-Monitoring**: Disabled.
-- **Vertical Pod Autoscaler**: Disabled.
-
-## Probes
-- **Liveness Probe**: Configured with a 5-second initial delay.
-- **Readiness Probe**: Configured with a 5-second initial delay.
-- **Startup Probe**: Disabled.
-
-## Deployment Strategy
-- **Update Strategy**: Default is `RollingUpdate`.
-
-## Resource Management
-- **Resource Requests and Limits**: Not explicitly defined, allowing flexibility for deployment in resource-constrained environments.
+- **Image**: `ghcr.io/prometheus-community/charts/kube-state-metrics`
+- **Image Policy**: Set to track semantic versioning.
 
 ## Additional Notes
-- The deployment uses FluxCD annotations and labels for integration with the GitOps workflow.
-- The `kube-state-metrics` chart is configured to provide metrics for monitoring Kubernetes resources and custom GitOps Toolkit resources, enabling comprehensive observability for the cluster.
 
-For more details on the configuration options, refer to the [kube-state-metrics documentation](https://github.com/kubernetes/kube-state-metrics).
+- The deployment includes configurations for security contexts, probes (liveness, readiness), and resource limits.
+- Custom metrics can be configured through the `customResourceState` settings.
+- The deployment supports vertical pod autoscaling, though it is currently disabled.
+
+This documentation provides a comprehensive overview of the `kube-state-metrics` deployment, its configuration, and its operational parameters within the Kubernetes cluster.

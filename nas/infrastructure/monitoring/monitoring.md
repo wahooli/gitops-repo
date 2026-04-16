@@ -6,107 +6,74 @@ grand_parent: "nas"
 
 # monitoring
 
-The `monitoring` component is deployed in the `nas` cluster and is responsible for collecting and managing metrics using VictoriaMetrics and related tools. This deployment includes several key resources and configurations to ensure effective monitoring of the cluster.
+The `monitoring` component is deployed in the `nas` cluster and utilizes VictoriaMetrics for metrics collection and monitoring. It consists of several sub-components, including VMCluster, VMNodeScrape, and VMServiceScrape, which are configured to scrape metrics from various sources within the Kubernetes environment.
 
-## Namespace
+## Sub-components
+
+### VMCluster
+- **Name**: `long-term`
 - **Namespace**: `monitoring`
-  - This namespace is dedicated to all monitoring-related resources.
+- **Image**: 
+  - `vminsert`: `victoriametrics/vminsert:v1.140.0-cluster`
+  - `vmselect`: `victoriametrics/vmselect:v1.140.0-cluster`
+  - `vmstorage`: `victoriametrics/vmstorage:v1.140.0-cluster`
+- **Replication Factor**: 1
+- **Retention Period**: 12 months
+- **Service Specifications**: 
+  - All services are of type `ClusterIP` with specific annotations for Cilium.
+
+### VMNodeScrape
+- **Scrapes**:
+  - `cadvisor`: Scrapes metrics from cAdvisor.
+  - `kubelet`: Scrapes metrics from the Kubelet.
+  - `probes`: Scrapes metrics from probe endpoints.
+  - `resources`: Scrapes resource metrics.
+- **Interval**: 30 seconds
+- **Bearer Token**: Uses service account token for authentication.
+
+### VMPodScrape
+- **Scrapes**:
+  - `cert-manager`: Scrapes metrics from the cert-manager pods.
+  - `fluxcd`: Scrapes metrics from FluxCD components.
+  - `node-exporter`: Scrapes metrics from the node-exporter.
+  - `topolvm`: Scrapes metrics from TopoLVM components.
+  - `envoy-gateway-proxy`: Scrapes metrics from Envoy Gateway proxy.
+- **Job Labels**: Various labels are used to identify the jobs.
+
+### VMServiceScrape
+- **Scrapes**:
+  - `authentik`: Scrapes metrics from the Authentik service.
+  - `envoy-gateway-controller`: Scrapes metrics from the Envoy Gateway controller.
+  - `kube-dns`: Scrapes metrics from CoreDNS.
+  - `kube-state-metrics`: Scrapes metrics from kube-state-metrics.
+  - `velero`: Scrapes metrics from Velero.
+  - `victoria-metrics-operator`: Scrapes metrics from the VictoriaMetrics operator.
+  
+### VMStaticScrape
+- **Scrapes**:
+  - `vps-node-exporter`: Scrapes metrics from static node exporters.
+  - `vps-haproxy`: Scrapes metrics from HAProxy instances.
+  - `vps-cert-metrics`: Scrapes certificate metrics from specified targets.
+
+## Services
+- **Services**:
+  - `vmagent-tpi-1`: Exposes metrics on port 8429.
+  - `vmclusterlb-short-term-tpi-1`: Exposes metrics on port 8427.
+  - `vminsert-short-term-tpi-1-server`: Exposes metrics on port 8480.
+  - `vmstorage-short-term-tpi-1-server`: Exposes multiple metrics ports.
 
 ## HTTPRoute
 - **Name**: `vmauth-global-write`
-  - **Hostnames**: 
-    - `vm-write.wahoo.li`
-    - `vm-write.absolutist.it`
-  - **Backend**: 
-    - Points to the service `vmauth-global-write` on port `8427`.
+- **Namespace**: `monitoring`
+- **Hostnames**: 
+  - `vm-write.wahoo.li`
+  - `vm-write.absolutist.it`
+- **Backend Reference**: Points to `vmauth-global-write` service on port 8427.
 
 ## Image Repositories and Policies
-The following image repositories and policies are configured to manage the images for the monitoring components:
+- **Image Repositories**: 
+  - `vmselect`, `vminsert`, `vmstorage`, `vmagent` with a 24-hour update interval.
+- **Image Policies**: 
+  - Policies defined for each image repository to manage versioning and updates.
 
-1. **Image Repository**: `vmselect`
-   - **Image**: `victoriametrics/vmselect`
-   - **Update Interval**: 24h
-
-2. **Image Policy**: `vmselect-cluster`
-   - **Filter Tags**: Matches versions in the format `vX.Y.Z-cluster`.
-
-3. **Image Repository**: `vminsert`
-   - **Image**: `victoriametrics/vminsert`
-   - **Update Interval**: 24h
-
-4. **Image Policy**: `vminsert-cluster`
-   - **Filter Tags**: Matches versions in the format `vX.Y.Z-cluster`.
-
-5. **Image Repository**: `vmstorage`
-   - **Image**: `victoriametrics/vmstorage`
-   - **Update Interval**: 24h
-
-6. **Image Policy**: `vmstorage-cluster`
-   - **Filter Tags**: Matches versions in the format `vX.Y.Z-cluster`.
-
-7. **Image Repository**: `vmagent`
-   - **Image**: `victoriametrics/vmagent`
-   - **Update Interval**: 24h
-
-8. **Image Policy**: `vmagent`
-   - **Filter Tags**: Matches versions in the format `vX.Y.Z`.
-
-## VMCluster
-- **Name**: `long-term`
-  - **Image Tags**: 
-    - `vminsert`: `v1.136.0-cluster`
-    - `vmselect`: `v1.136.0-cluster`
-    - `vmstorage`: `v1.136.0-cluster`
-  - **Replication Factor**: 1
-  - **Retention Period**: 12 months
-  - **Service Specifications**: All services are configured with `ClusterIP` type and specific annotations for Cilium.
-
-## Services
-The following services are created to expose the monitoring components:
-
-1. **Service**: `vmagent-tpi-1`
-   - **Port**: 8429
-
-2. **Service**: `vmclusterlb-short-term-tpi-1`
-   - **Port**: 8427
-
-3. **Service**: `vminsert-short-term-tpi-1-server`
-   - **Port**: 8480
-
-4. **Service**: `vmstorage-short-term-tpi-1-server`
-   - **Ports**: 
-     - 8482 (http)
-     - 8401 (vmselect)
-     - 8400 (vminsert)
-
-5. **Service**: `vmstorage-short-term-tpi-1`
-   - **Ports**: 
-     - 8482 (http)
-     - 8401 (vmselect)
-     - 8400 (vminsert)
-
-## VMNodeScrape
-Multiple `VMNodeScrape` resources are configured to scrape metrics from various sources:
-
-- **Node Scrapes**: 
-  - `cadvisor`, `kubelet`, `probes`, `resources` are configured to scrape metrics from nodes at a 30s interval.
-  
-## VMPodScrape
-Pod-level scraping is configured for various applications including:
-
-- **Pod Scrapes**: 
-  - `cert-manager`, `fluxcd`, `node-exporter`, `topolvm`, `envoy-gateway-proxy` are set up to collect metrics from specific namespaces and applications.
-
-## VMServiceScrape
-Service-level scraping is configured for services such as:
-
-- **Service Scrapes**: 
-  - `authentik`, `envoy-gateway-controller`, `kube-dns`, `kube-state-metrics`, `velero`, `victoria-metrics-operator` are set up to scrape metrics from services across different namespaces.
-
-## VMStaticScrape
-Static scraping configurations are set for specific targets:
-
-- **Static Scrapes**: 
-  - `vps-node-exporter`, `vps-haproxy`, `vps-cert-metrics` are configured to scrape metrics from predefined static endpoints.
-
-This comprehensive setup ensures that the monitoring component effectively collects, processes, and exposes metrics for the applications running in the `nas` cluster.
+This setup provides a comprehensive monitoring solution for the Kubernetes cluster, ensuring that metrics are collected, stored, and made available for analysis and alerting.

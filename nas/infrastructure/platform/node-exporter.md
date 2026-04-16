@@ -4,60 +4,37 @@ parent: "Infrastructure / Platform"
 grand_parent: "nas"
 ---
 
-# Node Exporter
+# node-exporter
 
 ## Overview
-The Node Exporter component provides system-level metrics for Kubernetes nodes, enabling monitoring of hardware and operating system metrics such as CPU usage, memory, disk I/O, and network statistics. It is deployed as a DaemonSet, ensuring that an instance runs on every node in the cluster. This component is essential for collecting metrics used by Prometheus and other monitoring tools.
+The `node-exporter` component is responsible for exposing metrics about the node's hardware and operating system, which are essential for monitoring and performance analysis in a Kubernetes cluster. It runs as a DaemonSet, ensuring that metrics are collected from each node in the cluster.
 
 ## Dependencies
-The Node Exporter HelmRelease depends on `prometheus-operator--prometheus-operator-crds`, which provides the necessary Custom Resource Definitions (CRDs) for Prometheus Operator. These CRDs enable integration with Prometheus for scraping metrics from Node Exporter.
+The `node-exporter` HelmRelease depends on the `prometheus-operator--prometheus-operator-crds`, which provides the necessary Custom Resource Definitions (CRDs) for Prometheus to scrape metrics from the node-exporter.
 
 ## Helm Chart(s)
-- **Chart Name**: prometheus-node-exporter  
-- **Repository**: prometheus-community (https://prometheus-community.github.io/helm-charts)  
-- **Version**: 4.52.0  
+- **Chart Name:** prometheus-node-exporter
+- **Repository:** prometheus-community (https://prometheus-community.github.io/helm-charts)
+- **Version:** 4.53.1
 
 ## Resource Glossary
-### Networking
-- **Service**:  
-  - Name: `node-exporter`  
-  - Type: `ClusterIP`  
-  - Port: `9100`  
-  - Purpose: Exposes the metrics endpoint for Prometheus to scrape.  
-
 ### Security
-- **ServiceAccount**:  
-  - Name: `node-exporter`  
-  - Automount Service Account Token: Disabled for enhanced security.  
+- **ServiceAccount:** A dedicated service account named `node-exporter` is created to manage permissions for the node-exporter pods.
+
+### Networking
+- **Service:** A ClusterIP service named `node-exporter` is created to expose the metrics endpoint on port 9100. It allows Prometheus to scrape metrics from the node-exporter.
 
 ### Workload
-- **DaemonSet**:  
-  - Name: `node-exporter`  
-  - Ensures that Node Exporter runs on every node in the cluster.  
-  - Security Context:  
-    - Runs as a non-root user (`65534`).  
-    - Read-only root filesystem for container security.  
-  - Host Network: Enabled to bind directly to the node's network interface.  
-  - Node Affinity: Ensures deployment only on Linux nodes and excludes virtual-kubelet and Fargate nodes.  
-  - Tolerations: Allows scheduling on nodes with `NoSchedule` taints.  
-  - Volumes:  
-    - `/proc`, `/sys`, and `/` mounted from the host for accessing system-level metrics.  
+- **DaemonSet:** The `node-exporter` runs as a DaemonSet, ensuring that an instance of the node-exporter is deployed on each node in the cluster. It collects metrics from the host's filesystem, network interfaces, and other system components.
 
 ## Configuration Highlights
-- **Extra Arguments**:  
-  - Excludes specific filesystem mount points and network devices from metrics collection to avoid unnecessary data.  
-  - Disables collectors for XFS, tapestats, bonding, bcache, and other unused subsystems.  
-  - Configures logging format as JSON for structured logging.  
-- **Environment Variables**:  
-  - `HOST_IP`: Set to `0.0.0.0` to bind the metrics endpoint to all interfaces.  
-- **Probes**:  
-  - Liveness and readiness probes are configured to ensure the container is healthy and ready to serve metrics.  
+- **Extra Arguments:** The node-exporter is configured with several command-line arguments to exclude certain filesystem mount points and network devices from metrics collection.
+- **Host Networking:** The node-exporter pods run in host network mode, allowing them to access the host's network stack.
+- **Security Context:** The container runs as a non-root user with a read-only root filesystem for enhanced security.
+- **Probes:** Liveness and readiness probes are configured to ensure the node-exporter is healthy and ready to serve metrics.
 
 ## Deployment
-- **Target Namespace**: `kube-system`  
-- **Release Name**: `node-exporter`  
-- **Reconciliation Interval**: 10 minutes  
-- **Install/Upgrade Behavior**:  
-  - Unlimited retries for remediation in case of installation or upgrade failures.  
-
-This component is configured to provide reliable and secure metrics collection for all nodes in the cluster, with integration into Prometheus for monitoring and alerting.
+- **Target Namespace:** kube-system
+- **Release Name:** node-exporter
+- **Reconciliation Interval:** 10m
+- **Install Behavior:** The HelmRelease is set to retry indefinitely on failure, ensuring that the node-exporter is always running.
