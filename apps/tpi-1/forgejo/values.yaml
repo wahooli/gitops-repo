@@ -1,3 +1,9 @@
+
+gitea:
+  config:
+    storage:
+      MINIO_ENDPOINT: seaweedfs-filer-tpi-1.seaweedfs.svc.cluster.local:8333
+
 service:
   http:
     annotations:

@@ -22,6 +22,7 @@ filer:
         service.cilium.io/global: "true"
         service.cilium.io/affinity: "local"
     tpi-1:
+      omitSelector: true
       annotations:
         service.cilium.io/global: "true"
         service.cilium.io/affinity: "remote"
@@ -33,13 +34,11 @@ filerSync:
     - -a.path=/buckets/forgejo-s3-data
     - -b.path=/buckets/forgejo-s3-data
     - -b.replication=001
-    - -isActivePassive
   zot-registry:
     enabled: true
     args:
     - -a.path=/buckets/zot-registry
     - -b.path=/buckets/zot-registry
-    - -isActivePassive
   __base__:
     resources:
       requests:
