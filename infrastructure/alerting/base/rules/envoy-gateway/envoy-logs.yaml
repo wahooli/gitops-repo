@@ -1,0 +1,24 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: envoy-gateway-logs
+  namespace: alerting
+  labels:
+    victoriametrics.com/rule-type: vlogs
+spec:
+  groups:
+  - name: envoy-gateway-logs
+    params: {}
+    type: vlogs
+    rules:
+    - alert: ServerErrors
+      annotations:
+        description: "Connection from address {{$labels.client_ip}} has encountered {{$labels.status}} error at {{$labels.vhost}}"
+        summary: "HTTP error {{$labels.status}} has occured"
+      expr: _time:60m method:!"" status:"~5.*" {source_type="kubernetes_logs", kubernetes.pod_namespace="envoy-gateway-system"} | stats by (client_ip, vhost, status) count() as errorLog | filter errorLog:>0
+      for: 10s
+      labels:
+        severity: warning
+        explore_expression: method:!"" status:"~5.*" {source_type="kubernetes_logs", kubernetes.pod_namespace="envoy-gateway-system"}
+        timespan: 15m
+        # show_at: dashboard

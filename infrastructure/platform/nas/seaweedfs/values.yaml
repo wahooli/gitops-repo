@@ -41,6 +41,13 @@ filerSync:
     - -b.path=/buckets/zot-registry
     - -isActivePassive
   __base__:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
     initContainers:
       wait-for-nas:
         image: ghcr.io/wahooli/docker/wait-for-it:latest
@@ -53,11 +60,20 @@ filerSync:
         image: ghcr.io/wahooli/docker/wait-for-it:latest
         imagePullPolicy: IfNotPresent
         args:
-        - seaweedfs-filer-lb.seaweedfs.svc.cluster.local:8888
+        - seaweedfs-filer-nas.seaweedfs.svc.cluster.local:8888
         - -t
         - "300"
     env:
+      SOURCE_FILER: "seaweedfs-filer-nas.seaweedfs.svc.cluster.local:8888"
       TARGET_FILER: "seaweedfs-filer-tpi-1.seaweedfs.svc.cluster.local:8888"
+      GOMAXPROCS:
+        valueFrom:
+          resourceFieldRef:
+            resource: limits.cpu
+      GOMEMLIMIT:
+        valueFrom:
+          resourceFieldRef:
+            resource: limits.memory
 
 postUp:
   enabled: true
