@@ -63,8 +63,9 @@ filer:
     lb:
       annotations:
         service.cilium.io/global: "true"
-        service.cilium.io/affinity: "remote"
+        service.cilium.io/affinity: "local"
     nas:
+      omitSelector: true
       annotations:
         service.cilium.io/global: "true"
         service.cilium.io/affinity: "remote"
