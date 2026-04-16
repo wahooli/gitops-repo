@@ -20,6 +20,51 @@ spec:
     backendRefs:
     - name: ak-outpost-proxy-default
       port: 9000
+  # Root — no cache
+  - backendRefs:
+    - name: bazarr
+      port: 6767
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "no-cache, no-store, must-revalidate"
+        - name: Pragma
+          value: "no-cache"
+    matches:
+    - path:
+        type: Exact
+        value: /
+  # Static assets — cached 7 days
+  - backendRefs:
+    - name: bazarr
+      port: 6767
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "public, max-age=604800"
+    matches:
+    - path:
+        type: PathPrefix
+        value: /assets
+    - path:
+        type: PathPrefix
+        value: /images
+  # API — extended timeout
+  - backendRefs:
+    - name: bazarr
+      port: 6767
+    matches:
+    - path:
+        type: PathPrefix
+        value: /api
+    timeouts:
+      request: 300s
+      backendRequest: 300s
+  # Everything else — default
   - backendRefs:
     - name: bazarr
       port: 6767
