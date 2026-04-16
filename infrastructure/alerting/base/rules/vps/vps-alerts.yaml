@@ -120,7 +120,7 @@ spec:
       annotations:
         description: "Certificate {{ $labels.domain }} on {{ $labels.instance }} expires in {{ $value }} days."
         summary: SSL certificate expiring.
-      expr: cert_expiry_days_remaining{source="vps"} < 30
+      expr: cert_expiry_days_remaining{source="vps"} < 25
       for: 1h
       labels:
         severity: warning

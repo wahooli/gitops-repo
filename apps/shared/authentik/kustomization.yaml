@@ -1,0 +1,54 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/authentik
+- rbac
+- blueprint-apply-job.yaml
+- imagepolicy.yaml
+- httproute.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+    name: base-authentik
+  options:
+    allowNameChange: true
+- path: namespace.yaml
+  target:
+    kind: Namespace
+  options:
+    allowNameChange: true
+configMapGenerator:
+- name: authentik-values
+  namespace: flux-system
+  behavior: merge
+  files:
+  - values-shared.yaml=values.yaml
+  options:
+    labels:
+      velero.io/exclude-from-backup: "true"
+- name: authentik-blueprint-apply-script
+  namespace: authentik
+  files:
+  - blueprint-apply.sh
+- name: authentik-blueprints
+  namespace: authentik
+  files:
+  - 00-groups.yaml=blueprints/groups.yaml
+  - 01-policies-shared.yaml=blueprints/policies-shared.yaml
+  - 02-plex-source.yaml=blueprints/plex-source.yaml
+  - 03-flow-user-settings.yaml=blueprints/flow-user-settings.yaml
+  - 04-brand-auth-wahooli.yaml=blueprints/brand-auth-wahooli.yaml
+  - 05-flow-password-reset.yaml=blueprints/flow-password-reset.yaml
+  - 06-flow-login.yaml=blueprints/flow-login.yaml
+  - 07-flow-ldap-login.yaml=blueprints/flow-ldap-login.yaml
+  - 08-flow-sso-login.yaml=blueprints/flow-sso-login.yaml
+  - 09-flow-sso-registration.yaml=blueprints/flow-sso-registration.yaml
+  - 10-flow-plex-registration.yaml=blueprints/flow-plex-registration.yaml
+  - 11-flow-register.yaml=blueprints/flow-register.yaml
+  - 12-users.yaml=blueprints/users.yaml
+  - 13-applications.yaml=blueprints/applications.yaml
+  - 14-outposts.yaml=blueprints/outposts.yaml
+configurations:
+- ../../.config/valuesFrom.yaml
+- kustomizeconfig.yaml

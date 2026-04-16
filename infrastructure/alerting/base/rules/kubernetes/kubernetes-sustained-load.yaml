@@ -1,0 +1,47 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: kubernetes-sustained-load
+  namespace: alerting
+spec:
+  groups:
+  - name: kubernetes-sustained-load
+    rules:
+    - alert: PodSustainedHighCPU
+      annotations:
+        description: >-
+          Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container }}
+          has been using {{ $value | humanizePercentage }} of its CPU limit for over 1 hour.
+        summary: Pod has sustained high CPU usage relative to its limit.
+      expr: |-
+        (
+          sum by (namespace, pod, container, cluster) (
+            rate(container_cpu_usage_seconds_total{container!="", job="kubelet", metrics_path="/metrics/cadvisor"}[15m])
+          )
+          /
+          sum by (namespace, pod, container, cluster) (
+            kube_pod_container_resource_limits{resource="cpu", job="kube-state-metrics"}
+          )
+        ) > 0.8
+      for: 1h
+      labels:
+        severity: warning
+    - alert: PodSustainedHighCPUNoLimit
+      annotations:
+        description: >-
+          Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container }}
+          has been using more than 1 CPU core for over 1 hour and has no CPU limit set.
+        summary: Pod without CPU limit has sustained high CPU usage.
+      expr: |-
+        (
+          sum by (namespace, pod, container, cluster) (
+            rate(container_cpu_usage_seconds_total{container!="", job="kubelet", metrics_path="/metrics/cadvisor"}[15m])
+          ) > 1
+        )
+        unless on (namespace, pod, container)
+        (
+          kube_pod_container_resource_limits{resource="cpu", job="kube-state-metrics"} > 0
+        )
+      for: 1h
+      labels:
+        severity: warning

@@ -21,6 +21,10 @@ spec:
     valuesKey: values-base.yaml
   - kind: ConfigMap
     name: authentik-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: authentik-values
+    optional: true
     valuesKey: values.yaml
   - kind: ConfigMap
     name: authentik-helmrelease-overrides

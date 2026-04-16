@@ -10,7 +10,9 @@ resources:
 - rules/kubernetes/kubernetes-apps.yaml
 - rules/kubernetes/kubernetes-resources.yaml
 - rules/kubernetes/kubernetes-storage.yaml
+- rules/kubernetes/kubernetes-sustained-load.yaml
 - rules/log-count.yaml
+- rules/envoy-gateway/envoy-logs.yaml
 - rules/nginx/nginx-logs.yaml
 - rules/victoriametrics/cluster.yaml
 - rules/victoriametrics/health.yaml

@@ -1,0 +1,170 @@
+global:
+  podAnnotations:
+    secret.reloader.stakater.com/reload: "authentik-redis-server,authentik-patroni-server"
+  securityContext:
+    fsGroup: 1000
+    runAsUser: 1000
+    runAsGroup: 1000
+  volumes:
+  - name: redis-tls
+    secret:
+      defaultMode: 0400
+      optional: false
+      secretName: authentik-redis-server
+  - name: postgres-tls
+    secret:
+      defaultMode: 0400
+      optional: false
+      secretName: authentik-patroni-server
+  volumeMounts:
+  - mountPath: /certs/postgres
+    name: postgres-tls
+  - mountPath: /certs/redis
+    name: redis-tls
+authentik:
+  secret_key: "${authentik_secret_key}"
+  log_level: warn
+  # This sends anonymous usage-data, stack traces on errors and
+  # performance data to authentik.error-reporting.a7k.io, and is fully opt-in
+  error_reporting:
+    enabled: false
+  postgresql:
+    password: "${authentik_database_password}"
+    name: authentik
+    user: authentik
+    host: authentik-patroni-proxy.authentik.svc.cluster.local
+    port: 5432
+    sslrootcert: /certs/postgres/ca.crt
+    sslcert: /certs/postgres/tls.crt
+    sslkey: /certs/postgres/tls.key
+    sslmode: verify-full
+    disable_server_side_cursors: true
+    conn_health_checks: true
+    conn_max_age: 0
+  redis:
+    host: authentik-redis-proxy.authentik.svc.cluster.local
+    port: 6379
+    tls: True # yamllint disable-line rule:truthy
+    tls_reqs: none
+    tls_ca_cert: "/certs/redis/ca.crt&ssl_keyfile=/certs/redis/tls.key&ssl_certfile=/certs/redis/tls.crt&ssl_check_hostname=false"
+  email:
+    host: "mail-relay.default"
+    port: 25
+    username: "authentik"
+    from: "auth.${domain_wahoo_li:=wahoo.li} <${authentik_email_from}>"
+    # from: "${authentik_email_from}"
+    password: "${authentik_email_password}"
+    use_ssl: false
+    use_tls: false
+    timeout: 30
+# global:
+#   additionalLabels:
+#     backupWeekly: "true"
+#     backupDaily: "true"
+#     appStack: authentik
+# global:
+#   env:
+#   - name: AUTHENTIK_BOOTSTRAP_EMAIL
+#     value: email@email.com
+#   - name: AUTHENTIK_BOOTSTRAP_PASSWORD
+#     value: password
+blueprints:
+  discovery: false
+worker:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
+server:
+  env:
+  - name: POSTGRES_PASSWORD
+    value: "${authentik_database_password}"
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+    - name: edns0
+  metrics:
+    enabled: true
+    service:
+      portName: http-metrics
+      labels:
+        goauthentik.io/scrape-metrics: "true"
+        scrape-job-name: authentik
+    serviceMonitor:
+      enabled: false
+  service:
+    annotations:
+      service.cilium.io/global: "true"
+      service.cilium.io/affinity: "local"
+  ingress:
+    enabled: false
+postgresql:
+  enabled: false
+  auth:
+    database: authentik
+    username: authentik
+    password: "${authentik_database_password}"
+    usePasswordFiles: false
+  metrics:
+    enabled: false
+  commonLabels:
+    backupWeekly: "true"
+    backupDaily: "true"
+    appStack: authentik
+  primary:
+    extendedConfiguration: |
+      max_connections = 500
+    extraVolumes:
+    - name: backup
+      emptyDir: {}
+    extraVolumeMounts:
+    - name: backup
+      mountPath: /dbdump
+    podAnnotations:
+      backup.velero.io/backup-volumes: backup
+      pre.hook.backup.velero.io/timeout: 5m
+      pre.hook.restore.velero.io/timeout: 5m
+      post.hook.restore.velero.io/timeout: 5m
+      pre.hook.backup.velero.io/container: postgresql
+      post.hook.restore.velero.io/container: postgresql
+      pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "PGPASSWORD=$POSTGRES_PASSWORD pg_dump -U $POSTGRES_USER -d $POSTGRES_DATABASE -F c --clean --if-exists -f /dbdump/backup.psql"]'
+      post.hook.restore.velero.io/wait-for-ready: "true"
+      post.hook.restore.velero.io/exec-timeout: 5m
+      post.hook.restore.velero.io/command: '["/bin/bash", "-ec", "[ -f \"/dbdump/backup.psql\" ] && PGPASSWORD=$POSTGRES_PASSWORD pg_restore -U $POSTGRES_USER -d $POSTGRES_DATABASE --clean --if-exists < /dbdump/backup.psql && rm -f /dbdump/backup.psql;"]'
+      # post.hook.restore.velero.io/command: |-
+      # ["/bin/bash", "-ec", "[ -f '/dbdump/backup.psql' ] && \
+      # while true; do pg_isready -U '$POSTGRES_USER' -d 'dbname=$POSTGRES_DATABASE' -h 127.0.0.1 -p 5432 > /dev/null && break; done && sleep 15 && \
+      # PGPASSWORD=$POSTGRES_PASSWORD pg_restore -U $POSTGRES_USER -d $POSTGRES_DATABASE --clean --if-exists < /dbdump/backup.psql && rm -f /dbdump/backup.psql;"]
+    persistence:
+      enabled: true
+      size: 2Gi
+redis:
+  enabled: false
+  metrics:
+    enabled: false
+  # commonLabels:
+  #   backupWeekly: "true"
+  #   backupDaily: "true"
+  #   appStack: authentik
+  master:
+    persistence:
+      enabled: false
+      size: 1Gi
+    extraVolumes:
+    - name: dummydata
+      emptyDir: {}
+      # extraVolumeMounts:
+      # - name: dummydata
+      #   mountPath: /dummy
+      # podAnnotations:
+      #   backup.velero.io/backup-volumes: dummydata  # backups essentially empty volume, so always new instance is initialized
+      #   pre.hook.backup.velero.io/timeout: 5m
+      #   pre.hook.restore.velero.io/timeout: 5m
+      #   post.hook.restore.velero.io/timeout: 5m
+      #   pre.hook.backup.velero.io/container: redis
+      #   post.hook.restore.velero.io/container: redis
+      #   pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "rm -rf /dummy/*"]'
+  auth:
+    enabled: false

@@ -189,9 +189,13 @@ entries:
     authorization_flow: !KeyOf ref-flow-authorization
     invalidation_flow: !KeyOf ref-flow-invalidation
     external_host: https://sonarr.${domain_wahoo_li:=wahoo.li}
+    internal_host: http://sonarr.default.svc.cluster.local:8989
     intercept_header_auth: true
-    internal_host_ssl_validation: true
-    mode: forward_single
+    basic_auth_enabled: true
+    basic_auth_password_attribute: sonarr_password
+    basic_auth_user_attribute: sonarr_username
+    internal_host_ssl_validation: false
+    mode: proxy
     name: sonarr-proxy
     refresh_token_validity: days=30
   identifiers:
@@ -285,9 +289,13 @@ entries:
     authorization_flow: !KeyOf ref-flow-authorization
     invalidation_flow: !KeyOf ref-flow-invalidation
     external_host: https://radarr.${domain_wahoo_li:=wahoo.li}
+    internal_host: http://radarr.default.svc.cluster.local:7878
+    internal_host_ssl_validation: false
     intercept_header_auth: true
-    internal_host_ssl_validation: true
-    mode: forward_single
+    basic_auth_enabled: true
+    basic_auth_password_attribute: radarr_username
+    basic_auth_user_attribute: radarr_username
+    mode: proxy
     name: radarr-proxy
     refresh_token_validity: days=30
   identifiers:
@@ -495,8 +503,9 @@ entries:
     basic_auth_enabled: true
     basic_auth_password_attribute: tautulli_password
     basic_auth_user_attribute: tautulli_username
+    internal_host_ssl_validation: false
     external_host: https://tautulli.${domain_wahoo_li:=wahoo.li}
-    internal_host: http://tautulli:8181
+    internal_host: http://tautulli.default.svc.cluster.local:8181
     mode: proxy
     name: tautulli-proxy
     refresh_token_validity: days=30
@@ -509,7 +518,7 @@ entries:
   attrs:
     name: tautulli
     meta_description: Media request system
-    meta_launch_url: https://tautulli-admin.${domain_wahoo_li:=wahoo.li}
+    meta_launch_url: https://tautulli.${domain_wahoo_li:=wahoo.li}
     policy_engine_mode: any
     provider: !KeyOf ref-tautulli-proxy
     icon: https://raw.githubusercontent.com/Tautulli/tautulli.github.io/master/images/logo.png

@@ -17,6 +17,10 @@ spec:
   valuesFrom:
   - kind: ConfigMap
     name: authentik-patroni-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: authentik-patroni-values
+    optional: true
     valuesKey: values.yaml
   - kind: ConfigMap
     name: authentik-patroni-helmrelease-overrides

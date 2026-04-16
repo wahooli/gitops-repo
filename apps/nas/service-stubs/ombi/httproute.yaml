@@ -14,16 +14,69 @@ spec:
   hostnames:
   - "ombi.${domain_wahoo_li:=wahoo.li}"
   rules:
-  - matches:
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: ak-outpost-nasse-proxy
+      port: 9000
+      weight: 1
+    matches:
     - path:
         type: PathPrefix
         value: /outpost.goauthentik.io
-    backendRefs:
-    - name: ak-outpost-nasse-proxy
-      port: 9000
+  # Root + API — no cache
   - backendRefs:
-    - name: ombi
+    - group: ""
+      kind: Service
+      name: ombi
       port: 3579
+      weight: 1
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "no-cache, no-store, must-revalidate"
+        - name: Pragma
+          value: "no-cache"
+    matches:
+    - path:
+        type: Exact
+        value: /
+    - path:
+        type: PathPrefix
+        value: /api
+  # Images & translations — explicitly cached
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: ombi
+      port: 3579
+      weight: 1
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "public, max-age=86400"
+    matches:
+    - path:
+        type: PathPrefix
+        value: /images
+    - path:
+        type: PathPrefix
+        value: /translations
+  # Everything else — default
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: ombi
+      port: 3579
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -37,9 +90,59 @@ spec:
   hostnames:
   - "ombi.${domain_absolutist_it:=absolutist.it}"
   rules:
+  # Root + API — no cache
   - backendRefs:
-    - name: ombi
+    - group: ""
+      kind: Service
+      name: ombi
       port: 3579
+      weight: 1
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "no-cache, no-store, must-revalidate"
+        - name: Pragma
+          value: "no-cache"
+    matches:
+    - path:
+        type: Exact
+        value: /
+    - path:
+        type: PathPrefix
+        value: /api
+  # Images & translations — explicitly cached
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: ombi
+      port: 3579
+      weight: 1
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: Cache-Control
+          value: "public, max-age=86400"
+    matches:
+    - path:
+        type: PathPrefix
+        value: /images
+    - path:
+        type: PathPrefix
+        value: /translations
+  # Everything else — default
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: ombi
+      port: 3579
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
