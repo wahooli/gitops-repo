@@ -105,14 +105,19 @@ entries:
 
 - model: authentik_outposts.kubernetesserviceconnection
   identifiers:
-    name: local-kube
-  id: ref-local-kube
-  state: present
+    name: Kubernetes TPi-1
+  id: ref-kube-tpi1
+  state: created
   attrs:
-    kubeconfig: {}
-    local: true
-    name: local-kube
-    verify_ssl: false
+    name: Kubernetes TPi-1
+
+- model: authentik_outposts.kubernetesserviceconnection
+  identifiers:
+    name: Kubernetes NAS
+  id: ref-kube-nas
+  state: created
+  attrs:
+    name: Kubernetes NAS
 
 - model: authentik_outposts.outpost
   identifiers:
@@ -120,28 +125,61 @@ entries:
   state: present
   attrs:
     config:
-      authentik_host: https://auth.${domain_wahoo_li:=wahoo.li}/
-      authentik_host_browser: ''
-      authentik_host_insecure: true
-      container_image: null
+      log_level: info
       docker_labels: null
-      docker_map_ports: true
+      authentik_host: http://authentik-server.authentik.svc.cluster.local.:80
       docker_network: null
-      kubernetes_disabled_components: []
-      kubernetes_image_pull_secrets: []
-      kubernetes_ingress_annotations: {}
-      kubernetes_ingress_class_name: null
-      kubernetes_ingress_secret_name: authentik-outpost-tls
+      container_image: null
+      docker_map_ports: true
+      refresh_interval: minutes=5
+      kubernetes_replicas: 1
+      kubernetes_namespace: default
+      authentik_host_browser: https://auth.${domain_wahoo_li:=wahoo.li}/
+      object_naming_template: ak-outpost-%(name)s
+      authentik_host_insecure: true
       kubernetes_json_patches:
+        secret:
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
+        service:
+        - op: add
+          path: /metadata/annotations
+          value:
+            service.cilium.io/global: "true"
+        - op: add
+          path: /metadata/labels/scrape-job-name
+          value: authentik
+        - op: add
+          path: /metadata/labels/goauthentik.io~1scrape-metrics
+          value: "true"
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
         deployment:
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
+        - op: add
+          path: /spec/template/spec/dnsConfig
+          value: {}
+        - op: add
+          path: /spec/template/spec/dnsConfig/options
+          value:
+          - name: ndots
+            value: "1"
         - op: add
           path: /spec/template/spec/dnsPolicy
           value: ClusterFirstWithHostNet
-      kubernetes_namespace: default
-      kubernetes_replicas: 1
       kubernetes_service_type: ClusterIP
-      log_level: warn
-      object_naming_template: ak-outpost-%(name)s
+      kubernetes_image_pull_secrets: []
+      kubernetes_ingress_class_name: null
+      kubernetes_disabled_components:
+      - ingress
+      - prometheus servicemonitor
+      - traefik middleware
+      kubernetes_ingress_annotations: {}
+      kubernetes_ingress_secret_name: authentik-outpost-tls
     name: Proxy default
     providers:
     - !KeyOf ref-ombi-proxy
@@ -149,7 +187,78 @@ entries:
     - !KeyOf ref-radarr-proxy
     - !KeyOf ref-bazarr-proxy
     - !KeyOf ref-tautulli-proxy
-    service_connection: !KeyOf ref-local-kube
+    service_connection: !KeyOf ref-kube-tpi1
+    type: proxy
+
+- model: authentik_outposts.outpost
+  identifiers:
+    name: Nasse proxy
+  state: present
+  attrs:
+    config:
+      log_level: info
+      docker_labels: null
+      authentik_host: http://authentik-server.authentik.svc.cluster.local.:80
+      docker_network: null
+      container_image: null
+      docker_map_ports: true
+      refresh_interval: minutes=5
+      kubernetes_replicas: 1
+      kubernetes_namespace: default
+      authentik_host_browser: https://auth.${domain_wahoo_li:=wahoo.li}/
+      object_naming_template: ak-outpost-%(name)s
+      authentik_host_insecure: true
+      kubernetes_json_patches:
+        secret:
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
+        service:
+        - op: add
+          path: /metadata/annotations
+          value:
+            service.cilium.io/global: "true"
+        - op: add
+          path: /metadata/labels/scrape-job-name
+          value: authentik
+        - op: add
+          path: /metadata/labels/goauthentik.io~1scrape-metrics
+          value: "true"
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
+        deployment:
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
+        - op: add
+          path: /spec/template/spec/dnsConfig
+          value: {}
+        - op: add
+          path: /spec/template/spec/dnsConfig/options
+          value:
+          - name: ndots
+            value: "1"
+        - op: add
+          path: /spec/template/spec/dnsPolicy
+          value: ClusterFirstWithHostNet
+      kubernetes_service_type: ClusterIP
+      kubernetes_image_pull_secrets: []
+      kubernetes_ingress_class_name: null
+      kubernetes_disabled_components:
+      - ingress
+      - prometheus servicemonitor
+      - traefik middleware
+      kubernetes_ingress_annotations: {}
+      kubernetes_ingress_secret_name: authentik-outpost-tls
+    name: Nasse proxy
+    providers:
+    - !KeyOf ref-ombi-proxy
+    - !KeyOf ref-sonarr-proxy
+    - !KeyOf ref-radarr-proxy
+    - !KeyOf ref-bazarr-proxy
+    - !KeyOf ref-tautulli-proxy
+    service_connection: !KeyOf ref-kube-nas
     type: proxy
 
 - model: authentik_outposts.outpost
@@ -158,31 +267,64 @@ entries:
   state: present
   attrs:
     config:
-      authentik_host: https://auth.${domain_wahoo_li:=wahoo.li}/
+      log_level: info
+      docker_labels: null
+      authentik_host: http://authentik-server.authentik.svc.cluster.local.:80
+      docker_network: null
+      container_image: null
+      docker_map_ports: true
+      refresh_interval: minutes=5
+      kubernetes_replicas: 1
+      kubernetes_namespace: authentik
+      authentik_host_browser: https://auth.${domain_wahoo_li:=wahoo.li}/
+      object_naming_template: ak-outpost-%(name)s
+      authentik_host_insecure: true
       kubernetes_json_patches:
+        secret:
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
+        service:
+        - op: add
+          path: /metadata/annotations
+          value:
+            service.cilium.io/global: "true"
+        - op: add
+          path: /metadata/labels/scrape-job-name
+          value: authentik
+        - op: add
+          path: /metadata/labels/goauthentik.io~1scrape-metrics
+          value: "true"
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
         deployment:
+        - op: add
+          path: /metadata/labels/velero.io~1exclude-from-backup
+          value: "true"
+        - op: add
+          path: /spec/template/spec/dnsConfig
+          value: {}
+        - op: add
+          path: /spec/template/spec/dnsConfig/options
+          value:
+          - name: ndots
+            value: "1"
         - op: add
           path: /spec/template/spec/dnsPolicy
           value: ClusterFirstWithHostNet
-      authentik_host_browser: ''
-      authentik_host_insecure: true
-      container_image: null
-      docker_labels: null
-      docker_map_ports: true
-      docker_network: null
-      kubernetes_disabled_components: []
-      kubernetes_image_pull_secrets: []
-      kubernetes_ingress_annotations: {}
-      kubernetes_ingress_class_name: null
-      kubernetes_ingress_secret_name: authentik-outpost-tls
-      kubernetes_namespace: authentik
-      kubernetes_replicas: 1
       kubernetes_service_type: ClusterIP
-      log_level: warn
-      object_naming_template: ak-outpost-%(name)s
+      kubernetes_image_pull_secrets: []
+      kubernetes_ingress_class_name: null
+      kubernetes_disabled_components:
+      - ingress
+      - prometheus servicemonitor
+      - traefik middleware
+      kubernetes_ingress_annotations: {}
+      kubernetes_ingress_secret_name: authentik-outpost-tls
     managed: null
     name: authentik LDAP Outpost
     providers:
     - !KeyOf ref-jellyfin-ldap
-    service_connection: !KeyOf ref-local-kube
+    service_connection: !KeyOf ref-kube-nas
     type: ldap
