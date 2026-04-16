@@ -38,6 +38,8 @@ spec:
     filters:
     - type: ResponseHeaderModifier
       responseHeaderModifier:
+        remove:
+        - Vary
         set:
         - name: Cache-Control
           value: "public, max-age=31536000"
