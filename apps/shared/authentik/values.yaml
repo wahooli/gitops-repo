@@ -1,6 +1,4 @@
 global:
-  image:
-    tag: 2025.10.2
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server,authentik-patroni-server"
   securityContext:
