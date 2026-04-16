@@ -27,6 +27,6 @@ spec:
   values:
     fullnameOverride: authentik
     serviceAccountSecret:
-      enabled: false
+      enabled: true
     clusterRole:
       enabled: true
