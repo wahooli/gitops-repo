@@ -2,15 +2,13 @@ service:
   http:
     annotations:
       service.cilium.io/affinity: "remote"
-
 image:
   registry: code.forgejo.org
   repository: forgejo/forgejo
-  tag: "14.0.3-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
-
+  tag: "14.0.4-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
 extraContainers:
 - name: syncthing
-  image: syncthing/syncthing:2.0.15 # {"$imagepolicy": "flux-system:syncthing"}
+  image: syncthing/syncthing:2.0.16 # {"$imagepolicy": "flux-system:syncthing"}
   ports:
   - containerPort: 22000
     name: sync
