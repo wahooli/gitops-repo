@@ -1,22 +1,18 @@
 image:
-  tag: v2.1.15 # {"$imagepolicy": "flux-system:zot:tag"}
-
+  tag: v2.1.16 # {"$imagepolicy": "flux-system:zot:tag"}
 service:
   annotations:
     service.cilium.io/global: "true"
     service.cilium.io/affinity: "local"
-
 persistence: true
 pvc:
   create: true
   accessModes:
   - ReadWriteOnce
   storage: 10Gi
-
 externalSecrets:
 - secretName: zot-credentials
   mountPath: /etc/zot/credentials
-
 extraVolumeMounts:
 - name: zot-config
   mountPath: /etc/zot/config.json
