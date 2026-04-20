@@ -1,6 +1,6 @@
 image:
   repository: chrislusf/seaweedfs
-  tag: "4.20" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
+  tag: "4.21" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
 fullNameOverride: seaweedfs-backup
 master:
   replicaCount: 1
