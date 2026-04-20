@@ -1,6 +1,6 @@
 image:
   repository: chrislusf/seaweedfs-csi-driver
-  tag: "v1.4.8" # {"$imagepolicy": "flux-system:seaweedfs-csi-driver:tag"}
+  tag: "v1.4.9" # {"$imagepolicy": "flux-system:seaweedfs-csi-driver:tag"}
 tls:
   enabled: true
   existingSecret: seaweedfs-shared
