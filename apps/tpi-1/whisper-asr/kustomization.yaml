@@ -3,6 +3,16 @@ kind: Kustomization
 resources:
 - ../../base/whisper-asr
 patches:
-- path: inferenceservice.yaml
-  target:
+- target:
     kind: InferenceService
+    name: whisper-asr
+  patch: |-
+    - op: replace
+      path: /spec/predictor/containers/0/resources
+      value:
+        requests:
+          cpu: "2"
+          memory: 4Gi
+        limits:
+          cpu: "4"
+          memory: 8Gi

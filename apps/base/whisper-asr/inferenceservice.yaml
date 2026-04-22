@@ -11,6 +11,10 @@ spec:
     maxReplicas: 1
     scaleTarget: 1
     scaleMetric: concurrency
+    volumes:
+    - name: model-cache
+      persistentVolumeClaim:
+        claimName: whisper-asr-models
     containers:
     - name: whisper
       image: onerahmet/openai-whisper-asr-webservice:latest
@@ -22,6 +26,11 @@ spec:
         value: faster_whisper
       - name: ASR_MODEL
         value: medium
+      - name: HF_HOME
+        value: /cache/hf
+      volumeMounts:
+      - name: model-cache
+        mountPath: /cache/hf
       resources:
         requests:
           cpu: "1"

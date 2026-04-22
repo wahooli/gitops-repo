@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - knative-serving.yaml
 - net-gateway-api.yaml
+- config-gateway.yaml

@@ -14,14 +14,6 @@ spec:
       domain-template: "{{.Name}}.{{.Namespace}}.{{.Domain}}"
     domain:
       svc.cluster.local: ""
-    gateway:
-      external-gateways: |
-        - class: envoy-gateway
-          gateway: envoy-gateway-system/envoy-gw-ai
-          supported-features:
-            - HTTPRouteRequestTimeout
-      local-gateways: |
-        - class: envoy-gateway
-          gateway: envoy-gateway-system/envoy-gw-ai
-          supported-features:
-            - HTTPRouteRequestTimeout
+    features:
+      kubernetes.podspec-persistent-volume-claim: enabled
+      kubernetes.podspec-persistent-volume-write: enabled
