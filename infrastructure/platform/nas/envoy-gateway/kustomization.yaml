@@ -2,6 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - ../../base/envoy-gateway
+- gateway-ai-alias.yaml
+- gateway-ai-stub-tpi-1.yaml
 patches:
 - path: envoy-proxy-patch.yaml
   target:

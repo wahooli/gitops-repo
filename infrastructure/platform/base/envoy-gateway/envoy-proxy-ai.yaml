@@ -1,0 +1,47 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: envoy-proxy-ai-config
+  namespace: envoy-gateway-system
+spec:
+  telemetry:
+    accessLog:
+      settings:
+      - format:
+          type: JSON
+          json:
+            timestamp: "%START_TIME%"
+            message: "%REQ(:METHOD)% %REQ(:AUTHORITY)%%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL% %RESPONSE_CODE%"
+            vhost: "%REQ(:AUTHORITY)%"
+            method: "%REQ(:METHOD)%"
+            path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+            protocol: "%PROTOCOL%"
+            status: "%RESPONSE_CODE%"
+            bytes_received: "%BYTES_RECEIVED%"
+            bytes_sent: "%BYTES_SENT%"
+            duration_ms: "%DURATION%"
+            upstream_host: "%UPSTREAM_HOST%"
+            upstream_cluster: "%UPSTREAM_CLUSTER%"
+            client_ip: "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
+            user_agent: "%REQ(USER-AGENT)%"
+            request_id: "%REQ(X-REQUEST-ID)%"
+            route_name: "%ROUTE_NAME%"
+            proxy_name: "%REQ(X-PROXY-NAME)%"
+        sinks:
+        - type: File
+          file:
+            path: /dev/stdout
+    metrics:
+      prometheus:
+        disable: false
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: ClusterIP
+      envoyDeployment:
+        replicas: 1
+        strategy:
+          type: RollingUpdate
+          rollingUpdate:
+            maxUnavailable: 1

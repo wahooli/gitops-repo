@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: knative-serving--knative-operator
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: knative-operator
+  chart:
+    spec:
+      version: "v1.21.1"
+  valuesFrom:
+  - kind: ConfigMap
+    name: knative-operator-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: knative-operator-values
+    valuesKey: values.yaml
+    optional: true
+  - kind: ConfigMap
+    name: knative-operator-values
+    valuesKey: values-extra.yaml
+    optional: true

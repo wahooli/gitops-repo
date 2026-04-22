@@ -1,0 +1,30 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: whisper-asr
+  namespace: default
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  predictor:
+    minReplicas: 0
+    maxReplicas: 1
+    scaleTarget: 1
+    scaleMetric: concurrency
+    containers:
+    - name: whisper
+      image: onerahmet/openai-whisper-asr-webservice:latest
+      ports:
+      - containerPort: 9000
+        protocol: TCP
+      env:
+      - name: ASR_ENGINE
+        value: faster_whisper
+      - name: ASR_MODEL
+        value: medium
+      resources:
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+        limits:
+          memory: "6Gi"

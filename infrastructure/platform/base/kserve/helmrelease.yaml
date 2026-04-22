@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kserve--kserve
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: kserve
+  dependsOn:
+  - name: kserve--kserve-crd
+  chart:
+    spec:
+      version: "v0.17.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: kserve-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: kserve-values
+    valuesKey: values.yaml
+    optional: true
+  - kind: ConfigMap
+    name: kserve-values
+    valuesKey: values-extra.yaml
+    optional: true

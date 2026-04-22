@@ -1,0 +1,27 @@
+apiVersion: operator.knative.dev/v1beta1
+kind: KnativeServing
+metadata:
+  name: knative-serving
+  namespace: knative-serving
+spec:
+  version: "1.21.1"
+  ingress:
+    istio:
+      enabled: false
+  config:
+    network:
+      ingress-class: gateway-api.ingress.networking.knative.dev
+      domain-template: "{{.Name}}.{{.Namespace}}.{{.Domain}}"
+    domain:
+      svc.cluster.local: ""
+    gateway:
+      external-gateways: |
+        - class: envoy-gateway
+          gateway: envoy-gateway-system/envoy-gw-ai
+          supported-features:
+            - HTTPRouteRequestTimeout
+      local-gateways: |
+        - class: envoy-gateway
+          gateway: envoy-gateway-system/envoy-gw-ai
+          supported-features:
+            - HTTPRouteRequestTimeout

@@ -1,0 +1,24 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: whisper-asr
+  namespace: default
+spec:
+  predictor:
+    containers:
+    - name: whisper
+      image: onerahmet/openai-whisper-asr-webservice:latest
+      ports:
+      - containerPort: 9000
+        protocol: TCP
+      env:
+      - name: ASR_ENGINE
+        value: faster_whisper
+      - name: ASR_MODEL
+        value: medium
+      resources:
+        requests:
+          cpu: "2"
+          memory: "4Gi"
+        limits:
+          memory: "8Gi"

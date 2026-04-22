@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-knative-operator
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: knative-operator
+spec:
+  releaseName: base-knative-operator
+  targetNamespace: knative-serving
+  chart:
+    spec:
+      chart: knative-operator
+      sourceRef:
+        kind: HelmRepository
+        name: knative-operator
+        namespace: flux-system
+      version: "v1.21.1"
+      interval: 24h
+  install:
+    timeout: 10m
+    remediation:
+      retries: -1
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  valuesFrom:
+  - kind: ConfigMap
+    name: knative-operator-values
+    valuesKey: values-base.yaml

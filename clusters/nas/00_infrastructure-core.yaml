@@ -31,6 +31,10 @@ spec:
     kind: Deployment
     name: reflector
     namespace: reflector
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: knative-operator
+    namespace: knative-serving
   postBuild:
     substituteFrom:
     - kind: Secret
