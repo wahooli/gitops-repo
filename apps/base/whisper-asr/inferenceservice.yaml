@@ -11,6 +11,7 @@ spec:
     maxReplicas: 1
     scaleTarget: 1
     scaleMetric: concurrency
+    timeout: 3600
     volumes:
     - name: model-cache
       persistentVolumeClaim:
