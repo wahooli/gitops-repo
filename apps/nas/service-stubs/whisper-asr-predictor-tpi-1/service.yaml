@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: whisper-asr-predictor
+  name: whisper-asr-predictor-tpi-1
   namespace: default
   annotations:
     homelab.wahoo.li/cross-cluster-source: envoy-gw-ai-tpi-1

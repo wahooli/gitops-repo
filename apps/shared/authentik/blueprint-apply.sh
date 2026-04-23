@@ -12,6 +12,8 @@ parse_resp() {
 }
 
 http_ok() { [ "$code" -ge 200 ] 2>/dev/null && [ "$code" -lt 300 ]; }
+# Transport failure (curl error) or 5xx — worth retrying. 4xx is the caller's fault.
+http_retryable() { [ -z "$code" ] || [ "$code" = "000" ] || { [ "$code" -ge 500 ] 2>/dev/null; }; }
 
 print_body() { echo "$body" | jq . 2>/dev/null || echo "$body"; }
 
@@ -29,7 +31,7 @@ echo "Authentik is ready"
 bp_map=$(mktemp)
 page=1
 while true; do
-  resp=$(curl -sf --connect-timeout 5 --max-time 15 \
+  resp=$(curl -sf --connect-timeout 5 --max-time 60 \
     "$${API}/managed/blueprints/?page=$page&page_size=100" \
     -H "$${AUTH}")
   [ -n "$resp" ] || break
@@ -63,7 +65,7 @@ for file in /blueprints/*.yaml; do
 done
 
 phase1_attempt=1
-max_phase1_attempts=3
+max_phase1_attempts=5
 while [ -s "$phase1_pending" ] && [ "$phase1_attempt" -le "$max_phase1_attempts" ]; do
   [ "$phase1_attempt" -gt 1 ] && echo "--- create/update retry $phase1_attempt ---"
   phase1_retry=$(mktemp)
@@ -93,7 +95,7 @@ while [ -s "$phase1_pending" ] && [ "$phase1_attempt" -le "$max_phase1_attempts"
       [ -z "$pk" ] && pk=$(echo "$body" | jq -r '.pk // empty')
       printf '%s\t%s\t%s\n' "$pk" "$file" "$name" >> "$pk_list"
       echo "$${action}D: $name"
-    elif [ "$code" -ge 500 ] 2>/dev/null; then
+    elif http_retryable; then
       echo "$${action} FAILED ($code): $name (will retry)"
       print_body
       echo "$file" >> "$phase1_retry"
@@ -127,7 +129,7 @@ echo "--- Phase 2: apply ---"
 max_wait="$${BLUEPRINT_APPLY_WAIT:-120}"
 task_filter='.results[] | select(.actor_name == "authentik.blueprints.v1.tasks.apply_blueprint") | .aggregated_status | select(test("queued|consumed|running|preprocess|postprocess"))'
 while IFS="$TAB" read -r pk file name; do
-  parse_resp "$(curl -sS -w '\n%{http_code}' --connect-timeout 5 --max-time 120 \
+  parse_resp "$(curl -sS -w '\n%{http_code}' --connect-timeout 5 --max-time 900 \
     -X POST "$${API}/managed/blueprints/$${pk}/apply/" \
     -H "$${AUTH}" -H "Content-Type: application/json")"
   if http_ok; then
@@ -143,7 +145,7 @@ while IFS="$TAB" read -r pk file name; do
   while [ "$wait_elapsed" -lt "$max_wait" ]; do
     sleep 3
     wait_elapsed=$((wait_elapsed + 3))
-    active=$(curl -sf --connect-timeout 5 --max-time 10 \
+    active=$(curl -sf --connect-timeout 5 --max-time 30 \
       "$${API}/tasks/tasks/?page_size=100" \
       -H "$${AUTH}" | jq "[$${task_filter}] | length")
     if [ "$active" = "0" ] 2>/dev/null; then
@@ -166,7 +168,7 @@ while [ -s "$disable_pending" ] && [ "$disable_attempt" -le "$max_disable_attemp
   disable_retry=$(mktemp)
   while IFS="$TAB" read -r pk file name; do
     jq -n --rawfile content "$file" '{content: $content, enabled: false}' > "$tmp"
-    parse_resp "$(curl -sS -w '\n%{http_code}' --connect-timeout 5 --max-time 480 \
+    parse_resp "$(curl -sS -w '\n%{http_code}' --connect-timeout 5 --max-time 900 \
       -X PATCH "$${API}/managed/blueprints/$${pk}/" \
       -H "$${AUTH}" -H "Content-Type: application/json" \
       --data-binary "@$tmp")"
@@ -185,7 +187,7 @@ while [ -s "$disable_pending" ] && [ "$disable_attempt" -le "$max_disable_attemp
   if [ ! -s "$disable_pending" ]; then
     sleep 5
     while IFS="$TAB" read -r pk file name; do
-      enabled=$(curl -sf --connect-timeout 5 --max-time 10 \
+      enabled=$(curl -sf --connect-timeout 5 --max-time 30 \
         "$${API}/managed/blueprints/$${pk}/" \
         -H "$${AUTH}" | jq -r 'if .enabled then "true" else "false" end')
       if [ "$enabled" = "true" ]; then

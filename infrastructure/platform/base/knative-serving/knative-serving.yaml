@@ -17,6 +17,7 @@ spec:
     features:
       kubernetes.podspec-persistent-volume-claim: enabled
       kubernetes.podspec-persistent-volume-write: enabled
+      kubernetes.podspec-runtimeclassname: enabled
     defaults:
-      revision-timeout-seconds: "3600"
-      max-revision-timeout-seconds: "3600"
+      revision-timeout-seconds: "9000"
+      max-revision-timeout-seconds: "9000"
