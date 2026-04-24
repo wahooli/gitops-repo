@@ -1,0 +1,10 @@
+kserve:
+  controller:
+    deploymentMode: Knative
+    gateway:
+      domain: svc.cluster.local
+      urlScheme: http
+      disableIstioVirtualHost: true
+      ingressGateway:
+        enableGatewayApi: false
+        createGateway: false

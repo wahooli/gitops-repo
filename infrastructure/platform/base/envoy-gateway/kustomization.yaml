@@ -3,8 +3,10 @@ kind: Kustomization
 resources:
 - gatewayclass.yaml
 - envoy-proxy.yaml
+- envoy-proxy-ai.yaml
 - gateway.yaml
 - gateway-private.yaml
+- gateway-ai.yaml
 - http-https-redirect.yaml
 - clienttrafficpolicy.yaml
 - backendtrafficpolicy.yaml

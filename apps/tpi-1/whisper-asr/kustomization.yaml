@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/whisper-asr
+- pvc.yaml
+patches:
+- target:
+    kind: InferenceService
+    name: whisper-asr
+  patch: |-
+    - op: replace
+      path: /spec/predictor/containers/0/resources
+      value:
+        requests:
+          cpu: "2"
+          memory: 4Gi
+        limits:
+          cpu: "4"
+          memory: 8Gi

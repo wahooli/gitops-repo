@@ -1,32 +1,25 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: registry--zot
+  name: kserve--kserve
   namespace: flux-system
 spec:
   interval: 10m
-  releaseName: zot
-  targetNamespace: registry
+  releaseName: kserve
   dependsOn:
-  - name: seaweedfs--seaweedfs
-    namespace: flux-system
+  - name: kserve--kserve-crd
   chart:
     spec:
-      version: "0.1.104"
-  values:
-    extraVolumes:
-    - name: zot-config
-      configMap:
-        name: zot-config
+      version: "v0.17.0"
   valuesFrom:
   - kind: ConfigMap
-    name: zot-values
+    name: kserve-values
     valuesKey: values-base.yaml
   - kind: ConfigMap
-    name: zot-values
+    name: kserve-values
     valuesKey: values.yaml
     optional: true
   - kind: ConfigMap
-    name: zot-values
+    name: kserve-values
     valuesKey: values-extra.yaml
     optional: true

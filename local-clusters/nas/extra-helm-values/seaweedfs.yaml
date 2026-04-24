@@ -8,3 +8,5 @@ data:
     filerSync:
       forgejo-s3-data:
         enabled: false
+      zot-registry:
+        enabled: false

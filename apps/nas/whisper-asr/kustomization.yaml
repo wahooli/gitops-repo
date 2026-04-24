@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/whisper-asr
+- pvc.yaml
+patches:
+- target:
+    kind: InferenceService
+    name: whisper-asr
+  patch: |-
+    - op: add
+      path: /spec/predictor/runtimeClassName
+      value: nvidia
+    - op: replace
+      path: /spec/predictor/containers/0/image
+      value: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    - op: replace
+      path: /spec/predictor/containers/0/resources
+      value:
+        requests:
+          cpu: "1"
+          memory: 4Gi
+        limits:
+          cpu: "2"
+          memory: 6Gi

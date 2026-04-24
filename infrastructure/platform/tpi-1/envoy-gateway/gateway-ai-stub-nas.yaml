@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: envoy-gw-ai-nas
+  namespace: envoy-gateway-system
+  annotations:
+    service.cilium.io/global: "true"
+    service.cilium.io/affinity: "remote"
+spec:
+  type: ClusterIP
+  internalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http

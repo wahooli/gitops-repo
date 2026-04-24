@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: whisper-asr-models
+  labels:
+    app.kubernetes.io/name: whisper-asr
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  claimRef:
+    namespace: default
+    name: whisper-asr-models
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: whisper-asr-models
+    volumeAttributes:
+      path: /buckets/whisper-asr-models
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: whisper-asr-models
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ""
+  volumeName: whisper-asr-models
+  resources:
+    requests:
+      storage: 10Gi

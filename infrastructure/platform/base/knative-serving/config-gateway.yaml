@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-gateway
+  namespace: knative-serving
+  labels:
+    networking.knative.dev/ingress-provider: net-gateway-api
+    app.kubernetes.io/component: net-gateway-api
+    app.kubernetes.io/name: knative-serving
+data:
+  external-gateways: |
+    - class: envoy-gateway
+      gateway: envoy-gateway-system/envoy-gw-ai
+      supported-features:
+        - HTTPRouteRequestTimeout
+  local-gateways: |
+    - class: envoy-gateway
+      gateway: envoy-gateway-system/envoy-gw-ai
+      supported-features:
+        - HTTPRouteRequestTimeout

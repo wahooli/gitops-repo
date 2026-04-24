@@ -13,3 +13,13 @@ configMapGenerator:
   options:
     labels:
       velero.io/exclude-from-backup: "true"
+patches:
+- target:
+    kind: Deployment
+    name: authentik-apply-blueprints
+  patch: |
+    $patch: delete
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: authentik-apply-blueprints

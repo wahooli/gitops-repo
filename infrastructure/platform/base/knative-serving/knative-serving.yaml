@@ -1,0 +1,23 @@
+apiVersion: operator.knative.dev/v1beta1
+kind: KnativeServing
+metadata:
+  name: knative-serving
+  namespace: knative-serving
+spec:
+  version: "1.21.1"
+  ingress:
+    istio:
+      enabled: false
+  config:
+    network:
+      ingress-class: gateway-api.ingress.networking.knative.dev
+      domain-template: "{{.Name}}.{{.Namespace}}.{{.Domain}}"
+    domain:
+      svc.cluster.local: ""
+    features:
+      kubernetes.podspec-persistent-volume-claim: enabled
+      kubernetes.podspec-persistent-volume-write: enabled
+      kubernetes.podspec-runtimeclassname: enabled
+    defaults:
+      revision-timeout-seconds: "9000"
+      max-revision-timeout-seconds: "9000"

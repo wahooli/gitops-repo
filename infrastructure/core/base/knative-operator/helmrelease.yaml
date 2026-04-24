@@ -1,32 +1,23 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: registry--zot
+  name: knative-serving--knative-operator
   namespace: flux-system
 spec:
   interval: 10m
-  releaseName: zot
-  targetNamespace: registry
-  dependsOn:
-  - name: seaweedfs--seaweedfs
-    namespace: flux-system
+  releaseName: knative-operator
   chart:
     spec:
-      version: "0.1.104"
-  values:
-    extraVolumes:
-    - name: zot-config
-      configMap:
-        name: zot-config
+      version: "v1.21.1"
   valuesFrom:
   - kind: ConfigMap
-    name: zot-values
+    name: knative-operator-values
     valuesKey: values-base.yaml
   - kind: ConfigMap
-    name: zot-values
+    name: knative-operator-values
     valuesKey: values.yaml
     optional: true
   - kind: ConfigMap
-    name: zot-values
+    name: knative-operator-values
     valuesKey: values-extra.yaml
     optional: true

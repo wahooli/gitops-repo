@@ -1,0 +1,40 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: whisper-asr
+  namespace: default
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  predictor:
+    minReplicas: 0
+    maxReplicas: 1
+    scaleTarget: 1
+    scaleMetric: concurrency
+    timeout: 9000
+    volumes:
+    - name: model-cache
+      persistentVolumeClaim:
+        claimName: whisper-asr-models
+    containers:
+    - name: whisper
+      image: onerahmet/openai-whisper-asr-webservice:latest
+      ports:
+      - containerPort: 9000
+        protocol: TCP
+      env:
+      - name: ASR_ENGINE
+        value: faster_whisper
+      - name: ASR_MODEL
+        value: medium
+      - name: HF_HOME
+        value: /cache/hf
+      volumeMounts:
+      - name: model-cache
+        mountPath: /cache/hf
+      resources:
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+        limits:
+          memory: "6Gi"

@@ -1,0 +1,17 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+spec:
+  patches:
+  # Local k3d clusters have no nvidia runtime or GPU — drop the GPU bits so
+  # the InferenceService is schedulable and runs CPU-only.
+  - target:
+      kind: InferenceService
+      name: whisper-asr
+    patch: |-
+      - op: remove
+        path: /spec/predictor/runtimeClassName
+      - op: replace
+        path: /spec/predictor/containers/0/image
+        value: onerahmet/openai-whisper-asr-webservice:latest
