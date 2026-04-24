@@ -21,3 +21,24 @@ spec:
     name: knative-operator-values
     valuesKey: values-extra.yaml
     optional: true
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          kind: ConfigMap
+          name: config-logging
+        patch: |
+          $patch: delete
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: config-logging
+      - target:
+          kind: ConfigMap
+          name: config-observability
+        patch: |
+          $patch: delete
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: config-observability
