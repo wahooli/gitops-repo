@@ -7,7 +7,7 @@ grand_parent: "nas"
 # knative-operator
 
 ## Overview
-The `knative-operator` component is responsible for managing the lifecycle of Knative Serving resources in the Kubernetes cluster. It simplifies the deployment and management of Knative components, ensuring that they are correctly configured and operational.
+The `knative-operator` component is responsible for managing the lifecycle of Knative Serving resources within the Kubernetes cluster. It automates the deployment and management of Knative components, enabling serverless capabilities on Kubernetes.
 
 ## Sub-components
 This deployment consists of a single HelmRelease:
@@ -15,10 +15,10 @@ This deployment consists of a single HelmRelease:
   - **Chart**: `knative-operator`
   - **Version**: `v1.21.1`
   - **Target Namespace**: `knative-serving`
-  - **Provides**: Manages Knative Serving resources, including deployments, services, and configuration for observability and logging.
+  - **Provides**: Manages Knative Serving resources, including deployments, service accounts, and configuration maps.
 
 ## Dependencies
-No dependencies are specified for this HelmRelease.
+This component does not have any defined dependencies.
 
 ## Helm Chart(s)
 - **Chart Name**: `knative-operator`
@@ -26,28 +26,42 @@ No dependencies are specified for this HelmRelease.
 - **Version**: `v1.21.1`
 
 ## Resource Glossary
-### Security
-- **ServiceAccount**: Two service accounts (`knative-operator` and `operator-webhook`) are created for the operator and webhook components, allowing them to interact with the Kubernetes API securely.
+- **Namespace**: `knative-serving`
+  - A dedicated namespace for all Knative Serving resources.
+  
+- **ServiceAccount**: 
+  - `knative-operator`: Used by the Knative operator to interact with the Kubernetes API.
+  - `operator-webhook`: Used for the operator's webhook functionality.
 
-### Configuration
+- **Secret**: 
+  - `operator-webhook-certs`: Holds the TLS certificates for the operator's webhook.
+
 - **ConfigMap**: 
-  - `config-logging`: Contains configuration for logging, including settings for log levels and output formats.
-  - `config-observability`: Provides configuration for observability features, such as metrics backend destinations and logging URL templates.
+  - `config-logging`: Contains logging configuration options for Knative components.
+  - `config-observability`: Contains observability configuration options, including logging and metrics settings.
 
-### Networking
-- **Secret**: `operator-webhook-certs` is created to store the TLS certificates for the operator's webhook, ensuring secure communication.
+- **ClusterRoleBinding**: Grants permissions to the operator to manage Knative resources across the cluster.
 
-### Workload
-- **Deployment**: The operator is deployed as part of the HelmRelease, managing the lifecycle of Knative resources.
-- **ClusterRoleBinding** and **ClusterRole**: These resources grant the operator the necessary permissions to manage Knative resources across the cluster.
+- **ClusterRole**: Defines the permissions for the operator to perform actions on Knative resources.
+
+- **Deployment**: 
+  - Two deployments are created to run the operator and its webhook.
+
+- **CustomResourceDefinition**: Defines the custom resources that the operator manages.
+
+- **Service**: Exposes the operator's webhook to handle incoming requests.
+
+- **RoleBinding**: Binds the role to the service account for namespace-specific permissions.
+
+- **Role**: Defines permissions for the operator within the `knative-serving` namespace.
 
 ## Configuration Highlights
-- The operator is configured to create or replace Custom Resource Definitions (CRDs) during installation and upgrades.
-- The reconciliation interval for the HelmRelease is set to 10 minutes, ensuring that the state of the deployed resources is regularly checked and updated.
-- Configurations for logging and observability can be customized through the `config-logging` and `config-observability` ConfigMaps.
+- The operator is configured to create and replace Custom Resource Definitions (CRDs) during installation and upgrades.
+- Configurations for logging and observability are provided through ConfigMaps, which can be customized as needed.
+- The reconciliation interval for the HelmRelease is set to 10 minutes, ensuring that the state of the deployment is regularly checked and updated.
 
 ## Deployment
 - **Target Namespace**: `knative-serving`
 - **Release Name**: `knative-operator`
 - **Reconciliation Interval**: 10 minutes
-- **Install/Upgrade Behavior**: CRDs are created or replaced as needed, with a timeout of 10 minutes for the installation process.
+- **Install/Upgrade Behavior**: CRDs are created or replaced as needed during installation and upgrades.
