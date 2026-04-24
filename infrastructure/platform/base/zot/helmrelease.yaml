@@ -7,6 +7,9 @@ spec:
   interval: 10m
   releaseName: zot
   targetNamespace: registry
+  dependsOn:
+  - name: seaweedfs--seaweedfs
+    namespace: flux-system
   chart:
     spec:
       version: "0.1.104"

@@ -132,9 +132,24 @@ for name in "${all_hr_names[@]}"; do
   fi
 done
 
-ready_count=${#completed[@]}
+# Count target HR states at start (independent of RECONCILE_READY)
+ready_count=0
+unready_count=0
+for hr in "${targets[@]}"; do
+  [[ -z "${hr_ready[$hr]:-}" ]] && continue
+  if [[ "${hr_ready[$hr]}" == "True" ]]; then
+    ((++ready_count))
+  else
+    ((++unready_count))
+  fi
+done
+
 process_count=${#to_process[@]}
-echo "Already ready: $ready_count HelmReleases, to process: $process_count"
+if [[ "$RECONCILE_READY" == "true" && $ready_count -gt 0 ]]; then
+  echo "Targets: ${#targets[@]} (ready: $ready_count, unready: $unready_count). Reconciling all $process_count (RECONCILE_READY=true)."
+else
+  echo "Targets: ${#targets[@]} (ready: $ready_count, unready: $unready_count). Reconciling: $process_count."
+fi
 
 if [[ $process_count -eq 0 ]]; then
   echo "All target HelmReleases are ready."
@@ -288,6 +303,10 @@ while [[ $processed -lt $process_count ]]; do
 done
 
 echo ""
-echo "HelmRelease verification complete. ($process_count reconciled, $ready_count already ready)"
+if [[ "$RECONCILE_READY" == "true" && $ready_count -gt 0 ]]; then
+  echo "HelmRelease verification complete. ($process_count reconciled; $ready_count of those were already ready, $unready_count needed work)"
+else
+  echo "HelmRelease verification complete. ($process_count reconciled, $ready_count already ready)"
+fi
 
 exit 0
