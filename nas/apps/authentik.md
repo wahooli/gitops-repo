@@ -7,82 +7,55 @@ grand_parent: "nas"
 # authentik
 
 ## Overview
-The `authentik` component is deployed in the `nas` cluster and is responsible for providing authentication services. It utilizes various Kubernetes resources to manage its deployment, including Helm releases, ConfigMaps, Secrets, and RBAC configurations.
+The `authentik` component is deployed in the `nas` cluster and provides identity and access management capabilities. It is configured using Helm and Flux for GitOps-based deployment.
 
 ## Namespace
 The component is deployed in the `authentik` namespace.
 
 ## Helm Repository
-- **Name**: `goauthentik`
+The Helm chart for `authentik` is sourced from the following repository:
+- **Name**: goauthentik
 - **URL**: [https://charts.goauthentik.io/](https://charts.goauthentik.io/)
 - **Update Interval**: 24 hours
 
 ## Helm Releases
-### authentik--authentik
-- **Chart**: `authentik`
-- **Version**: `2025.12.4`
-- **Namespace**: `authentik`
-- **Interval**: 5 minutes
-- **Release Name**: `authentik`
-- **Values Source**:
-  - ConfigMap: `authentik-values-8gk4dh676k`
-    - `values-base.yaml`
-    - `values-shared.yaml`
-    - `values.yaml` (optional)
-  - ConfigMap: `authentik-helmrelease-overrides` (optional)
-
-### Dependencies
-- `authentik--authentik-redis`
-- `authentik--authentik-patroni`
-
-## Configurations
-### ConfigMap: authentik-values-8gk4dh676k
-Contains configuration values for the authentik deployment, including:
-- Logging settings
-- PostgreSQL and Redis configurations
-- Email settings
-- Security context and volume mounts
-
-### ConfigMap: authentik-blueprint-apply-script-677dtm4b8t
-A script used to apply blueprints to the authentik service, ensuring that the necessary configurations are set up correctly.
-
-## Services
-### Service Account
-- **Name**: `authentik`
-- **Namespace**: `default`
-- **Type**: `kubernetes.io/service-account-token`
-
-### RBAC
-- **ClusterRole**: `authentik-outpost`
-- **ClusterRoleBinding**: `authentik-outpost`
-- **Role**: `authentik-outpost` (in both `default` and `authentik` namespaces)
-- **RoleBinding**: `authentik-outpost` (in both `default` and `authentik` namespaces)
-
-## Deployment
-### Deployment: authentik-apply-blueprints
-- **Replicas**: 1
-- **Init Containers**: 
-  - `apply-blueprints`: Executes the blueprint application script.
-- **Main Container**: 
-  - `pause`: A placeholder container.
-
-## HTTP Routes
-### HTTPRoute: authentik
-- **Hostnames**:
-  - `auth.wahoo.li`
-  - `auth.absolutist.it`
-  - `authentik.wahoo.li`
-  - `authentik.absolutist.it`
-- **Backend Reference**: `authentik-server` on port 80
+### authentik
+- **Release Name**: authentik
+- **Chart Version**: 2025.12.4
+- **Target Namespace**: authentik
+- **Update Interval**: 5 minutes
+- **Dependencies**:
+  - authentik--authentik-redis
+  - authentik--authentik-patroni
+- **Values**: Configurations are sourced from multiple ConfigMaps:
+  - `authentik-values-8gk4dh676k` (base and shared values)
+  - `authentik-helmrelease-overrides` (optional)
 
 ## Image Repository
-- **Name**: `authentik-server`
 - **Image**: `ghcr.io/goauthentik/server`
 - **Update Interval**: 24 hours
 
-## Image Policy
-- **Name**: `authentik`
-- **Policy**: Semantic versioning policy for image updates.
+## Configuration
+The configuration for `authentik` includes:
+- Logging settings
+- Database connection details for PostgreSQL and Redis
+- Email server configurations
+- Security context and volume mounts for TLS certificates
 
-## Notes
-Ensure that the necessary secrets and environment variables are configured correctly for the deployment to function as expected. The deployment relies on external services such as PostgreSQL and Redis, which must be available and properly configured.
+## HTTP Routes
+The `authentik` service is exposed via HTTP routes that handle various paths and set appropriate response headers. The routes are configured to work with the Envoy gateway.
+
+## RBAC Configuration
+The deployment includes several RBAC resources:
+- **ClusterRole**: `authentik-outpost` with permissions to manage custom resource definitions and other resources.
+- **RoleBindings**: Bind the `authentik` service account to the necessary roles in both the `default` and `authentik` namespaces.
+
+## Blueprint Management
+The deployment includes a script for managing blueprints in `authentik`, which handles the creation, updating, and disabling of blueprints based on YAML configurations.
+
+## Additional Notes
+- The component is designed to be resilient with automatic remediation on failure.
+- It supports TLS for secure connections to Redis and PostgreSQL.
+- Metrics are enabled for monitoring the `authentik` server.
+
+This documentation provides a comprehensive overview of the `authentik` deployment in the `nas` cluster, detailing its configuration, dependencies, and operational aspects.

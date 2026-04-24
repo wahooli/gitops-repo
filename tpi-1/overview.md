@@ -6,12 +6,12 @@ has_children: true
 # tpi-1
 
 ## Overview
-The `tpi-1` cluster is designed to manage infrastructure, monitoring, logging, alerting, DNS, and application deployments using GitOps principles with Flux. It automates the deployment and management of various components essential for a robust Kubernetes environment.
+The `tpi-1` cluster is designed to manage and deploy a variety of infrastructure components and applications using GitOps principles. It utilizes Flux for continuous delivery, ensuring that the cluster state is always in sync with the configurations defined in the Git repository.
 
 ## Dependency Chain
 The Kustomization entries are processed in the following order, with dependencies indicated:
 
-1. **infrastructure-core**: Base infrastructure components.
+1. **infrastructure-core**: The foundational infrastructure components.
 2. **infrastructure-platform**: Depends on `infrastructure-core`.
 3. **infrastructure-monitoring**: Depends on `infrastructure-platform`.
 4. **infrastructure-logging**: Depends on `infrastructure-platform`.
