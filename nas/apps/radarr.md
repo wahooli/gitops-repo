@@ -7,7 +7,7 @@ grand_parent: "nas"
 # radarr
 
 ## Overview
-Radarr is a movie collection manager for Usenet and BitTorrent users. It automates the process of downloading and managing movies, providing a user-friendly interface for tracking and organizing your movie library. In the `nas` cluster, Radarr is deployed using Flux for GitOps, ensuring that the deployment is continuously reconciled with the desired state defined in the repository.
+Radarr is a movie collection manager for Usenet and BitTorrent users, allowing for the automation of downloading and managing movies. It is deployed in the 'nas' cluster and is configured to run in the default namespace.
 
 ## Sub-components
 This deployment consists of a single HelmRelease:
@@ -15,7 +15,7 @@ This deployment consists of a single HelmRelease:
   - **Chart**: radarr
   - **Version**: latest (floating: >=0.1.1-0)
   - **Target Namespace**: default
-  - **Provides**: Deployment of the Radarr application, including necessary services and persistent storage.
+  - **Provides**: Deployment of the Radarr application, including necessary services, persistent storage, and environment configurations.
 
 ## Dependencies
 No dependencies are specified for this HelmRelease.
@@ -27,31 +27,38 @@ No dependencies are specified for this HelmRelease.
 
 ## Resource Glossary
 ### Networking
-- **HTTPRoute**: Defines routing rules for HTTP traffic. Two routes are created:
-  - `radarr`: Routes traffic to the Radarr service on port 9000.
-  - `radarr-private`: Routes traffic to the Radarr service on port 7878, with an external DNS annotation for accessibility.
+- **HTTPRoute**: Two HTTPRoute resources are created to manage traffic routing for Radarr. They define the rules for incoming requests and specify backend services.
+  - `radarr`: Routes traffic to the Radarr service on port 7878 for API requests.
+  - `radarr-private`: Routes traffic to the Radarr service on port 7878 for private access.
 
 ### Storage
-- **PersistentVolumeClaim**: Requests 2Gi of storage for the Radarr configuration, ensuring that the application can persist its settings and data across restarts.
+- **PersistentVolumeClaim**: A PVC named `config-radarr` is created to ensure that Radarr has persistent storage for its configuration data, requesting 2Gi of storage with ReadWriteOnce access.
 
 ### Security
-- **ServiceAccount**: A dedicated service account for the Radarr application, allowing it to interact with the Kubernetes API securely.
+- **ServiceAccount**: A ServiceAccount named `radarr` is created to provide the necessary permissions for the Radarr application to interact with the Kubernetes API.
 
 ### Workload
-- **Deployment**: Manages the Radarr application, specifying a single replica with a Recreate strategy. It includes:
+- **Deployment**: A Deployment named `radarr` is created to manage the Radarr application pods. It specifies a single replica and uses a Recreate strategy for updates. The deployment includes:
   - **Containers**: 
-    - `radarr`: The main application container running the Radarr service.
-    - `radarr-exporter`: A metrics exporter for monitoring Radarr's performance.
-  - **Probes**: Liveness, readiness, and startup probes to ensure the application is running correctly.
+    - The main Radarr container runs the image `ghcr.io/linuxserver/radarr:6.1.1`.
+    - A secondary container, `radarr-exporter`, is included for metrics collection.
+
+### Configuration
+- **ConfigMap**: Two ConfigMaps are created:
+  - `radarr-values-8mgh624cbm`: Contains configuration values for the Radarr deployment, including resource limits, persistence settings, and environment variables.
+  - `radarr-env-gk9dgb4gfb`: Holds environment variables like PGID, PUID, and timezone settings.
 
 ## Configuration Highlights
-- **Resource Requests/Limits**: The Radarr container has CPU limits set to 150m and memory limits to 60Mi.
-- **Persistence**: Configuration is stored in a persistent volume claim with 2Gi of storage.
-- **Environment Variables**: Configured via a ConfigMap, including `PGID`, `PUID`, and `TZ` for timezone settings.
-- **Service Annotations**: Includes annotations for Cilium to manage service affinity.
+- **Resource Requests/Limits**: The Radarr container has CPU limits set to 150m and memory limits set to 60Mi.
+- **Persistence**: Configuration data is stored persistently with a PVC requesting 2Gi of storage.
+- **Environment Variables**: Key environment variables include:
+  - `PGID`: 2003
+  - `PUID`: 2002
+  - `TZ`: Europe/Helsinki
+- **Service Annotations**: The main service has annotations for Cilium networking, enabling local affinity.
 
 ## Deployment
 - **Target Namespace**: default
 - **Release Name**: radarr
 - **Reconciliation Interval**: 5m
-- **Install/Upgrade Behavior**: The deployment is set to retry indefinitely on failure, ensuring resilience during installation or upgrades.
+- **Install/Upgrade Behavior**: The HelmRelease is configured to allow unlimited retries on installation or upgrades.
