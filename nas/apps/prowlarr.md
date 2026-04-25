@@ -7,7 +7,7 @@ grand_parent: "nas"
 # prowlarr
 
 ## Overview
-Prowlarr is a tool designed for managing and automating the downloading of media content. It acts as a companion application to various download clients and indexers, providing a unified interface for managing these services. In this deployment, Prowlarr is configured to run in the `default` namespace of the Kubernetes cluster named `nas`.
+Prowlarr is a tool that acts as an indexer manager for various media downloaders. It integrates with other applications to automate the process of finding and downloading content. In this deployment, Prowlarr is set up to run in the Kubernetes cluster named 'nas', providing a centralized service for managing indexers.
 
 ## Sub-components
 This deployment consists of a single HelmRelease:
@@ -15,7 +15,10 @@ This deployment consists of a single HelmRelease:
   - **Chart**: prowlarr
   - **Version**: latest (floating: >=0.1.0-0)
   - **Target Namespace**: default
-  - **Provides**: Deployment of the Prowlarr application, including necessary services and persistent storage.
+  - **Provides**: A complete Prowlarr application setup, including a Deployment, Service, and PersistentVolumeClaim.
+
+## Dependencies
+No dependencies are specified for this HelmRelease.
 
 ## Helm Chart(s)
 - **Chart Name**: prowlarr
@@ -24,27 +27,26 @@ This deployment consists of a single HelmRelease:
 
 ## Resource Glossary
 ### Networking
-- **Service**: A ClusterIP service named `prowlarr` that exposes the application on port `9696` for HTTP traffic and port `9707` for metrics. This allows other services within the cluster to communicate with Prowlarr.
+- **Service**: Exposes the Prowlarr application on port 9696 for HTTP traffic and port 9707 for metrics. It uses ClusterIP to allow internal communication within the cluster.
+- **HTTPRoute**: Routes external traffic to the Prowlarr service, allowing access via the hostname `prowlarr.${domain_absolutist_it:=absolutist.it}`.
 
 ### Storage
-- **PersistentVolumeClaim**: A PVC named `config-prowlarr` that requests `1Gi` of storage. This is used to persist configuration data for Prowlarr, ensuring that settings are retained across pod restarts.
+- **PersistentVolumeClaim**: Requests 1Gi of storage for Prowlarr's configuration data, ensuring that the data persists across pod restarts.
 
 ### Security
-- **ServiceAccount**: A service account named `prowlarr` that grants permissions to the Prowlarr deployment, allowing it to interact with the Kubernetes API.
+- **ServiceAccount**: Provides an identity for the Prowlarr application to interact with the Kubernetes API.
 
 ### Workload
-- **Deployment**: A deployment named `prowlarr` that manages the Prowlarr application. It is configured to run a single replica and uses a `Recreate` strategy for updates. The deployment includes two containers: 
-  - The main Prowlarr application container, which listens on port `9696`.
-  - An exporter container for metrics, which listens on port `9707`.
+- **Deployment**: Manages the Prowlarr application, ensuring that one replica is running. It includes health checks (liveness, readiness, and startup probes) to monitor the application's status.
 
 ## Configuration Highlights
-- **Image**: The Prowlarr application uses the image `ghcr.io/linuxserver/prowlarr:2.3.0`.
-- **Resource Requests/Limits**: Resource requests and limits are defined for the metrics container, with CPU limits set to `100m` and memory limits to `60Mi`.
-- **Persistence**: The configuration is stored in a persistent volume, ensuring data is retained across restarts.
-- **Environment Variables**: Key environment variables include `PGID`, `PUID`, and `TZ` for user and timezone settings.
+- **Image**: The Prowlarr container uses the image `ghcr.io/linuxserver/prowlarr:2.3.5`.
+- **Resource Requests/Limits**: The deployment is configured with resource requests and limits for the metrics container, ensuring it has sufficient resources to operate.
+- **Persistence**: Configuration data is stored in a persistent volume, ensuring data durability.
+- **Environment Variables**: Configurations such as `PGID`, `PUID`, and `TZ` are set in a ConfigMap for the application.
 
 ## Deployment
 - **Target Namespace**: default
 - **Release Name**: prowlarr
 - **Reconciliation Interval**: 5m
-- **Install/Upgrade Behavior**: The deployment is set to retry indefinitely on failure, ensuring resilience during installation or upgrades.
+- **Install/Upgrade Behavior**: The HelmRelease is configured to retry indefinitely on failure.
