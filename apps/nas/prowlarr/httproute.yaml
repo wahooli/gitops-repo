@@ -12,6 +12,18 @@ spec:
   hostnames:
   - "prowlarr.${domain_absolutist_it:=absolutist.it}"
   rules:
+  # API — extended timeout
+  - backendRefs:
+    - name: prowlarr
+      port: 9696
+    matches:
+    - path:
+        type: PathPrefix
+        value: /api
+    timeouts:
+      request: 900s
+      backendRequest: 900s
+  # Everything else — default
   - backendRefs:
     - name: prowlarr
       port: 9696

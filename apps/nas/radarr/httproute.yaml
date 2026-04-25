@@ -22,8 +22,8 @@ spec:
         type: PathPrefix
         value: /api
     timeouts:
-      request: 300s
-      backendRequest: 300s
+      request: 900s
+      backendRequest: 900s
   # Everything else — default
   - backendRefs:
     - name: ak-outpost-nasse-proxy
