@@ -23,9 +23,11 @@ spec:
         imagePullPolicy: IfNotPresent
         args:
         - --model
-        - base.en-int8
+        - base.en
         - --language
         - en
+        - --compute-type
+        - int8
         - --uri
         - tcp://0.0.0.0:10300
         - --data-dir
