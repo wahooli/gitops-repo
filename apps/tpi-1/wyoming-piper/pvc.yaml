@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wyoming-piper-voices
+  labels:
+    app.kubernetes.io/name: wyoming-piper
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  claimRef:
+    namespace: voice-assist
+    name: wyoming-piper-voices
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: wyoming-piper-voices
+    volumeAttributes:
+      path: /buckets/wyoming-piper-voices
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wyoming-piper-voices
+  namespace: voice-assist
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ""
+  volumeName: wyoming-piper-voices
+  resources:
+    requests:
+      storage: 2Gi

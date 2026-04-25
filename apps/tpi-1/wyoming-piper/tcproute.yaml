@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: wyoming-piper
+  namespace: voice-assist
+spec:
+  parentRefs:
+  - name: envoy-gw-voice
+    namespace: envoy-gateway-system
+    sectionName: wyoming-piper
+  rules:
+  - backendRefs:
+    - name: wyoming-piper
+      port: 10200
