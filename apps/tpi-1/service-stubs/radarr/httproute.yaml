@@ -13,6 +13,18 @@ spec:
   hostnames:
   - "radarr.${domain_wahoo_li:=wahoo.li}"
   rules:
+  # API — extended timeout
+  - backendRefs:
+    - name: ak-outpost-proxy-default
+      port: 9000
+    matches:
+    - path:
+        type: PathPrefix
+        value: /api
+    timeouts:
+      request: 300s
+      backendRequest: 300s
+  # Everything else — default
   - backendRefs:
     - name: ak-outpost-proxy-default
       port: 9000
