@@ -48,6 +48,17 @@ spec:
     containers:
     - name: ollama
       image: ollama/ollama:0.21.2
+      command:
+      - sh
+      - -c
+      - |
+        set -e
+        ollama serve &
+        SRV=$!
+        trap 'kill -TERM "$SRV" 2>/dev/null; wait "$SRV"' TERM INT
+        until ollama list >/dev/null 2>&1; do sleep 1; done
+        ollama run assist-llm 'hi' </dev/null >/dev/null 2>&1 || true
+        wait "$SRV"
       ports:
       - containerPort: 11434
         protocol: TCP
@@ -58,16 +69,6 @@ spec:
         value: "-1"
       - name: OLLAMA_CONTEXT_LENGTH
         value: "8192"
-      lifecycle:
-        postStart:
-          exec:
-            command:
-            - sh
-            - -c
-            - |
-              # wait for ollama daemon to be up, then trigger model load
-              until ollama list >/dev/null 2>&1; do sleep 1; done
-              ollama run assist-llm 'hi' </dev/null >/dev/null 2>&1 || true
       readinessProbe:
         exec:
           command:
