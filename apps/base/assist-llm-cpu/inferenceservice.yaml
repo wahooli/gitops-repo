@@ -53,7 +53,7 @@ spec:
       - name: OLLAMA_KEEP_ALIVE
         value: "-1"
       - name: OLLAMA_CONTEXT_LENGTH
-        value: "16384"
+        value: "8192"
       resources:
         requests:
           cpu: "1"
