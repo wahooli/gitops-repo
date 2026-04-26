@@ -27,9 +27,9 @@ spec:
         ollama serve >/tmp/serve.log 2>&1 &
         SRV=$!
         until ollama list >/dev/null 2>&1; do sleep 1; done
-        ollama pull qwen3:4b
+        ollama pull qwen3:1.7b
         cat > /tmp/Modelfile <<'EOF'
-        FROM qwen3:4b
+        FROM qwen3:1.7b
         SYSTEM "/no_think"
         EOF
         ollama create assist-llm -f /tmp/Modelfile
@@ -58,10 +58,35 @@ spec:
         value: "-1"
       - name: OLLAMA_CONTEXT_LENGTH
         value: "8192"
+      lifecycle:
+        postStart:
+          exec:
+            command:
+            - sh
+            - -c
+            - |
+              # wait for ollama daemon to be up, then trigger model load
+              until ollama list >/dev/null 2>&1; do sleep 1; done
+              ollama run --keepalive -1 assist-llm 'hi' >/dev/null 2>&1 || true
+      readinessProbe:
+        exec:
+          command:
+          - sh
+          - -c
+          - 'ollama ps 2>/dev/null | grep -q assist-llm'
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 60
+      livenessProbe:
+        tcpSocket:
+          port: 11434
+        initialDelaySeconds: 300
+        periodSeconds: 60
       resources:
         requests:
           cpu: 500m
-          memory: 3Gi
+          memory: 2Gi
         limits:
           cpu: "2"
-          memory: 5Gi
+          memory: 3Gi
