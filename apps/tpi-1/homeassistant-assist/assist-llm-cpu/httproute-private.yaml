@@ -19,3 +19,6 @@ spec:
     - name: envoy-gw-ai-tpi-1
       namespace: envoy-gateway-system
       port: 80
+    timeouts:
+      request: 300s
+      backendRequest: 300s

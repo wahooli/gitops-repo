@@ -23,9 +23,9 @@ spec:
         ollama serve >/tmp/serve.log 2>&1 &
         SRV=$!
         until ollama list >/dev/null 2>&1; do sleep 1; done
-        ollama pull qwen3:1.7b
+        ollama pull qwen3.5:0.8b
         cat > /tmp/Modelfile <<'EOF'
-        FROM qwen3:1.7b
+        FROM qwen3.5:0.8b
         SYSTEM "/no_think"
         EOF
         ollama create assist-llm -f /tmp/Modelfile
@@ -66,7 +66,7 @@ spec:
       - name: OLLAMA_KEEP_ALIVE
         value: "-1"
       - name: OLLAMA_CONTEXT_LENGTH
-        value: "4096"
+        value: "2048"
       readinessProbe:
         exec:
           command:

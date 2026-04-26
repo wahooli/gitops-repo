@@ -15,5 +15,5 @@ spec:
     - name: assist-llm-router
       port: 4000
     timeouts:
-      request: 120s
-      backendRequest: 120s
+      request: 300s
+      backendRequest: 300s
