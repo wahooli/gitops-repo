@@ -27,8 +27,8 @@ spec:
         ollama serve >/tmp/serve.log 2>&1 &
         SRV=$!
         until ollama list >/dev/null 2>&1; do sleep 1; done
-        ollama pull gemma4:e2b
-        ollama cp gemma4:e2b assist-llm
+        ollama pull qwen3.5:2b
+        ollama cp qwen3.5:2b assist-llm
         kill $SRV
         wait $SRV 2>/dev/null || true
       env:
@@ -53,7 +53,9 @@ spec:
         SRV=$!
         trap 'kill -TERM "$SRV" 2>/dev/null; wait "$SRV"' TERM INT
         until ollama list >/dev/null 2>&1; do sleep 1; done
-        ollama run assist-llm 'hi' </dev/null >/dev/null 2>&1 || true
+        if ollama run assist-llm 'hi' </dev/null >/dev/null 2>&1; then
+          touch /tmp/ready
+        fi
         wait "$SRV"
       ports:
       - containerPort: 11434
@@ -68,13 +70,13 @@ spec:
       readinessProbe:
         exec:
           command:
-          - sh
-          - -c
-          - 'ollama ps 2>/dev/null | grep -q assist-llm'
+          - test
+          - -f
+          - /tmp/ready
         initialDelaySeconds: 5
         periodSeconds: 10
-        timeoutSeconds: 5
-        failureThreshold: 60
+        timeoutSeconds: 2
+        failureThreshold: 90
       livenessProbe:
         tcpSocket:
           port: 11434
