@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: assist-llm-router-private
+  namespace: homeassistant-assist
+spec:
+  parentRefs:
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
+  hostnames:
+  - "assist-llm.${domain_wahoo_li:=wahoo.li}"
+  rules:
+  - backendRefs:
+    - name: assist-llm-router
+      port: 4000

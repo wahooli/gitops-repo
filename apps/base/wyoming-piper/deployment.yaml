@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wyoming-piper
-  namespace: voice-assist
+  namespace: homeassistant-assist
   labels:
     app.kubernetes.io/name: wyoming-piper
 spec:
@@ -36,10 +36,10 @@ spec:
           protocol: TCP
         resources:
           requests:
-            cpu: 200m
+            cpu: 500m
             memory: 256Mi
           limits:
-            cpu: "1"
+            cpu: "4"
             memory: 768Mi
         readinessProbe:
           tcpSocket:

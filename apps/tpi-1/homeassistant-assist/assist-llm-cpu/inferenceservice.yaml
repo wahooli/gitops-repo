@@ -1,0 +1,11 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: assist-llm-cpu
+  namespace: homeassistant-assist
+spec:
+  predictor:
+    volumes:
+    - name: models
+      persistentVolumeClaim:
+        claimName: assist-llm-cpu-models

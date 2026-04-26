@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wyoming-piper
-  namespace: voice-assist
+  namespace: homeassistant-assist
   labels:
     app.kubernetes.io/name: wyoming-piper
 spec:

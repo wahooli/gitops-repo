@@ -5,3 +5,8 @@ resources:
 - service.yaml
 - imagerepository.yaml
 - imagepolicy.yaml
+configMapGenerator:
+- name: assist-llm-router-config
+  namespace: homeassistant-assist
+  files:
+  - config.yaml=config.yaml

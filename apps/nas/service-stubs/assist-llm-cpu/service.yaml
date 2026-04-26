@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: assist-llm-cpu
+  namespace: homeassistant-assist
+  annotations:
+    homelab.wahoo.li/cross-cluster-source: envoy-gw-ai-tpi-1
+spec:
+  type: ExternalName
+  externalName: envoy-gw-ai-tpi-1.envoy-gateway-system.svc.cluster.local
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP

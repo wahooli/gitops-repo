@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wyoming-whisper
-  namespace: voice-assist
+  namespace: homeassistant-assist
   labels:
     app.kubernetes.io/name: wyoming-whisper
 spec:

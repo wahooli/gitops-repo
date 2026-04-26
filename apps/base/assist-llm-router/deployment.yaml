@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assist-llm-router
+  namespace: homeassistant-assist
+  labels:
+    app.kubernetes.io/name: assist-llm-router
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: assist-llm-router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: assist-llm-router
+    spec:
+      containers:
+      - name: litellm
+        image: ghcr.io/berriai/litellm:v1.83.7-stable.patch.1
+        imagePullPolicy: IfNotPresent
+        args:
+        - --config
+        - /etc/litellm/config.yaml
+        - --port
+        - "4000"
+        ports:
+        - containerPort: 4000
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 768Mi
+        readinessProbe:
+          httpGet:
+            path: /health/liveliness
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health/liveliness
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        volumeMounts:
+        - name: config
+          mountPath: /etc/litellm
+      volumes:
+      - name: config
+        configMap:
+          name: assist-llm-router-config

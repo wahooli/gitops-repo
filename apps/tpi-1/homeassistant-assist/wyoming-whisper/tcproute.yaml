@@ -2,7 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
 metadata:
   name: wyoming-whisper
-  namespace: voice-assist
+  namespace: homeassistant-assist
 spec:
   parentRefs:
   - name: envoy-gw-voice

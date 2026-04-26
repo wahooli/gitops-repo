@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: assist-llm-router
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: assist-llm-router
+  filterTags:
+    pattern: '^v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)-stable(?:\.patch\.(?P<sub>\d+))?$'
+    extract: '$major.$minor.$patch.$sub'
+  policy:
+    numerical:
+      order: asc

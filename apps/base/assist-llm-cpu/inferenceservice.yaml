@@ -1,0 +1,56 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: base-assist-llm-cpu
+  namespace: homeassistant-assist
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    scaleTarget: 1
+    scaleMetric: concurrency
+    timeout: 9000
+    initContainers:
+    - name: model-pull
+      image: ollama/ollama:0.21.2
+      command:
+      - sh
+      - -c
+      - |
+        set -e
+        ollama serve >/tmp/serve.log 2>&1 &
+        SRV=$!
+        until ollama list >/dev/null 2>&1; do sleep 1; done
+        ollama pull qwen3:1.7b
+        kill $SRV
+        wait $SRV 2>/dev/null || true
+      env:
+      - name: OLLAMA_HOST
+        value: 127.0.0.1:11434
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: "2"
+          memory: 2Gi
+    containers:
+    - name: ollama
+      image: ollama/ollama:0.21.2
+      ports:
+      - containerPort: 11434
+        protocol: TCP
+      env:
+      - name: OLLAMA_HOST
+        value: 0.0.0.0:11434
+      - name: OLLAMA_KEEP_ALIVE
+        value: "-1"
+      resources:
+        requests:
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          cpu: "3"
+          memory: 3Gi
