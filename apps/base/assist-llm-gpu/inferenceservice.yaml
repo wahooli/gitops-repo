@@ -67,7 +67,7 @@ spec:
             - |
               # wait for ollama daemon to be up, then trigger model load
               until ollama list >/dev/null 2>&1; do sleep 1; done
-              ollama run --keepalive -1 assist-llm 'hi' >/dev/null 2>&1 || true
+              ollama run assist-llm 'hi' </dev/null >/dev/null 2>&1 || true
       readinessProbe:
         exec:
           command:

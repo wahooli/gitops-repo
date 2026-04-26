@@ -23,12 +23,8 @@ spec:
         ollama serve >/tmp/serve.log 2>&1 &
         SRV=$!
         until ollama list >/dev/null 2>&1; do sleep 1; done
-        ollama pull qwen3:1.7b
-        cat > /tmp/Modelfile <<'EOF'
-        FROM qwen3:1.7b
-        SYSTEM "/no_think"
-        EOF
-        ollama create assist-llm -f /tmp/Modelfile
+        ollama pull gemma4:e2b
+        ollama cp gemma4:e2b assist-llm
         kill $SRV
         wait $SRV 2>/dev/null || true
       env:
@@ -62,7 +58,7 @@ spec:
             - -c
             - |
               until ollama list >/dev/null 2>&1; do sleep 1; done
-              ollama run --keepalive -1 assist-llm 'hi' >/dev/null 2>&1 || true
+              ollama run assist-llm 'hi' </dev/null >/dev/null 2>&1 || true
       readinessProbe:
         exec:
           command:
