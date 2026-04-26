@@ -28,6 +28,7 @@ spec:
         SRV=$!
         until ollama list >/dev/null 2>&1; do sleep 1; done
         ollama pull qwen3:4b
+        ollama cp qwen3:4b assist-llm
         kill $SRV
         wait $SRV 2>/dev/null || true
       env:
@@ -50,7 +51,9 @@ spec:
       - name: OLLAMA_HOST
         value: 0.0.0.0:11434
       - name: OLLAMA_KEEP_ALIVE
-        value: 10m
+        value: "-1"
+      - name: OLLAMA_CONTEXT_LENGTH
+        value: "16384"
       resources:
         requests:
           cpu: 500m

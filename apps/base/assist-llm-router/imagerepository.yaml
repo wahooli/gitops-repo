@@ -4,5 +4,5 @@ metadata:
   name: assist-llm-router
   namespace: flux-system
 spec:
-  image: ghcr.io/berriai/litellm
+  image: nginx
   interval: 24h

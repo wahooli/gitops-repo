@@ -24,6 +24,11 @@ spec:
         SRV=$!
         until ollama list >/dev/null 2>&1; do sleep 1; done
         ollama pull qwen3:1.7b
+        cat > /tmp/Modelfile <<'EOF'
+        FROM qwen3:1.7b
+        SYSTEM "/no_think"
+        EOF
+        ollama create assist-llm -f /tmp/Modelfile
         kill $SRV
         wait $SRV 2>/dev/null || true
       env:
@@ -47,10 +52,12 @@ spec:
         value: 0.0.0.0:11434
       - name: OLLAMA_KEEP_ALIVE
         value: "-1"
+      - name: OLLAMA_CONTEXT_LENGTH
+        value: "16384"
       resources:
         requests:
-          cpu: 500m
+          cpu: "1"
           memory: 2Gi
         limits:
-          cpu: "3"
-          memory: 3Gi
+          cpu: "4"
+          memory: 4Gi

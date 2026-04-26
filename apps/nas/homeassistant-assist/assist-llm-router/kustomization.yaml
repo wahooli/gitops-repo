@@ -5,5 +5,5 @@ resources:
 - httproute-private.yaml
 - securitypolicy.yaml
 images:
-- name: ghcr.io/berriai/litellm
-  newTag: v1.83.7-stable.patch.1 # {"$imagepolicy": "flux-system:assist-llm-router:tag"}
+- name: nginx
+  newTag: 1.30.0-alpine # {"$imagepolicy": "flux-system:assist-llm-router:tag"}
