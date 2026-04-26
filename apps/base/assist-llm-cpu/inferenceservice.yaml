@@ -24,7 +24,11 @@ spec:
         SRV=$!
         until ollama list >/dev/null 2>&1; do sleep 1; done
         ollama pull gemma4:e2b
-        ollama cp gemma4:e2b assist-llm
+        cat > /tmp/Modelfile <<'EOF'
+        FROM gemma4:e2b
+        PARAMETER use_mmap true
+        EOF
+        ollama create assist-llm -f /tmp/Modelfile
         kill $SRV
         wait $SRV 2>/dev/null || true
       env:
@@ -82,4 +86,4 @@ spec:
           memory: 2Gi
         limits:
           cpu: "4"
-          memory: 4Gi
+          memory: 8Gi
