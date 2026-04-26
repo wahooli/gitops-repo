@@ -14,7 +14,7 @@ spec:
   - filters:
     - type: URLRewrite
       urlRewrite:
-        hostname: assist-llm-cpu.homeassistant-assist.svc.cluster.local
+        hostname: assist-llm-cpu-predictor.homeassistant-assist.svc.cluster.local
     backendRefs:
     - name: envoy-gw-ai-tpi-1
       namespace: envoy-gateway-system

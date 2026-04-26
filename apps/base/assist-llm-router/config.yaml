@@ -2,13 +2,13 @@ model_list:
 - model_name: assist-llm
   litellm_params:
     model: openai/qwen3:4b
-    api_base: http://assist-llm-gpu.homeassistant-assist.svc.cluster.local/v1
+    api_base: http://assist-llm-gpu-predictor.homeassistant-assist.svc.cluster.local/v1
     api_key: "ollama-no-auth"
     timeout: 5
 - model_name: assist-llm-cpu-fallback
   litellm_params:
     model: openai/qwen3:1.7b
-    api_base: http://assist-llm-cpu.homeassistant-assist.svc.cluster.local/v1
+    api_base: http://assist-llm-cpu-predictor.homeassistant-assist.svc.cluster.local/v1
     api_key: "ollama-no-auth"
     timeout: 60
 litellm_settings:

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: assist-llm-cpu
+  name: assist-llm-cpu-predictor
   namespace: homeassistant-assist
   annotations:
     homelab.wahoo.li/cross-cluster-source: envoy-gw-ai-tpi-1

@@ -55,8 +55,6 @@ spec:
         requests:
           cpu: 500m
           memory: 3Gi
-          nvidia.com/gpu: 1
         limits:
           cpu: "2"
           memory: 5Gi
-          nvidia.com/gpu: 1
