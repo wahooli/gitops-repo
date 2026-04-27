@@ -36,9 +36,9 @@ spec:
         mv "$MODEL_PATH.partial" "$MODEL_PATH"
       env:
       - name: MODEL_URL
-        value: https://huggingface.co/unsloth/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf
+        value: https://huggingface.co/unsloth/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf
       - name: MODEL_PATH
-        value: /models/Qwen3-1.7B-Q4_K_M.gguf
+        value: /models/Qwen3-4B-Q4_K_M.gguf
       resources:
         requests:
           cpu: 100m
@@ -55,13 +55,15 @@ spec:
       runtime: llama-cpp-cuda
       args:
       - -m
-      - /models/Qwen3-1.7B-Q4_K_M.gguf
+      - /models/Qwen3-4B-Q4_K_M.gguf
       - -c
       - "8192"
+      - --chat-template-kwargs
+      - '{"enable_thinking":false}'
       resources:
         requests:
           cpu: 500m
           memory: 2Gi
         limits:
           cpu: "2"
-          memory: 3Gi
+          memory: 4Gi
