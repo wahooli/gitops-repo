@@ -15,6 +15,7 @@ spec:
     scaleTarget: 1
     scaleMetric: concurrency
     timeout: 9000
+    runtimeClassName: nvidia
     securityContext:
       fsGroup: 1000
     initContainers:

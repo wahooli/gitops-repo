@@ -6,7 +6,6 @@ spec:
   supportedModelFormats:
   - name: gguf
     autoSelect: false
-  runtimeClassName: nvidia
   containers:
   - name: kserve-container
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
