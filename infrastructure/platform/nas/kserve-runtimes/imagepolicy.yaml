@@ -1,11 +1,26 @@
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
+  name: llama-cpp-cpu
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: llama-cpp
+  filterTags:
+    pattern: '^server-b(?P<build>\d+)$'
+    extract: '$build'
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
   name: llama-cpp-cuda
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: llama-cpp-cuda
+    name: llama-cpp
   filterTags:
     pattern: '^server-cuda-b(?P<build>\d+)$'
     extract: '$build'

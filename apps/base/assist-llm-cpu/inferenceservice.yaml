@@ -12,11 +12,11 @@ spec:
     scaleTarget: 1
     scaleMetric: concurrency
     timeout: 9000
-    securityContext:
-      fsGroup: 1000
     initContainers:
     - name: model-pull
       image: curlimages/curl:8.11.1
+      securityContext:
+        runAsUser: 0
       command:
       - sh
       - -c
