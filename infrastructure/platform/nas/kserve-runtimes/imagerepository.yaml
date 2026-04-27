@@ -1,8 +1,8 @@
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
-  name: assist-llm-gpu
+  name: llama-cpp-cuda
   namespace: flux-system
 spec:
-  image: ollama/ollama
+  image: ghcr.io/ggml-org/llama.cpp
   interval: 24h

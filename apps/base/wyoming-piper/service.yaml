@@ -13,4 +13,4 @@ spec:
     targetPort: wyoming
     protocol: TCP
   selector:
-    app.kubernetes.io/name: wyoming-piper
+    serving.kserve.io/inferenceservice: wyoming-piper

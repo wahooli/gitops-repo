@@ -7,3 +7,12 @@ resources:
 images:
 - name: rhasspy/wyoming-whisper
   newTag: 3.1.0 # {"$imagepolicy": "flux-system:wyoming-whisper:tag"}
+patches:
+- path: inferenceservice.yaml
+  target:
+    kind: InferenceService
+    name: wyoming-whisper
+- path: volumemounts-patch.yaml
+  target:
+    kind: InferenceService
+    name: wyoming-whisper

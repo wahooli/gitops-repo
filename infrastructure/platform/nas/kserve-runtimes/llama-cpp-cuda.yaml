@@ -1,0 +1,42 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: llama-cpp-cuda
+spec:
+  supportedModelFormats:
+  - name: gguf
+    autoSelect: false
+  runtimeClassName: nvidia
+  containers:
+  - name: kserve-container
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    args:
+    - --host
+    - 0.0.0.0
+    - --port
+    - "8080"
+    - --jinja
+    - -ngl
+    - "999"
+    - --parallel
+    - "2"
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 2
+      failureThreshold: 90
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 300
+      periodSeconds: 60
+    volumeMounts:
+    - name: models
+      mountPath: /models

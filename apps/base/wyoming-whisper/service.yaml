@@ -13,4 +13,4 @@ spec:
     targetPort: wyoming
     protocol: TCP
   selector:
-    app.kubernetes.io/name: wyoming-whisper
+    serving.kserve.io/inferenceservice: wyoming-whisper

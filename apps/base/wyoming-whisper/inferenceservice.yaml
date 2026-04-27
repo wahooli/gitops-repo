@@ -1,0 +1,53 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: wyoming-whisper
+  namespace: homeassistant-assist
+  labels:
+    app.kubernetes.io/name: wyoming-whisper
+  annotations:
+    serving.kserve.io/deploymentMode: RawDeployment
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    containers:
+    - name: wyoming-whisper
+      image: rhasspy/wyoming-whisper:3.1.0
+      imagePullPolicy: IfNotPresent
+      args:
+      - --model
+      - base.en
+      - --language
+      - en
+      - --compute-type
+      - int8
+      - --uri
+      - tcp://0.0.0.0:10300
+      - --data-dir
+      - /data
+      - --download-dir
+      - /data
+      ports:
+      - containerPort: 10300
+        name: wyoming
+        protocol: TCP
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: "2"
+          memory: 2560Mi
+      readinessProbe:
+        tcpSocket:
+          port: wyoming
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        failureThreshold: 30
+      livenessProbe:
+        tcpSocket:
+          port: wyoming
+        initialDelaySeconds: 120
+        periodSeconds: 30
+        failureThreshold: 3

@@ -15,77 +15,48 @@ spec:
     scaleTarget: 1
     scaleMetric: concurrency
     timeout: 9000
-    runtimeClassName: nvidia
+    securityContext:
+      fsGroup: 1000
     initContainers:
     - name: model-pull
-      image: ollama/ollama:0.21.2
+      image: curlimages/curl:8.11.1
       command:
       - sh
       - -c
       - |
         set -e
-        ollama serve >/tmp/serve.log 2>&1 &
-        SRV=$!
-        until ollama list >/dev/null 2>&1; do sleep 1; done
-        ollama pull qwen3:1.7b
-        cat > /tmp/Modelfile <<'EOF'
-        FROM qwen3:1.7b
-        SYSTEM "/no_think"
-        EOF
-        ollama create assist-llm -f /tmp/Modelfile
-        kill $SRV
-        wait $SRV 2>/dev/null || true
+        if [ -f "$MODEL_PATH" ]; then
+          echo "model cached: $MODEL_PATH"
+          exit 0
+        fi
+        echo "downloading $MODEL_URL"
+        rm -f "$MODEL_PATH.partial"
+        curl -fL --retry 5 --retry-delay 5 -o "$MODEL_PATH.partial" "$MODEL_URL"
+        mv "$MODEL_PATH.partial" "$MODEL_PATH"
       env:
-      - name: OLLAMA_HOST
-        value: 127.0.0.1:11434
+      - name: MODEL_URL
+        value: https://huggingface.co/bartowski/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf
+      - name: MODEL_PATH
+        value: /models/Qwen3-1.7B-Q4_K_M.gguf
       resources:
         requests:
-          cpu: 500m
-          memory: 1Gi
+          cpu: 100m
+          memory: 64Mi
         limits:
-          cpu: "2"
-          memory: 2Gi
-    containers:
-    - name: ollama
-      image: ollama/ollama:0.21.2
-      command:
-      - sh
+          cpu: "1"
+          memory: 256Mi
+      volumeMounts:
+      - name: models
+        mountPath: /models
+    model:
+      modelFormat:
+        name: gguf
+      runtime: llama-cpp-cuda
+      args:
+      - -m
+      - /models/Qwen3-1.7B-Q4_K_M.gguf
       - -c
-      - |
-        set -e
-        ollama serve &
-        SRV=$!
-        trap 'kill -TERM "$SRV" 2>/dev/null; wait "$SRV"' TERM INT
-        until ollama list >/dev/null 2>&1; do sleep 1; done
-        if ollama run assist-llm 'hi' </dev/null >/dev/null 2>&1; then
-          touch /tmp/ready
-        fi
-        wait "$SRV"
-      ports:
-      - containerPort: 11434
-        protocol: TCP
-      env:
-      - name: OLLAMA_HOST
-        value: 0.0.0.0:11434
-      - name: OLLAMA_KEEP_ALIVE
-        value: "-1"
-      - name: OLLAMA_CONTEXT_LENGTH
-        value: "8192"
-      readinessProbe:
-        exec:
-          command:
-          - test
-          - -f
-          - /tmp/ready
-        initialDelaySeconds: 5
-        periodSeconds: 10
-        timeoutSeconds: 2
-        failureThreshold: 90
-      livenessProbe:
-        tcpSocket:
-          port: 11434
-        initialDelaySeconds: 300
-        periodSeconds: 60
+      - "8192"
       resources:
         requests:
           cpu: 500m

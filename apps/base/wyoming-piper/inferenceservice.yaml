@@ -1,0 +1,49 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: wyoming-piper
+  namespace: homeassistant-assist
+  labels:
+    app.kubernetes.io/name: wyoming-piper
+  annotations:
+    serving.kserve.io/deploymentMode: RawDeployment
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    containers:
+    - name: wyoming-piper
+      image: rhasspy/wyoming-piper:2.2.2
+      imagePullPolicy: IfNotPresent
+      args:
+      - --voice
+      - en_US-lessac-medium
+      - --uri
+      - tcp://0.0.0.0:10200
+      - --data-dir
+      - /data
+      - --download-dir
+      - /data
+      ports:
+      - containerPort: 10200
+        name: wyoming
+        protocol: TCP
+      resources:
+        requests:
+          cpu: 500m
+          memory: 256Mi
+        limits:
+          cpu: "4"
+          memory: 768Mi
+      readinessProbe:
+        tcpSocket:
+          port: wyoming
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        failureThreshold: 12
+      livenessProbe:
+        tcpSocket:
+          port: wyoming
+        initialDelaySeconds: 60
+        periodSeconds: 30
+        failureThreshold: 3

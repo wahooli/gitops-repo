@@ -7,3 +7,12 @@ resources:
 images:
 - name: rhasspy/wyoming-piper
   newTag: 2.2.2 # {"$imagepolicy": "flux-system:wyoming-piper:tag"}
+patches:
+- path: inferenceservice.yaml
+  target:
+    kind: InferenceService
+    name: wyoming-piper
+- path: volumemounts-patch.yaml
+  target:
+    kind: InferenceService
+    name: wyoming-piper

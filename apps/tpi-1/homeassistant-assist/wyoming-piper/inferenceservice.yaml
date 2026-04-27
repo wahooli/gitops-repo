@@ -1,0 +1,11 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: wyoming-piper
+  namespace: homeassistant-assist
+spec:
+  predictor:
+    volumes:
+    - name: voices
+      persistentVolumeClaim:
+        claimName: wyoming-piper-voices
