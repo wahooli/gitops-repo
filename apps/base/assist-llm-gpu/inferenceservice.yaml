@@ -36,7 +36,7 @@ spec:
         mv "$MODEL_PATH.partial" "$MODEL_PATH"
       env:
       - name: MODEL_URL
-        value: https://huggingface.co/bartowski/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf
+        value: https://huggingface.co/unsloth/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf
       - name: MODEL_PATH
         value: /models/Qwen3-1.7B-Q4_K_M.gguf
       resources:
