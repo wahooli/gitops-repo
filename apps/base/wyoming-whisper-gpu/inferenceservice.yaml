@@ -25,7 +25,7 @@ spec:
       - --device
       - cuda
       - --compute-type
-      - float16
+      - int8_float16
       ports:
       - containerPort: 10300
         name: wyoming
