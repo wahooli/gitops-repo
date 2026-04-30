@@ -36,6 +36,8 @@ spec:
       - --enable-auto-tool-choice
       - --tool-call-parser
       - qwen3_xml
+      - --reasoning-parser
+      - qwen3
       resources:
         requests:
           cpu: 500m
