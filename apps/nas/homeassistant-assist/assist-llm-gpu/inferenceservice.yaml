@@ -5,6 +5,7 @@ metadata:
   namespace: homeassistant-assist
 spec:
   predictor:
+    minReplicas: 1
     volumes:
     - name: models
       persistentVolumeClaim:
