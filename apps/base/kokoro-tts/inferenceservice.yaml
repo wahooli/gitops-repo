@@ -1,0 +1,50 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: kokoro-tts
+  namespace: homeassistant-assist
+  labels:
+    networking.knative.dev/visibility: cluster-local
+  annotations:
+    autoscaling.knative.dev/scale-down-delay: "5m"
+    autoscaling.knative.dev/window: "60s"
+spec:
+  predictor:
+    minReplicas: 0
+    maxReplicas: 1
+    scaleTarget: 1
+    scaleMetric: concurrency
+    timeout: 600
+    runtimeClassName: nvidia
+    containers:
+    - name: kokoro-tts
+      image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+      env:
+      - name: USE_GPU
+        value: "true"
+      - name: DOWNLOAD_MODEL
+        value: "true"
+      ports:
+      - containerPort: 8880
+        protocol: TCP
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 8880
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 2
+        failureThreshold: 60
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 8880
+        initialDelaySeconds: 120
+        periodSeconds: 60
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: "2"
+          memory: 4Gi

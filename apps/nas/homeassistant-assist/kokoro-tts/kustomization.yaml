@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/kokoro-tts
+- pvc.yaml
+images:
+- name: ghcr.io/remsky/kokoro-fastapi-gpu
+  newTag: latest # {"$imagepolicy": "flux-system:kokoro-tts:tag"}
+patches:
+- path: inferenceservice.yaml
+  target:
+    kind: InferenceService
+    name: kokoro-tts
+- path: volumemounts-patch.yaml
+  target:
+    kind: InferenceService
+    name: kokoro-tts

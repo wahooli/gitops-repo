@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: wyoming-whisper-gpu
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: wyoming-whisper-gpu
+  filterTags:
+    pattern: '^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)-gpu$'
+    extract: '$major.$minor.$patch'
+  policy:
+    semver:
+      range: '>=3.0.0'

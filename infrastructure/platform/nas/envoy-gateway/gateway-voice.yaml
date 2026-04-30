@@ -1,0 +1,25 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: envoy-gw-voice
+  namespace: envoy-gateway-system
+  labels:
+    dns-visibility: internal
+spec:
+  gatewayClassName: envoy-gateway
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: envoy-proxy-config
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: voice.nas.${domain_wahoo_li:=wahoo.li}
+  listeners:
+  - name: wyoming-whisper
+    protocol: TCP
+    port: 10300
+    allowedRoutes:
+      namespaces:
+        from: All
+      kinds:
+      - kind: TCPRoute

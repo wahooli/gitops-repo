@@ -7,6 +7,7 @@ metadata:
     app.kubernetes.io/name: wyoming-piper
   annotations:
     serving.kserve.io/deploymentMode: RawDeployment
+    serving.kserve.io/autoscalerClass: "none"
 spec:
   predictor:
     minReplicas: 1

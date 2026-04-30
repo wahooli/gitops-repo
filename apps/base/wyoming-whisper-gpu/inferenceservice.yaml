@@ -1,10 +1,10 @@
 apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
-  name: wyoming-whisper
+  name: wyoming-whisper-gpu
   namespace: homeassistant-assist
   labels:
-    app.kubernetes.io/name: wyoming-whisper
+    app.kubernetes.io/name: wyoming-whisper-gpu
   annotations:
     serving.kserve.io/deploymentMode: RawDeployment
     serving.kserve.io/autoscalerClass: "none"
@@ -12,23 +12,24 @@ spec:
   predictor:
     minReplicas: 1
     maxReplicas: 1
+    runtimeClassName: nvidia
     containers:
-    - name: wyoming-whisper
-      image: rhasspy/wyoming-whisper:3.1.0
+    - name: wyoming-whisper-gpu
+      image: lscr.io/linuxserver/faster-whisper:gpu
       imagePullPolicy: IfNotPresent
-      args:
-      - --model
-      - base.en
-      - --language
-      - en
-      - --compute-type
-      - int8
-      - --uri
-      - tcp://0.0.0.0:10300
-      - --data-dir
-      - /data
-      - --download-dir
-      - /data
+      env:
+      - name: WHISPER_MODEL
+        value: medium
+      - name: WHISPER_LANG
+        value: en
+      - name: WHISPER_BEAM
+        value: "1"
+      - name: PUID
+        value: "1000"
+      - name: PGID
+        value: "1000"
+      - name: TZ
+        value: UTC
       ports:
       - containerPort: 10300
         name: wyoming
@@ -39,16 +40,16 @@ spec:
           memory: 1Gi
         limits:
           cpu: "2"
-          memory: 2560Mi
+          memory: 4Gi
       readinessProbe:
         tcpSocket:
           port: wyoming
-        initialDelaySeconds: 20
+        initialDelaySeconds: 30
         periodSeconds: 10
-        failureThreshold: 30
+        failureThreshold: 60
       livenessProbe:
         tcpSocket:
           port: wyoming
-        initialDelaySeconds: 120
+        initialDelaySeconds: 180
         periodSeconds: 30
         failureThreshold: 3

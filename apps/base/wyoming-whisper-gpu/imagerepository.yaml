@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: wyoming-whisper-gpu
+  namespace: flux-system
+spec:
+  image: lscr.io/linuxserver/faster-whisper
+  interval: 24h

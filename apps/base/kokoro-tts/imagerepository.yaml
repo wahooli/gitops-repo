@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: kokoro-tts
+  namespace: flux-system
+spec:
+  image: ghcr.io/remsky/kokoro-fastapi-gpu
+  interval: 24h

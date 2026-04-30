@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../base/wyoming-whisper-gpu
+- pvc.yaml
+- tcproute.yaml
+images:
+- name: lscr.io/linuxserver/faster-whisper
+  newTag: gpu # {"$imagepolicy": "flux-system:wyoming-whisper-gpu:tag"}
+patches:
+- path: inferenceservice.yaml
+  target:
+    kind: InferenceService
+    name: wyoming-whisper-gpu
+- path: volumemounts-patch.yaml
+  target:
+    kind: InferenceService
+    name: wyoming-whisper-gpu
