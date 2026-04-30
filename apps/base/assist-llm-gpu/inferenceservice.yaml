@@ -22,13 +22,13 @@ spec:
       runtime: vllm-cuda
       args:
       - --model
-      - cosmicproc/Qwen3.5-4B-NVFP4
+      - apolo13x/Qwen3.5-9B-NVFP4
       - --served-model-name
       - assist-llm
       - --max-model-len
       - "102400"
       - --gpu-memory-utilization
-      - "0.4"
+      - "0.55"
       - --kv-cache-memory-bytes
       - "4294967296"
       - --max-num-seqs
