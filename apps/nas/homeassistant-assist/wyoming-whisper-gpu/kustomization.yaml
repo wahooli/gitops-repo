@@ -4,9 +4,6 @@ resources:
 - ../../../base/wyoming-whisper-gpu
 - pvc.yaml
 - tcproute.yaml
-images:
-- name: lscr.io/linuxserver/faster-whisper
-  newTag: gpu # {"$imagepolicy": "flux-system:wyoming-whisper-gpu:tag"}
 patches:
 - path: inferenceservice.yaml
   target:

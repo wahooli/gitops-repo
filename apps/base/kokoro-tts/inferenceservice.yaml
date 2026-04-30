@@ -10,7 +10,7 @@ metadata:
     autoscaling.knative.dev/window: "60s"
 spec:
   predictor:
-    minReplicas: 0
+    minReplicas: 1
     maxReplicas: 1
     scaleTarget: 1
     scaleMetric: concurrency

@@ -3,9 +3,6 @@ kind: Kustomization
 resources:
 - ../../../base/kokoro-tts
 - pvc.yaml
-images:
-- name: ghcr.io/remsky/kokoro-fastapi-gpu
-  newTag: latest # {"$imagepolicy": "flux-system:kokoro-tts:tag"}
 patches:
 - path: inferenceservice.yaml
   target:

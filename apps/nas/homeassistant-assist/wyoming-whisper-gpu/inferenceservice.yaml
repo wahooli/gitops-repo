@@ -6,6 +6,6 @@ metadata:
 spec:
   predictor:
     volumes:
-    - name: config
+    - name: models
       persistentVolumeClaim:
         claimName: wyoming-whisper-gpu-models

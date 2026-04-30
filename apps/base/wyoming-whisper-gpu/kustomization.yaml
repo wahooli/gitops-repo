@@ -3,5 +3,3 @@ kind: Kustomization
 resources:
 - inferenceservice.yaml
 - service.yaml
-- imagerepository.yaml
-- imagepolicy.yaml

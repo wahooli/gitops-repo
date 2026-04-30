@@ -15,21 +15,13 @@ spec:
     runtimeClassName: nvidia
     containers:
     - name: wyoming-whisper-gpu
-      image: lscr.io/linuxserver/faster-whisper:gpu-v3.1.0-ls37
+      image: ghcr.io/wahooli/docker/wyoming-whisper-gpu:latest
       imagePullPolicy: IfNotPresent
-      env:
-      - name: WHISPER_MODEL
-        value: medium
-      - name: WHISPER_LANG
-        value: en
-      - name: WHISPER_BEAM
-        value: "1"
-      - name: PUID
-        value: "1000"
-      - name: PGID
-        value: "1000"
-      - name: TZ
-        value: UTC
+      args:
+      - --model
+      - medium-int8
+      - --language
+      - en
       ports:
       - containerPort: 10300
         name: wyoming
