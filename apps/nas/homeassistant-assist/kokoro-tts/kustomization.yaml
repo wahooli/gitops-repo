@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - ../../../base/kokoro-tts
 - pvc.yaml
+- httproute-private.yaml
 patches:
 - path: inferenceservice.yaml
   target:
