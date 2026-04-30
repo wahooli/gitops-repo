@@ -23,3 +23,11 @@ spec:
         from: All
       kinds:
       - kind: TCPRoute
+  - name: wyoming-openai
+    protocol: TCP
+    port: 10200
+    allowedRoutes:
+      namespaces:
+        from: All
+      kinds:
+      - kind: TCPRoute

@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wyoming-openai
+  namespace: homeassistant-assist
+  labels:
+    app.kubernetes.io/name: wyoming-openai
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wyoming-openai
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wyoming-openai
+    spec:
+      containers:
+      - name: wyoming-openai
+        image: ghcr.io/roryeckel/wyoming_openai:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: WYOMING_URI
+          value: tcp://0.0.0.0:10200
+        - name: WYOMING_LOG_LEVEL
+          value: INFO
+        - name: WYOMING_LANGUAGES
+          value: en
+        - name: TTS_OPENAI_URL
+          value: http://kokoro-tts-predictor.homeassistant-assist.svc.cluster.local/v1
+        - name: TTS_OPENAI_KEY
+          value: not-needed
+        - name: TTS_MODELS
+          value: kokoro
+        - name: TTS_VOICES
+          value: af_alloy af_aoede af_bella af_heart af_jessica af_kore af_nicole af_nova af_river af_sarah af_sky
+        ports:
+        - containerPort: 10200
+          name: wyoming
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        readinessProbe:
+          tcpSocket:
+            port: wyoming
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 30
+        livenessProbe:
+          tcpSocket:
+            port: wyoming
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
