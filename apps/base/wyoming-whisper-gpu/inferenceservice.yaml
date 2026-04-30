@@ -19,9 +19,13 @@ spec:
       imagePullPolicy: IfNotPresent
       args:
       - --model
-      - medium-int8
+      - medium
       - --language
       - en
+      - --device
+      - cuda
+      - --compute-type
+      - float16
       ports:
       - containerPort: 10300
         name: wyoming
