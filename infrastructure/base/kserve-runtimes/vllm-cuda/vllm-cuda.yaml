@@ -8,7 +8,7 @@ spec:
     autoSelect: false
   containers:
   - name: kserve-container
-    image: vllm/vllm-openai:latest-cu130
+    image: vllm/vllm-openai:cu130-nightly
     args:
     - --host
     - 0.0.0.0
