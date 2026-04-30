@@ -18,7 +18,7 @@ spec:
     runtimeClassName: nvidia
     containers:
     - name: kokoro-tts
-      image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.2.4-master
+      image: ghcr.io/wahooli/docker/kokoro-fastapi-gpu:latest
       env:
       - name: USE_GPU
         value: "true"
