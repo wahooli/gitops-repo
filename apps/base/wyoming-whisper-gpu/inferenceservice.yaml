@@ -16,7 +16,7 @@ spec:
     containers:
     - name: wyoming-whisper-gpu
       image: ghcr.io/wahooli/docker/wyoming-whisper-gpu:blackwell
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       args:
       - --model
       - medium
