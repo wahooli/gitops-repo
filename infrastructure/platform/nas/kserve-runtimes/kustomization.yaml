@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
 - ../../../base/kserve-runtimes/llama-cpp-cpu
 - ../../../base/kserve-runtimes/llama-cpp-cuda
+- ../../../base/kserve-runtimes/vllm-cuda
 - imagerepository.yaml
 - imagepolicy.yaml

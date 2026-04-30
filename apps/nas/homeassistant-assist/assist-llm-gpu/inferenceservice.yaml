@@ -5,8 +5,10 @@ metadata:
   namespace: homeassistant-assist
 spec:
   predictor:
-    minReplicas: 1
     volumes:
-    - name: models
+    - name: hf-cache
       persistentVolumeClaim:
         claimName: assist-llm-gpu-models
+    - name: vllm-config
+      configMap:
+        name: assist-llm-gpu-vllm-config
