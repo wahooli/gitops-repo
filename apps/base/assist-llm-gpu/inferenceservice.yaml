@@ -36,8 +36,6 @@ spec:
       - --enable-auto-tool-choice
       - --tool-call-parser
       - qwen3_xml
-      - --default-chat-template-kwargs
-      - '{"enable_thinking":false}'
       resources:
         requests:
           cpu: 500m
