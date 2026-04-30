@@ -27,6 +27,8 @@ spec:
       - "102400"
       - --gpu-memory-utilization
       - "0.4"
+      - --max-num-seqs
+      - "16"
       resources:
         requests:
           cpu: 500m

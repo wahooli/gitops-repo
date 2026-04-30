@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
 - ../../../base/assist-llm-gpu
 - pvc.yaml
+- httproute-private.yaml
+- securitypolicy.yaml
 patches:
 - path: inferenceservice.yaml
   target:
