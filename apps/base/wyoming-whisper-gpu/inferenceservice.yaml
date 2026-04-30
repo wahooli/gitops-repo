@@ -15,7 +15,7 @@ spec:
     runtimeClassName: nvidia
     containers:
     - name: wyoming-whisper-gpu
-      image: lscr.io/linuxserver/faster-whisper:gpu
+      image: lscr.io/linuxserver/faster-whisper:gpu-v3.1.0-ls37
       imagePullPolicy: IfNotPresent
       env:
       - name: WHISPER_MODEL
