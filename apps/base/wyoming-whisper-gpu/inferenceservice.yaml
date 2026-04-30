@@ -15,7 +15,7 @@ spec:
     runtimeClassName: nvidia
     containers:
     - name: wyoming-whisper-gpu
-      image: ghcr.io/wahooli/docker/wyoming-whisper-gpu:latest
+      image: ghcr.io/wahooli/docker/wyoming-whisper-gpu:blackwell
       imagePullPolicy: IfNotPresent
       args:
       - --model
