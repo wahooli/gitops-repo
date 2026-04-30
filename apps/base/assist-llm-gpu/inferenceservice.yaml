@@ -23,10 +23,14 @@ spec:
       args:
       - --model
       - cosmicproc/Qwen3.5-4B-NVFP4
+      - --served-model-name
+      - assist-llm
       - --max-model-len
       - "102400"
       - --gpu-memory-utilization
       - "0.4"
+      - --kv-cache-memory-bytes
+      - "4294967296"
       - --max-num-seqs
       - "16"
       resources:

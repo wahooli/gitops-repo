@@ -11,7 +11,11 @@ spec:
   hostnames:
   - "assist-llm.${domain_wahoo_li:=wahoo.li}"
   rules:
-  - backendRefs:
+  - filters:
+    - type: URLRewrite
+      urlRewrite:
+        hostname: assist-llm-gpu-predictor.homeassistant-assist.svc.cluster.local
+    backendRefs:
     - name: assist-llm-gpu-predictor
       port: 80
     timeouts:
