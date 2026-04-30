@@ -20,7 +20,7 @@ spec:
     - --limit-mm-per-prompt
     - '{"image":0,"video":0}'
     - --generation-config
-    - /etc/vllm/generation_config.json
+    - /etc/vllm
     env:
     - name: VLLM_NVFP4_GEMM_BACKEND
       value: marlin
