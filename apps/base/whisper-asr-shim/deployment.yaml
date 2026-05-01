@@ -42,11 +42,15 @@ spec:
           protocol: TCP
         resources:
           requests:
-            cpu: 25m
-            memory: 64Mi
-          limits:
-            cpu: 500m
+            cpu: 50m
             memory: 256Mi
+          limits:
+            # Audio is loaded into memory as 16 kHz mono float32 before being
+            # re-encoded as WAV bytes. A 2-hour movie ≈ 230 MB for the
+            # numpy buffer alone, plus the WAV copy and Python overhead;
+            # 4 GiB gives headroom for back-to-back jobs.
+            cpu: "2"
+            memory: 4Gi
         readinessProbe:
           tcpSocket:
             port: http
