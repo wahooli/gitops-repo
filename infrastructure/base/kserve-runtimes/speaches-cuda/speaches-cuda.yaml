@@ -18,6 +18,10 @@ spec:
       value: "-1"
     - name: HF_HOME
       value: /cache/hf
+    # Default 10s is too short for the XET-backed LFS CDN — model.bin
+    # head call has timed out on cold cache. 120s gives plenty of slack.
+    - name: HF_HUB_DOWNLOAD_TIMEOUT
+      value: "120"
     ports:
     - containerPort: 8000
       protocol: TCP
