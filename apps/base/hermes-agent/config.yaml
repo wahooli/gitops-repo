@@ -1,0 +1,46 @@
+model:
+  default: assist-llm
+  provider: custom
+  base_url: http://assist-llm-gpu-predictor.homeassistant-assist.svc.cluster.local/v1
+  api_key: not-needed
+
+terminal:
+  backend: local
+  cwd: /opt/data/workspace
+  timeout: 180
+  lifetime_seconds: 300
+
+agent:
+  max_turns: 60
+  reasoning_effort: medium
+  verbose: false
+
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+
+# Pin auxiliary tasks to the main Qwen endpoint so we don't depend on
+# OpenRouter/Nous Portal credentials. Vision will degrade — Qwen3.5-9B is
+# text-only — but vision tools are excluded from platform_toolsets below.
+auxiliary:
+  vision:
+    provider: main
+  web_extract:
+    provider: main
+  session_search:
+    provider: main
+  compression:
+    provider: main
+
+# Compose toolsets explicitly: drop vision (no multimodal model), browser
+# (needs Browserbase key), image_gen (needs FAL key), tts (no audio sink in
+# pod). Keep terminal/file/web/skills/todo/memory.
+platform_toolsets:
+  cli:
+  - terminal
+  - file
+  - web
+  - skills
+  - todo
+  - memory
+  - session_search

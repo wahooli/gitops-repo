@@ -1,0 +1,18 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: hermes-agent-apikey
+  namespace: hermes-agent
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: hermes-agent-private
+  apiKeyAuth:
+    extractFrom:
+    - headers:
+      - Authorization
+    credentialRefs:
+    - group: ""
+      kind: Secret
+      name: hermes-agent-api-keys
