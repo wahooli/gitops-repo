@@ -28,7 +28,12 @@ spec:
       resources:
         requests:
           cpu: 500m
-          memory: 1Gi
+          memory: 2Gi
         limits:
+          # Long-form transcription holds the full audio buffer + VAD +
+          # ctranslate2 activations in RAM at once. A ~1h 16 kHz mono
+          # float32 audio is ~220 MB just for the buffer; movies push
+          # well past that. 4 Gi OOMed at 58 min, 8 Gi gives margin for
+          # 3 h files.
           cpu: "2"
-          memory: 4Gi
+          memory: 8Gi
