@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: assist-llm-cpu-models
+  labels:
+    app.kubernetes.io/name: assist-llm-cpu
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  claimRef:
+    namespace: homeassistant-assist
+    name: assist-llm-cpu-models
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: assist-llm-cpu-models
+    volumeAttributes:
+      path: /buckets/assist-llm-cpu-models
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: assist-llm-cpu-models
+  namespace: homeassistant-assist
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ""
+  volumeName: assist-llm-cpu-models
+  resources:
+    requests:
+      storage: 10Gi

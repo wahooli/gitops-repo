@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homeassistant-assist
+  labels:
+    topolvm.io/webhook: ignore
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent

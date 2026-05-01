@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: wyoming-whisper
+  namespace: flux-system
+spec:
+  image: rhasspy/wyoming-whisper
+  interval: 24h

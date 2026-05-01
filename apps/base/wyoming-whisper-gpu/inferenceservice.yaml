@@ -1,0 +1,51 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: wyoming-whisper-gpu
+  namespace: homeassistant-assist
+  labels:
+    app.kubernetes.io/name: wyoming-whisper-gpu
+  annotations:
+    serving.kserve.io/deploymentMode: RawDeployment
+    serving.kserve.io/autoscalerClass: "none"
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    runtimeClassName: nvidia
+    containers:
+    - name: wyoming-whisper-gpu
+      image: ghcr.io/wahooli/docker/wyoming-whisper-gpu:blackwell
+      imagePullPolicy: Always
+      args:
+      - --model
+      - medium
+      - --language
+      - en
+      - --device
+      - cuda
+      - --compute-type
+      - int8_float16
+      ports:
+      - containerPort: 10300
+        name: wyoming
+        protocol: TCP
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: "2"
+          memory: 4Gi
+      readinessProbe:
+        tcpSocket:
+          port: wyoming
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        failureThreshold: 60
+      livenessProbe:
+        tcpSocket:
+          port: wyoming
+        initialDelaySeconds: 180
+        periodSeconds: 30
+        failureThreshold: 3

@@ -3,6 +3,9 @@ kind: Kustomization
 resources:
 - ../../base/whisper-asr
 - pvc.yaml
+images:
+- name: onerahmet/openai-whisper-asr-webservice
+  newTag: v1.9.1 # {"$imagepolicy": "flux-system:whisper-asr:tag"}
 patches:
 - target:
     kind: InferenceService

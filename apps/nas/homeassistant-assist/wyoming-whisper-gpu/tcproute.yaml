@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: wyoming-whisper-gpu
+  namespace: homeassistant-assist
+spec:
+  parentRefs:
+  - name: envoy-gw-voice
+    namespace: envoy-gateway-system
+    sectionName: wyoming-whisper
+  rules:
+  - backendRefs:
+    - name: wyoming-whisper-gpu
+      port: 10300

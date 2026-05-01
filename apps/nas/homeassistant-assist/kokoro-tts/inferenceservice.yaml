@@ -1,0 +1,11 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: kokoro-tts
+  namespace: homeassistant-assist
+spec:
+  predictor:
+    volumes:
+    - name: models
+      persistentVolumeClaim:
+        claimName: kokoro-tts-models

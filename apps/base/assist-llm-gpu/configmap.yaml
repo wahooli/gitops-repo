@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: assist-llm-gpu-vllm-config
+  namespace: homeassistant-assist
+  labels:
+    velero.io/exclude-from-backup: "true"
+data:
+  generation_config.json: |
+    {
+      "temperature": 0.7,
+      "top_k": 20,
+      "top_p": 0.8
+    }

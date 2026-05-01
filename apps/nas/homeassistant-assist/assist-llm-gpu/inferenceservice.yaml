@@ -1,0 +1,14 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: assist-llm-gpu
+  namespace: homeassistant-assist
+spec:
+  predictor:
+    volumes:
+    - name: hf-cache
+      persistentVolumeClaim:
+        claimName: assist-llm-gpu-models
+    - name: vllm-config
+      configMap:
+        name: assist-llm-gpu-vllm-config

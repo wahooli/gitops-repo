@@ -4,6 +4,7 @@ resources:
 - ../../base/envoy-gateway
 - gateway-ai-alias.yaml
 - gateway-ai-stub-tpi-1.yaml
+- gateway-voice.yaml
 patches:
 - path: envoy-proxy-patch.yaml
   target:

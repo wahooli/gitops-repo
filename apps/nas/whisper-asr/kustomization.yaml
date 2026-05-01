@@ -3,6 +3,9 @@ kind: Kustomization
 resources:
 - ../../base/whisper-asr
 - pvc.yaml
+images:
+- name: onerahmet/openai-whisper-asr-webservice
+  newTag: v1.9.1-gpu # {"$imagepolicy": "flux-system:whisper-asr-gpu:tag"}
 patches:
 - target:
     kind: InferenceService
@@ -11,9 +14,6 @@ patches:
     - op: add
       path: /spec/predictor/runtimeClassName
       value: nvidia
-    - op: replace
-      path: /spec/predictor/containers/0/image
-      value: onerahmet/openai-whisper-asr-webservice:latest-gpu
     - op: replace
       path: /spec/predictor/containers/0/resources
       value:

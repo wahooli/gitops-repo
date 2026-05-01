@@ -1,0 +1,57 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: base-assist-llm-gpu
+  namespace: homeassistant-assist
+  labels:
+    networking.knative.dev/visibility: cluster-local
+  annotations:
+    autoscaling.knative.dev/scale-down-delay: "10m"
+    autoscaling.knative.dev/window: "60s"
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    scaleTarget: 1
+    scaleMetric: concurrency
+    timeout: 9000
+    runtimeClassName: nvidia
+    model:
+      modelFormat:
+        name: vllm
+      runtime: vllm-cuda
+      args:
+      - --model
+      # uncensored variants tried, all broken on consumer Blackwell W4A16 fallback path:
+      # - YuYu1015/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated-NVFP4 # broken: Qwen3_5TextConfig unsupported in current vLLM (PR #39316 unmerged)
+      # - sakamakismile/Huihui-Qwen3.5-9B-abliterated-NVFP4 # works but ~32GB repo (sharded+unsharded duplicate) and slower
+      # - prithivMLmods/Qwen3.5-9B-abliterated-v2-MAX-NVFP4 # MAX abliteration broke numerics — outputs !!!! garbage
+      # - nivvis/Qwen3.5-9B-heretic-NVFP4A16 # heretic uncensoring also broke numerics — token-soup output
+      - apolo13x/Qwen3.5-9B-NVFP4
+      - --served-model-name
+      - assist-llm
+      - --quantization
+      - compressed-tensors
+      - --language-model-only
+      - --trust-remote-code
+      - --max-model-len
+      - "102400"
+      - --gpu-memory-utilization
+      - "0.55"
+      - --kv-cache-memory-bytes
+      - "4294967296"
+      - --max-num-seqs
+      - "16"
+      - --enable-chunked-prefill
+      - --enable-auto-tool-choice
+      - --tool-call-parser
+      - qwen3_coder
+      - --reasoning-parser
+      - qwen3
+      resources:
+        requests:
+          cpu: 500m
+          memory: 4Gi
+        limits:
+          cpu: "4"
+          memory: 8Gi

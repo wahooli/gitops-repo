@@ -18,7 +18,7 @@ spec:
         claimName: whisper-asr-models
     containers:
     - name: whisper
-      image: onerahmet/openai-whisper-asr-webservice:latest
+      image: onerahmet/openai-whisper-asr-webservice:v1.9.1
       ports:
       - containerPort: 9000
         protocol: TCP

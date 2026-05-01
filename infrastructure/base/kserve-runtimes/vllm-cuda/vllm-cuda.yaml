@@ -1,0 +1,54 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: vllm-cuda
+spec:
+  supportedModelFormats:
+  - name: vllm
+    autoSelect: false
+  containers:
+  - name: kserve-container
+    image: vllm/vllm-openai:cu130-nightly
+    args:
+    - --host
+    - 0.0.0.0
+    - --port
+    - "8000"
+    - --enable-prefix-caching
+    - --kv-cache-dtype
+    - fp8_e4m3
+    - --limit-mm-per-prompt
+    - '{"image":0,"video":0}'
+    - --generation-config
+    - /etc/vllm
+    env:
+    - name: VLLM_NVFP4_GEMM_BACKEND
+      value: marlin
+    - name: PYTORCH_ALLOC_CONF
+      value: expandable_segments:True
+    - name: HF_HOME
+      value: /cache/hf
+    - name: HF_HUB_DISABLE_XET
+      value: "1"
+    ports:
+    - containerPort: 8000
+      protocol: TCP
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 60
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8000
+      initialDelaySeconds: 600
+      periodSeconds: 60
+    volumeMounts:
+    - name: hf-cache
+      mountPath: /cache/hf
+    - name: vllm-config
+      mountPath: /etc/vllm

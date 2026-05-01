@@ -1,0 +1,5 @@
+- op: add
+  path: /spec/predictor/containers/0/volumeMounts
+  value:
+  - name: voices
+    mountPath: /data

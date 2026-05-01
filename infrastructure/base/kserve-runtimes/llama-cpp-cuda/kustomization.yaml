@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- llama-cpp-cuda.yaml
+images:
+- name: ghcr.io/ggml-org/llama.cpp
+  newTag: server-cuda # {"$imagepolicy": "flux-system:llama-cpp-cuda:tag"}
