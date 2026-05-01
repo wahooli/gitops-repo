@@ -1,0 +1,49 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: assist-llm-disable-thinking
+  namespace: homeassistant-assist
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: assist-llm-gpu-private
+  lua:
+  - type: Inline
+    inline: |
+      -- Inject `chat_template_kwargs.enable_thinking = false` into POST
+      -- /v1/chat/completions bodies that don't already specify it. Scope
+      -- is the assist-llm-gpu-private HTTPRoute, which is HA's only
+      -- entry point. In-cluster callers (OpenWebUI, Hermes) bypass this
+      -- by hitting the predictor's ClusterIP directly, so they keep
+      -- thinking on by model default.
+      function envoy_on_request(request_handle)
+        local headers = request_handle:headers()
+        if headers:get(":method") ~= "POST" then return end
+
+        local path = headers:get(":path") or ""
+        if not path:find("^/v1/chat/completions") then return end
+
+        local body_buf = request_handle:body(true)
+        if not body_buf or body_buf:length() == 0 then return end
+
+        local body = body_buf:getBytes(0, body_buf:length())
+        if not body then return end
+
+        -- If the caller already set the kwarg block, leave the body alone.
+        if body:find("chat_template_kwargs", 1, true) then return end
+
+        -- Match everything up to the final closing brace; %s*$ tolerates
+        -- trailing whitespace.
+        local prefix = body:match("^(.-)}%s*$")
+        if not prefix then return end
+
+        -- Empty object {} → no leading comma.
+        local sep = ","
+        if prefix:sub(-1) == "{" then sep = "" end
+
+        local new_body = prefix .. sep ..
+          '"chat_template_kwargs":{"enable_thinking":false}}'
+        body_buf:setBytes(new_body)
+        headers:replace("content-length", tostring(#new_body))
+      end

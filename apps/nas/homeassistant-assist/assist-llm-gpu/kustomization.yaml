@@ -5,6 +5,7 @@ resources:
 - pvc.yaml
 - httproute-private.yaml
 - securitypolicy.yaml
+- envoyextensionpolicy.yaml
 patches:
 - path: inferenceservice.yaml
   target:

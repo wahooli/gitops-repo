@@ -19,7 +19,7 @@ websocket:
 
 enableOpenaiApi: true
 openaiBaseApiUrls:
-- http://assist-llm-router.homeassistant-assist.svc.cluster.local:4000/v1
+- http://assist-llm-gpu-predictor.homeassistant-assist.svc.cluster.local/v1
 - http://hermes-agent.hermes-agent.svc.cluster.local/v1
 openaiApiKeysExistingSecret: open-webui-openai-keys
 openaiApiKeysExistingSecretKey: keys
@@ -66,9 +66,13 @@ extraEnvVars:
 #   https://chat.<domain>/oauth/oidc/callback
 - name: WEBUI_URL
   value: "https://chat.${domain_wahoo_li:=wahoo.li}"
-# Disable email/password signup; OAuth-only via sso.oidc above. Form login
-# itself stays on as a fallback in case OIDC misconfigures.
+# Disable email/password signup AND the login form — OAuth-only.
+# If Authentik breaks, recover via:
+#   kubectl -n open-webui exec -it open-webui-0 -- \
+#     bash -c 'cd /app/backend && python -m open_webui.cli list-users'
 - name: ENABLE_SIGNUP
+  value: "false"
+- name: ENABLE_LOGIN_FORM
   value: "false"
 - name: DEFAULT_USER_ROLE
   value: pending
