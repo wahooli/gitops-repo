@@ -22,7 +22,8 @@ spec:
       runtime: vllm-cuda
       args:
       - --model
-      - YuYu1015/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated-NVFP4
+      # - YuYu1015/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated-NVFP4 # broken: Qwen3_5TextConfig unsupported in current vLLM (PR #39316 unmerged)
+      - huihui-ai/Huihui-Qwen3.5-9B-abliterated-NVFP4
       - --served-model-name
       - assist-llm
       - --quantization
