@@ -79,10 +79,22 @@ extraEnvVars:
 # Skip RAG embedding model download on first boot.
 - name: RAG_EMBEDDING_ENGINE
   value: ""
+# STT: leave blank → built-in faster-whisper in the pod (CPU, model 'base').
+# wyoming-whisper-gpu is Wyoming-protocol only and can't be used directly.
 - name: AUDIO_STT_ENGINE
   value: ""
+# TTS: route through the existing kokoro-tts InferenceService — same OpenAI
+# endpoint `wyoming-openai` already consumes for HA voice.
 - name: AUDIO_TTS_ENGINE
-  value: ""
+  value: openai
+- name: AUDIO_TTS_OPENAI_API_BASE_URL
+  value: http://kokoro-tts-predictor.homeassistant-assist.svc.cluster.local/v1
+- name: AUDIO_TTS_OPENAI_API_KEY
+  value: not-needed
+- name: AUDIO_TTS_MODEL
+  value: kokoro
+- name: AUDIO_TTS_VOICE
+  value: af_bella
 
 resources:
   requests:

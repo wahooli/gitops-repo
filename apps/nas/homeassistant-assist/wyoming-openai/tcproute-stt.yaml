@@ -1,14 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
 metadata:
-  name: wyoming-openai
+  name: wyoming-openai-stt
   namespace: homeassistant-assist
 spec:
   parentRefs:
   - name: envoy-gw-voice
     namespace: envoy-gateway-system
-    sectionName: wyoming-openai
+    sectionName: wyoming-whisper
   rules:
   - backendRefs:
     - name: wyoming-openai
-      port: 10200
+      port: 10300

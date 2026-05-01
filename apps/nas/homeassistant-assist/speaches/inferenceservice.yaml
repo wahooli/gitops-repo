@@ -1,11 +1,11 @@
 apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
-  name: wyoming-whisper-gpu
+  name: speaches
   namespace: homeassistant-assist
 spec:
   predictor:
     volumes:
-    - name: models
+    - name: hf-cache
       persistentVolumeClaim:
-        claimName: wyoming-whisper-gpu-models
+        claimName: speaches-models
