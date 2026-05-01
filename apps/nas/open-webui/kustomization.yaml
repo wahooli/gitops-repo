@@ -3,3 +3,9 @@ kind: Kustomization
 resources:
 - ../../base/open-webui
 - httproute-private.yaml
+patches:
+- path: helmrelease.yaml
+  target:
+    kind: HelmRelease
+  options:
+    allowNameChange: true
