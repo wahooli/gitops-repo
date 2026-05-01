@@ -25,6 +25,10 @@ spec:
       - YuYu1015/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated-NVFP4
       - --served-model-name
       - assist-llm
+      - --quantization
+      - compressed-tensors
+      - --language-model-only
+      - --trust-remote-code
       - --max-model-len
       - "102400"
       - --gpu-memory-utilization
@@ -33,9 +37,10 @@ spec:
       - "4294967296"
       - --max-num-seqs
       - "16"
+      - --enable-chunked-prefill
       - --enable-auto-tool-choice
       - --tool-call-parser
-      - qwen3_xml
+      - qwen3_coder
       - --reasoning-parser
       - qwen3
       resources:
