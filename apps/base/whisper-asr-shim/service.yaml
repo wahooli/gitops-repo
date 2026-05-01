@@ -3,7 +3,7 @@ kind: Service
 metadata:
   # Named to match the old KServe-auto-generated whisper-asr Service so
   # Bazarr's existing endpoint URL keeps working without reconfig.
-  name: whisper-asr-predictor
+  name: whisper-asr-shim
   namespace: default
   labels:
     app.kubernetes.io/name: whisper-asr-shim
