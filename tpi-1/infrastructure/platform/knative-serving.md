@@ -7,44 +7,51 @@ grand_parent: "tpi-1"
 # knative-serving
 
 ## Overview
-Knative Serving is a component of the Knative framework that enables the deployment and management of serverless workloads on Kubernetes. It provides features such as automatic scaling, traffic splitting, and revision management for applications. In this deployment, Knative Serving is configured to work with the Gateway API for ingress management.
+Knative Serving is a Kubernetes component that provides the ability to deploy and manage serverless workloads. It enables automatic scaling of applications, including scaling down to zero, and supports routing and traffic management. This deployment is part of the infrastructure platform for the cluster `tpi-1`.
 
 ## Sub-components
-This deployment does not have multiple HelmReleases.
+This deployment does not contain multiple HelmReleases.
 
 ## Dependencies
-This deployment does not have any dependencies specified.
+This deployment does not have any specified dependencies.
 
 ## Helm Chart(s)
-- **Chart Name**: knative-serving
-- **Repository**: knative.dev
-- **Version**: 1.21.1
+- **Chart Name:** knative-serving
+- **Repository:** operator.knative.dev
+- **Version:** 1.21.1
 
 ## Resource Glossary
 ### Networking
-- **KnativeServing**: The primary resource that configures the Knative Serving component, including settings for domain, ingress class, and feature flags.
-- **Deployment**: Two deployments are created:
-  - **net-gateway-api-controller**: Manages the controller for the Gateway API, responsible for handling HTTP routes and ingress traffic.
-  - **net-gateway-api-webhook**: Provides a webhook for validating configurations related to the Gateway API.
-- **Service**: Exposes the webhook deployment, allowing it to receive traffic on specified ports for metrics and profiling.
-- **ValidatingWebhookConfiguration**: Configures the admission controller to validate incoming requests to the Gateway API.
+- **KnativeServing:** The main resource that configures the Knative Serving component, including settings for domain, timeout, and feature flags.
+- **Service (net-gateway-api-webhook):** Exposes the webhook for the net-gateway-api, allowing it to receive and process admission requests.
+- **ValidatingWebhookConfiguration:** Configures the webhook to validate incoming requests for the net-gateway-api.
 
 ### Security
-- **ClusterRole**: Two roles are created to manage permissions for the Gateway API controller and its components, allowing it to interact with Gateway API resources.
-- **Secret**: Stores certificates for the webhook to ensure secure communication.
+- **ClusterRole (knative-gateway-api-admin):** Provides administrative access for the Knative Serving component, though no specific rules are defined.
+- **ClusterRole (knative-gateway-api-core):** Grants permissions to manage gateway resources, including HTTP routes and reference policies.
+
+### Workloads
+- **Deployment (net-gateway-api-controller):** Runs the controller for the net-gateway-api, responsible for managing the lifecycle of gateway resources.
+- **Deployment (net-gateway-api-webhook):** Runs the webhook server that handles admission requests for the net-gateway-api.
 
 ### Configuration
-- **ConfigMap**: Contains configuration details for external and local gateways, specifying supported features for the Gateway API.
+- **ConfigMap (config-gateway):** Stores configuration for external and local gateways, specifying supported features.
+
+### Secrets
+- **Secret (net-gateway-api-webhook-certs):** Holds certificates for the webhook to ensure secure communication.
 
 ## Configuration Highlights
-- **Resource Requests/Limits**: 
-  - `net-gateway-api-controller`: Requests 100m CPU and 100Mi memory; limits 1000m CPU and 1000Mi memory.
-  - `net-gateway-api-webhook`: Requests 20m CPU and 20Mi memory; limits 200m CPU and 200Mi memory.
-- **Replicas**: The deployments are configured with a single replica.
-- **Environment Variables**: Key environment variables include `SYSTEM_NAMESPACE`, `CONFIG_LOGGING_NAME`, and `METRICS_DOMAIN`, which are essential for the operation of the Knative Serving components.
+- **Resource Requests/Limits:** 
+  - Controller: Requests 100m CPU and 100Mi memory; limits 1000m CPU and 1000Mi memory.
+  - Webhook: Requests 20m CPU and 20Mi memory; limits 200m CPU and 200Mi memory.
+- **Replicas:** Both deployments are set to 1 replica.
+- **Environment Variables:** 
+  - SYSTEM_NAMESPACE: Automatically set to the namespace of the deployment.
+  - CONFIG_LOGGING_NAME and CONFIG_OBSERVABILITY_NAME: Set to `config-logging` and `config-observability`, respectively.
+  - METRICS_DOMAIN: Set to `knative.dev/net-gateway-api`.
 
 ## Deployment
-- **Target Namespace**: knative-serving
-- **Release Name**: knative-serving
-- **Reconciliation Interval**: Not specified in the manifests.
-- **Install/Upgrade Behavior**: Not specified in the manifests.
+- **Target Namespace:** knative-serving
+- **Release Name:** knative-serving
+- **Reconciliation Interval:** Not specified in the manifests.
+- **Install/Upgrade Behavior:** Not specified in the manifests.

@@ -5,7 +5,7 @@ nav_order: 0
 
 # GitOps Repository Documentation
 
-This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kustomize, and Helm. Below is the structured documentation for each cluster, including applications and infrastructure components.
+This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kustomize, and Helm. It provides a structured approach to deploying and managing applications and infrastructure across different environments.
 
 ### livingroom-pi
 - [Cluster overview](livingroom-pi/overview.md)
@@ -114,6 +114,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [haproxy](nas/infrastructure/platform/haproxy.md)
 - [ingress-nginx](nas/infrastructure/platform/ingress-nginx.md)
 - [knative-serving](nas/infrastructure/platform/knative-serving.md)
+- [kserve-runtimes](nas/infrastructure/platform/kserve-runtimes.md)
 - [kserve](nas/infrastructure/platform/kserve.md)
 - [kube-state-metrics](nas/infrastructure/platform/kube-state-metrics.md)
 - [node-exporter](nas/infrastructure/platform/node-exporter.md)
@@ -142,6 +143,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [sources](tpi-1/apps/sources.md)
 - [tautulli](tpi-1/apps/tautulli.md)
 - [vaultwarden](tpi-1/apps/vaultwarden.md)
+- [whisper-asr](tpi-1/apps/whisper-asr.md)
 
 **Infrastructure / alerting:**
 - [alerting](tpi-1/infrastructure/alerting/alerting.md)
@@ -190,6 +192,7 @@ This repository manages multiple Kubernetes clusters using Flux CD, Cilium, Kust
 - [haproxy](tpi-1/infrastructure/platform/haproxy.md)
 - [ingress-nginx](tpi-1/infrastructure/platform/ingress-nginx.md)
 - [knative-serving](tpi-1/infrastructure/platform/knative-serving.md)
+- [kserve-runtimes](tpi-1/infrastructure/platform/kserve-runtimes.md)
 - [kserve](tpi-1/infrastructure/platform/kserve.md)
 - [kube-state-metrics](tpi-1/infrastructure/platform/kube-state-metrics.md)
 - [node-exporter](tpi-1/infrastructure/platform/node-exporter.md)

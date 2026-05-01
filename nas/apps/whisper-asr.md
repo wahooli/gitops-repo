@@ -7,48 +7,57 @@ grand_parent: "nas"
 # whisper-asr
 
 ## Overview
-The `whisper-asr` component provides an automatic speech recognition (ASR) service using the Whisper model. It is deployed in the `default` namespace of the cluster `nas`. This service leverages GPU resources for efficient processing and is designed to handle concurrent requests for transcription.
+The `whisper-asr` component provides an automatic speech recognition (ASR) service using the OpenAI Whisper model. It is deployed in the `default` namespace of the cluster `nas` and is designed to handle audio transcription tasks. The service is optimized for GPU usage, leveraging NVIDIA runtime for efficient processing.
 
 ## Sub-components
-This deployment consists of a single InferenceService and a PersistentVolumeClaim, which are essential for the operation of the ASR service.
+This deployment does not have multiple HelmReleases.
 
 ## Dependencies
-There are no dependencies specified for this component.
+This deployment does not have any dependencies.
 
 ## Helm Chart(s)
-- **Chart Name:** openai-whisper-asr-webservice
-- **Repository:** Not specified (assumed to be a public repository)
-- **Version:** latest
+This deployment does not utilize Helm charts as it is defined directly through Kubernetes manifests.
 
 ## Resource Glossary
 ### InferenceService
-- **Purpose:** This resource defines the ASR service that handles incoming requests for speech recognition. It specifies the container image, environment variables, resource limits, and scaling configurations.
-- **Key Features:**
-  - **Container:** Runs the `onerahmet/openai-whisper-asr-webservice:latest-gpu` image.
-  - **Environment Variables:** Configures the ASR engine to use `faster_whisper` and the model to `medium`.
-  - **Scaling:** Configured to scale based on concurrency with a minimum of 0 and a maximum of 1 replica.
-  - **Timeout:** Set to 9000 milliseconds for request processing.
+- **Kind**: `InferenceService`
+- **Purpose**: This resource defines the ASR service that handles incoming requests for audio transcription. It specifies the container image, environment variables, resource limits, and scaling behavior.
+- **Key Features**:
+  - **Container**: Uses the image `onerahmet/openai-whisper-asr-webservice:v1.9.1-gpu`.
+  - **Environment Variables**: Configured with `ASR_ENGINE`, `ASR_MODEL`, and `HF_HOME` for model configuration.
+  - **Resource Limits**: Requests 1 CPU and 4Gi of memory, with limits set to 2 CPUs and 6Gi of memory.
+  - **Scaling**: Configured to scale based on concurrency with a minimum of 0 and a maximum of 1 replica.
 
 ### PersistentVolumeClaim
-- **Purpose:** This resource allocates persistent storage for the ASR model cache, ensuring that the model data is retained across pod restarts.
-- **Specifications:**
-  - **Storage Size:** Requests 10Gi of storage.
-  - **Access Mode:** Set to `ReadWriteOnce`, allowing a single node to read and write to the volume.
-  - **Storage Class:** Uses `topolvm-fast` for optimized storage performance.
+- **Kind**: `PersistentVolumeClaim`
+- **Purpose**: This resource requests storage for caching the ASR model files, ensuring that the model is available for the service to use.
+- **Specifications**: Requests 10Gi of storage with `ReadWriteOnce` access mode and uses the `topolvm-fast` storage class.
+
+### ImageRepository
+- **Kind**: `ImageRepository`
+- **Purpose**: Defines the source of the container image for the ASR service, allowing Flux to monitor and update the image as needed.
+- **Specifications**: Monitors the image `onerahmet/openai-whisper-asr-webservice` with a reconciliation interval of 24 hours.
+
+### ImagePolicy
+- **Kind**: `ImagePolicy`
+- **Purpose**: Specifies the versioning policy for the ASR service images, allowing for automated updates based on semantic versioning.
+- **Specifications**: Two policies are defined:
+  - `whisper-asr`: Monitors versions in the format `vX.Y.Z`.
+  - `whisper-asr-gpu`: Monitors versions in the format `vX.Y.Z-gpu`.
 
 ## Configuration Highlights
-- **Resource Requests/Limits:**
-  - CPU: Requests 1 core, limits set to 2 cores.
-  - Memory: Requests 4Gi, limits set to 6Gi.
-- **Persistence:** Utilizes a PersistentVolumeClaim named `whisper-asr-models` for model caching.
-- **Replica Counts:** Configured to scale between 0 and 1 replicas based on concurrency.
-- **Environment Variables:**
+- **Resource Requests/Limits**: 
+  - Requests: 1 CPU, 4Gi memory.
+  - Limits: 2 CPUs, 6Gi memory.
+- **Persistence**: The model cache is stored in a PersistentVolumeClaim named `whisper-asr-models`.
+- **Replicas**: Configured with a minimum of 0 and a maximum of 1 replica.
+- **Environment Variables**:
   - `ASR_ENGINE`: Set to `faster_whisper`.
   - `ASR_MODEL`: Set to `medium`.
   - `HF_HOME`: Set to `/cache/hf`.
 
 ## Deployment
-- **Target Namespace:** default
-- **Release Name:** whisper-asr
-- **Reconciliation Interval:** Not specified.
-- **Install/Upgrade Behavior:** Not specified.
+- **Target Namespace**: `default`
+- **Release Name**: Not applicable as this is not a Helm deployment.
+- **Reconciliation Interval**: 24 hours for image updates.
+- **Install/Upgrade Behavior**: Managed through Flux, ensuring the latest compatible image is deployed based on the defined policies.

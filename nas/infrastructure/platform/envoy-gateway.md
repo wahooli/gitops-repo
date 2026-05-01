@@ -7,50 +7,40 @@ grand_parent: "nas"
 # envoy-gateway
 
 ## Overview
-The `envoy-gateway` component serves as a gateway for managing incoming traffic to services within the Kubernetes cluster. It utilizes Envoy Proxy to provide advanced traffic management features, including load balancing, traffic routing, and telemetry. This deployment consists of multiple EnvoyProxy configurations and Gateway resources to handle both public and private traffic efficiently.
+The `envoy-gateway` component serves as a gateway for managing traffic routing within the Kubernetes cluster named `nas`. It utilizes Envoy Proxy to handle incoming requests and route them to appropriate services based on defined rules. This deployment includes multiple gateways for public and private traffic, ensuring secure and efficient communication across services.
 
 ## Sub-components
-This deployment does not have multiple HelmReleases.
+This deployment consists of multiple EnvoyProxy configurations and gateways, each serving different traffic patterns and purposes.
 
 ## Dependencies
-This deployment does not have any dependencies.
+There are no explicit dependencies defined in the manifests for this component.
 
 ## Helm Chart(s)
-This deployment does not utilize Helm charts.
+- **Chart Name**: envoy-gateway
+- **Repository**: gateway.envoyproxy.io
+- **Version**: latest
 
 ## Resource Glossary
-### Networking Resources
-- **GatewayClass**: Defines a class of gateways that can be managed by the Envoy Proxy controller. It specifies the controller name as `gateway.envoyproxy.io/gatewayclass-controller`.
-  
-- **Gateway**: Represents a network gateway that manages traffic routing. Three Gateway resources are defined:
-  - `envoy-gw`: Handles HTTP and HTTPS traffic for the domain `wahoo.li` and terminates TLS using a specified secret.
-  - `envoy-gw-private`: Similar to `envoy-gw`, but also manages traffic for the domain `absolutist.it` and includes additional HTTP and HTTPS listeners.
-  - `envoy-gw-ai`: A dedicated gateway for AI-related traffic, configured to handle HTTP requests.
+### Networking
+- **Gateway**: Defines entry points for traffic into the cluster. Multiple gateways are configured for different protocols (HTTP, HTTPS, TCP) and hostnames, allowing for flexible routing.
+- **HTTPRoute**: Specifies routing rules for HTTP traffic, including redirection from HTTP to HTTPS.
+- **Service**: Exposes the Envoy Proxy to handle incoming traffic. Services are defined for different gateways, ensuring that traffic is directed to the correct Envoy instance.
 
-- **HTTPRoute**: Defines routing rules for HTTP traffic. The `envoy-gw-private-https-redirect` resource redirects HTTP traffic to HTTPS for specified hostnames.
+### Security
+- **ClientTrafficPolicy**: Manages policies related to client traffic, such as connection limits and IP detection settings.
+- **BackendTrafficPolicy**: Configures policies for backend services, including compression settings for responses.
 
-### Service Resources
-- **Service**: Two ClusterIP services are defined:
-  - `envoy-gw-ai-nas`: Exposes the `envoy-gw-ai` gateway for internal traffic on port 80, targeting port 10080.
-  - `envoy-gw-ai-tpi-1`: Another service for internal traffic, configured to handle HTTP requests.
-
-### Traffic Policies
-- **ClientTrafficPolicy**: Two policies that define how client traffic is managed:
-  - `envoy-gw-public-policy`: Configures client IP detection and connection limits for the public gateway.
-  - `envoy-gw-private-policy`: Similar configuration for the private gateway.
-
-- **BackendTrafficPolicy**: Two policies that manage backend traffic:
-  - `envoy-gw-compression`: Enables Gzip and Brotli compression for responses from the public and private gateways.
-  - `media-streaming`: Configures timeout settings for media streaming services.
+### Load Balancing
+- **GatewayClass**: Defines the class of gateways that Envoy will manage, allowing for custom configurations and behaviors.
 
 ## Configuration Highlights
-- **Replicas**: Each EnvoyProxy configuration specifies a replica count of 1.
-- **Rolling Update Strategy**: Both EnvoyProxy configurations use a rolling update strategy with a maximum of 1 unavailable pod during updates.
-- **Telemetry**: Access logs are configured in JSON format, outputting various request and response metrics to stdout.
-- **TLS Configuration**: The gateways utilize TLS termination with certificates managed by cert-manager.
+- **Replicas**: Each EnvoyProxy deployment is configured with 1 replica to ensure high availability.
+- **Rolling Update Strategy**: A rolling update strategy is employed to minimize downtime during updates, allowing for 1 unavailable pod at a time.
+- **Telemetry**: Access logs are configured in JSON format, providing detailed insights into traffic patterns and performance metrics.
+- **TLS Configuration**: The gateways are set up to terminate TLS connections, using secrets for certificate management.
 
 ## Deployment
 - **Target Namespace**: `envoy-gateway-system`
-- **Release Names**: Not applicable as there are no HelmReleases.
-- **Reconciliation Interval**: Not specified.
-- **Install/Upgrade Behavior**: Not specified.
+- **Release Names**: Various gateways and EnvoyProxy configurations as specified in the manifests.
+- **Reconciliation Interval**: Managed by Flux, with no specific interval mentioned in the manifests.
+- **Install/Upgrade Behavior**: The deployment follows standard Helm practices, with configurations applied as defined in the manifests.
