@@ -22,7 +22,7 @@ spec:
       runtime: vllm-cuda
       args:
       - --model
-      - apolo13x/Qwen3.5-9B-NVFP4
+      - YuYu1015/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated-NVFP4
       - --served-model-name
       - assist-llm
       - --max-model-len
