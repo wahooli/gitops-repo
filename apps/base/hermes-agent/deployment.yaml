@@ -26,7 +26,8 @@ spec:
       - name: hermes-agent
         image: docker.io/nousresearch/hermes-agent:v2026.4.30
         imagePullPolicy: IfNotPresent
-        command: ["hermes"]
+        # Leave ENTRYPOINT alone (tini → entrypoint.sh activates the venv
+        # that puts `hermes` on PATH); only override CMD via args.
         args: ["gateway", "run"]
         env:
         - name: HERMES_HOME
@@ -35,6 +36,11 @@ spec:
           value: 0.0.0.0
         - name: API_SERVER_PORT
           value: "8642"
+        # Auth is enforced upstream by API_SERVER_KEY (and, when external
+        # exposure is enabled, by Envoy apiKeyAuth too). Disable Hermes'
+        # platform-level user allowlist so /v1 traffic isn't double-gated.
+        - name: GATEWAY_ALLOW_ALL_USERS
+          value: "true"
         envFrom:
         - secretRef:
             name: hermes-agent-secrets
