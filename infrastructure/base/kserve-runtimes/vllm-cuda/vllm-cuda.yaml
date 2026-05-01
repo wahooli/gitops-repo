@@ -28,6 +28,8 @@ spec:
       value: expandable_segments:True
     - name: HF_HOME
       value: /cache/hf
+    - name: HF_HUB_DISABLE_XET
+      value: "1"
     ports:
     - containerPort: 8000
       protocol: TCP
