@@ -23,7 +23,8 @@ spec:
       args:
       - --model
       # - YuYu1015/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated-NVFP4 # broken: Qwen3_5TextConfig unsupported in current vLLM (PR #39316 unmerged)
-      - sakamakismile/Huihui-Qwen3.5-9B-abliterated-NVFP4
+      # - sakamakismile/Huihui-Qwen3.5-9B-abliterated-NVFP4 # works but has duplicate single+sharded model files (~32GB total) and conservative quant
+      - prithivMLmods/Qwen3.5-9B-abliterated-v2-MAX-NVFP4
       - --served-model-name
       - assist-llm
       - --quantization
