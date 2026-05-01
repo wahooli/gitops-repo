@@ -3,5 +3,10 @@ kind: Kustomization
 resources:
 - ../../base/hermes-agent
 - pvc.yaml
+- imagerepository.yaml
+- imagepolicy.yaml
 # httproute-private.yaml + securitypolicy.yaml retained as templates;
 # external exposure is via OpenWebUI in front of the in-cluster Service.
+images:
+- name: docker.io/nousresearch/hermes-agent
+  newTag: v2026.4.30  # {"$imagepolicy": "flux-system:hermes-agent:tag"}
