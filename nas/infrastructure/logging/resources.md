@@ -5,62 +5,41 @@ grand_parent: "nas"
 ---
 
 ## Overview
-
-The `logging` infrastructure layer for the `nas` cluster is responsible for managing log storage and retrieval using VictoriaMetrics components. This setup includes resources for both long-term and short-term log retention, as well as a proxy for read access to these logs. The resources are configured to optimize storage usage and provide high availability for log data.
+The logging infrastructure layer for the 'nas' cluster consists of several Kubernetes resources that manage log storage and retrieval using VictoriaMetrics. These resources include both long-term and short-term logging solutions, which are designed to handle log data efficiently. The `VLogs` resources are responsible for managing log data, while the `VLSingle` resources provide a single-instance logging solution. The `VMAuth` resource acts as an authentication proxy for accessing logs.
 
 ## Resource Glossary
 
-### VLogs: `long-term-nas`
-- **Kind**: `VLogs`
-- **Name**: `long-term-nas`
-- **Namespace**: `logging`
-- **Purpose**: This resource manages long-term log storage using the VictoriaMetrics `VLogs` operator. It is configured to store logs for up to 100 years (overridden by a disk space limit of 200GiB) and uses a hostPath volume for storage.
-- **Details**:
-  - Uses the `victoriametrics/victoria-logs` image with a tag managed by Flux.
-  - Logs are stored in JSON format.
-  - The service is exposed as a `ClusterIP` with global and local affinity annotations for Cilium.
-  - Storage is mounted from a hostPath directory specified by the `${long_term_logs_cluster_directory_path}` variable.
+### VLogs (long-term)
+- **Kind**: VLogs
+- **Name**: long-term-nas
+- **Namespace**: logging
+- **Purpose**: Manages long-term log storage.
+- **Description**: This resource uses the VictoriaLogs image to store logs for up to 100 years, with a maximum disk space usage of 200GiB. It mounts a host path for storage and exposes a ClusterIP service for access.
 
-### VLogs: `short-term-nas`
-- **Kind**: `VLogs`
-- **Name**: `short-term-nas`
-- **Namespace**: `logging`
-- **Purpose**: This resource manages short-term log storage using the VictoriaMetrics `VLogs` operator. It is configured to store logs for up to 100 years (overridden by a disk space limit of 14.5GiB) and uses a PVC for storage.
-- **Details**:
-  - Uses the `victoriametrics/victoria-logs` image with a tag managed by Flux.
-  - Logs are stored in JSON format.
-  - The service is exposed as a `ClusterIP` with global annotations for Cilium.
-  - Storage is provisioned dynamically with a PVC requesting 15Gi of storage.
+### VLogs (short-term)
+- **Kind**: VLogs
+- **Name**: short-term-nas
+- **Namespace**: logging
+- **Purpose**: Manages short-term log storage.
+- **Description**: Similar to the long-term VLogs, this resource stores logs for up to 100 years but limits the maximum disk space usage to 14848MiB. It also exposes a ClusterIP service and requests 15Gi of storage.
 
-### VLSingle: `long-term-nas`
-- **Kind**: `VLSingle`
-- **Name**: `long-term-nas`
-- **Namespace**: `logging`
-- **Purpose**: This resource provides a single-node VictoriaMetrics instance for long-term log storage. It is configured to store logs for up to 100 years (overridden by a disk space limit of 100GiB) and uses a hostPath volume for storage.
-- **Details**:
-  - Uses the `victoriametrics/victoria-logs` image with a tag managed by Flux.
-  - Logs are stored in JSON format.
-  - The service is exposed as a `ClusterIP` with global annotations for Cilium.
-  - Storage is mounted from a hostPath directory specified by the `${long_term_logs_cluster_directory_path}` variable.
+### VLSingle (long-term)
+- **Kind**: VLSingle
+- **Name**: long-term-nas
+- **Namespace**: logging
+- **Purpose**: Provides a single-instance long-term logging solution.
+- **Description**: This resource uses the VictoriaLogs image to manage logs for up to 100 years, with a maximum disk space usage of 100GiB. It specifies resource requests for CPU and memory and mounts a host path for storage, exposing a ClusterIP service.
 
-### VLSingle: `short-term-nas`
-- **Kind**: `VLSingle`
-- **Name**: `short-term-nas`
-- **Namespace**: `logging`
-- **Purpose**: This resource provides a single-node VictoriaMetrics instance for short-term log storage. It is configured to store logs for up to 100 years (overridden by a disk space limit of 14.5GiB) and uses a PVC for storage.
-- **Details**:
-  - Uses the `victoriametrics/victoria-logs` image with a tag managed by Flux.
-  - Logs are stored in JSON format.
-  - The service is exposed as a `ClusterIP` with global and local affinity annotations for Cilium.
-  - Storage is provisioned dynamically with a PVC requesting 15Gi of storage.
+### VLSingle (short-term)
+- **Kind**: VLSingle
+- **Name**: short-term-nas
+- **Namespace**: logging
+- **Purpose**: Provides a single-instance short-term logging solution.
+- **Description**: This resource manages logs for up to 100 years with a maximum disk space usage of 14848MiB. It requests 15Gi of storage and exposes a ClusterIP service, with specific annotations for service affinity.
 
-### VMAuth: `read-proxy`
-- **Kind**: `VMAuth`
-- **Name**: `read-proxy`
-- **Namespace**: `logging`
-- **Purpose**: This resource provides a proxy for read access to the log storage backends. It routes requests to the appropriate short-term log storage instances, with retry logic for unavailable backends.
-- **Details**:
-  - Exposes a service on port `9428`.
-  - Configured with a URL map to route requests to the `short-term-nas` instances (`VLSingle` and `VLogs`).
-  - Includes retry logic for HTTP 503 status codes.
-  - Long-term storage (`long-term-nas`) is commented out in the configuration, indicating it is not currently used for read proxying.
+### VMAuth
+- **Kind**: VMAuth
+- **Name**: read-proxy
+- **Namespace**: logging
+- **Purpose**: Acts as an authentication proxy for log access.
+- **Description**: This resource listens on port 9428 and defines access rules for unauthorized users. It maps specific URL paths to various logging services, allowing for load balancing and retry mechanisms in case of service unavailability.

@@ -7,63 +7,37 @@ grand_parent: "nas"
 # kserve-runtimes
 
 ## Overview
-The `kserve-runtimes` component provides a set of serving runtimes for machine learning models, enabling the deployment and management of models in a Kubernetes cluster. This deployment includes multiple runtimes optimized for different hardware configurations, specifically CPU and CUDA-enabled environments.
+The `kserve-runtimes` component provides a set of serving runtimes for machine learning models in the Kubernetes cluster. It includes multiple runtimes optimized for different use cases, such as CPU and CUDA-based models. This deployment consists of multiple `ClusterServingRuntime` resources, each configured to serve specific model formats.
 
 ## Sub-components
-This component consists of the following sub-components, each represented by a `ClusterServingRuntime`:
-
-1. **llama-cpp-cpu**
-   - **Chart**: kserve
-   - **Version**: latest
-   - **Namespace**: flux-system
-   - **Provides**: A serving runtime for the LLaMA model using CPU.
-
-2. **llama-cpp-cuda**
-   - **Chart**: kserve
-   - **Version**: latest
-   - **Namespace**: flux-system
-   - **Provides**: A serving runtime for the LLaMA model using CUDA for GPU acceleration.
-
-3. **vllm-cuda**
-   - **Chart**: kserve
-   - **Version**: latest
-   - **Namespace**: flux-system
-   - **Provides**: A serving runtime for the VLLM model optimized for CUDA.
+This component does not have multiple HelmReleases; it consists of several `ClusterServingRuntime` resources deployed directly.
 
 ## Dependencies
-No dependencies are specified for this component.
+There are no dependencies specified for this component.
 
 ## Helm Chart(s)
-- **Chart Name**: kserve
-- **Repository**: kserve
-- **Version**: latest
+This component does not utilize Helm charts for deployment; it is configured using Kubernetes manifests directly.
 
 ## Resource Glossary
-### ClusterServingRuntime
-- **Purpose**: This resource defines a runtime environment for serving machine learning models.
-- **Details**:
-  - **llama-cpp-cpu**: Uses the image `ghcr.io/ggml-org/llama.cpp:server` and listens on port 8080. It supports the `gguf` model format.
-  - **llama-cpp-cuda**: Uses the image `ghcr.io/ggml-org/llama.cpp:server-cuda` and also listens on port 8080. It supports the `gguf` model format.
-  - **vllm-cuda**: Uses the image `vllm/vllm-openai:cu130-nightly` and listens on port 8000. It supports the `vllm` model format.
-
-### ImageRepository
-- **Purpose**: This resource defines the source of container images for the runtimes.
-- **Details**: 
-  - **llama-cpp**: Points to the image repository `ghcr.io/ggml-org/llama.cpp` and checks for updates every 24 hours.
-
-### ImagePolicy
-- **Purpose**: This resource defines policies for image updates based on tags.
-- **Details**:
-  - **llama-cpp-cpu**: Extracts build numbers from tags matching the pattern `^server-b(?P<build>\d+)$`.
-  - **llama-cpp-cuda**: Extracts build numbers from tags matching the pattern `^server-cuda-b(?P<build>\d+)$`.
+- **ClusterServingRuntime**: This resource defines a runtime environment for serving machine learning models. Each runtime has specific configurations, including:
+  - **Containers**: Each runtime includes a container specification that defines the image to use, command-line arguments, health probes, and ports.
+  - **Liveness and Readiness Probes**: These are HTTP checks that ensure the service is running and ready to accept traffic.
+  - **Supported Model Formats**: Each runtime specifies the model formats it can serve, such as `gguf` for Llama and `whisper` for Speaches.
 
 ## Configuration Highlights
-- **Container Probes**: Each runtime includes liveness and readiness probes to ensure the service is healthy and ready to accept traffic.
-- **Environment Variables**: The `vllm-cuda` runtime includes several important environment variables for configuration, such as `VLLM_NVFP4_GEMM_BACKEND` and `PYTORCH_ALLOC_CONF`.
-- **Volume Mounts**: All runtimes mount volumes for model storage, ensuring models are accessible at the specified paths.
+- **Container Images**:
+  - `llama-cpp-cpu`: `ghcr.io/ggml-org/llama.cpp:server`
+  - `llama-cpp-cuda`: `ghcr.io/ggml-org/llama.cpp:server-cuda`
+  - `speaches-cuda`: `ghcr.io/wahooli/docker/speaches:latest-cuda`
+  - `vllm-cuda`: `vllm/vllm-openai:cu130-nightly`
+  
+- **Environment Variables**: 
+  - `LOG_LEVEL`, `WHISPER__INFERENCE_DEVICE`, `HF_HOME`, and others for the Speaches runtime.
+  
+- **Health Probes**: Each runtime has defined liveness and readiness probes to monitor the health of the services.
 
 ## Deployment
-- **Target Namespace**: flux-system
-- **Release Names**: Not explicitly defined; managed under the `kserve` chart.
-- **Reconciliation Interval**: Not specified in the manifests.
-- **Install/Upgrade Behavior**: Managed by Flux, with automatic reconciliation based on the defined manifests.
+- **Target Namespace**: `flux-system`
+- **Release Names**: Not applicable as this component is not deployed via Helm.
+- **Reconciliation Interval**: Not specified.
+- **Install/Upgrade Behavior**: Not specified, as this component is managed through direct Kubernetes manifests.
