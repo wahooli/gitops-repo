@@ -6,43 +6,74 @@ grand_parent: "tpi-1"
 
 # vector-lb
 
-The `vector-lb` component is deployed in the `logging` namespace of the `tpi-1` cluster using the Vector Helm chart version `0.52.0`. This component is responsible for aggregating logs and metrics from various sources and providing a unified logging solution.
+The `vector-lb` component is deployed in the `logging` namespace of the `tpi-1` cluster using the Vector Helm chart version `0.52.0`. This component is responsible for aggregating logs and metrics from various sources.
 
-## HelmRelease Configuration
+## HelmRelease
 
-### General Information
-- **Release Name**: `vector-lb`
+### Overview
+- **Name**: `logging--vector-lb`
 - **Namespace**: `flux-system`
+- **Release Name**: `vector-lb`
 - **Chart Source**: [Vector Helm Repository](https://helm.vector.dev)
 - **Chart Version**: `0.52.0`
 - **Update Interval**: 10 minutes
 
 ### Dependencies
-- The `vector-lb` HelmRelease depends on the `victoria-metrics--victoria-metrics-operator` in the `flux-system` namespace.
+- Depends on `victoria-metrics--victoria-metrics-operator` in the `flux-system` namespace.
 
-### Values Configuration
-The following values are configured for the `vector-lb` deployment:
+### Configuration
+The `vector-lb` is configured using the following values:
 
 - **Role**: `Aggregator`
 - **Replicas**: 1
-- **Service Configuration**:
-  - **Enabled**: true
-  - **Type**: `ClusterIP`
-- **Existing ConfigMaps**: 
-  - `vector-lb-config-tct77bkb5g`
-- **Image Configuration**:
-  - **Repository**: `timberio/vector`
-  - **Pull Policy**: `IfNotPresent`
-- **Logging Level**: `info`
-- **Pod Security Context**: Custom security settings can be applied.
+- **Service**: Enabled with type `ClusterIP`
+- **Existing ConfigMaps**: Uses `vector-lb-config-tct77bkb5g`
+- **Pod Annotations**: `vector.dev/exclude: "true"`
+- **Log Level**: `info`
 
-### ConfigMaps Used
-- **Base Values**: Configurations are sourced from `vector-values-5cf8f5678g` ConfigMap, specifically from `values-base.yaml` and `values.yaml`.
+### Values from ConfigMaps
+The configuration values are sourced from the following ConfigMaps:
+- `vector-values-6kt8f5h5hc`:
+  - `values-base.yaml`
+  - `values.yaml`
 
-## Additional Resources
-- **Image Repository**: The images for the Vector component are sourced from `ghcr.io/vectordotdev/helm-charts/vector`.
-- **Image Policy**: The image policy is set to allow semantic versioning.
+## HelmRepository
+
+### Overview
+- **Name**: `vector`
+- **Namespace**: `flux-system`
+- **URL**: `https://helm.vector.dev`
+- **Update Interval**: 24 hours
+
+## ImageRepository
+
+### Overview
+- **Name**: `vector-helm-chart`
+- **Namespace**: `flux-system`
+- **Image**: `ghcr.io/vectordotdev/helm-charts/vector`
+- **Update Interval**: 24 hours
+
+## ImagePolicy
+
+### Overview
+- **Name**: `vector-helm-chart`
+- **Namespace**: `flux-system`
+- **Policy**: Semantic versioning (semver) range is specified.
+
+## Additional Configuration
+
+### HAProxy
+The configuration includes an optional HAProxy load balancer, which is currently disabled. If enabled, it would use the image `haproxytech/haproxy-alpine` with tag `2.6.12`.
+
+### Persistence
+Persistence is configured to use hostPath at `/var/lib/vector` for data storage.
+
+### Probes
+Liveness and readiness probes can be configured, but defaults are currently set.
+
+### Security Context
+The component supports RBAC and can create a ServiceAccount for Vector.
 
 ## Notes
-- The deployment includes configurations for logging, metrics aggregation, and potential integration with other services.
-- Ensure that the `victoria-metrics--victoria-metrics-operator` is properly deployed and configured, as it is a prerequisite for the `vector-lb` component to function correctly.
+- Ensure that the `victoria-metrics--victoria-metrics-operator` is deployed and running before deploying `vector-lb`.
+- Review the Vector documentation for detailed configuration options and best practices: [Vector Documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).
