@@ -9,4 +9,4 @@ spec:
   storageClassName: topolvm-fast
   resources:
     requests:
-      storage: 35Gi
+      storage: 20Gi
