@@ -10,6 +10,10 @@ spec:
   - name: kserve-container
     image: ghcr.io/wahooli/docker/speaches:latest-cuda
     env:
+    # Default is "debug" which floods logs with per-segment generation
+    # traces. INFO keeps startup, request lifecycle, and errors.
+    - name: LOG_LEVEL
+      value: info
     - name: WHISPER__INFERENCE_DEVICE
       value: cuda
     # Always-loaded; per-IS we still want this pinned even if a future
