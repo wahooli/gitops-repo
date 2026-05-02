@@ -7,50 +7,51 @@ grand_parent: "nas"
 # forgejo-runner
 
 ## Overview
-The `forgejo-runner` component is responsible for executing jobs in a Kubernetes cluster using Docker-in-Docker (DinD) technology. It allows for the execution of tasks that require a Docker environment, leveraging the Forgejo platform for continuous integration and deployment workflows. This component operates within its dedicated namespace, `forgejo-runners`, and is designed to scale based on job demand.
+The `forgejo-runner` component is responsible for executing jobs in a Kubernetes cluster, leveraging Docker for containerized execution. It integrates with Forgejo, a self-hosted Git service, to manage CI/CD workflows. The runner operates within its dedicated namespace, providing a scalable solution for running jobs with specific configurations and resource limits.
 
 ## Sub-components
-This deployment does not have multiple HelmReleases.
+This deployment does not contain multiple HelmReleases.
 
 ## Dependencies
-There are no dependencies specified for this component.
+This deployment does not have any dependencies.
 
 ## Helm Chart(s)
-- **Chart Name:** forgejo-runner
-- **Repository:** code.forgejo.org
-- **Version:** 12.8.2
+This deployment does not utilize Helm charts.
 
 ## Resource Glossary
 ### Networking
-- **CiliumNetworkPolicy:** This resource defines network policies that restrict egress traffic from the `forgejo-runner` pods. It allows traffic to specific services such as DNS, Forgejo, and other defined endpoints while blocking all other external traffic.
+- **CiliumNetworkPolicy**: This resource defines network policies that restrict egress traffic from the `forgejo-runner` pods to specific endpoints, enhancing security by controlling which services the runner can communicate with.
 
 ### Security
-- **ServiceAccount:** The `forgejo-runner` service account is created to provide the necessary permissions for the runner to execute jobs securely within the Kubernetes environment.
+- **ServiceAccount**: The `forgejo-runner` service account is created to provide the necessary permissions for the runner to interact with the Kubernetes API securely.
 
-### Job Execution
-- **ScaledJob:** This resource manages the execution of jobs, allowing for scaling based on demand. It defines the job template, including the Docker containers to run, their commands, environment variables, and resource limits. The job is configured to run a Docker daemon and execute tasks defined in the Forgejo runner configuration.
+### Job Management
+- **ScaledJob**: This resource manages the execution of jobs, allowing for scaling based on demand. It specifies the job template, including the Docker containers to run, their commands, and resource limits.
 
 ### Configuration
-- **ConfigMap:** The `forgejo-runner-registration` config map contains configuration settings for the runner, including logging levels, environment variables, and Docker settings.
+- **ConfigMap**: The `forgejo-runner-registration` ConfigMap contains configuration data for the runner, including logging levels, environment variables, and job capacity settings.
+
+### Authentication
+- **TriggerAuthentication**: This resource is used to manage authentication for the runner, referencing a secret that contains the necessary credentials.
 
 ### Image Management
-- **ImageRepository:** This resource tracks the Docker image used by the `forgejo-runner`, specifying the image location and update interval.
-- **ImagePolicy:** This resource defines the policy for updating the Docker image, ensuring that it adheres to semantic versioning rules.
+- **ImageRepository**: This resource defines the source of the Docker images used by the runner, specifying the image repository and the update interval.
+- **ImagePolicy**: This resource sets the policy for image updates, allowing the runner to pull images that meet the specified semantic versioning criteria.
 
 ## Configuration Highlights
-- **Resource Requests/Limits:**
+- **Resource Requests/Limits**: 
   - Runner container: 
     - Requests: CPU: 50m, Memory: 64Mi
     - Limits: CPU: 500m, Memory: 512Mi
   - Daemon container:
     - Requests: CPU: 500m, Memory: 1Gi
     - Limits: CPU: 2, Memory: 16Gi
-- **Replica Counts:** Minimum of 0 and a maximum of 6 replicas for job execution.
-- **Environment Variables:** Key variables include `DOCKER_HOST`, `DOCKER_TLS_VERIFY`, and `DOCKER_CONFIG`, which are essential for configuring the Docker environment within the runner.
-- **Important Helm Values:** The runner configuration is defined in the `registration.yaml` file, which specifies job settings, logging levels, and Docker configurations.
+- **Replica Counts**: The `ScaledJob` can scale from 0 to a maximum of 6 replicas based on job demand.
+- **Environment Variables**: Key environment variables include `DOCKER_HOST`, `DOCKER_TLS_VERIFY`, and `DOCKER_CONFIG`, which configure the Docker daemon and runner behavior.
+- **Timeouts**: The job has a timeout of 3 hours for execution and a shutdown timeout of 3 hours.
 
 ## Deployment
-- **Target Namespace:** `forgejo-runners`
-- **Release Name:** Not specified in the manifests.
-- **Reconciliation Interval:** Not explicitly defined in the manifests.
-- **Install/Upgrade Behavior:** Not specified in the manifests.
+- **Target Namespace**: `forgejo-runners`
+- **Release Name**: Not applicable as there are no Helm releases.
+- **Reconciliation Interval**: Not specified.
+- **Install/Upgrade Behavior**: Not specified.

@@ -4,98 +4,70 @@ parent: "Infrastructure / Logging"
 grand_parent: "livingroom-pi"
 ---
 
-# Vector Agent
+# vector-agent
 
-The `vector-agent` component is deployed in the `livingroom-pi` cluster to manage logging infrastructure using the Vector Helm chart. It is configured as an aggregator to collect and process logs.
+The `vector-agent` component is deployed in the `livingroom-pi` cluster using the Vector Helm chart version `0.52.0`. This component is responsible for collecting and processing logs and metrics from the cluster.
 
-## Deployment Overview
+## Overview
 
-### HelmRelease Configuration
+The deployment consists of a HelmRelease that manages the installation of the Vector agent, along with associated ConfigMaps and image repositories for the required images.
+
+### HelmRelease
+
 - **Name**: `logging--vector-agent`
 - **Namespace**: `flux-system`
-- **Target Namespace**: `logging`
-- **Chart**: `vector`
-- **Version**: `0.51.0`
-- **Source Repository**: [https://helm.vector.dev](https://helm.vector.dev)
 - **Release Name**: `vector-agent`
+- **Target Namespace**: `logging`
+- **Chart Source**: [Vector Helm Repository](https://helm.vector.dev)
+- **Chart Version**: `0.52.0`
 - **Update Interval**: 10 minutes
-- **Dependencies**:
-  - `victoria-metrics--victoria-metrics-operator` (Namespace: `flux-system`)
 
-### Values Configuration
-The deployment uses custom values provided via two ConfigMaps:
-- `vector-agent-values-kth4kf668g`:
-  - `values-base.yaml`: Default values for Vector configuration.
-  - `values.yaml`: Additional custom values.
-- `existingConfigMaps`: `vector-agent-config-tc927k88m7`
+### Dependencies
 
-### Key Configuration Parameters
-- **Role**: Aggregator
-  - Deploys as a StatefulSet.
-- **Image**:
-  - Repository: `timberio/vector`
-  - Pull Policy: `IfNotPresent`
-- **Replicas**: 1
-- **Service**:
-  - Enabled: `true`
-  - Type: `ClusterIP`
-- **Headless Service**:
-  - Enabled: `true`
-- **Pod Disruption Budget**:
-  - Enabled: `false`
-- **RBAC**:
-  - Enabled: `true`
-- **Persistence**:
-  - HostPath persistence enabled at `/var/lib/vector`
-- **Pod Labels**:
-  - `vector.dev/exclude: "true"`
-- **Log Level**: `info`
+The `vector-agent` depends on the following component:
+- `victoria-metrics--victoria-metrics-operator` (Namespace: `flux-system`)
 
-### Image Management
-The following ImageRepository and ImagePolicy resources are defined for managing Vector images:
-1. **ImageRepository**: `vector-helm-chart`
-   - Repository: `ghcr.io/vectordotdev/helm-charts/vector`
-   - Update Interval: 24 hours
-2. **ImagePolicy**: `vector-helm-chart`
-   - Policy: SemVer range `x.x.x`
-3. **ImageRepository**: `vector-dockerhub`
-   - Repository: `timberio/vector`
-   - Update Interval: 24 hours
-4. **ImagePolicy**: `vector-debian`
-   - Filter Tags: Extract version matching `^([0-9]+\.[0-9]+\.[0-9]+)-debian$`
-   - Policy: SemVer range `x.x.x`
+### Configuration
 
-### Configuration Details
-The deployment uses existing ConfigMaps for configuration:
-- `vector-agent-config-tc927k88m7`: Contains configuration files for Vector.
-- `vector-agent-values-kth4kf668g`: Provides base and additional values.
+The Vector agent is configured using the following values:
 
-#### Key Features
-- **RBAC**: Role-based access control is enabled.
-- **ServiceAccount**: Automatically created for Vector.
-- **Pod Security Context**: Configurable for enhanced security.
-- **Affinity and Tolerations**: Customizable for scheduling.
-- **Autoscaling**: Disabled by default.
-- **PodMonitor**: Not enabled.
+- **Role**: `Aggregator`
+- **Replicas**: `1`
+- **Service**: Enabled with type `ClusterIP`
+- **Existing ConfigMaps**: 
+  - `vector-agent-config-tc927k88m7`
+- **Values from ConfigMaps**:
+  - `vector-agent-values-tc42b2k4fg` (keys: `values-base.yaml`, `values.yaml`)
 
-### Default Volumes and Mounts
-The following volumes and mounts are configured:
-- **Volumes**:
-  - `/var/log/` (read-only)
-  - `/var/lib/` (read-only)
-  - `/proc` (read-only)
-  - `/sys` (read-only)
-- **Mounts**:
-  - `/var/log/`
-  - `/var/lib`
-  - `/host/proc`
-  - `/host/sys`
+### Image Repositories
+
+The deployment uses the following image repositories:
+1. **Vector Helm Chart**:
+   - **Image**: `ghcr.io/vectordotdev/helm-charts/vector`
+   - **Update Interval**: 24 hours
+
+2. **Vector Docker Hub**:
+   - **Image**: `timberio/vector`
+   - **Update Interval**: 24 hours
+
+### Image Policies
+
+Image policies are defined to manage the versions of the images used:
+- **Vector Helm Chart**: Policy for semantic versioning.
+- **Vector Debian**: Filters tags for specific version patterns.
 
 ### Additional Configuration
-- **Termination Grace Period**: 60 seconds.
-- **DNS Policy**: `ClusterFirst`.
-- **Ingress**: Disabled.
 
-## References
-- [Vector Helm Chart Documentation](https://vector.dev/docs/setup/installation/package-managers/helm/)
-- [Vector Configuration Documentation](https://vector.dev/docs/reference/configuration/)
+The configuration for the Vector agent includes:
+- **Log Level**: `info`
+- **Pod Disruption Budget**: Disabled
+- **RBAC**: Enabled
+- **Service Account**: Created with default settings
+- **Termination Grace Period**: 60 seconds
+
+### Notes
+
+- The Vector agent is designed to run as an aggregator, collecting logs and metrics from various sources within the Kubernetes cluster.
+- Ensure that the ConfigMaps referenced in the deployment are correctly configured to avoid issues during startup.
+
+For more detailed information on configuring and using Vector, refer to the [Vector documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).

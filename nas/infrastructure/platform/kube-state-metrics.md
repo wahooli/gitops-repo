@@ -6,75 +6,44 @@ grand_parent: "nas"
 
 # kube-state-metrics
 
-The `kube-state-metrics` component is deployed in the `kube-system` namespace of the `nas` cluster using Flux CD. This component provides metrics about the state of Kubernetes objects, which can be scraped by Prometheus.
+## Overview
+`kube-state-metrics` is a service that listens to the Kubernetes API server and generates metrics about the state of the objects. It is designed to be used with Prometheus for monitoring Kubernetes clusters.
 
 ## Deployment Details
-
-- **Helm Chart**: `kube-state-metrics`
-- **Version**: 7.2.2
-- **Helm Repository**: `prometheus-community`
-- **Release Name**: `kube-state-metrics`
+- **Namespace**: `flux-system`
 - **Target Namespace**: `kube-system`
-- **Update Interval**: 10 minutes
-- **Dependencies**: 
-  - `prometheus-operator--prometheus-operator-crds`
+- **Release Name**: `kube-state-metrics`
+- **Chart Version**: `7.3.0`
+- **Source Repository**: `prometheus-community`
 
-## Configuration
+## HelmRelease Configuration
+The `kube-state-metrics` deployment is managed by a `HelmRelease` resource with the following specifications:
 
-The deployment is configured using values from two ConfigMaps:
-- `kube-state-metrics-values-52k4bbt862` with keys:
-  - `values-base.yaml`
-  - `values.yaml`
+- **Interval**: 10 minutes for updates.
+- **Dependencies**: It depends on the `prometheus-operator--prometheus-operator-crds` in the `flux-system` namespace.
+- **Values Configuration**: The deployment uses values from two ConfigMaps:
+  - `kube-state-metrics-values-52k4bbt862` (keys: `values-base.yaml`, `values.yaml`)
 
-### Key Configuration Options
+## Image Configuration
+- **Image Repository**: `ghcr.io/prometheus-community/charts/kube-state-metrics`
+- **Image Policy**: The image policy is set to track versions using semantic versioning.
 
-- **Prometheus Scrape**: Enabled (`prometheusScrape: true`)
+## Key Features
+- **Prometheus Scraping**: Enabled by default.
+- **RBAC**: Role-based access control is configured to allow the necessary permissions for the service.
+- **Service Type**: The service is exposed as a `ClusterIP` by default, allowing internal access within the cluster.
+- **Metrics Collection**: Collects metrics from various Kubernetes resources including deployments, pods, services, and more.
+
+## Configuration Values
+The following are notable configuration values used in the deployment:
+
 - **Replicas**: 1
-- **Service Type**: ClusterIP
-- **RBAC**: Enabled with a ClusterRole
-- **Service Account**: Created with automounting of API credentials enabled
+- **Service Port**: 8080
+- **Autosharding**: Disabled
+- **Extra Arguments**: None specified
+- **Security Context**: Configured to run as a non-root user with specific security settings.
 
-### Metrics Collection
+## Additional Information
+For further customization, users can modify the values in the associated ConfigMaps or adjust the HelmRelease specifications as needed. The kube-state-metrics service can be monitored via Prometheus, and additional metrics can be configured through the `metricAllowlist` and `metricDenylist` settings. 
 
-The following Kubernetes resources are collected by `kube-state-metrics`:
-- Certificatesigningrequests
-- Configmaps
-- Cronjobs
-- Daemonsets
-- Deployments
-- Endpoints
-- Horizontalpodautoscalers
-- Ingresses
-- Jobs
-- Leases
-- Limitranges
-- Mutatingwebhookconfigurations
-- Namespaces
-- Networkpolicies
-- Nodes
-- Persistentvolumeclaims
-- Persistentvolumes
-- Poddisruptionbudgets
-- Pods
-- Replicasets
-- Replicationcontrollers
-- Resourcequotas
-- Secrets
-- Services
-- Statefulsets
-- Storageclasses
-- Validatingwebhookconfigurations
-- Volumeattachments
-
-## Image Repository
-
-- **Image**: `ghcr.io/prometheus-community/charts/kube-state-metrics`
-- **Image Policy**: Set to track semantic versioning.
-
-## Additional Notes
-
-- The deployment includes configurations for security contexts, probes (liveness, readiness), and resource limits.
-- Custom metrics can be configured through the `customResourceState` settings.
-- The deployment supports vertical pod autoscaling, though it is currently disabled.
-
-This documentation provides a comprehensive overview of the `kube-state-metrics` deployment, its configuration, and its operational parameters within the Kubernetes cluster.
+For more details on kube-state-metrics, refer to the official [kube-state-metrics documentation](https://github.com/kubernetes/kube-state-metrics).
