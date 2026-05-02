@@ -7,69 +7,74 @@ grand_parent: "tpi-1"
 # paperless-ngx
 
 ## Overview
-`paperless-ngx` is a document management system that allows users to manage their documents digitally. It is deployed in the `tpi-1` cluster and consists of multiple components, including a PostgreSQL database and a Redis cache, to provide a complete solution for document storage and retrieval.
+`paperless-ngx` is a document management system that allows users to manage and organize their documents digitally. This deployment consists of multiple components, including a PostgreSQL database and a Redis cache, which are essential for the application's functionality.
 
 ## Sub-components
 ### HelmRelease: default--paperless-ngx
 - **Chart**: paperless-ngx
 - **Version**: latest (floating: >=0.1.1-0)
 - **Target Namespace**: default
-- **Provides**: The main application deployment, including a service, persistent storage, and necessary configurations.
+- **Provides**: The main application deployment, including a service, persistent volume claim, and deployment for managing document processing.
 
 ### HelmRelease: default--paperless-ngx-postgresql
 - **Chart**: postgresql
 - **Version**: 14.3.3
 - **Target Namespace**: default
-- **Provides**: A PostgreSQL database for storing application data, including a StatefulSet and services for database access.
+- **Provides**: A PostgreSQL database for storing application data, including services for database access and a stateful set for managing database instances.
 
 ### HelmRelease: default--paperless-ngx-redis
 - **Chart**: redis
 - **Version**: 18.19.2
 - **Target Namespace**: default
-- **Provides**: A Redis cache for managing session data and other temporary storage needs, including a StatefulSet and services.
+- **Provides**: A Redis cache for improving application performance, including services for cache access and a stateful set for managing Redis instances.
 
 ## Dependencies
-The `default--paperless-ngx` HelmRelease depends on:
-- **default--paperless-ngx-postgresql**: Provides the PostgreSQL database for persistent data storage.
-- **default--paperless-ngx-redis**: Provides Redis for caching and session management.
+The `paperless-ngx` HelmRelease has dependencies on:
+- **default--paperless-ngx-postgresql**: Provides the PostgreSQL database required for application data storage.
+- **default--paperless-ngx-redis**: Provides the Redis cache for application performance optimization.
 
 ## Helm Chart(s)
-- **paperless-ngx**
-  - **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
-  - **Version**: latest (floating: >=0.1.1-0)
-  
-- **postgresql**
-  - **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
-  - **Version**: 14.3.3
-  
-- **redis**
-  - **Repository**: bitnami (https://charts.bitnami.com/bitnami)
-  - **Version**: 18.19.2
+### default--paperless-ngx
+- **Chart**: paperless-ngx
+- **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+- **Version**: latest (floating: >=0.1.1-0)
+
+### default--paperless-ngx-postgresql
+- **Chart**: postgresql
+- **Repository**: wahooli (oci://ghcr.io/wahooli/charts)
+- **Version**: 14.3.3
+
+### default--paperless-ngx-redis
+- **Chart**: redis
+- **Repository**: bitnami (https://charts.bitnami.com/bitnami)
+- **Version**: 18.19.2
 
 ## Resource Glossary
 ### Networking
-- **Service**: Exposes the `paperless-ngx` application on port 8000, allowing access to the application from within the cluster.
-- **HTTPRoute**: Routes HTTP traffic to the `paperless-ngx` service based on the specified hostname.
+- **Service**: Exposes the `paperless-ngx` application and its dependencies (PostgreSQL and Redis) to other services within the cluster.
+- **HTTPRoute**: Routes HTTP traffic to the `paperless-ngx` service based on hostname.
 
 ### Storage
-- **PersistentVolumeClaim**: Requests 10Gi of storage for the `paperless-ngx` application to persist data across pod restarts.
+- **PersistentVolumeClaim**: Allocates storage for the `paperless-ngx` application, ensuring data persistence across pod restarts.
 
 ### Security
 - **ServiceAccount**: Provides an identity for the `paperless-ngx` application to interact with the Kubernetes API.
 
 ### Workload
-- **Deployment**: Manages the deployment of the `paperless-ngx` application, ensuring that the desired number of replicas are running and handling updates.
+- **Deployment**: Manages the lifecycle of the `paperless-ngx` application, ensuring the desired number of replicas are running and handling updates.
 
 ## Configuration Highlights
 - **Resource Requests/Limits**: 
-  - Memory: Requests 2048Mi, Limits 6144Mi
-  - CPU: Requests 600m
-- **Persistence**: Enabled for application data with a 10Gi PVC.
-- **Environment Variables**: Key configurations include database credentials, admin user settings, and Redis connection strings.
-- **Init Containers**: Two init containers (`wait-for-redis` and `wait-for-psql`) ensure that Redis and PostgreSQL are ready before the main application starts.
+  - Memory: Requests 2048Mi, Limits 6144Mi for `paperless-ngx`.
+  - CPU: Requests 600m.
+- **Persistence**: Enabled for the `paperless-ngx` application with a storage request of 10Gi.
+- **Environment Variables**: Key variables include:
+  - `PAPERLESS_DBUSER`, `PAPERLESS_DBPASS`: Database credentials sourced from a secret.
+  - `PAPERLESS_PORT`: Set to "8000" for application access.
+- **Init Containers**: Used to wait for PostgreSQL and Redis to be ready before starting the main application.
 
 ## Deployment
 - **Target Namespace**: default
 - **Release Name**: paperless-ngx
 - **Reconciliation Interval**: 5m
-- **Install/Upgrade Behavior**: Remediation retries are set to unlimited, ensuring that the application will continue to attempt installation or upgrades until successful.
+- **Install/Upgrade Behavior**: Remediation retries are set to unlimited, ensuring resilience during installation or upgrades.
