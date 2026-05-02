@@ -1,0 +1,32 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: speaches
+  namespace: homeassistant-assist
+spec:
+  predictor:
+    # Pre-populate the HF cache before the main container starts so a fresh
+    # PVC self-heals (Speaches refuses to start serving requests if
+    # /cache/hf/hub is empty). snapshot_download is idempotent — fast no-op
+    # on warm cache, ~30-60s on cold.
+    initContainers:
+    - name: model-warmup
+      image: ghcr.io/wahooli/docker/speaches:latest-cuda
+      env:
+      - name: HF_HOME
+        value: /cache/hf
+      - name: HF_HUB_DOWNLOAD_TIMEOUT
+        value: "120"
+      command:
+      - /home/ubuntu/speaches/.venv/bin/python
+      - -c
+      - |
+        from huggingface_hub import snapshot_download
+        snapshot_download("Systran/faster-distil-whisper-large-v3", cache_dir="/cache/hf/hub")
+      volumeMounts:
+      - name: hf-cache
+        mountPath: /cache/hf
+    volumes:
+    - name: hf-cache
+      persistentVolumeClaim:
+        claimName: speaches-models

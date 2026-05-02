@@ -1,0 +1,112 @@
+fullnameOverride: open-webui
+
+# We already run our own LLM (assist-llm-gpu) and agent (hermes-agent),
+# both wired in via openaiBaseApiUrls. No bundled Ollama or Pipelines.
+ollama:
+  enabled: false
+pipelines:
+  enabled: false
+tika:
+  enabled: false
+
+# Streaming chat UX needs websocket + Redis. Bundled Redis is fine for a
+# single replica.
+websocket:
+  enabled: true
+  manager: redis
+  redis:
+    enabled: true
+
+enableOpenaiApi: true
+openaiBaseApiUrls:
+- http://assist-llm-gpu-predictor.homeassistant-assist.svc.cluster.local/v1
+- http://hermes-agent.hermes-agent.svc.cluster.local/v1
+openaiApiKeysExistingSecret: open-webui-openai-keys
+openaiApiKeysExistingSecretKey: keys
+
+databaseUrl: ""
+
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: topolvm-fast
+  accessModes:
+  - ReadWriteOnce
+
+# We expose via Gateway API HTTPRoute, not the chart's Ingress.
+ingress:
+  enabled: false
+
+service:
+  type: ClusterIP
+  port: 80
+
+sso:
+  enabled: true
+  enableSignup: true
+  mergeAccountsByEmail: false
+  enableRoleManagement: true
+  oidc:
+    enabled: true
+    providerName: Authentik
+    providerUrl: "https://auth.${domain_wahoo_li:=wahoo.li}/application/o/open-web-ui/.well-known/openid-configuration"
+    scopes: "openid email profile groups"
+    clientExistingSecret: open-webui-oauth-data
+    clientIdExistingSecretKey: client_id
+    clientExistingSecretKey: client_secret
+  roleManagement:
+    rolesClaim: groups
+    allowedRoles: "OpenWebUI Admins,OpenWebUI Users"
+    adminRoles: "OpenWebUI Admins"
+
+extraEnvVars:
+- name: WEBUI_NAME
+  value: nas-chat
+# Public URL — OpenWebUI uses this to build the OAuth redirect_uri:
+#   https://chat.<domain>/oauth/oidc/callback
+- name: WEBUI_URL
+  value: "https://chat.${domain_wahoo_li:=wahoo.li}"
+# Disable email/password signup AND the login form — OAuth-only.
+# If Authentik breaks, recover via:
+#   kubectl -n open-webui exec -it open-webui-0 -- \
+#     bash -c 'cd /app/backend && python -m open_webui.cli list-users'
+- name: ENABLE_SIGNUP
+  value: "false"
+- name: ENABLE_LOGIN_FORM
+  value: "false"
+- name: DEFAULT_USER_ROLE
+  value: pending
+# Skip RAG embedding model download on first boot.
+- name: RAG_EMBEDDING_ENGINE
+  value: ""
+# STT: route through Speaches (OpenAI-compatible /v1/audio/transcriptions)
+# instead of the in-pod faster-whisper. Same backend as the Bazarr
+# subtitle pipeline and HA's Wyoming STT.
+- name: AUDIO_STT_ENGINE
+  value: openai
+- name: AUDIO_STT_OPENAI_API_BASE_URL
+  value: http://speaches-predictor.homeassistant-assist.svc.cluster.local/v1
+- name: AUDIO_STT_OPENAI_API_KEY
+  value: not-needed
+- name: AUDIO_STT_MODEL
+  value: Systran/faster-distil-whisper-large-v3
+# TTS: route through the existing kokoro-tts InferenceService — same OpenAI
+# endpoint `wyoming-openai` already consumes for HA voice.
+- name: AUDIO_TTS_ENGINE
+  value: openai
+- name: AUDIO_TTS_OPENAI_API_BASE_URL
+  value: http://kokoro-tts-predictor.homeassistant-assist.svc.cluster.local/v1
+- name: AUDIO_TTS_OPENAI_API_KEY
+  value: not-needed
+- name: AUDIO_TTS_MODEL
+  value: kokoro
+- name: AUDIO_TTS_VOICE
+  value: af_bella
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: "2"
+    memory: 2Gi

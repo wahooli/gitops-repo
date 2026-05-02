@@ -13,6 +13,13 @@ spec:
   retentionMaxDiskSpaceUsageBytes: 100GiB
   extraArgs:
     storageDataPath: /storage
+  resources:
+    requests:
+      cpu: 150m
+      memory: 1Gi
+    limits:
+      cpu: 1200m
+      memory: 4Gi
   serviceSpec:
     useAsDefault: true
     spec:

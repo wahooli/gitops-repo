@@ -1,0 +1,17 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: hermes-agent
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: hermes-agent
+  # Upstream uses CalVer (vYYYY.M.D). Strip the leading "v" so the
+  # remainder parses as semver — the patch component compares numerically,
+  # so v2026.5.10 correctly beats v2026.5.2.
+  filterTags:
+    pattern: '^v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$'
+    extract: '$major.$minor.$patch'
+  policy:
+    semver:
+      range: '>=2026.0.0'

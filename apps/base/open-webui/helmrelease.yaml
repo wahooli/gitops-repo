@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: base-open-webui
+  namespace: flux-system
+  annotations:
+    homelab.wahoo.li/base-helmrelease: open-webui
+spec:
+  releaseName: base-open-webui
+  targetNamespace: open-webui
+  chart:
+    spec:
+      chart: open-webui
+      sourceRef:
+        kind: HelmRepository
+        name: open-webui
+        namespace: flux-system
+      interval: 24h
+  install:
+    timeout: 10m
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+  valuesFrom:
+  - kind: ConfigMap
+    name: open-webui-values
+    valuesKey: values-base.yaml

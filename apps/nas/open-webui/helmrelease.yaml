@@ -1,0 +1,9 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui--open-webui
+  namespace: flux-system
+spec:
+  releaseName: open-webui
+  interval: 5m
+  targetNamespace: open-webui

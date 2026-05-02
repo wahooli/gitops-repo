@@ -6,9 +6,22 @@ metadata:
   labels:
     velero.io/exclude-from-backup: "true"
 data:
+  # Sampling defaults applied to every request that doesn't override them.
+  #
+  # presence_penalty=1.5 + repetition_penalty=1.05 are the load-bearing
+  # anti-loop knobs for thinking mode — without them the abliterated
+  # NVFP4 quant runs reasoning to max_tokens on simple prompts (see
+  # `llm-thinking-test.py` in the repo root for the comparison run).
+  # temperature/top_p match Qwen3's official thinking-mode recipe.
+  #
+  # No-thinking callers (HA via the Lua filter, OpenWebUI's qwen35-fast
+  # preset) get the same defaults; the penalty barely affects short
+  # direct answers since they don't repeat tokens enough to trip it.
   generation_config.json: |
     {
-      "temperature": 0.7,
+      "temperature": 0.6,
       "top_k": 20,
-      "top_p": 0.8
+      "top_p": 0.95,
+      "presence_penalty": 1.5,
+      "repetition_penalty": 1.05
     }

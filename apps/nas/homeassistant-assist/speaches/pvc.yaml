@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: whisper-asr-models
-  namespace: default
+  name: speaches-models
+  namespace: homeassistant-assist
 spec:
   accessModes:
   - ReadWriteOnce
   storageClassName: topolvm-fast
   resources:
     requests:
-      storage: 10Gi
+      storage: 5Gi

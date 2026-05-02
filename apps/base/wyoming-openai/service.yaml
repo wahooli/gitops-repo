@@ -8,9 +8,13 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: wyoming
+  - name: wyoming-tts
     port: 10200
-    targetPort: wyoming
+    targetPort: wyoming-tts
+    protocol: TCP
+  - name: wyoming-stt
+    port: 10300
+    targetPort: wyoming-stt
     protocol: TCP
   selector:
     app.kubernetes.io/name: wyoming-openai

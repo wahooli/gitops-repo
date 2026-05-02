@@ -18,7 +18,7 @@ spec:
         app.kubernetes.io/name: wyoming-openai
     spec:
       containers:
-      - name: wyoming-openai
+      - name: wyoming-openai-tts
         image: ghcr.io/roryeckel/wyoming_openai:latest
         imagePullPolicy: IfNotPresent
         env:
@@ -38,7 +38,7 @@ spec:
           value: af_alloy af_aoede af_bella af_heart af_jessica af_kore af_nicole af_nova af_river af_sarah af_sky
         ports:
         - containerPort: 10200
-          name: wyoming
+          name: wyoming-tts
           protocol: TCP
         resources:
           requests:
@@ -49,13 +49,57 @@ spec:
             memory: 256Mi
         readinessProbe:
           tcpSocket:
-            port: wyoming
+            port: wyoming-tts
           initialDelaySeconds: 5
           periodSeconds: 10
           failureThreshold: 30
         livenessProbe:
           tcpSocket:
-            port: wyoming
+            port: wyoming-tts
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+      # Sidecar serving the same Wyoming protocol but for STT, bridging to
+      # speaches over OpenAI HTTP. HA's whisper Wyoming entry sees this
+      # endpoint at port 10300 — same as wyoming-whisper-gpu used to.
+      - name: wyoming-openai-stt
+        image: ghcr.io/roryeckel/wyoming_openai:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: WYOMING_URI
+          value: tcp://0.0.0.0:10300
+        - name: WYOMING_LOG_LEVEL
+          value: INFO
+        - name: WYOMING_LANGUAGES
+          value: en
+        - name: STT_OPENAI_URL
+          value: http://speaches-predictor.homeassistant-assist.svc.cluster.local/v1
+        - name: STT_OPENAI_KEY
+          value: not-needed
+        - name: STT_MODELS
+          value: Systran/faster-distil-whisper-large-v3
+        - name: STT_BACKEND
+          value: OPENAI
+        ports:
+        - containerPort: 10300
+          name: wyoming-stt
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        readinessProbe:
+          tcpSocket:
+            port: wyoming-stt
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 30
+        livenessProbe:
+          tcpSocket:
+            port: wyoming-stt
           initialDelaySeconds: 30
           periodSeconds: 30
           failureThreshold: 3

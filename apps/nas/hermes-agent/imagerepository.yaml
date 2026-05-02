@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: hermes-agent
+  namespace: flux-system
+spec:
+  image: docker.io/nousresearch/hermes-agent
+  interval: 24h

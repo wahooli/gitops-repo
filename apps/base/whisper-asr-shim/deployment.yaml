@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whisper-asr-shim
+  namespace: default
+  labels:
+    app.kubernetes.io/name: whisper-asr-shim
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: whisper-asr-shim
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: whisper-asr-shim
+    spec:
+      containers:
+      - name: whisper-asr-shim
+        # Patched onerahmet/openai-whisper-asr-webservice with a "speaches"
+        # ASR engine added — preserves Bazarr's /asr + /detect-language API
+        # but forwards everything to Speaches over OpenAI HTTP.
+        # Source: /home/wahooli/Code/whisper-asr-webservice
+        image: ghcr.io/wahooli/docker/whisper-asr-shim:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ASR_ENGINE
+          value: speaches
+        - name: SPEACHES_URL
+          value: http://speaches-predictor.homeassistant-assist.svc.cluster.local/v1
+        - name: SPEACHES_MODEL
+          value: Systran/faster-distil-whisper-large-v3
+        # Long-form subtitle jobs against medium can take a while; 1 hour
+        # is generous safety margin.
+        - name: SPEACHES_TIMEOUT
+          value: "3600"
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            # Audio is loaded into memory as 16 kHz mono float32 before being
+            # re-encoded as WAV bytes. A 2-hour movie ≈ 230 MB for the
+            # numpy buffer alone, plus the WAV copy and Python overhead;
+            # 4 GiB gives headroom for back-to-back jobs.
+            cpu: "2"
+            memory: 4Gi
+        readinessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 12
+        livenessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3

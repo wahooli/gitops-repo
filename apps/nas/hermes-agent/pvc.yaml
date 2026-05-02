@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: wyoming-whisper-gpu-models
-  namespace: homeassistant-assist
+  name: hermes-agent-data
+  namespace: hermes-agent
 spec:
   accessModes:
   - ReadWriteOnce
   storageClassName: topolvm-fast
   resources:
     requests:
-      storage: 5Gi
+      storage: 10Gi

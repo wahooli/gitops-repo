@@ -1,14 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- ../../../base/assist-llm-gpu
-- pvc.yaml
+- ../../base/open-webui
 - httproute-private.yaml
-- securitypolicy.yaml
-- envoyextensionpolicy.yaml
 patches:
-- path: inferenceservice.yaml
+- path: helmrelease.yaml
   target:
-    kind: InferenceService
+    kind: HelmRelease
   options:
     allowNameChange: true

@@ -24,7 +24,7 @@ spec:
       - --model
       # uncensored variants tried, all broken on consumer Blackwell W4A16 fallback path:
       # - YuYu1015/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated-NVFP4 # broken: Qwen3_5TextConfig unsupported in current vLLM (PR #39316 unmerged)
-      # - sakamakismile/Huihui-Qwen3.5-9B-abliterated-NVFP4 # works but ~32GB repo (sharded+unsharded duplicate) and slower
+      # - sakamakismile/Huihui-Qwen3.5-9B-abliterated-NVFP4 # ~32GB repo (sharded+unsharded duplicate); doesn't loop in thinking mode (less abliteration than nothink ones), BUT tool-calling reliability degrades over multi-turn HA conversations — model stops emitting tool_calls after a few exchanges. PVC ≥35Gi.
       # - prithivMLmods/Qwen3.5-9B-abliterated-v2-MAX-NVFP4 # MAX abliteration broke numerics — outputs !!!! garbage
       # - nivvis/Qwen3.5-9B-heretic-NVFP4A16 # heretic uncensoring also broke numerics — token-soup output
       - apolo13x/Qwen3.5-9B-NVFP4
@@ -35,11 +35,11 @@ spec:
       - --language-model-only
       - --trust-remote-code
       - --max-model-len
-      - "102400"
+      - "131072"
       - --gpu-memory-utilization
-      - "0.55"
+      - "0.65"
       - --kv-cache-memory-bytes
-      - "4294967296"
+      - "5368709120"
       - --max-num-seqs
       - "16"
       - --enable-chunked-prefill

@@ -1,0 +1,39 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: speaches
+  namespace: homeassistant-assist
+  labels:
+    networking.knative.dev/visibility: cluster-local
+  annotations:
+    autoscaling.knative.dev/scale-down-delay: "10m"
+    autoscaling.knative.dev/window: "60s"
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    scaleTarget: 1
+    scaleMetric: concurrency
+    timeout: 600
+    runtimeClassName: nvidia
+    model:
+      modelFormat:
+        name: whisper
+      runtime: speaches-cuda
+      env:
+      - name: WHISPER__MODEL
+        value: Systran/faster-distil-whisper-large-v3
+      - name: WHISPER__COMPUTE_TYPE
+        value: int8_float16
+      resources:
+        requests:
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          # Long-form transcription holds the full audio buffer + VAD +
+          # ctranslate2 activations in RAM at once. A ~1h 16 kHz mono
+          # float32 audio is ~220 MB just for the buffer; movies push
+          # well past that. 4 Gi OOMed at 58 min, 8 Gi gives margin for
+          # 3 h files.
+          cpu: "2"
+          memory: 8Gi
