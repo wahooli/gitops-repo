@@ -2,7 +2,6 @@ data_dir: /vector-data-dir
 api:
   enabled: false
   address: 0.0.0.0:8686
-  playground: true
 sources:
   vector:
     address: 0.0.0.0:6000
