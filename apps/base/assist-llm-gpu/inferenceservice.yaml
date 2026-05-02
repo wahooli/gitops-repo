@@ -35,11 +35,11 @@ spec:
       - --language-model-only
       - --trust-remote-code
       - --max-model-len
-      - "102400"
+      - "131072"
       - --gpu-memory-utilization
-      - "0.55"
+      - "0.65"
       - --kv-cache-memory-bytes
-      - "4294967296"
+      - "5368709120"
       - --max-num-seqs
       - "16"
       - --enable-chunked-prefill
