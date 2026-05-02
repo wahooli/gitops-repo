@@ -1,11 +1,9 @@
 image:
   repository: chrislusf/seaweedfs
-  tag: "4.19" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
-
+  tag: "4.22" # {"$imagepolicy": "flux-system:seaweedfs:tag"}
 podAnnotations:
   secret.reloader.stakater.com/reload: "seaweedfs-shared"
   configmap.reloader.stakater.com/reload: "seaweedfs-shared-config"
-
 defaultReplication: "000"
 tls:
   enabled: true
@@ -13,10 +11,8 @@ tls:
   issuerRef:
     name: clustermesh-issuer
     kind: ClusterIssuer
-
 master:
   replicaCount: 1
-
 volume:
   podManagementPolicy: Parallel
   cluster:
@@ -37,7 +33,6 @@ volume:
         resources:
           requests:
             storage: "5Gi"
-
 filer:
   replicaCount: 1
   service:
