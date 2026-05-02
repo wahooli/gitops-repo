@@ -22,7 +22,7 @@ spec:
       runtime: speaches-cuda
       env:
       - name: WHISPER__MODEL
-        value: Systran/faster-whisper-medium
+        value: Systran/faster-distil-whisper-large-v3
       - name: WHISPER__COMPUTE_TYPE
         value: int8_float16
       resources:

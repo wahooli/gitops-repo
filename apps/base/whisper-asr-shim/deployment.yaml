@@ -31,7 +31,7 @@ spec:
         - name: SPEACHES_URL
           value: http://speaches-predictor.homeassistant-assist.svc.cluster.local/v1
         - name: SPEACHES_MODEL
-          value: Systran/faster-whisper-medium
+          value: Systran/faster-distil-whisper-large-v3
         # Long-form subtitle jobs against medium can take a while; 1 hour
         # is generous safety margin.
         - name: SPEACHES_TIMEOUT

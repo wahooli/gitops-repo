@@ -22,7 +22,7 @@ spec:
       - -c
       - |
         from huggingface_hub import snapshot_download
-        snapshot_download("Systran/faster-whisper-medium", cache_dir="/cache/hf/hub")
+        snapshot_download("Systran/faster-distil-whisper-large-v3", cache_dir="/cache/hf/hub")
       volumeMounts:
       - name: hf-cache
         mountPath: /cache/hf

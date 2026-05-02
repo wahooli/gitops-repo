@@ -77,7 +77,7 @@ spec:
         - name: STT_OPENAI_KEY
           value: not-needed
         - name: STT_MODELS
-          value: Systran/faster-whisper-medium
+          value: Systran/faster-distil-whisper-large-v3
         - name: STT_BACKEND
           value: OPENAI
         ports:
