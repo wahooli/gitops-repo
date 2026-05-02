@@ -6,104 +6,51 @@ grand_parent: "tpi-1"
 
 # vector-global-write
 
-The `vector-global-write` component is a deployment of the [Vector](https://vector.dev/) log aggregation and processing tool in the `tpi-1` Kubernetes cluster. It is managed using Flux and Helm, and is configured to function as an "Aggregator" for log data.
+The `vector-global-write` component is deployed in the `flux-system` namespace of the `tpi-1` cluster. It utilizes the Vector logging agent to aggregate logs from various sources.
 
-## Helm Chart
+## HelmRelease Details
 
-- **Chart Name**: `vector`
-- **Version**: `0.51.0`
-- **Source**: Referenced from a Helm repository named `vector` in the `flux-system` namespace.
-
-## Namespace
-
-- **Target Namespace**: `logging`
-
-## Release Details
-
+- **Name**: `logging--vector-global-write`
+- **Namespace**: `flux-system`
+- **Chart**: `vector`
+- **Version**: `0.52.0`
 - **Release Name**: `vector-global-write`
+- **Target Namespace**: `logging`
 - **Interval**: 10 minutes
 - **Dependencies**:
-  - `victoria-metrics--victoria-metrics-operator` (namespace: `flux-system`)
-  - `logging--vector-lb` (namespace: `flux-system`)
+  - `victoria-metrics--victoria-metrics-operator`
+  - `logging--vector-lb`
 
-## Configuration
+## Configuration Values
 
-### Role
+The following configuration values are set for the Vector deployment:
 
 - **Role**: `Aggregator`
-  - This role deploys Vector as a `StatefulSet`.
-
-### Image
-
-- **Repository**: `timberio/vector`
-- **Pull Policy**: `IfNotPresent`
-- **Tag**: Derived from the chart's `appVersion`.
-
-### Replicas
-
-- **Count**: 1
-
-### Configuration Source
-
-The configuration for this deployment is sourced from existing ConfigMaps:
-- `vector-global-write-config-dgdtt584kh`
-- `vector-global-write-values-mtkcfdk4hm` (keys: `values-base.yaml`, `values.yaml`)
-- `vector-global-write-helmrelease-overrides` (optional, key: `values.yaml`)
-
-### Persistence
-
-- **Enabled**: No persistent storage is configured for this deployment.
-- **Host Path**: `/var/lib/vector` is used for data storage.
-
-### Autoscaling
-
-- **Enabled**: No autoscaling is configured.
-
-### Service
-
-- **Type**: `ClusterIP`
-- **Headless Service**: Enabled
-
-### Security and RBAC
-
-- **RBAC**: Enabled
-- **Service Account**: Created with default settings.
-
-### Probes
-
-- **Liveness Probe**: Not explicitly configured.
-- **Readiness Probe**: Not explicitly configured.
-
-### Additional Configuration
-
-- **Pod Annotations**: Includes `vector.dev/exclude: "true"`.
-- **Pod Priority Class**: Not specified.
-- **Node Selector, Tolerations, Affinity**: Not configured.
-- **Topology Spread Constraints**: Not configured.
-
-### Logging
-
+- **Replicas**: `1`
+- **Image**:
+  - **Repository**: `timberio/vector`
+  - **Pull Policy**: `IfNotPresent`
+  - **Tag**: Derived from the Chart's appVersion
+- **Service**:
+  - **Enabled**: `true`
+  - **Type**: `ClusterIP`
+- **Headless Service**:
+  - **Enabled**: `true`
+- **Existing ConfigMaps**: 
+  - `vector-global-write-config-696cmtmf2m`
+- **Pod Annotations**:
+  - `vector.dev/exclude: "true"`
 - **Log Level**: `info`
 
-### HAProxy Load Balancer
+## Additional Configuration
 
-- **Enabled**: No HAProxy load balancer is configured.
+- **Pod Management Policy**: `OrderedReady`
+- **Termination Grace Period**: `60 seconds`
+- **DNS Policy**: `ClusterFirst`
+- **Service Account**: Created with RBAC enabled.
 
 ## Notes
 
-- The deployment uses existing ConfigMaps for configuration, which takes precedence over the chart's default configurations.
-- The `Aggregator` role is suitable for centralized log aggregation and processing.
-- For further customization, refer to the [Vector Helm Chart documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).
-
-## Dependencies
-
-Ensure the following dependencies are deployed and healthy before using `vector-global-write`:
-- `victoria-metrics--victoria-metrics-operator`
-- `logging--vector-lb`
-
-## Troubleshooting
-
-If the deployment is not functioning as expected:
-1. Verify the health of the dependent components.
-2. Check the logs of the `vector-global-write` pods.
-3. Ensure the referenced ConfigMaps are correctly configured and accessible.
+- The Vector instance is configured to run as an Aggregator, which is suitable for collecting logs from multiple sources and sending them to a centralized location.
+- The deployment includes a headless service for internal communication between pods.
+- Ensure that the dependencies are properly installed and configured for the Vector deployment to function correctly.

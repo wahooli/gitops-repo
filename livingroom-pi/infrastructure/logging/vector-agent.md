@@ -6,68 +6,72 @@ grand_parent: "livingroom-pi"
 
 # vector-agent
 
-The `vector-agent` component is deployed in the `livingroom-pi` cluster using the Vector Helm chart version `0.52.0`. This component is responsible for collecting and processing logs and metrics from the cluster.
+The `vector-agent` component is deployed in the `livingroom-pi` cluster using Flux and Helm. It is responsible for collecting and processing logs and metrics from various sources.
 
 ## Overview
 
-The deployment consists of a HelmRelease that manages the installation of the Vector agent, along with associated ConfigMaps and image repositories for the required images.
-
-### HelmRelease
-
-- **Name**: `logging--vector-agent`
-- **Namespace**: `flux-system`
+- **Helm Chart**: `vector`
+- **Version**: `0.52.0`
 - **Release Name**: `vector-agent`
-- **Target Namespace**: `logging`
-- **Chart Source**: [Vector Helm Repository](https://helm.vector.dev)
-- **Chart Version**: `0.52.0`
-- **Update Interval**: 10 minutes
+- **Namespace**: `logging`
+- **Dependencies**: Depends on `victoria-metrics--victoria-metrics-operator` in the `flux-system` namespace.
 
-### Dependencies
+## Configuration
 
-The `vector-agent` depends on the following component:
-- `victoria-metrics--victoria-metrics-operator` (Namespace: `flux-system`)
+The `vector-agent` is configured through a combination of Helm values and existing ConfigMaps. The key configurations include:
 
-### Configuration
+- **Role**: Set to `Aggregator`, which means it will run as a StatefulSet.
+- **Replicas**: 1
+- **Service**: Enabled with type `ClusterIP`.
+- **Existing ConfigMaps**: Uses `vector-agent-config-2658c2h57d` for configuration.
 
-The Vector agent is configured using the following values:
+### Values
 
-- **Role**: `Aggregator`
-- **Replicas**: `1`
-- **Service**: Enabled with type `ClusterIP`
-- **Existing ConfigMaps**: 
-  - `vector-agent-config-tc927k88m7`
-- **Values from ConfigMaps**:
-  - `vector-agent-values-tc42b2k4fg` (keys: `values-base.yaml`, `values.yaml`)
+The following values are defined for the `vector-agent`:
 
-### Image Repositories
+- **Image**: 
+  - Repository: `timberio/vector`
+  - Pull Policy: `IfNotPresent`
+  - Tag: Derived from the chart's appVersion.
+  
+- **Service Configuration**:
+  - Enabled: `true`
+  - Type: `ClusterIP`
+  
+- **Pod Management**:
+  - Pod Management Policy: `OrderedReady`
+  
+- **Resource Requests and Limits**: Can be defined in the `resources` section (currently empty).
 
-The deployment uses the following image repositories:
-1. **Vector Helm Chart**:
-   - **Image**: `ghcr.io/vectordotdev/helm-charts/vector`
-   - **Update Interval**: 24 hours
+- **Logging Level**: Set to `info`.
+
+## Helm Repository
+
+The Helm chart is sourced from the following repository:
+
+- **Name**: `vector`
+- **URL**: [https://helm.vector.dev](https://helm.vector.dev)
+- **Update Interval**: 24 hours
+
+## Image Management
+
+The component uses images from two repositories:
+
+1. **Vector Helm Chart**: 
+   - Image: `ghcr.io/vectordotdev/helm-charts/vector`
+   - Update Interval: 24 hours
 
 2. **Vector Docker Hub**:
-   - **Image**: `timberio/vector`
-   - **Update Interval**: 24 hours
+   - Image: `timberio/vector`
+   - Update Interval: 24 hours
 
-### Image Policies
+## Monitoring
 
-Image policies are defined to manage the versions of the images used:
-- **Vector Helm Chart**: Policy for semantic versioning.
-- **Vector Debian**: Filters tags for specific version patterns.
+The `vector-agent` can be monitored using a PodMonitor, which is currently disabled. If enabled, it would scrape metrics from the configured endpoints.
 
-### Additional Configuration
+## Additional Notes
 
-The configuration for the Vector agent includes:
-- **Log Level**: `info`
-- **Pod Disruption Budget**: Disabled
-- **RBAC**: Enabled
-- **Service Account**: Created with default settings
-- **Termination Grace Period**: 60 seconds
+- The `vector-agent` is designed to be highly configurable, allowing for various deployment scenarios and resource management strategies.
+- Ensure that any sensitive information is managed securely, especially when configuring secrets and environment variables.
 
-### Notes
-
-- The Vector agent is designed to run as an aggregator, collecting logs and metrics from various sources within the Kubernetes cluster.
-- Ensure that the ConfigMaps referenced in the deployment are correctly configured to avoid issues during startup.
-
-For more detailed information on configuring and using Vector, refer to the [Vector documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).
+For further details on configuration options, refer to the [Vector documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).

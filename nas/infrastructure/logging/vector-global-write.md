@@ -6,92 +6,61 @@ grand_parent: "nas"
 
 # vector-global-write
 
-The `vector-global-write` component is a deployment of the [Vector](https://vector.dev/) log aggregation tool in the `nas` Kubernetes cluster. It is managed using Flux's HelmRelease and is configured to act as an "Aggregator" for log data.
+The `vector-global-write` component is deployed in the `flux-system` namespace of the `nas` cluster. It utilizes the Vector logging agent to aggregate logs and metrics from various sources.
 
-## Helm Chart Details
+## Overview
 
-- **Chart Name**: `vector`
-- **Chart Version**: `0.51.0`
-- **Source Repository**: Referenced via a HelmRepository named `vector` in the `flux-system` namespace.
-- **Release Name**: `vector-global-write`
-- **Target Namespace**: `logging`
-
-## Dependencies
-
-This HelmRelease depends on the following components:
-- `victoria-metrics--victoria-metrics-operator` in the `flux-system` namespace.
-- `logging--vector-lb` in the `flux-system` namespace.
+- **Chart**: Vector
+- **Version**: 0.52.0
+- **Release Name**: vector-global-write
+- **Target Namespace**: logging
+- **Installation Interval**: 10 minutes
+- **Dependencies**:
+  - `victoria-metrics--victoria-metrics-operator`
+  - `logging--vector-lb`
 
 ## Configuration
 
-### Role
-- **Role**: `Aggregator`  
-  The deployment is configured as an "Aggregator," which uses a StatefulSet to manage pods.
+The configuration for the Vector instance is primarily defined in the `values-base.yaml` and additional ConfigMaps. Key configurations include:
 
-### Image
-- **Repository**: `timberio/vector`
-- **Pull Policy**: `IfNotPresent`
-- **Tag**: Not explicitly set (defaults to the chart's appVersion).
-
-### Replicas
-- **Number of Replicas**: 1
-
-### Service
-- **Type**: `ClusterIP`
+- **Role**: Aggregator
+- **Replicas**: 1
+- **Image**: 
+  - Repository: `timberio/vector`
+  - Pull Policy: `IfNotPresent`
+- **Service**: Enabled with type `ClusterIP`
 - **Headless Service**: Enabled
+- **Pod Disruption Budget**: Disabled
+- **RBAC**: Created
+- **Service Account**: Created
 
-### Persistence
-- **Enabled**: No persistent volume claims are created.
-- **Host Path**: `/var/lib/vector` is used for hostPath persistence.
+### Key Values
 
-### Configuration Management
+- **Logging Level**: `info`
+- **Termination Grace Period**: 60 seconds
+- **Pod Management Policy**: OrderedReady
+- **Update Strategy**: RollingUpdate
 - **Existing ConfigMaps**: 
-  - `vector-global-write-config-4mm2g6t2cf`
-- **Additional Values from ConfigMaps**:
-  - `vector-global-write-values-bct65c9cgf` (keys: `values-base.yaml`, `values.yaml`)
-  - `vector-global-write-helmrelease-overrides` (optional, key: `values.yaml`)
-
-### Resource Management
-- **Resource Requests and Limits**: Not explicitly defined.
+  - `vector-global-write-config-bdb5795f69`
 
 ### Autoscaling
-- **Enabled**: No autoscaling is configured.
 
-### Security
-- **RBAC**: Enabled
-- **Pod Security Policy**: Not created (deprecated in Kubernetes v1.21+).
+- **Enabled**: false
+- **Min Replicas**: 1
+- **Max Replicas**: 10
+- **Target CPU Utilization**: 80%
 
-### Probes
-- **Liveness Probe**: Not explicitly configured.
-- **Readiness Probe**: Not explicitly configured.
+## Resources Created
 
-### Logging
-- **Log Level**: `info`
+The deployment creates the following Kubernetes resources:
 
-### Additional Features
-- **Pod Disruption Budget**: Not enabled.
-- **HAProxy Load Balancer**: Not enabled.
+- **Deployment**: For the Vector Aggregator
+- **Service**: For internal communication
+- **Headless Service**: For direct pod access
+- **ConfigMaps**: For configuration management
 
-## Annotations and Labels
+## Additional Information
 
-### Annotations
-- **Base HelmRelease**: `vector`
+For more details on configuring Vector, refer to the [Vector Helm documentation](https://vector.dev/docs/setup/installation/package-managers/helm/). 
 
-### Labels
-- **Kustomize Name**: `infrastructure-logging`
-- **Kustomize Namespace**: `flux-system`
-
-## Update and Remediation Strategy
-
-- **Install Remediation**: Unlimited retries on failure.
-- **Update Interval**: Every 10 minutes.
-- **Chart Update Interval**: Every 24 hours.
-
-## Additional Notes
-
-- The deployment uses a combination of default and custom configurations for Vector, as defined in the `values-base.yaml` and `values.yaml` files.
-- The deployment includes default volume mounts for `/var/log/`, `/var/lib/`, `/proc`, and `/sys`.
-- The StatefulSet uses an `OrderedReady` pod management policy.
-- The deployment does not include an Ingress resource by default.
-
-For more details on the Vector Helm chart configuration, refer to the [official documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).
+This component is part of a larger logging infrastructure and is designed to work in conjunction with other components such as the Victoria Metrics operator and load balancers.

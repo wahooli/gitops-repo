@@ -6,91 +6,43 @@ grand_parent: "tpi-1"
 
 # vector-lb
 
-The `vector-lb` component is deployed in the `tpi-1` Kubernetes cluster within the `logging` namespace. It is managed using Flux and HelmRelease, leveraging the `vector` Helm chart (version `0.51.0`) from the official Vector Helm repository.
+The `vector-lb` component is deployed in the `logging` namespace of the `tpi-1` cluster using the Vector Helm chart version `0.52.0`. This component is responsible for aggregating logs and metrics from various sources and providing a unified logging solution.
 
-## Overview
+## HelmRelease Configuration
 
-`vector-lb` is configured as an Aggregator role, which deploys Vector as a `StatefulSet`. It is designed to collect, process, and route logs efficiently. The deployment is configured to use an existing ConfigMap for its configuration and supports integration with VictoriaMetrics for metrics collection.
+### General Information
+- **Release Name**: `vector-lb`
+- **Namespace**: `flux-system`
+- **Chart Source**: [Vector Helm Repository](https://helm.vector.dev)
+- **Chart Version**: `0.52.0`
+- **Update Interval**: 10 minutes
 
----
-
-## Deployment Details
-
-### HelmRelease Configuration
-
-- **Name:** `logging--vector-lb`
-- **Namespace:** `flux-system`
-- **Chart:** `vector` (version `0.51.0`)
-- **Source Repository:** [https://helm.vector.dev](https://helm.vector.dev)
-- **Release Name:** `vector-lb`
-- **Target Namespace:** `logging`
-- **Sync Interval:** 10 minutes
-- **Dependencies:** 
-  - `victoria-metrics--victoria-metrics-operator` (namespace: `flux-system`)
+### Dependencies
+- The `vector-lb` HelmRelease depends on the `victoria-metrics--victoria-metrics-operator` in the `flux-system` namespace.
 
 ### Values Configuration
+The following values are configured for the `vector-lb` deployment:
 
-The deployment uses a combination of inline values and external ConfigMaps for configuration:
+- **Role**: `Aggregator`
+- **Replicas**: 1
+- **Service Configuration**:
+  - **Enabled**: true
+  - **Type**: `ClusterIP`
+- **Existing ConfigMaps**: 
+  - `vector-lb-config-tct77bkb5g`
+- **Image Configuration**:
+  - **Repository**: `timberio/vector`
+  - **Pull Policy**: `IfNotPresent`
+- **Logging Level**: `info`
+- **Pod Security Context**: Custom security settings can be applied.
 
-- **Existing ConfigMaps:**
-  - `vector-lb-config-457cm42g2b`
-- **Values from ConfigMaps:**
-  - `vector-values-5cf8f5678g` (keys: `values-base.yaml`, `values.yaml`)
+### ConfigMaps Used
+- **Base Values**: Configurations are sourced from `vector-values-5cf8f5678g` ConfigMap, specifically from `values-base.yaml` and `values.yaml`.
 
-Key configuration options include:
-- **Role:** `Aggregator`
-- **Replicas:** `1`
-- **Service:**
-  - Enabled: `true`
-  - Type: `ClusterIP`
-- **Pod Annotations:** `vector.dev/exclude: "true"`
-- **Persistence:**
-  - Enabled: `false`
-  - HostPath: `/var/lib/vector`
-- **RBAC:** Enabled
-- **Service Account:** Automatically created
-- **Pod Disruption Budget:** Disabled
-- **Autoscaling:** Disabled
-- **HAProxy Load Balancer:** Disabled
+## Additional Resources
+- **Image Repository**: The images for the Vector component are sourced from `ghcr.io/vectordotdev/helm-charts/vector`.
+- **Image Policy**: The image policy is set to allow semantic versioning.
 
----
-
-## Kubernetes Resources
-
-The following Kubernetes resources are created by the `vector-lb` HelmRelease:
-
-1. **StatefulSet:** Deploys Vector in Aggregator role.
-2. **Service:** Exposes Vector as a `ClusterIP` service.
-3. **ConfigMaps:** Used for external configuration (`vector-lb-config-457cm42g2b`, `vector-values-5cf8f5678g`).
-4. **ServiceAccount:** Automatically created for the Vector Pods.
-5. **HelmRepository:** 
-   - Name: `vector`
-   - URL: [https://helm.vector.dev](https://helm.vector.dev)
-6. **ImageRepository:**
-   - Image: `ghcr.io/vectordotdev/helm-charts/vector`
-   - Sync Interval: 24 hours
-7. **ImagePolicy:**
-   - Policy: Semantic versioning (`x.x.x`)
-
----
-
-## Key Features
-
-- **Log Aggregation:** Configured as an Aggregator to collect and process logs.
-- **Custom Configuration:** Supports external ConfigMaps for custom configurations.
-- **RBAC Support:** Role-based access control is enabled.
-- **Service Exposure:** Exposed as a `ClusterIP` service.
-- **Persistence:** HostPath persistence enabled for storing data at `/var/lib/vector`.
-- **Pod Annotations:** Custom annotations for Vector Pods.
-- **Update Strategy:** Rolling updates for seamless upgrades.
-
----
-
-## Additional Notes
-
-- The deployment is configured to retry installation indefinitely in case of failures.
-- The `vector-lb` component is dependent on the `victoria-metrics--victoria-metrics-operator` for metrics collection.
-- The `haproxy` load balancer feature is disabled in this deployment.
-- The deployment uses the default Vector image (`timberio/vector`) with the tag derived from the chart's `appVersion`.
-
-For more details on the Vector Helm chart and its configuration options, refer to the [official documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).
+## Notes
+- The deployment includes configurations for logging, metrics aggregation, and potential integration with other services.
+- Ensure that the `victoria-metrics--victoria-metrics-operator` is properly deployed and configured, as it is a prerequisite for the `vector-lb` component to function correctly.
