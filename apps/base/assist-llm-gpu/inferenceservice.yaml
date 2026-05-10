@@ -6,14 +6,14 @@ metadata:
   labels:
     networking.knative.dev/visibility: cluster-local
   annotations:
-    autoscaling.knative.dev/scale-down-delay: "10m"
-    autoscaling.knative.dev/window: "60s"
+    serving.kserve.io/deploymentMode: RawDeployment
+    serving.kserve.io/autoscalerClass: "none"
 spec:
   predictor:
+    deploymentStrategy:
+      type: Recreate
     minReplicas: 1
     maxReplicas: 1
-    scaleTarget: 1
-    scaleMetric: concurrency
     timeout: 9000
     runtimeClassName: nvidia
     model:
@@ -21,12 +21,15 @@ spec:
         name: vllm
       runtime: vllm-cuda
       args:
-      - --model
-      # uncensored variants tried, all broken on consumer Blackwell W4A16 fallback path:
+      # vLLM v0.20.1 wants model as positional args[0], but KServe appends
+      # ISvc args after runtime args (--host/--port/etc), so we keep --model
+      # and tolerate its deprecation warning. Uncensored variants tried,
+      # all broken on consumer Blackwell W4A16 fallback path:
       # - YuYu1015/Huihui-Qwen3.5-9B-Claude-4.6-Opus-abliterated-NVFP4 # broken: Qwen3_5TextConfig unsupported in current vLLM (PR #39316 unmerged)
       # - sakamakismile/Huihui-Qwen3.5-9B-abliterated-NVFP4 # ~32GB repo (sharded+unsharded duplicate); doesn't loop in thinking mode (less abliteration than nothink ones), BUT tool-calling reliability degrades over multi-turn HA conversations — model stops emitting tool_calls after a few exchanges. PVC ≥35Gi.
       # - prithivMLmods/Qwen3.5-9B-abliterated-v2-MAX-NVFP4 # MAX abliteration broke numerics — outputs !!!! garbage
       # - nivvis/Qwen3.5-9B-heretic-NVFP4A16 # heretic uncensoring also broke numerics — token-soup output
+      - --model
       - apolo13x/Qwen3.5-9B-NVFP4
       - --served-model-name
       - assist-llm
@@ -34,14 +37,35 @@ spec:
       - compressed-tensors
       - --language-model-only
       - --trust-remote-code
+      # FlashInfer attention backend — Blackwell-tuned kernels, better
+      # prefill throughput at long context. Orthogonal to the Marlin
+      # NVFP4 GEMM backend (VLLM_NVFP4_GEMM_BACKEND env, runtime base).
+      - --attention-backend
+      - flashinfer
+      # Bias scheduler toward latency over throughput; matches our
+      # single-user-at-a-time pattern (HA Assist + opencode + OpenWebUI).
+      - --performance-mode
+      - interactivity
+      # Parallel safetensor fetch from the HF cache PVC — faster cold start.
+      - --safetensors-load-strategy=prefetch
       - --max-model-len
       - "131072"
+      # gpu-memory-utilization caps total vLLM VRAM at ~15.2 GiB, leaving
+      # headroom for speaches + wyoming + Plex/Jellyfin NVENC transcodes
+      # on this shared GPU.
       - --gpu-memory-utilization
       - "0.65"
+      # 7 GiB at fp8 (~72 KiB/token for Qwen3-8B arch) gives ~99K tokens of
+      # usable single-seq context. max-model-len above is the admission
+      # ceiling — requests beyond ~99K will preempt/recompute. Sized for
+      # opencode/coding-agent workloads that actually use the context window;
+      # HA Assist conversations are <10K and trivially fit.
       - --kv-cache-memory-bytes
-      - "5368709120"
+      - "7516192768"
       - --max-num-seqs
-      - "16"
+      - "4"
+      - --max-num-batched-tokens
+      - "8192"
       - --enable-chunked-prefill
       - --enable-auto-tool-choice
       - --tool-call-parser

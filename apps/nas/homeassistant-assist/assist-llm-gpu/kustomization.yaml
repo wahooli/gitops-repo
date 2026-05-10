@@ -4,6 +4,7 @@ resources:
 - ../../../base/assist-llm-gpu
 - pvc.yaml
 - httproute-private.yaml
+- httproute-private-think.yaml
 - securitypolicy.yaml
 - envoyextensionpolicy.yaml
 patches:

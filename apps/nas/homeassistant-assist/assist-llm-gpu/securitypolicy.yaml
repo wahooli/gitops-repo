@@ -8,6 +8,9 @@ spec:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: assist-llm-gpu-private
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: assist-llm-gpu-private-think
   apiKeyAuth:
     extractFrom:
     - headers:

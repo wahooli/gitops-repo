@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: assist-llm-gpu-private-think
+  namespace: homeassistant-assist
+spec:
+  parentRefs:
+  - name: envoy-gw-private
+    namespace: envoy-gateway-system
+    sectionName: wahooli-https
+  hostnames:
+  - "assist-llm-think.${domain_wahoo_li:=wahoo.li}"
+  rules:
+  - filters:
+    - type: URLRewrite
+      urlRewrite:
+        hostname: assist-llm-gpu-predictor.homeassistant-assist.svc.cluster.local
+    backendRefs:
+    - name: assist-llm-gpu-predictor
+      port: 80
+    timeouts:
+      request: 300s
+      backendRequest: 300s

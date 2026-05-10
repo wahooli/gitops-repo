@@ -8,7 +8,7 @@ spec:
     autoSelect: false
   containers:
   - name: kserve-container
-    image: vllm/vllm-openai:cu130-nightly
+    image: vllm/vllm-openai:v0.20.1-cu129
     args:
     - --host
     - 0.0.0.0
@@ -22,6 +22,14 @@ spec:
     - --generation-config
     - /etc/vllm
     env:
+    # Optional — if the Secret doesn't exist in the ISvc's namespace, vLLM
+    # falls back to anonymous HF Hub access (rate-limited).
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: huggingface-token
+          key: token
+          optional: true
     - name: VLLM_NVFP4_GEMM_BACKEND
       value: marlin
     - name: PYTORCH_ALLOC_CONF
