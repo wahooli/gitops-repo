@@ -12,7 +12,7 @@ image:
   tag: "15.0.2-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
 extraContainers:
 - name: syncthing
-  image: syncthing/syncthing:2.0.16 # {"$imagepolicy": "flux-system:syncthing"}
+  image: syncthing/syncthing:2.1.0 # {"$imagepolicy": "flux-system:syncthing"}
   ports:
   - containerPort: 22000
     name: sync
