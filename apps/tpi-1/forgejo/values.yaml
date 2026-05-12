@@ -2,7 +2,6 @@ gitea:
   config:
     storage:
       MINIO_ENDPOINT: seaweedfs-filer-tpi-1.seaweedfs.svc.cluster.local:8333
-
 service:
   http:
     annotations:
@@ -10,7 +9,7 @@ service:
 image:
   registry: code.forgejo.org
   repository: forgejo/forgejo
-  tag: "15.0.1-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
+  tag: "15.0.2-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
 extraContainers:
 - name: syncthing
   image: syncthing/syncthing:2.0.16 # {"$imagepolicy": "flux-system:syncthing"}
