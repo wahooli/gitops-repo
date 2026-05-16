@@ -7,82 +7,66 @@ grand_parent: "nas"
 # forgejo
 
 ## Overview
-Forgejo is a self-hosted Git service that provides a collaborative platform for software development. This deployment includes additional components such as Redis for caching and Patroni for PostgreSQL clustering.
+Forgejo is a self-hosted Git service that provides a collaborative platform for managing Git repositories. It is deployed in the `forgejo` namespace of the `nas` cluster using Flux for GitOps.
 
-## Deployment Details
-The Forgejo component is deployed in the `forgejo` namespace and is managed using Flux CD with Helm. The current version of the Forgejo chart is **16.2.1**.
+## Components
+The Forgejo deployment consists of the following sub-components:
 
-### Helm Releases
-The deployment consists of the following Helm releases:
+### 1. Forgejo
+- **Helm Chart**: `forgejo`
+- **Version**: `16.2.1`
+- **Namespace**: `flux-system`
+- **Release Name**: `forgejo`
+- **Target Namespace**: `forgejo`
+- **Install Interval**: Every 5 minutes
+- **Dependencies**:
+  - Redis (forgejo--forgejo-redis)
+  - Patroni (forgejo--forgejo-patroni)
+  - SeaweedFS (seaweedfs--seaweedfs)
 
-#### 1. Forgejo
-- **Release Name:** `forgejo`
-- **Namespace:** `forgejo`
-- **Chart Version:** `16.2.1`
-- **Source Repository:** `oci://code.forgejo.org/forgejo-helm`
-- **Dependencies:**
-  - Redis (`forgejo--forgejo-redis`)
-  - Patroni (`forgejo--forgejo-patroni`)
-  - SeaweedFS (`seaweedfs--seaweedfs`)
-- **Install Interval:** 5 minutes
-- **Values Configuration:** Loaded from multiple ConfigMaps, including base and shared values.
+#### Configuration
+- **Service Type**: ClusterIP for HTTP and SSH services.
+- **Persistence**: Enabled with a size of 10Gi.
+- **Init Containers**: Used for copying SSH host keys and JWT keys.
+- **Environment Variables**: Configured for OAuth, database connection, and security settings.
 
-#### 2. Redis
-- **Release Name:** `forgejo-redis`
-- **Namespace:** `forgejo`
-- **Chart Version:** `>=0.1.0-0`
-- **Source Repository:** `wahooli`
-- **Install Interval:** 5 minutes
-- **Values Configuration:** Loaded from a ConfigMap with shared values for Redis.
+### 2. Redis
+- **Helm Chart**: `redis`
+- **Version**: `>=0.1.0-0`
+- **Release Name**: `forgejo-redis`
+- **Namespace**: `flux-system`
+- **Install Interval**: Every 5 minutes
 
-#### 3. Patroni
-- **Release Name:** `forgejo-patroni`
-- **Namespace:** `forgejo`
-- **Chart Version:** `>=0.1.0-0`
-- **Source Repository:** `wahooli`
-- **Install Interval:** 5 minutes
-- **Values Configuration:** Loaded from a ConfigMap with shared values for Patroni.
+#### Configuration
+- **Sentinel**: Enabled for high availability.
+- **Persistence**: Data persistence is enabled.
+
+### 3. Patroni
+- **Helm Chart**: `patroni`
+- **Version**: `>=0.1.0-0`
+- **Release Name**: `forgejo-patroni`
+- **Namespace**: `flux-system`
+- **Install Interval**: Every 5 minutes
 
 ## Services
-### Forgejo SSH Load Balancer
-- **Service Type:** LoadBalancer
-- **Ports:**
-  - SSH: 22
-  - SSH Proxy: 2222
-- **Annotations:** Configured for external DNS and Cilium.
+- **SSH Load Balancer**: Exposes SSH service on port 22 and a proxy on port 2222.
+- **HTTP Routes**: Configured for both public and private access to the Forgejo application.
 
-### HTTP Routes
-Two HTTP routes are configured for Forgejo:
-1. **Public Route**: Exposes the Forgejo application on `git.${domain_wahoo_li}`.
-2. **Private Route**: Used for internal communication within the cluster.
-
-## Configuration
-The configuration for Forgejo is extensive and includes settings for:
-- **Service Accounts**
-- **Persistence**
-- **OAuth2 Integration**
-- **Database Connection**
-- **Storage Options** (using MinIO via SeaweedFS)
-- **Logging and Metrics**
-
-### Example Configuration Snippet
-```yaml
-service:
-  http:
-    type: ClusterIP
-    port: 3000
-  ssh:
-    type: ClusterIP
-    port: 22
-```
+## Ingress
+- **Public Ingress**: Routes traffic to the Forgejo HTTP service on port 8923.
+- **Private Ingress**: Routes traffic to the Forgejo HTTP service on port 3000.
 
 ## Image Repositories
-The following images are used in the deployment:
-- **Forgejo**: `code.forgejo.org/forgejo/forgejo:15.0.1-rootless`
-- **Syncthing**: `syncthing/syncthing:2.0.16`
-- **Anubis**: `ghcr.io/techarohq/anubis:v1.25.0`
+- **Forgejo Image**: `code.forgejo.org/forgejo/forgejo`
+- **Syncthing Image**: `syncthing/syncthing:2.0.16`
+- **Anubis Image**: `ghcr.io/techarohq/anubis:v1.25.0`
+
+## Image Policies
+- Policies are defined for managing image updates based on semantic versioning.
+
+## Configurations
+- Configurations are managed through ConfigMaps, allowing for flexible adjustments to the deployment without modifying the Helm charts directly.
 
 ## Notes
-- The deployment is configured to use Redis for caching and session management.
-- The application is set to run in production mode with various security and performance optimizations.
 - Ensure that the necessary secrets and ConfigMaps are created and available in the `forgejo` namespace for the deployment to function correctly.
+- The deployment is designed for high availability and scalability, leveraging Redis and Patroni for database management.
