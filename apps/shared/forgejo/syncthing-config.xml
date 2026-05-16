@@ -8,13 +8,6 @@
     <device id="${forgejo_syncthing_device_nas}" introducedBy=""/>
     <device id="${forgejo_syncthing_device_tpi_1}" introducedBy=""/>
     <minDiskFree unit="%">1</minDiskFree>
-    <ignorePattern>indexers/**</ignorePattern>
-    <ignorePattern>tmp/**</ignorePattern>
-    <ignorePattern>jwt/**</ignorePattern>
-    <ignorePattern>ssh/**</ignorePattern>
-    <ignorePattern>gitea/conf/**</ignorePattern>
-    <ignorePattern>git/.ssh/**</ignorePattern>
-    <ignorePattern>home/**</ignorePattern>
   </folder>
   <device id="${forgejo_syncthing_device_nas}" name="nas">
     <address>tcp://forgejo-syncthing-nas.forgejo.svc.cluster.local:22000</address>

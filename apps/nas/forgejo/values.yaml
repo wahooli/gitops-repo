@@ -21,6 +21,7 @@ extraContainers:
     cp /syncthing-src/config.xml "$STHOMEDIR/config.xml"
     cp /syncthing-src/cert.pem "$STHOMEDIR/cert.pem"
     cp /syncthing-src/key.pem "$STHOMEDIR/key.pem"
+    printf 'indexers\ntmp\njwt\nssh\ngitea/conf\ngit/.ssh\nhome\n' > /data/.stignore
     exec /bin/entrypoint.sh /bin/syncthing serve
   env:
   - name: STGUIADDRESS
