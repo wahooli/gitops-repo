@@ -4,4 +4,4 @@ resources:
 - llama-cpp-cuda.yaml
 images:
 - name: ghcr.io/ggml-org/llama.cpp
-  newTag: server-cuda-b9159 # {"$imagepolicy": "flux-system:llama-cpp-cuda:tag"}
+  newTag: server-cuda-b9174 # {"$imagepolicy": "flux-system:llama-cpp-cuda:tag"}
