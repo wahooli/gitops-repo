@@ -50,11 +50,14 @@ spec:
         - nas
         - tpi-1
   # Allow external HTTPS (code.forgejo.org for actions, git.wahoo.li via LB)
+  # and HTTP (Debian apt mirrors during image builds)
   - toEntities:
     - world
     toPorts:
     - ports:
       - port: "443"
+        protocol: TCP
+      - port: "80"
         protocol: TCP
   # Allow SeaweedFS (local and remote clusters)
   - toEndpoints:
