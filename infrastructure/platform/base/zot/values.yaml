@@ -1,5 +1,5 @@
 image:
-  tag: v2.1.16 # {"$imagepolicy": "flux-system:zot:tag"}
+  tag: v2.1.17 # {"$imagepolicy": "flux-system:zot:tag"}
 service:
   annotations:
     service.cilium.io/global: "true"
