@@ -4,7 +4,7 @@
           type="sendreceive"
           fsWatcherEnabled="true"
           fsWatcherDelayS="1"
-          rescanIntervalS="15">
+          rescanIntervalS="3600">
     <device id="${forgejo_syncthing_device_nas}" introducedBy=""/>
     <device id="${forgejo_syncthing_device_tpi_1}" introducedBy=""/>
     <minDiskFree unit="%">1</minDiskFree>
