@@ -35,7 +35,7 @@ spec:
           emptyDir: {}
         containers:
         - name: runner
-          image: code.forgejo.org/forgejo/runner:12.10.1 # {"$imagepolicy": "flux-system:forgejo-runner"}
+          image: code.forgejo.org/forgejo/runner:12.10.2 # {"$imagepolicy": "flux-system:forgejo-runner"}
           command:
           - sh
           - -c
