@@ -9,4 +9,4 @@ resources:
 # external exposure is via OpenWebUI in front of the in-cluster Service.
 images:
 - name: docker.io/nousresearch/hermes-agent
-  newTag: v2026.4.30  # {"$imagepolicy": "flux-system:hermes-agent:tag"}
+  newTag: v2026.5.29 # {"$imagepolicy": "flux-system:hermes-agent:tag"}
