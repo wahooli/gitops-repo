@@ -1,5 +1,5 @@
 image:
-  tag: "v0.30.0" # {"$imagepolicy": "flux-system:blocky:tag"}
+  tag: "v0.31.0" # {"$imagepolicy": "flux-system:blocky:tag"}
 podMonitor:
   create: true
   jobLabel: app.kubernetes.io/name
