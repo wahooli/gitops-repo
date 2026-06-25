@@ -6,7 +6,7 @@ resources:
 - tcproute.yaml
 images:
 - name: rhasspy/wyoming-whisper
-  newTag: 3.2.0 # {"$imagepolicy": "flux-system:wyoming-whisper:tag"}
+  newTag: 3.3.0 # {"$imagepolicy": "flux-system:wyoming-whisper:tag"}
 patches:
 - path: inferenceservice.yaml
   target:
