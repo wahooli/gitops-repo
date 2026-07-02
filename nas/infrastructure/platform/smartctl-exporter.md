@@ -7,72 +7,35 @@ grand_parent: "nas"
 # smartctl-exporter
 
 ## Overview
-The `smartctl-exporter` component is a Prometheus exporter designed to monitor the health of storage devices using the `smartctl` utility. It is deployed as a DaemonSet to ensure that the exporter runs on each node in the Kubernetes cluster. This component is part of the monitoring stack and provides metrics about the health and status of storage devices, which can be scraped by Prometheus for alerting and visualization.
+The `smartctl-exporter` is a monitoring component that collects and exposes metrics from storage devices using the `smartctl` command. It is deployed in the `kube-system` namespace and is designed to work alongside the Prometheus monitoring stack, providing insights into the health and performance of storage devices in the cluster.
 
 ## Dependencies
-This component has a dependency on the `prometheus-operator-crds` HelmRelease. This dependency ensures that the necessary Custom Resource Definitions (CRDs) for Prometheus are installed and available before deploying the `smartctl-exporter`.
+The `smartctl-exporter` has a dependency on the `prometheus-operator--prometheus-operator-crds`, which provides the necessary Custom Resource Definitions (CRDs) for Prometheus to function correctly. This dependency ensures that the metrics collected by the exporter can be scraped and processed by Prometheus.
 
 ## Helm Chart(s)
-- **Chart Name**: `prometheus-smartctl-exporter`
-- **Repository**: [prometheus-community](https://prometheus-community.github.io/helm-charts)
-- **Version**: 0.16.0
+- **Chart Name:** prometheus-smartctl-exporter
+- **Repository:** prometheus-community (https://prometheus-community.github.io/helm-charts)
+- **Version:** 0.17.1
 
 ## Resource Glossary
-The `smartctl-exporter` component creates the following Kubernetes resources:
-
 ### Networking
-- **Service**: 
-  - Name: `smartctl-exporter`
-  - Type: `ClusterIP`
-  - Port: `80` (mapped to container port `9633` for HTTP metrics endpoint)
-  - Purpose: Exposes the metrics endpoint (`/metrics`) for Prometheus to scrape.
-
-### Workload
-- **DaemonSet**: 
-  - Name: `smartctl-exporter-0`
-  - Purpose: Ensures that the `smartctl-exporter` runs on all nodes in the cluster.
-  - Container:
-    - **Image**: `quay.io/prometheuscommunity/smartctl-exporter:v0.14.0`
-    - **Args**:
-      - `--smartctl.path=/usr/sbin/smartctl`
-      - `--smartctl.interval=120s`
-      - `--smartctl.device-include=sd.*|nvme.*`
-      - `--web.listen-address=0.0.0.0:9633`
-      - `--web.telemetry-path=/metrics`
-    - **Security Context**: Runs as a privileged container with `runAsUser: 0`.
-    - **Volumes**:
-      - Mounts `/dev` from the host to `/hostdev` in the container for accessing storage devices.
+- **Service:** A `ClusterIP` service named `smartctl-exporter` is created to expose the metrics endpoint on port 80. This allows Prometheus to scrape metrics from the exporter.
 
 ### Security
-- **ServiceAccount**:
-  - Name: `smartctl-exporter`
-  - Purpose: Provides an identity for the `smartctl-exporter` DaemonSet to interact with the Kubernetes API.
-- **RoleBinding**:
-  - Name: `smartctl-exporter`
-  - Purpose: Grants the `smartctl-exporter` ServiceAccount permissions to use the `unrestricted-psp` ClusterRole.
+- **ServiceAccount:** A service account named `smartctl-exporter` is created to provide the necessary permissions for the DaemonSet to run.
+- **RoleBinding:** A role binding is established to associate the `smartctl-exporter` service account with the `unrestricted-psp` ClusterRole, allowing it to operate with the necessary privileges.
 
-### Configuration
-- **ConfigMap**:
-  - Name: `smartctl-exporter-values-64c6g7g48b`
-  - Purpose: Stores additional Helm values for the `smartctl-exporter` configuration.
-  - Key settings:
-    - `config.device_include`: Regex pattern to include devices (`sd.*|nvme.*`).
-    - `common.config`: Configures the exporter to bind to `0.0.0.0:9633` and expose metrics at `/metrics`.
-    - `serviceMonitor.enabled`: Disabled by default.
-    - `image.repository`: `quay.io/prometheuscommunity/smartctl-exporter`.
-    - `image.tag`: Defaults to `v0.14.0` (inherited from the chart's appVersion).
-    - `service.type`: `ClusterIP`.
+### Workload
+- **DaemonSet:** A DaemonSet named `smartctl-exporter-0` is deployed to ensure that the exporter runs on every node in the cluster. It collects metrics from the storage devices on each node and exposes them for scraping.
 
 ## Configuration Highlights
-- **Device Inclusion**: The exporter is configured to monitor devices matching the regex `sd.*|nvme.*`.
-- **Metrics Endpoint**: Metrics are exposed on port `9633` at the `/metrics` path.
-- **Security Context**: The container runs as a privileged user (`runAsUser: 0`) to access storage device details.
-- **Tolerations**: Configured to allow scheduling on nodes with `NoSchedule` taints.
+- **Device Inclusion:** The exporter is configured to include devices matching the regex `sd.*|nvme.*`.
+- **Metrics Endpoint:** The exporter listens on `0.0.0.0:9633` for metrics scraping.
+- **Resource Requests/Limits:** Resource requests and limits are not explicitly defined, allowing the exporter to run with default resource settings.
+- **Tolerations:** The DaemonSet includes tolerations to allow it to run on nodes with specific taints.
 
 ## Deployment
-- **Target Namespace**: `kube-system`
-- **Release Name**: `smartctl-exporter`
-- **Reconciliation Interval**: Every 10 minutes
-- **Install/Upgrade Behavior**: Unlimited retries for failed installations or upgrades.
-
-This deployment ensures that the `smartctl-exporter` is consistently reconciled and running on all nodes in the cluster, providing critical storage health metrics for monitoring and alerting purposes.
+- **Target Namespace:** kube-system
+- **Release Name:** smartctl-exporter
+- **Reconciliation Interval:** 10 minutes
+- **Install/Upgrade Behavior:** The HelmRelease is configured to retry indefinitely on failure, ensuring that the exporter remains deployed and operational.

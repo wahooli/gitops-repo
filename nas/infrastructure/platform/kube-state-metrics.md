@@ -7,43 +7,46 @@ grand_parent: "nas"
 # kube-state-metrics
 
 ## Overview
-`kube-state-metrics` is a service that listens to the Kubernetes API server and generates metrics about the state of the objects. It is designed to be used with Prometheus for monitoring Kubernetes clusters.
+`kube-state-metrics` is a service that listens to the Kubernetes API server and generates metrics about the state of various Kubernetes resources. It provides insights into the state of the cluster, which can be scraped by Prometheus for monitoring and alerting purposes.
 
 ## Deployment Details
-- **Namespace**: `flux-system`
-- **Target Namespace**: `kube-system`
-- **Release Name**: `kube-state-metrics`
-- **Chart Version**: `7.3.0`
-- **Source Repository**: `prometheus-community`
+- **Release Name:** kube-state-metrics
+- **Target Namespace:** kube-system
+- **Helm Chart Version:** 7.5.1
+- **Source Repository:** prometheus-community
+- **Update Interval:** 10 minutes
+- **Dependencies:** 
+  - `prometheus-operator--prometheus-operator-crds` (namespace: flux-system)
 
-## HelmRelease Configuration
-The `kube-state-metrics` deployment is managed by a `HelmRelease` resource with the following specifications:
+## Configuration
+The deployment is configured using values from two ConfigMaps:
+- `kube-state-metrics-values-52k4bbt862` (values-base.yaml)
+- `kube-state-metrics-values-52k4bbt862` (values.yaml)
 
-- **Interval**: 10 minutes for updates.
-- **Dependencies**: It depends on the `prometheus-operator--prometheus-operator-crds` in the `flux-system` namespace.
-- **Values Configuration**: The deployment uses values from two ConfigMaps:
-  - `kube-state-metrics-values-52k4bbt862` (keys: `values-base.yaml`, `values.yaml`)
+### Key Configuration Options
+- **Prometheus Scraping:** Enabled
+- **Replicas:** 1
+- **Service Type:** ClusterIP
+- **RBAC:** Enabled with a ClusterRole
+- **Automount Service Account Token:** True
+- **Collectors Enabled:** All available collectors including pods, services, deployments, etc.
 
-## Image Configuration
-- **Image Repository**: `ghcr.io/prometheus-community/charts/kube-state-metrics`
-- **Image Policy**: The image policy is set to track versions using semantic versioning.
+### RBAC Configuration
+The deployment includes RBAC permissions to allow `kube-state-metrics` to access the necessary Kubernetes resources. The extra rules defined in the values.yaml allow it to list and watch various GitOps Toolkit resources.
 
-## Key Features
-- **Prometheus Scraping**: Enabled by default.
-- **RBAC**: Role-based access control is configured to allow the necessary permissions for the service.
-- **Service Type**: The service is exposed as a `ClusterIP` by default, allowing internal access within the cluster.
-- **Metrics Collection**: Collects metrics from various Kubernetes resources including deployments, pods, services, and more.
+## Image Details
+- **Image Repository:** ghcr.io/prometheus-community/charts/kube-state-metrics
+- **Image Policy:** Set to follow semantic versioning.
 
-## Configuration Values
-The following are notable configuration values used in the deployment:
+## Probes
+- **Liveness Probe:** Configured to check the health of the service.
+- **Readiness Probe:** Ensures the service is ready to accept traffic.
 
-- **Replicas**: 1
-- **Service Port**: 8080
-- **Autosharding**: Disabled
-- **Extra Arguments**: None specified
-- **Security Context**: Configured to run as a non-root user with specific security settings.
+## Additional Features
+- **Self Monitoring:** Disabled by default.
+- **Vertical Pod Autoscaler Support:** Disabled by default.
+- **Custom Resource State Metrics:** Enabled with specific configurations for various resource types.
 
-## Additional Information
-For further customization, users can modify the values in the associated ConfigMaps or adjust the HelmRelease specifications as needed. The kube-state-metrics service can be monitored via Prometheus, and additional metrics can be configured through the `metricAllowlist` and `metricDenylist` settings. 
-
-For more details on kube-state-metrics, refer to the official [kube-state-metrics documentation](https://github.com/kubernetes/kube-state-metrics).
+## Notes
+- The deployment is designed to be resilient and can be configured further based on the specific needs of the cluster.
+- For detailed metrics and scraping configurations, refer to the official [kube-state-metrics documentation](https://github.com/kubernetes/kube-state-metrics).

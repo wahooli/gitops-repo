@@ -6,72 +6,75 @@ grand_parent: "livingroom-pi"
 
 # vector-agent
 
-The `vector-agent` component is deployed in the `livingroom-pi` cluster using Flux and Helm. It is responsible for collecting and processing logs and metrics from various sources.
+The `vector-agent` component is deployed in the `livingroom-pi` cluster using FluxCD to manage its lifecycle through Helm. This component is responsible for collecting and processing logs and metrics.
 
 ## Overview
 
 - **Helm Chart**: `vector`
-- **Version**: `0.52.0`
+- **Version**: `0.56.0`
 - **Release Name**: `vector-agent`
 - **Namespace**: `logging`
-- **Dependencies**: Depends on `victoria-metrics--victoria-metrics-operator` in the `flux-system` namespace.
+- **Interval for Updates**: `10m`
+- **Dependencies**: Depends on `victoria-metrics--victoria-metrics-operator`
 
 ## Configuration
 
-The `vector-agent` is configured through a combination of Helm values and existing ConfigMaps. The key configurations include:
+The `vector-agent` is configured using values from existing ConfigMaps and custom values defined in the HelmRelease. The following key configurations are applied:
 
-- **Role**: Set to `Aggregator`, which means it will run as a StatefulSet.
-- **Replicas**: 1
-- **Service**: Enabled with type `ClusterIP`.
-- **Existing ConfigMaps**: Uses `vector-agent-config-2658c2h57d` for configuration.
+- **Role**: `Aggregator`
+- **Replicas**: `1`
+- **Service**: Enabled with type `ClusterIP`
+- **Existing ConfigMaps**: Uses `vector-agent-config-2658c2h57d`
+- **Values from ConfigMap**: 
+  - `values-base.yaml`
+  - `values.yaml`
 
-### Values
-
-The following values are defined for the `vector-agent`:
+### Key Values
 
 - **Image**: 
   - Repository: `timberio/vector`
   - Pull Policy: `IfNotPresent`
-  - Tag: Derived from the chart's appVersion.
-  
-- **Service Configuration**:
-  - Enabled: `true`
-  - Type: `ClusterIP`
-  
-- **Pod Management**:
-  - Pod Management Policy: `OrderedReady`
-  
-- **Resource Requests and Limits**: Can be defined in the `resources` section (currently empty).
+- **Pod Management Policy**: `OrderedReady`
+- **Termination Grace Period**: `60 seconds`
+- **Log Level**: `info`
 
-- **Logging Level**: Set to `info`.
+### Persistence
+
+- **Persistence**: 
+  - Enabled: `false`
+  - Host Path: `/var/lib/vector`
+
+### Service Configuration
+
+- **Service Enabled**: `true`
+- **Service Type**: `ClusterIP`
+- **Headless Service**: Enabled
+
+## Monitoring
+
+The component can be monitored using a PodMonitor, which is currently disabled. If enabled, it would scrape metrics from the Vector pods.
 
 ## Helm Repository
 
 The Helm chart is sourced from the following repository:
 
-- **Name**: `vector`
-- **URL**: [https://helm.vector.dev](https://helm.vector.dev)
-- **Update Interval**: 24 hours
+- **Repository Name**: `vector`
+- **URL**: `https://helm.vector.dev`
+- **Update Interval**: `24h`
 
-## Image Management
+## Image Repositories
 
-The component uses images from two repositories:
+Two image repositories are defined for the `vector-agent`:
 
 1. **Vector Helm Chart**: 
    - Image: `ghcr.io/vectordotdev/helm-charts/vector`
-   - Update Interval: 24 hours
-
-2. **Vector Docker Hub**:
+   - Update Interval: `24h`
+   
+2. **Vector Docker Hub**: 
    - Image: `timberio/vector`
-   - Update Interval: 24 hours
-
-## Monitoring
-
-The `vector-agent` can be monitored using a PodMonitor, which is currently disabled. If enabled, it would scrape metrics from the configured endpoints.
+   - Update Interval: `24h`
 
 ## Additional Notes
 
-- The `vector-agent` is designed to be highly configurable, allowing for various deployment scenarios and resource management strategies.
-- Ensure that any sensitive information is managed securely, especially when configuring secrets and environment variables.
-
-For further details on configuration options, refer to the [Vector documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).
+- Ensure that the necessary ConfigMaps are created and available in the `logging` namespace for the `vector-agent` to function correctly.
+- Review the [Vector documentation](https://vector.dev/docs/setup/installation/package-managers/helm/) for more details on configuration options and best practices.

@@ -6,56 +6,68 @@ grand_parent: "nas"
 
 # vector-agent
 
-The `vector-agent` component is deployed in the `nas` cluster using the Vector Helm chart version `0.52.0`. This component is part of the logging infrastructure and is responsible for collecting and processing logs.
+The `vector-agent` component is deployed in the `nas` cluster to handle logging and data collection. It utilizes the Vector tool, which is designed for high-performance data processing and routing.
 
-## HelmRelease
+## Deployment Details
 
-### Overview
-The `vector-agent` is managed by a `HelmRelease` resource named `logging--vector-agent` in the `flux-system` namespace. It is configured to install the Vector chart from the `flux-system` Helm repository.
+### HelmRelease
 
-### Configuration
+- **Name**: `logging--vector-agent`
+- **Namespace**: `flux-system`
+- **Chart Version**: `0.56.0`
 - **Release Name**: `vector-agent`
 - **Target Namespace**: `logging`
-- **Chart Version**: `0.52.0`
 - **Update Interval**: 10 minutes
 - **Dependencies**:
   - `victoria-metrics--victoria-metrics-operator`
   - `logging--vector-global-write`
 
-### Values
-The following values are configured for the `vector-agent` deployment:
+### Configuration
+
+The deployment uses the following configuration values:
+
 - **Role**: `Aggregator`
 - **Replicas**: 1
-- **Image**: 
-  - Repository: `timberio/vector`
-  - Pull Policy: `IfNotPresent`
-- **Service**: 
-  - Enabled: true
-  - Type: `ClusterIP`
+- **Image**: `timberio/vector`
+- **Image Pull Policy**: `IfNotPresent`
+- **Service**: Enabled with type `ClusterIP`
+- **Headless Service**: Enabled
 - **Existing ConfigMaps**: 
   - `vector-agent-config-926d7t9786`
-- **Custom Config**: 
-  - Command: `--config-dir /etc/vector/`
-  - Args: `--config-dir /etc/vector/`
+- **Custom Configurations**: 
+  - Uses values from `vector-agent-values-cbdkf978bd` ConfigMap.
 
-## Image Repository
+### Image Repository
 
-### Overview
-An `ImageRepository` resource named `vector-dockerhub` is defined to track the Vector image from Docker Hub.
+- **Image Repository**: `timberio/vector`
+- **Image Policy**: 
+  - Filter Tags: `^([0-9]+\.[0-9]+\.[0-9]+)-debian$`
+  - Semver Range: `x.x.x`
 
-- **Image**: `timberio/vector`
-- **Update Interval**: 24 hours
+### Resource Management
 
-## Image Policy
+- **Pod Management Policy**: `OrderedReady`
+- **Termination Grace Period**: 60 seconds
+- **Pod Security Context**: Customizable
+- **Service Account**: Created for Vector
 
-### Overview
-An `ImagePolicy` resource named `vector-debian` is configured to manage the versioning of the Vector image.
+### Probes
 
-- **Filter Tags**: Extracts the version from tags matching the pattern `^(?P<version>[0-9]+\.[0-9]+\.[0-9]+)-debian$`.
-- **Policy**: Semantic versioning range is set to `x.x.x`.
+- **Liveness Probe**: Customizable
+- **Readiness Probe**: Customizable
 
-## Additional Notes
-- The deployment includes configuration for resource requests, limits, and optional features such as autoscaling and pod disruption budgets.
-- The Vector agent is designed to run as an aggregator, collecting logs from various sources and forwarding them to configured sinks. 
+### Logging Level
 
-For more detailed configuration options, refer to the [Vector Helm documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).
+- **Log Level**: `info`
+
+### Additional Features
+
+- **Pod Disruption Budget**: Disabled
+- **Horizontal Pod Autoscaler**: Disabled
+- **Persistence**: 
+  - HostPath enabled with path `/var/lib/vector`
+  
+### Notes
+
+- Ensure that the necessary ConfigMaps and dependencies are in place for the `vector-agent` to function correctly.
+- Review the Vector documentation for further customization and configuration options: [Vector Documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).

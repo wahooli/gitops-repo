@@ -6,61 +6,48 @@ grand_parent: "nas"
 
 # vector-global-write
 
-The `vector-global-write` component is deployed in the `flux-system` namespace of the `nas` cluster. It utilizes the Vector logging agent to aggregate logs and metrics from various sources.
-
 ## Overview
+The `vector-global-write` component is deployed in the `flux-system` namespace of the `nas` cluster. It utilizes the Vector logging tool to aggregate logs across the cluster. This deployment is managed using Flux and Helm.
 
-- **Chart**: Vector
-- **Version**: 0.52.0
-- **Release Name**: vector-global-write
-- **Target Namespace**: logging
-- **Installation Interval**: 10 minutes
+## Helm Release Details
+- **Release Name**: `vector-global-write`
+- **Chart**: `vector`
+- **Version**: `0.56.0`
+- **Target Namespace**: `logging`
+- **Update Interval**: 10 minutes
 - **Dependencies**:
-  - `victoria-metrics--victoria-metrics-operator`
-  - `logging--vector-lb`
+  - `victoria-metrics--victoria-metrics-operator` (namespace: `flux-system`)
+  - `logging--vector-lb` (namespace: `flux-system`)
 
 ## Configuration
+The deployment is configured using several ConfigMaps and values defined in the HelmRelease. Key configurations include:
 
-The configuration for the Vector instance is primarily defined in the `values-base.yaml` and additional ConfigMaps. Key configurations include:
-
-- **Role**: Aggregator
+- **Role**: `Aggregator`
 - **Replicas**: 1
-- **Image**: 
-  - Repository: `timberio/vector`
-  - Pull Policy: `IfNotPresent`
-- **Service**: Enabled with type `ClusterIP`
-- **Headless Service**: Enabled
+- **Image**:
+  - **Repository**: `timberio/vector`
+  - **Pull Policy**: `IfNotPresent`
+- **Service**:
+  - **Enabled**: true
+  - **Type**: `ClusterIP`
+- **Headless Service**:
+  - **Enabled**: true
+- **Log Level**: `info`
+
+### Existing ConfigMaps
+The deployment references the following existing ConfigMaps for configuration:
+- `vector-global-write-config-bdb5795f69`
+- `vector-global-write-values-bct65c9cgf` (contains `values-base.yaml` and `values.yaml`)
+- `vector-global-write-helmrelease-overrides` (optional)
+
+### Resource Management
 - **Pod Disruption Budget**: Disabled
-- **RBAC**: Created
-- **Service Account**: Created
-
-### Key Values
-
-- **Logging Level**: `info`
+- **Horizontal Pod Autoscaler**: Disabled
 - **Termination Grace Period**: 60 seconds
-- **Pod Management Policy**: OrderedReady
-- **Update Strategy**: RollingUpdate
-- **Existing ConfigMaps**: 
-  - `vector-global-write-config-bdb5795f69`
 
-### Autoscaling
+### Security Context
+- **Service Account**: Automatically created with default settings.
 
-- **Enabled**: false
-- **Min Replicas**: 1
-- **Max Replicas**: 10
-- **Target CPU Utilization**: 80%
-
-## Resources Created
-
-The deployment creates the following Kubernetes resources:
-
-- **Deployment**: For the Vector Aggregator
-- **Service**: For internal communication
-- **Headless Service**: For direct pod access
-- **ConfigMaps**: For configuration management
-
-## Additional Information
-
-For more details on configuring Vector, refer to the [Vector Helm documentation](https://vector.dev/docs/setup/installation/package-managers/helm/). 
-
-This component is part of a larger logging infrastructure and is designed to work in conjunction with other components such as the Victoria Metrics operator and load balancers.
+## Additional Notes
+- The Vector instance is configured to aggregate logs and can be customized further through the provided ConfigMaps.
+- Ensure that the dependencies are properly installed and configured for the logging system to function correctly.
