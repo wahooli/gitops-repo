@@ -1,5 +1,4 @@
 rack: nas
-
 volume:
   replicaCount: 1
   ordinals:
@@ -14,7 +13,6 @@ volume:
         resources:
           requests:
             storage: 1Ti
-
 filer:
   service:
     nas:
@@ -26,7 +24,6 @@ filer:
       annotations:
         service.cilium.io/global: "true"
         service.cilium.io/affinity: "remote"
-
 filerSync:
   forgejo-s3-data:
     enabled: true
@@ -73,14 +70,12 @@ filerSync:
         valueFrom:
           resourceFieldRef:
             resource: limits.memory
-
 postUp:
   enabled: true
   collections:
   - name: forgejo-s3-data
   - name: immich-data
   - name: zot-registry
-
 resticBackup:
   enabled: true
   schedule: "15 * * * *" # every hour past 15 minutes
@@ -94,7 +89,7 @@ resticBackup:
     keepMonthly: 6
   image:
     repository: ghcr.io/restic/restic
-    tag: "0.18.1" # {"$imagepolicy": "flux-system:restic:tag"}
+    tag: "0.19.0" # {"$imagepolicy": "flux-system:restic:tag"}
     pullPolicy: IfNotPresent
   initContainers:
     wait-for-filer:

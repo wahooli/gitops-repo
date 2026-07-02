@@ -1,5 +1,5 @@
 image:
-  tag: "1.35.8" # {"$imagepolicy": "flux-system:vaultwarden:tag"}
+  tag: "1.36.0" # {"$imagepolicy": "flux-system:vaultwarden:tag"}
 envFrom:
   envs:
     type: configMap
