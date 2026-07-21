@@ -5,7 +5,7 @@ gitea:
 image:
   registry: code.forgejo.org
   repository: forgejo/forgejo
-  tag: "16.0.0-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
+  tag: "16.0.1-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
 extraContainers:
 - name: syncthing
   image: syncthing/syncthing:2.1.2 # {"$imagepolicy": "flux-system:syncthing"}
