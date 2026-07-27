@@ -6,75 +6,59 @@ grand_parent: "livingroom-pi"
 
 # vector-agent
 
-The `vector-agent` component is deployed in the `livingroom-pi` cluster using FluxCD to manage its lifecycle through Helm. This component is responsible for collecting and processing logs and metrics.
+The `vector-agent` component is deployed in the `livingroom-pi` cluster using Flux and Helm. It is responsible for collecting and processing logs and metrics from various sources.
 
 ## Overview
 
-- **Helm Chart**: `vector`
-- **Version**: `0.56.0`
-- **Release Name**: `vector-agent`
-- **Namespace**: `logging`
-- **Interval for Updates**: `10m`
-- **Dependencies**: Depends on `victoria-metrics--victoria-metrics-operator`
+- **Chart**: vector
+- **Version**: 0.57.0
+- **Release Name**: vector-agent
+- **Namespace**: logging
+- **Helm Repository**: [vector](https://helm.vector.dev)
+
+## Dependencies
+
+The `vector-agent` HelmRelease depends on the following component:
+- **victoria-metrics--victoria-metrics-operator** (namespace: flux-system)
 
 ## Configuration
 
-The `vector-agent` is configured using values from existing ConfigMaps and custom values defined in the HelmRelease. The following key configurations are applied:
+The `vector-agent` is configured using the following values:
 
-- **Role**: `Aggregator`
-- **Replicas**: `1`
-- **Service**: Enabled with type `ClusterIP`
-- **Existing ConfigMaps**: Uses `vector-agent-config-2658c2h57d`
-- **Values from ConfigMap**: 
-  - `values-base.yaml`
-  - `values.yaml`
+- **Role**: Aggregator
+- **Replicas**: 1
+- **Image**: timberio/vector
+- **Service**: Enabled (type: ClusterIP)
+- **Existing ConfigMaps**: 
+  - vector-agent-config-2658c2h57d
 
-### Key Values
+### Values from ConfigMaps
 
-- **Image**: 
-  - Repository: `timberio/vector`
-  - Pull Policy: `IfNotPresent`
-- **Pod Management Policy**: `OrderedReady`
-- **Termination Grace Period**: `60 seconds`
-- **Log Level**: `info`
+The configuration values are sourced from the following ConfigMaps:
+- **ConfigMap**: vector-agent-values-67kkb858d2
+  - **Key**: values-base.yaml
+  - **Key**: values.yaml
 
-### Persistence
+## Resource Management
 
-- **Persistence**: 
-  - Enabled: `false`
-  - Host Path: `/var/lib/vector`
+The `vector-agent` deployment includes the following Kubernetes resources:
 
-### Service Configuration
+- **DaemonSet**: Manages the deployment of the Vector agent across the nodes in the cluster.
+- **Service**: Exposes the Vector agent for internal communication.
+- **ConfigMap**: Holds configuration data for the Vector agent.
 
-- **Service Enabled**: `true`
-- **Service Type**: `ClusterIP`
-- **Headless Service**: Enabled
+## Image Management
 
-## Monitoring
+The component utilizes images from the following repositories:
+- **Image Repository**: ghcr.io/vectordotdev/helm-charts/vector
+- **Image Policy**: 
+  - **Name**: vector-helm-chart
+  - **Policy**: semver range
+- **Image Repository**: timberio/vector
+- **Image Policy**: 
+  - **Name**: vector-debian
+  - **Filter Tags**: Extracts version from tags matching the pattern `^(?P<version>[0-9]+\.[0-9]+\.[0-9]+)-debian$`
 
-The component can be monitored using a PodMonitor, which is currently disabled. If enabled, it would scrape metrics from the Vector pods.
+## Additional Information
 
-## Helm Repository
-
-The Helm chart is sourced from the following repository:
-
-- **Repository Name**: `vector`
-- **URL**: `https://helm.vector.dev`
-- **Update Interval**: `24h`
-
-## Image Repositories
-
-Two image repositories are defined for the `vector-agent`:
-
-1. **Vector Helm Chart**: 
-   - Image: `ghcr.io/vectordotdev/helm-charts/vector`
-   - Update Interval: `24h`
-   
-2. **Vector Docker Hub**: 
-   - Image: `timberio/vector`
-   - Update Interval: `24h`
-
-## Additional Notes
-
-- Ensure that the necessary ConfigMaps are created and available in the `logging` namespace for the `vector-agent` to function correctly.
-- Review the [Vector documentation](https://vector.dev/docs/setup/installation/package-managers/helm/) for more details on configuration options and best practices.
+For more details on configuring and using Vector, refer to the official documentation: [Vector Documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).

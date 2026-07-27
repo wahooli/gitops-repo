@@ -6,68 +6,61 @@ grand_parent: "nas"
 
 # vector-agent
 
-The `vector-agent` component is deployed in the `nas` cluster to handle logging and data collection. It utilizes the Vector tool, which is designed for high-performance data processing and routing.
+The `vector-agent` component is deployed in the `flux-system` namespace of the `nas` cluster. It utilizes the Vector logging agent to collect and process logs.
 
-## Deployment Details
+## Overview
 
-### HelmRelease
-
-- **Name**: `logging--vector-agent`
-- **Namespace**: `flux-system`
-- **Chart Version**: `0.56.0`
+- **Helm Chart**: `vector`
+- **Version**: `0.57.0`
 - **Release Name**: `vector-agent`
 - **Target Namespace**: `logging`
-- **Update Interval**: 10 minutes
-- **Dependencies**:
-  - `victoria-metrics--victoria-metrics-operator`
-  - `logging--vector-global-write`
+- **Deployment Type**: Aggregator (StatefulSet)
 
-### Configuration
+## Dependencies
 
-The deployment uses the following configuration values:
+The `vector-agent` HelmRelease depends on the following components:
+- `victoria-metrics--victoria-metrics-operator` (namespace: `flux-system`)
+- `logging--vector-global-write` (namespace: `flux-system`)
 
+## Configuration
+
+The configuration for the `vector-agent` is primarily managed through ConfigMaps and Helm values. The following key configurations are defined:
+
+### Values from ConfigMaps
+- **Base Values**: Configured through `vector-agent-values-76hc5h25f6` with keys:
+  - `values-base.yaml`
+  - `values.yaml`
+
+### Key Configuration Options
 - **Role**: `Aggregator`
-- **Replicas**: 1
-- **Image**: `timberio/vector`
-- **Image Pull Policy**: `IfNotPresent`
+- **Replicas**: `1`
 - **Service**: Enabled with type `ClusterIP`
-- **Headless Service**: Enabled
-- **Existing ConfigMaps**: 
-  - `vector-agent-config-926d7t9786`
-- **Custom Configurations**: 
-  - Uses values from `vector-agent-values-cbdkf978bd` ConfigMap.
-
-### Image Repository
-
-- **Image Repository**: `timberio/vector`
-- **Image Policy**: 
-  - Filter Tags: `^([0-9]+\.[0-9]+\.[0-9]+)-debian$`
-  - Semver Range: `x.x.x`
+- **Pod Management Policy**: `OrderedReady`
+- **Log Level**: `info`
+- **Termination Grace Period**: `60 seconds`
 
 ### Resource Management
+- **Resource Requests and Limits**: Not explicitly defined, defaults will apply.
+- **Pod Disruption Budget**: Disabled by default.
 
-- **Pod Management Policy**: `OrderedReady`
-- **Termination Grace Period**: 60 seconds
-- **Pod Security Context**: Customizable
-- **Service Account**: Created for Vector
+### Persistence
+- **Persistence**: Not enabled by default, but can be configured to use hostPath for data storage.
 
-### Probes
+### Security Context
+- **RBAC**: Enabled for the service account.
+- **Pod Security Context**: Default settings apply.
 
-- **Liveness Probe**: Customizable
-- **Readiness Probe**: Customizable
+## Image Repository
 
-### Logging Level
+The component uses the following image repository:
+- **Image**: `timberio/vector`
+- **Image Policy**: `vector-debian` with a semver range policy.
 
-- **Log Level**: `info`
+## Monitoring
 
-### Additional Features
+The component does not have a PodMonitor enabled by default, but it can be configured if required.
 
-- **Pod Disruption Budget**: Disabled
-- **Horizontal Pod Autoscaler**: Disabled
-- **Persistence**: 
-  - HostPath enabled with path `/var/lib/vector`
-  
-### Notes
+## Additional Notes
 
-- Ensure that the necessary ConfigMaps and dependencies are in place for the `vector-agent` to function correctly.
-- Review the Vector documentation for further customization and configuration options: [Vector Documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).
+- Ensure that the existing ConfigMaps referenced in the configuration are created and available in the `logging` namespace.
+- The component is designed to work in conjunction with other logging and monitoring tools within the cluster.

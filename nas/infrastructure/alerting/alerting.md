@@ -4,134 +4,74 @@ parent: "Infrastructure / Alerting"
 grand_parent: "nas"
 ---
 
-# Alerting
+# alerting
 
-The `alerting` component in the `nas` cluster is responsible for managing alerting configurations, routing, and rules for monitoring system and application health. It integrates with VictoriaMetrics and Prometheus Alertmanager for alerting and notification purposes.
+The `alerting` component is deployed in the `nas` cluster and is responsible for managing alerting rules and configurations using VictoriaMetrics and Alertmanager. This component includes several Kubernetes resources that facilitate alert routing, service discovery, and alert rules definition.
 
-## Namespace
+## Resources
 
-The `alerting` component operates within the `alerting` namespace.
+### Namespaces
+- **Namespace**: `alerting`
+  - This namespace contains all resources related to the alerting functionality.
 
-## HTTP Routes
+### Services
+- **Service**: `vmalertmanager-tpi-1`
+  - **Type**: ClusterIP
+  - **Ports**:
+    - HTTP: 9093 (target port: web)
+    - TCP/UDP Mesh: 9094
 
-The following HTTP routes are configured for external access:
+### HTTP Routes
+- **HTTPRoute**: `alertmanager`
+  - **Hostnames**: `alertmanager.absolutist.it`
+  - **Backend**: `vmalertmanager-nas` on port 9093
 
-- **Alertmanager**  
-  - Hostname: `alertmanager.absolutist.it`
-  - Backend: `vmalertmanager-nas` on port `9093`
+- **HTTPRoute**: `vmalert-vlogs`
+  - **Hostnames**: `log-alerts.absolutist.it`
+  - **Backend**: `vmalert-vlogs-nas` on port 8080
 
-- **VMAlert Logs**  
-  - Hostname: `log-alerts.absolutist.it`
-  - Backend: `vmalert-vlogs-nas` on port `8080`
+- **HTTPRoute**: `vmalert-vmetrics`
+  - **Hostnames**: `metrics-alerts.absolutist.it`
+  - **Backend**: `vmalert-vmetrics-nas` on port 8080
 
-- **VMAlert Metrics**  
-  - Hostname: `metrics-alerts.absolutist.it`
-  - Backend: `vmalert-vmetrics-nas` on port `8080`
+### Alert Rules
+- **VMRule**: `smartctl-rules`
+  - Contains rules for monitoring smart device temperatures and critical warnings.
 
-## Services
+- **VMRule**: `authentik-outpost-health`
+  - Monitors the health of Authentik outposts.
 
-- **vmalertmanager-tpi-1**  
-  - Type: `ClusterIP`
-  - Ports:
-    - HTTP: `9093`
-    - TCP Mesh: `9094`
-    - UDP Mesh: `9094`
+- **VMRule**: `kubernetes-apps`
+  - Monitors various Kubernetes application states, including pod readiness and deployment statuses.
 
-## Image Management
+- **VMRule**: `kubernetes-resources`
+  - Monitors resource usage in the Kubernetes cluster, including CPU and memory overcommitment.
 
-### VictoriaMetrics VMAlert
+### Alertmanager Configurations
+- **VMAlertmanagerConfig**: `generic-alerts`
+  - Configures alert routing to Discord for generic alerts.
 
-- **Image Repository**: `victoriametrics/vmalert`
-- **Update Interval**: `24h`
-- **Image Policy**: Semantic versioning (`x.x.x`)
+- **VMAlertmanagerConfig**: `systemd-alerts`
+  - Configures alert routing to Discord for systemd-related alerts.
 
-### Prometheus Alertmanager
+### Image Repositories and Policies
+- **ImageRepository**: `vmalert`
+  - **Image**: `victoriametrics/vmalert`
+  - **Update Interval**: 24h
 
-- **Image Repository**: `prom/alertmanager`
-- **Update Interval**: `24h`
-- **Image Policy**: Semantic versioning (`x.x.x`)
+- **ImagePolicy**: `vmalert`
+  - **Policy**: Semver range for versioning.
 
-## Alerting Rules
+- **ImageRepository**: `alertmanager`
+  - **Image**: `prom/alertmanager`
+  - **Update Interval**: 24h
 
-### Smartctl Rules
+- **ImagePolicy**: `vmalertmanager`
+  - **Policy**: Semver range for versioning.
 
-Alerts for monitoring device health using Smartctl metrics:
-
-- **SmartDeviceTemperatureWarning**: Triggered when device temperature exceeds 60°C for 2 minutes.
-- **SmartDeviceTemperatureCritical**: Triggered when device temperature exceeds 80°C for 2 minutes.
-- **SmartCriticalWarning**: Triggered when a device reports critical warnings for 15 minutes.
-- **SmartMediaErrors**: Triggered when media errors are detected for 15 minutes.
-- **SmartNvmeWearoutIndicator**: Triggered when NVMe devices approach wear-out thresholds for 15 minutes.
-
-### Kubernetes Applications
-
-Alerts for monitoring Kubernetes application health:
-
-- **KubePodCrashLooping**: Detects pods in a crash loop state.
-- **KubePodNotReady**: Detects pods in a non-ready state for over 15 minutes.
-- **KubeDeploymentGenerationMismatch**: Detects mismatched deployment generations.
-- **KubeDeploymentReplicasMismatch**: Detects mismatched deployment replicas.
-- **KubeDeploymentRolloutStuck**: Detects deployment rollouts that are not progressing.
-- **KubeStatefulSetReplicasMismatch**: Detects mismatched StatefulSet replicas.
-- **KubeStatefulSetGenerationMismatch**: Detects mismatched StatefulSet generations.
-- **KubeStatefulSetUpdateNotRolledOut**: Detects unrolled updates in StatefulSets.
-- **KubeDaemonSetRolloutStuck**: Detects stuck DaemonSet rollouts.
-- **KubeContainerWaiting**: Detects containers in waiting state for over 1 hour.
-- **KubeDaemonSetNotScheduled**: Detects unscheduled DaemonSet pods.
-- **KubeDaemonSetMisScheduled**: Detects DaemonSet pods running on incorrect nodes.
-- **KubeJobNotCompleted**: Detects jobs taking longer than 12 hours to complete.
-- **KubeJobFailed**: Detects failed jobs.
-- **KubeHpaReplicasMismatch**: Detects mismatched HPA replicas.
-- **KubeHpaMaxedOut**: Detects HPA running at maximum replicas for over 15 minutes.
-
-### Kubernetes Resources
-
-Alerts for monitoring Kubernetes resource utilization:
-
-- **KubeCPUOvercommit**: Detects overcommitted CPU resource requests.
-- **KubeMemoryOvercommit**: Detects overcommitted memory resource requests.
-- **KubeCPUQuotaOvercommit**: Detects overcommitted CPU quotas for namespaces.
-- **KubeMemoryQuotaOvercommit**: Detects overcommitted memory quotas for namespaces.
-- **KubeQuotaAlmostFull**: Detects namespaces nearing quota limits.
-
-## Alertmanager Configurations
-
-### Generic Alerts
-
-- **Receiver**: Discord
-- **Route**:
-  - Group by: `alertgroup`, `alertname`
-  - Group interval: `5m`
-  - Group wait: `0s`
-  - Repeat interval: `3h`
-  - Routes:
-    - Alerts with `alertname="SomeRemoteWriteTargetsFailing"` are routed to Discord with a repeat interval of `24h`.
-
-### Systemd Alerts
-
-- **Receiver**: Discord
-- **Route**:
-  - Group by: `systemd_host`, `systemd_unit`
-  - Group interval: `15m`
-  - Group wait: `120s`
-  - Repeat interval: `6h`
-  - Matchers: Alerts originating from `journald` sources.
-
-## ConfigMap Templates
-
-Custom Grafana URL templates for logs and metrics exploration:
-
-- **Logs URL**: Configured for VictoriaMetrics logs datasource.
-- **Metrics URL**: Configured for Prometheus metrics datasource.
-
-## External DNS Configuration
-
-External DNS annotations are set for the HTTP routes to enable DNS resolution for the following domains:
-
-- `alertmanager.absolutist.it`
-- `log-alerts.absolutist.it`
-- `metrics-alerts.absolutist.it`
+### ConfigMaps
+- **ConfigMap**: `vmalert-templates`
+  - Contains templates for Grafana URLs for logs and metrics.
 
 ## Summary
-
-The `alerting` component provides comprehensive monitoring and alerting capabilities for the `nas` cluster, including system health, Kubernetes resource utilization, and application monitoring. It integrates with VictoriaMetrics and Prometheus Alertmanager, and supports external notifications via Discord.
+The `alerting` component integrates various resources to provide a comprehensive alerting solution within the Kubernetes cluster. It leverages VictoriaMetrics for metrics collection and Alertmanager for alert routing, ensuring that alerts are effectively managed and communicated.

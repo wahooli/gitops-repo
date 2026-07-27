@@ -7,46 +7,55 @@ grand_parent: "nas"
 # kube-state-metrics
 
 ## Overview
-`kube-state-metrics` is a service that listens to the Kubernetes API server and generates metrics about the state of various Kubernetes resources. It provides insights into the state of the cluster, which can be scraped by Prometheus for monitoring and alerting purposes.
+`kube-state-metrics` is a service that listens to the Kubernetes API server and generates metrics about the state of the objects. It is designed to be used with Prometheus to provide insights into the state of your Kubernetes cluster.
 
 ## Deployment Details
-- **Release Name:** kube-state-metrics
-- **Target Namespace:** kube-system
-- **Helm Chart Version:** 7.5.1
-- **Source Repository:** prometheus-community
-- **Update Interval:** 10 minutes
-- **Dependencies:** 
-  - `prometheus-operator--prometheus-operator-crds` (namespace: flux-system)
+- **Namespace**: `kube-system`
+- **Helm Chart Version**: `8.0.0`
+- **Helm Repository**: `prometheus-community`
+- **Release Name**: `kube-state-metrics`
+- **Update Interval**: `10m`
+- **Image Repository**: `ghcr.io/prometheus-community/charts/kube-state-metrics`
+- **Image Policy Interval**: `24h`
 
 ## Configuration
 The deployment is configured using values from two ConfigMaps:
-- `kube-state-metrics-values-52k4bbt862` (values-base.yaml)
-- `kube-state-metrics-values-52k4bbt862` (values.yaml)
+1. `kube-state-metrics-values-52k4bbt862` (values-base.yaml)
+2. `kube-state-metrics-values-52k4bbt862` (values.yaml)
 
 ### Key Configuration Options
-- **Prometheus Scraping:** Enabled
-- **Replicas:** 1
-- **Service Type:** ClusterIP
-- **RBAC:** Enabled with a ClusterRole
-- **Automount Service Account Token:** True
-- **Collectors Enabled:** All available collectors including pods, services, deployments, etc.
+- **Prometheus Scraping**: Enabled by default.
+- **Replicas**: 1
+- **Service Type**: ClusterIP
+- **RBAC**: Enabled with a ClusterRole
+- **Service Account**: Created by default
+- **Metrics Collection**: Collects metrics from various Kubernetes resources including pods, deployments, services, etc.
 
-### RBAC Configuration
-The deployment includes RBAC permissions to allow `kube-state-metrics` to access the necessary Kubernetes resources. The extra rules defined in the values.yaml allow it to list and watch various GitOps Toolkit resources.
+### Additional Features
+- **Autosharding**: Disabled by default.
+- **Self-Monitoring**: Disabled by default.
+- **Vertical Pod Autoscaler Support**: Disabled by default.
 
-## Image Details
-- **Image Repository:** ghcr.io/prometheus-community/charts/kube-state-metrics
-- **Image Policy:** Set to follow semantic versioning.
+## Dependencies
+This deployment depends on the `prometheus-operator--prometheus-operator-crds` resource.
+
+## Security Context
+- **Run As User**: 65534
+- **Run As Group**: 65534
+- **FS Group**: 65534
+- **Read Only Root Filesystem**: True
+- **Allow Privilege Escalation**: False
 
 ## Probes
-- **Liveness Probe:** Configured to check the health of the service.
-- **Readiness Probe:** Ensures the service is ready to accept traffic.
+- **Liveness Probe**: Configured to check the health of the application.
+- **Readiness Probe**: Configured to ensure the application is ready to serve traffic.
 
-## Additional Features
-- **Self Monitoring:** Disabled by default.
-- **Vertical Pod Autoscaler Support:** Disabled by default.
-- **Custom Resource State Metrics:** Enabled with specific configurations for various resource types.
+## Resource Management
+- **Resource Requests and Limits**: Not specified by default, allowing flexibility for resource allocation.
+
+## Monitoring and Metrics
+Metrics are exposed for various Kubernetes resources, and can be scraped by Prometheus for monitoring purposes. The configuration allows for customization of which metrics to collect and expose.
 
 ## Notes
-- The deployment is designed to be resilient and can be configured further based on the specific needs of the cluster.
-- For detailed metrics and scraping configurations, refer to the official [kube-state-metrics documentation](https://github.com/kubernetes/kube-state-metrics).
+- Ensure that the Prometheus server is configured to scrape metrics from the `kube-state-metrics` service.
+- Review the values in the ConfigMaps for any custom configurations that may be necessary for your environment.

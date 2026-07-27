@@ -6,48 +6,50 @@ grand_parent: "nas"
 
 # vector-global-write
 
-## Overview
-The `vector-global-write` component is deployed in the `flux-system` namespace of the `nas` cluster. It utilizes the Vector logging tool to aggregate logs across the cluster. This deployment is managed using Flux and Helm.
+The `vector-global-write` component is deployed in the `flux-system` namespace of the `nas` cluster. It utilizes the Vector logging agent to aggregate logs and metrics from various sources.
 
 ## Helm Release Details
+
 - **Release Name**: `vector-global-write`
 - **Chart**: `vector`
-- **Version**: `0.56.0`
+- **Chart Version**: `0.57.0`
+- **Namespace**: `flux-system`
 - **Target Namespace**: `logging`
 - **Update Interval**: 10 minutes
 - **Dependencies**:
-  - `victoria-metrics--victoria-metrics-operator` (namespace: `flux-system`)
-  - `logging--vector-lb` (namespace: `flux-system`)
+  - `victoria-metrics--victoria-metrics-operator`
+  - `logging--vector-lb`
 
 ## Configuration
-The deployment is configured using several ConfigMaps and values defined in the HelmRelease. Key configurations include:
+
+The deployment is configured using values from existing ConfigMaps and specific values defined in the HelmRelease. Key configurations include:
 
 - **Role**: `Aggregator`
 - **Replicas**: 1
-- **Image**:
-  - **Repository**: `timberio/vector`
-  - **Pull Policy**: `IfNotPresent`
-- **Service**:
-  - **Enabled**: true
-  - **Type**: `ClusterIP`
-- **Headless Service**:
-  - **Enabled**: true
+- **Image**: `timberio/vector`
+- **Service**: Enabled with type `ClusterIP`
+- **Headless Service**: Enabled
 - **Log Level**: `info`
 
-### Existing ConfigMaps
-The deployment references the following existing ConfigMaps for configuration:
-- `vector-global-write-config-bdb5795f69`
-- `vector-global-write-values-bct65c9cgf` (contains `values-base.yaml` and `values.yaml`)
-- `vector-global-write-helmrelease-overrides` (optional)
+### ConfigMaps Used
 
-### Resource Management
+1. **Base Values**: `vector-global-write-values-bct65c9cgf` (key: `values-base.yaml`)
+2. **Custom Values**: `vector-global-write-values-bct65c9cgf` (key: `values.yaml`)
+3. **Overrides**: `vector-global-write-helmrelease-overrides` (optional, key: `values.yaml`)
+
+### Important Configuration Options
+
+- **Existing ConfigMaps**: 
+  - `vector-global-write-config-bdb5795f69`
+- **Pod Management Policy**: `OrderedReady`
+- **Termination Grace Period**: 60 seconds
+- **Service Account**: Created for Vector
+
+## Additional Features
+
 - **Pod Disruption Budget**: Disabled
 - **Horizontal Pod Autoscaler**: Disabled
-- **Termination Grace Period**: 60 seconds
+- **RBAC**: Enabled
+- **PodMonitor**: Disabled
 
-### Security Context
-- **Service Account**: Automatically created with default settings.
-
-## Additional Notes
-- The Vector instance is configured to aggregate logs and can be customized further through the provided ConfigMaps.
-- Ensure that the dependencies are properly installed and configured for the logging system to function correctly.
+This deployment is designed to efficiently collect and process logs and metrics, ensuring high availability and scalability within the logging namespace. For more detailed configuration options, refer to the [Vector Helm documentation](https://vector.dev/docs/setup/installation/package-managers/helm/).

@@ -7,64 +7,78 @@ grand_parent: "livingroom-pi"
 # kube-state-metrics
 
 ## Overview
-`kube-state-metrics` is a service that listens to the Kubernetes API server and generates metrics about the state of the objects. It is typically used in conjunction with Prometheus to monitor the health and performance of Kubernetes clusters.
+`kube-state-metrics` is a service that listens to the Kubernetes API and generates metrics about the state of the objects. It provides insights into the state of various Kubernetes resources, which can be scraped by Prometheus.
 
 ## Deployment Details
-- **Namespace**: `kube-system`
-- **Release Name**: `kube-state-metrics`
-- **Chart Version**: `7.5.1`
-- **Source Repository**: `prometheus-community`
-- **Update Interval**: Every 10 minutes for the HelmRelease, and every 24 hours for the ImageRepository.
-
-## Components
-### HelmRelease
-The `kube-state-metrics` is deployed as a HelmRelease with the following specifications:
-- **Chart**: `kube-state-metrics`
-- **Target Namespace**: `kube-system`
-- **Values**: Loaded from two ConfigMaps (`kube-state-metrics-values-52k4bbt862`), which include configurations for RBAC, service settings, and metrics collection.
-
-### ImageRepository
-An ImageRepository is defined to track the image used by `kube-state-metrics`:
-- **Image**: `ghcr.io/prometheus-community/charts/kube-state-metrics`
-- **Update Interval**: Every 24 hours.
-
-### ImagePolicy
-An ImagePolicy is set to manage the versioning of the `kube-state-metrics` image:
-- **Policy**: Semantic versioning range is defined as `x.x.x`.
-
-## Configuration Values
-The following key configurations are defined in the `values.yaml`:
-
-- **RBAC**: 
-  - `create`: true
-  - `useClusterRole`: true
-  - `extraRules`: Additional permissions for Flux resources.
-
-- **Service**:
-  - `port`: 8080
-  - `type`: ClusterIP
-
-- **Replicas**: 1
-
-- **Collectors**: Enabled for various Kubernetes resources including pods, services, deployments, etc.
-
-- **Security Context**:
-  - `runAsUser`: 65534
-  - `runAsGroup`: 65534
-  - `fsGroup`: 65534
-
-- **Probes**:
-  - **Liveness Probe**: Configured to check the health of the application.
-  - **Readiness Probe**: Configured to ensure the application is ready to serve traffic.
+- **Release Name:** kube-state-metrics
+- **Namespace:** kube-system
+- **Helm Chart Version:** 8.0.0
+- **Source Repository:** prometheus-community
+- **Update Interval:** 10 minutes for the HelmRelease, 24 hours for the ImageRepository
 
 ## Dependencies
-The deployment of `kube-state-metrics` depends on the `prometheus-operator--prometheus-operator-crds` which must be installed in the same namespace.
+This deployment depends on the `prometheus-operator--prometheus-operator-crds` resource.
 
-## Monitoring
-`kube-state-metrics` can be monitored using Prometheus by scraping the metrics endpoint exposed by the service. The service is configured to allow Prometheus to scrape metrics for monitoring purposes.
+## Configuration
+The configuration for `kube-state-metrics` is managed through two ConfigMaps:
+1. `kube-state-metrics-values-52k4bbt862` (values-base.yaml)
+2. `kube-state-metrics-values-52k4bbt862` (values.yaml)
 
-## Additional Notes
-- The deployment is configured to use RBAC for security, ensuring that the service has the necessary permissions to access Kubernetes resources.
-- The `autosharding` feature is disabled, and the deployment uses a single replica for simplicity.
+### Key Configuration Values
+- **Prometheus Scrape:** Enabled (`prometheusScrape: true`)
+- **Replicas:** 1
+- **Service Type:** ClusterIP
+- **RBAC:** Enabled with a ClusterRole
+- **Service Account:** Created with automounting of API credentials
 
-This documentation provides a concise overview of the `kube-state-metrics` deployment in the `livingroom-pi` cluster, detailing its configuration, components, and operational parameters.
+### Metrics Collection
+The following Kubernetes resources are monitored:
+- Certificatesigningrequests
+- Configmaps
+- Cronjobs
+- Daemonsets
+- Deployments
+- Endpoints
+- Horizontalpodautoscalers
+- Ingresses
+- Jobs
+- Leases
+- Limitranges
+- Mutatingwebhookconfigurations
+- Namespaces
+- Networkpolicies
+- Nodes
+- Persistentvolumeclaims
+- Persistentvolumes
+- Poddisruptionbudgets
+- Pods
+- Replicasets
+- Replicationcontrollers
+- Resourcequotas
+- Secrets
+- Services
+- Statefulsets
+- Storageclasses
+- Validatingwebhookconfigurations
+- Volumeattachments
+
+## Image Details
+- **Image Repository:** ghcr.io/prometheus-community/charts/kube-state-metrics
+- **Image Policy:** Semver policy is applied for versioning.
+
+## Additional Features
+- **Self-Monitoring:** Not enabled by default.
+- **Vertical Pod Autoscaler Support:** Not enabled by default.
+- **Custom Resource State Metrics:** Enabled with specific configurations for various resource types.
+
+## Security Context
+- **Run As User:** 65534
+- **Run As Group:** 65534
+- **FS Group:** 65534
+- **Seccomp Profile:** RuntimeDefault
+
+## Probes
+- **Liveness Probe:** Configured to check the health of the service.
+- **Readiness Probe:** Configured to ensure the service is ready to accept traffic.
+
+This deployment of `kube-state-metrics` provides essential metrics for monitoring the state of Kubernetes resources, facilitating better observability and management of the cluster.

@@ -6,100 +6,72 @@ grand_parent: "nas"
 
 # monitoring
 
-The `monitoring` component is deployed in the `nas` cluster and utilizes VictoriaMetrics for metrics collection and monitoring. This deployment includes several key resources for scraping metrics from various services and nodes within the cluster.
+The `monitoring` component is deployed in the `nas` cluster and is responsible for collecting and managing metrics from various services within the Kubernetes environment. It utilizes VictoriaMetrics for long-term storage and scraping of metrics.
 
-## Resources Overview
+## Components
+
+### VMCluster
+- **Kind**: `VMCluster`
+- **Version**: `v1.148.0-cluster`
+- **Namespace**: `monitoring`
+- **Spec**:
+  - **Replication Factor**: 1
+  - **Retention Period**: 12 months
+  - **Components**:
+    - **vminsert**: 
+      - Image: `victoriametrics/vminsert:v1.148.0-cluster`
+      - Replica Count: 1
+    - **vmselect**: 
+      - Image: `victoriametrics/vmselect:v1.148.0-cluster`
+      - Replica Count: 1
+      - Storage: 2Gi
+    - **vmstorage**: 
+      - Image: `victoriametrics/vmstorage:v1.148.0-cluster`
+      - Replica Count: 1
+      - Volume Mounts: `/storage`
+
+### Services
+- **Namespace**: `monitoring`
+- **Services**:
+  - `vmagent-tpi-1`: Exposes metrics on port 8429.
+  - `vmclusterlb-short-term-tpi-1`: Exposes metrics on port 8427.
+  - `vminsert-short-term-tpi-1-server`: Exposes metrics on port 8480.
+  - `vmstorage-short-term-tpi-1-server`: Exposes multiple metrics ports (8482, 8401, 8400).
+  - `vmstorage-short-term-tpi-1`: Exposes multiple metrics ports (8482, 8401, 8400).
 
 ### HTTPRoute
 - **Name**: `vmauth-global-write`
 - **Namespace**: `monitoring`
-- **Hostnames**: 
-  - `vm-write.wahoo.li`
-  - `vm-write.absolutist.it`
-- **Backend Reference**: 
-  - Service: `vmauth-global-write` on port `8427`
+- **Spec**:
+  - **Hostnames**: 
+    - `vm-write.wahoo.li`
+    - `vm-write.absolutist.it`
+  - **Backend Reference**: 
+    - `vmauth-global-write` on port 8427.
 
 ### Image Repositories and Policies
-The following image repositories and policies are defined for the VictoriaMetrics components:
-
-1. **vmselect**
-   - **Image**: `victoriametrics/vmselect`
-   - **Image Policy**: `vmselect-cluster`
-   - **Version**: `v1.146.0-cluster`
-
-2. **vminsert**
-   - **Image**: `victoriametrics/vminsert`
-   - **Image Policy**: `vminsert-cluster`
-   - **Version**: `v1.146.0-cluster`
-
-3. **vmstorage**
-   - **Image**: `victoriametrics/vmstorage`
-   - **Image Policy**: `vmstorage-cluster`
-   - **Version**: `v1.146.0-cluster`
-
-4. **vmagent**
-   - **Image**: `victoriametrics/vmagent`
-   - **Image Policy**: `vmagent`
-   - **Version**: `latest`
-
-### VMCluster
-- **Name**: `long-term`
-- **Namespace**: `monitoring`
-- **Replication Factor**: `1`
-- **Retention Period**: `12`
-- **Components**:
-  - **vminsert**: 
-    - Image: `victoriametrics/vminsert:v1.146.0-cluster`
-    - Replica Count: `1`
-  - **vmselect**: 
-    - Image: `victoriametrics/vmselect:v1.146.0-cluster`
-    - Replica Count: `1`
-    - Storage: `2Gi`
-  - **vmstorage**: 
-    - Image: `victoriametrics/vmstorage:v1.146.0-cluster`
-    - Replica Count: `1`
-
-### Services
-Several services are created to expose the metrics endpoints:
-- **vmagent-tpi-1**: Exposes port `8429`
-- **vmclusterlb-short-term-tpi-1**: Exposes port `8427`
-- **vminsert-short-term-tpi-1-server**: Exposes port `8480`
-- **vmstorage-short-term-tpi-1-server**: Exposes ports `8482`, `8401`, and `8400`
-- **vmstorage-short-term-tpi-1**: Exposes the same ports as above
+- **Image Repositories**:
+  - `vmselect`, `vminsert`, `vmstorage`, `vmagent`: All set to check for new images every 24 hours.
+- **Image Policies**:
+  - Each image repository has a corresponding policy to manage versioning based on semantic versioning.
 
 ### VMNodeScrape
-Multiple `VMNodeScrape` resources are defined to scrape metrics from various sources:
-- **cadvisor**
-- **kubelet**
-- **probes**
-- **resources**
+- **Node Scrapes**:
+  - Configured for `cadvisor`, `kubelet`, `probes`, and `resources` with a scrape interval of 30 seconds.
+  - Each node scrape has specific relabeling and dropping configurations to filter metrics.
 
 ### VMPodScrape
-Pod scraping configurations are defined for:
-- **cert-manager**
-- **fluxcd**
-- **node-exporter**
-- **topolvm**
-- **envoy-gateway-proxy**
+- **Pod Scrapes**:
+  - Configured for `cert-manager`, `fluxcd`, `node-exporter`, `topolvm`, and `envoy-gateway-proxy` to scrape metrics from specific namespaces and pods.
 
 ### VMServiceScrape
-Service scraping configurations are defined for:
-- **authentik**
-- **envoy-gateway-controller**
-- **kube-dns**
-- **kube-state-metrics**
-- **velero**
-- **victoria-metrics-operator**
+- **Service Scrapes**:
+  - Configured for `authentik`, `envoy-gateway-controller`, `kube-dns`, `kube-state-metrics`, `velero`, and `victoria-metrics-operator` to scrape metrics from various services across different namespaces.
 
 ### VMStaticScrape
-Static scraping configurations are defined for:
-- **vps-node-exporter**
-- **vps-haproxy**
-- **vps-cert-metrics**
+- **Static Scrapes**:
+  - Configured for `vps-node-exporter`, `vps-haproxy`, and `vps-cert-metrics` to scrape metrics from specified static targets.
 
-## Namespace
-- **Namespace**: `monitoring`
-- **Labels**: 
-  - `internal-services: true`
-
-This comprehensive setup ensures that metrics are collected from various components within the Kubernetes cluster, providing visibility into the performance and health of the applications and infrastructure.
+## Notes
+- The `monitoring` component is essential for observability within the Kubernetes cluster, providing insights into the performance and health of various services.
+- Ensure that the necessary permissions and configurations are in place for scraping metrics from the specified endpoints.

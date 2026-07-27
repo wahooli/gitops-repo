@@ -7,15 +7,15 @@ grand_parent: "nas"
 # seaweedfs-backup
 
 ## Overview
-The `seaweedfs-backup` component is responsible for managing backups of SeaweedFS data within the Kubernetes cluster. It deploys a set of services that facilitate data storage and retrieval, ensuring that backups are efficiently handled and accessible.
+The `seaweedfs-backup` component provides a backup solution for SeaweedFS, a distributed file system. It is deployed in the `nas` cluster and is responsible for managing persistent storage and backup operations. This component ensures data durability and accessibility through its various services and configurations.
 
 ## Sub-components
 This deployment consists of a single HelmRelease:
-- **HelmRelease**: `seaweedfs-backup--seaweedfs`
+- **HelmRelease: seaweedfs-backup--seaweedfs**
   - **Chart**: seaweedfs
   - **Version**: latest (floating: >=0.1.0-0)
   - **Target Namespace**: seaweedfs-backup
-  - **Provides**: StatefulSets for volume and filer management, along with necessary services and configurations for backup operations.
+  - **Provides**: Backup services for SeaweedFS, including volume management and S3-compatible storage.
 
 ## Dependencies
 No dependencies are specified for this HelmRelease.
@@ -27,33 +27,29 @@ No dependencies are specified for this HelmRelease.
 
 ## Resource Glossary
 ### Networking
-- **HTTPRoute**: Defines routing rules for incoming HTTP requests to the SeaweedFS services. Three routes are created:
-  - `seaweedfs-backup-filer`: Routes to the filer service on port 8888.
-  - `seaweedfs-backup-master`: Routes to the master service on port 9333.
-  - `seaweedfs-backup-s3`: Routes to the S3-compatible interface on port 8333.
+- **HTTPRoute**: Defines routing rules for HTTP traffic to the SeaweedFS backup services. There are three HTTPRoutes:
+  - `seaweedfs-backup-filer`: Routes traffic to the filer service on port 8888.
+  - `seaweedfs-backup-master`: Routes traffic to the master service on port 9333.
+  - `seaweedfs-backup-s3`: Routes traffic to the S3-compatible service on port 8333.
 
 ### Storage
-- **PersistentVolume**: Two volumes are created to store data:
-  - `seaweedfs-backup-volume-data`: A 1Ti storage volume for backup data.
-  - `seaweedfs-backup-filer-data`: A 1Ti storage volume for the filer data.
-  
-### Namespace
-- **Namespace**: `seaweedfs-backup`: A dedicated namespace for isolating SeaweedFS backup resources.
+- **PersistentVolume**: Two persistent volumes are created:
+  - `seaweedfs-backup-volume-data`: Provides storage for SeaweedFS backup data with a capacity of 1Ti and a reclaim policy of Retain.
+  - `seaweedfs-backup-filer-data`: Provides storage for the SeaweedFS filer with a capacity of 1Ti and a reclaim policy of Retain.
 
-### ConfigMap
-- **ConfigMap**: `seaweedfs-backup-values-9682hk4gf4`: Contains configuration values for the SeaweedFS deployment, including image repository and tag, volume settings, and S3 configurations.
+### Other Resources
+- **Namespace**: `seaweedfs-backup`: The namespace where all resources related to the SeaweedFS backup are deployed.
+- **HelmRelease**: Manages the deployment of the SeaweedFS backup services.
+- **ConfigMap**: Contains configuration data for the SeaweedFS backup, including shared configurations and post-up scripts.
 
 ## Configuration Highlights
-- **Image**: Uses `chrislusf/seaweedfs` with a tag of `4.37`.
-- **Replica Counts**: 
-  - Master: 1
-  - Volume: 1
-- **Persistence**: 
-  - Each volume has a persistent storage request of 1Ti.
-- **Post-Up Script**: Configures collections and replication settings after deployment.
+- **Image**: The SeaweedFS image used is `chrislusf/seaweedfs` with a tag of `4.40`.
+- **Persistence**: Both the volume and filer services are configured with persistent storage requests of 1Ti.
+- **Replica Counts**: The master and volume services are set to have a replica count of 1.
+- **Post-Up Configuration**: The post-up script is enabled and includes commands to create S3 buckets and configure replication settings.
 
 ## Deployment
-- **Target Namespace**: `seaweedfs-backup`
-- **Release Name**: `seaweedfs-backup`
-- **Reconciliation Interval**: 5 minutes
-- **Install Behavior**: The installation allows for unlimited retries on failure.
+- **Target Namespace**: seaweedfs-backup
+- **Release Name**: seaweedfs-backup
+- **Reconciliation Interval**: 5m
+- **Install Behavior**: The HelmRelease is set to retry indefinitely on failure.

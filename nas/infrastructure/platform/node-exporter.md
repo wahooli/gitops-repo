@@ -7,33 +7,33 @@ grand_parent: "nas"
 # node-exporter
 
 ## Overview
-The `node-exporter` component is responsible for exposing hardware and OS metrics from the nodes in the Kubernetes cluster. It collects various system metrics and makes them available for scraping by monitoring systems like Prometheus. This deployment consists of a single HelmRelease that manages the installation of the Prometheus Node Exporter.
+The `node-exporter` component is responsible for exposing metrics about the node's hardware and operating system. It runs as a DaemonSet in the `kube-system` namespace, ensuring that an instance of the exporter runs on each node in the cluster. This component is essential for monitoring node performance and health, providing data that can be scraped by Prometheus.
 
 ## Dependencies
-The `node-exporter` HelmRelease has a dependency on the `prometheus-operator--prometheus-operator-crds`, which provides the necessary Custom Resource Definitions (CRDs) for Prometheus to function correctly in the cluster.
+The `node-exporter` HelmRelease depends on the `prometheus-operator--prometheus-operator-crds`, which provides the necessary Custom Resource Definitions (CRDs) for Prometheus to function correctly. This dependency is crucial for integrating the metrics collected by `node-exporter` into the Prometheus monitoring system.
 
 ## Helm Chart(s)
-- **Chart Name:** prometheus-node-exporter
-- **Repository:** prometheus-community (https://prometheus-community.github.io/helm-charts)
-- **Version:** 4.55.0
+- **Chart Name**: prometheus-node-exporter
+- **Repository**: prometheus-community (https://prometheus-community.github.io/helm-charts)
+- **Version**: 4.56.1
 
 ## Resource Glossary
-### Security
-- **ServiceAccount:** A service account named `node-exporter` is created in the `kube-system` namespace to provide an identity for the node-exporter pods.
-
 ### Networking
-- **Service:** A ClusterIP service named `node-exporter` is created to expose the metrics endpoint on port 9100. This service allows Prometheus to scrape metrics from the node-exporter pods.
+- **Service**: A `ClusterIP` service named `node-exporter` is created to expose the metrics endpoint on port 9100. This allows Prometheus to scrape metrics from the node-exporter instances running on each node.
+
+### Security
+- **ServiceAccount**: A service account named `node-exporter` is created to provide the necessary permissions for the DaemonSet to operate securely.
 
 ### Workload
-- **DaemonSet:** A DaemonSet named `node-exporter` is deployed in the `kube-system` namespace. This ensures that a node-exporter pod runs on each node in the cluster, collecting metrics from the host system. The DaemonSet is configured to use host networking and mounts host paths for `/proc`, `/sys`, and the root filesystem to access system metrics.
+- **DaemonSet**: The `node-exporter` DaemonSet ensures that the node-exporter runs on every node in the cluster. It is configured to use host networking and mounts host paths to access system metrics.
 
 ## Configuration Highlights
-- **Extra Arguments:** The node-exporter is configured with several command-line arguments to exclude certain filesystem mount points and devices from being monitored, as well as to specify logging format.
-- **Host Networking:** The node-exporter pods run in host network mode, allowing them to access host-level metrics directly.
-- **Probes:** Liveness and readiness probes are configured to ensure the node-exporter is healthy and ready to serve metrics.
+- **Extra Arguments**: The node-exporter is configured with several extra arguments to exclude specific filesystem mount points and devices from being monitored, ensuring that only relevant metrics are collected.
+- **Security Context**: The DaemonSet runs containers with a non-root user and has a read-only root filesystem for enhanced security.
+- **Probes**: Liveness and readiness probes are configured to ensure the node-exporter is healthy and ready to serve metrics.
 
 ## Deployment
-- **Target Namespace:** kube-system
-- **Release Name:** node-exporter
-- **Reconciliation Interval:** 10 minutes
-- **Install Behavior:** The HelmRelease is set to retry indefinitely on failure, ensuring that the node-exporter is always running.
+- **Target Namespace**: kube-system
+- **Release Name**: node-exporter
+- **Reconciliation Interval**: 10 minutes
+- **Install Behavior**: The installation is configured to retry indefinitely in case of failure.
