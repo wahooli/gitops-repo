@@ -3,7 +3,7 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
 image:
-  tag: v3.6.13 # {"$imagepolicy": "flux-system:etcd:tag"}
+  tag: v3.7.1 # {"$imagepolicy": "flux-system:etcd:tag"}
 cluster:
   ordinals:
     start: 0
