@@ -52,7 +52,7 @@ extraContainers:
       cpu: 500m
       memory: 256Mi
 - name: anubis
-  image: ghcr.io/techarohq/anubis:v1.26.0 # {"$imagepolicy": "flux-system:anubis"}
+  image: ghcr.io/techarohq/anubis:v1.26.2 # {"$imagepolicy": "flux-system:anubis"}
   env:
   - name: ED25519_PRIVATE_KEY_HEX
     valueFrom:
