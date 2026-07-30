@@ -6,33 +6,34 @@ grand_parent: "nas"
 
 # alerting
 
-The `alerting` component is deployed in the `nas` cluster and is responsible for managing alerting rules and configurations using VictoriaMetrics and Alertmanager. This component includes several Kubernetes resources that facilitate alert routing, service discovery, and alert rules definition.
+The `alerting` component is deployed in the `nas` cluster and is responsible for managing alerting rules and configurations using VictoriaMetrics and Alertmanager. It includes HTTP routes for alerting services, alert rules, and configurations for notifications.
 
-## Resources
+## Kubernetes Resources
 
 ### Namespaces
 - **Namespace**: `alerting`
-  - This namespace contains all resources related to the alerting functionality.
+  - This namespace is created to isolate the alerting resources.
 
 ### Services
 - **Service**: `vmalertmanager-tpi-1`
   - **Type**: ClusterIP
   - **Ports**:
-    - HTTP: 9093 (target port: web)
-    - TCP/UDP Mesh: 9094
+    - `http`: 9093 (TCP)
+    - `tcp-mesh`: 9094 (TCP)
+    - `udp-mesh`: 9094 (UDP)
 
 ### HTTP Routes
 - **HTTPRoute**: `alertmanager`
-  - **Hostnames**: `alertmanager.absolutist.it`
-  - **Backend**: `vmalertmanager-nas` on port 9093
-
+  - **Hostname**: `alertmanager.absolutist.it`
+  - **Backend**: `vmalertmanager-nas:9093`
+  
 - **HTTPRoute**: `vmalert-vlogs`
-  - **Hostnames**: `log-alerts.absolutist.it`
-  - **Backend**: `vmalert-vlogs-nas` on port 8080
-
+  - **Hostname**: `log-alerts.absolutist.it`
+  - **Backend**: `vmalert-vlogs-nas:8080`
+  
 - **HTTPRoute**: `vmalert-vmetrics`
-  - **Hostnames**: `metrics-alerts.absolutist.it`
-  - **Backend**: `vmalert-vmetrics-nas` on port 8080
+  - **Hostname**: `metrics-alerts.absolutist.it`
+  - **Backend**: `vmalert-vmetrics-nas:8080`
 
 ### Alert Rules
 - **VMRule**: `smartctl-rules`
@@ -42,10 +43,10 @@ The `alerting` component is deployed in the `nas` cluster and is responsible for
   - Monitors the health of Authentik outposts.
 
 - **VMRule**: `kubernetes-apps`
-  - Monitors various Kubernetes application states, including pod readiness and deployment statuses.
+  - Monitors various Kubernetes application states, including pod health and deployment statuses.
 
 - **VMRule**: `kubernetes-resources`
-  - Monitors resource usage in the Kubernetes cluster, including CPU and memory overcommitment.
+  - Monitors resource usage and overcommitment in the Kubernetes cluster.
 
 ### Alertmanager Configurations
 - **VMAlertmanagerConfig**: `generic-alerts`
@@ -60,18 +61,18 @@ The `alerting` component is deployed in the `nas` cluster and is responsible for
   - **Update Interval**: 24h
 
 - **ImagePolicy**: `vmalert`
-  - **Policy**: Semver range for versioning.
+  - **Version Policy**: Semver matching for `v1.x.x`.
 
 - **ImageRepository**: `alertmanager`
   - **Image**: `prom/alertmanager`
   - **Update Interval**: 24h
 
 - **ImagePolicy**: `vmalertmanager`
-  - **Policy**: Semver range for versioning.
+  - **Version Policy**: Semver matching for `v0.x.x`.
 
 ### ConfigMaps
 - **ConfigMap**: `vmalert-templates`
   - Contains templates for Grafana URLs for logs and metrics.
 
 ## Summary
-The `alerting` component integrates various resources to provide a comprehensive alerting solution within the Kubernetes cluster. It leverages VictoriaMetrics for metrics collection and Alertmanager for alert routing, ensuring that alerts are effectively managed and communicated.
+The `alerting` component integrates various alerting mechanisms and configurations to monitor the health and performance of applications and infrastructure within the `nas` cluster. It utilizes VictoriaMetrics for alert rules and Alertmanager for notifications, specifically targeting Discord for alert delivery.

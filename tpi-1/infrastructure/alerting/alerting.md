@@ -4,147 +4,59 @@ parent: "Infrastructure / Alerting"
 grand_parent: "tpi-1"
 ---
 
-# Alerting
+# alerting
 
-The `alerting` component is deployed in the `tpi-1` cluster and is responsible for managing alerting and monitoring configurations. It includes multiple sub-components for alerting and monitoring functionalities, primarily leveraging VictoriaMetrics and Prometheus Alertmanager.
+The `alerting` component is deployed in the `tpi-1` cluster and is responsible for managing alerting rules and notifications using VictoriaMetrics and Alertmanager. It includes various configurations for monitoring and alerting on different services and metrics.
 
----
+## Kubernetes Resources
 
-## Overview
+### Namespace
+- **Name:** `alerting`
+- **Purpose:** Contains all resources related to the alerting functionality.
 
-The `alerting` component is deployed in the `alerting` namespace and provides the following functionalities:
+### Services
+- **Service Name:** `vmalertmanager-nas`
+  - **Type:** ClusterIP
+  - **Ports:**
+    - HTTP: 9093
+    - TCP/UDP Mesh: 9094
 
-1. **Alertmanager**: Handles alert notifications and routing.
-2. **VMAlert**: Manages alert rules and notifications for VictoriaMetrics.
-3. **HTTPRoutes**: Configures HTTP routing for alerting services.
-4. **VMRules**: Defines alerting rules for various use cases.
-5. **Image Automation**: Manages container image versions for `vmalert` and `alertmanager`.
+### HTTP Routes
+1. **Alertmanager**
+   - **Hostname:** `alertmanager.${domain_absolutist_it}`
+   - **Backend:** `vmalertmanager-tpi-1` on port 9093
 
----
+2. **VMAlert Vlogs**
+   - **Hostname:** `log-alerts.${domain_absolutist_it}`
+   - **Backend:** `vmalert-vlogs-tpi-1` on port 8080
 
-## Namespace
+3. **VMAlert VMetrics**
+   - **Hostname:** `metrics-alerts.${domain_absolutist_it}`
+   - **Backend:** `vmalert-vmetrics-tpi-1` on port 8080
 
-The `alerting` namespace is labeled as an internal service namespace and is managed by FluxCD.
+### Alerting Rules
+- **VMRule Resources:**
+  - **docker-mailserver:** Monitors login failures, service down alerts, and mail deferrals.
+  - **authentik-outpost-health:** Monitors the health of the Authentik outpost.
+  - **kubernetes-apps:** Monitors various Kubernetes application states, including pod health and deployment status.
+  - **kubernetes-resources:** Monitors resource utilization and quotas in the Kubernetes cluster.
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: alerting
-  labels:
-    internal-services: "true"
-    kustomize.toolkit.fluxcd.io/name: infrastructure-alerting
-    kustomize.toolkit.fluxcd.io/namespace: flux-system
-```
+### Alertmanager Configurations
+- **VMAlertmanagerConfig Resources:**
+  - **generic-alerts:** Configures alert routing and receivers for generic alerts.
+  - **systemd-alerts:** Configures alert routing and receivers for systemd-related alerts.
 
----
+### Image Repositories and Policies
+- **Image Repositories:**
+  - **vmalert:** Uses the image `victoriametrics/vmalert`.
+  - **alertmanager:** Uses the image `prom/alertmanager`.
 
-## Sub-Components
+- **Image Policies:**
+  - **vmalert:** Policy for versioning the `vmalert` image.
+  - **vmalertmanager:** Policy for versioning the `alertmanager` image.
 
-### Alertmanager
-
-#### Description
-The Alertmanager handles alert notifications and routing. It uses the `prom/alertmanager` container image, with the version managed by FluxCD's ImagePolicy.
-
-#### Image Configuration
-- **Image Repository**: `prom/alertmanager`
-- **Image Policy**: Semantic versioning (`x.x.x`)
-
-#### Service
-The `vmalertmanager-nas` service is configured as a `ClusterIP` service with the following ports:
-- `http`: Port 9093 (TCP)
-- `tcp-mesh`: Port 9094 (TCP)
-- `udp-mesh`: Port 9094 (UDP)
-
-#### HTTPRoute
-The `alertmanager` HTTPRoute exposes the Alertmanager service:
-- **Hostname**: `alertmanager.${domain_absolutist_it:=absolutist.it}`
-- **Parent Gateway**: `internal-gw` in the `infrastructure` namespace
-- **Backend Service**: `vmalertmanager-tpi-1` on port 9093
-
-#### Alertmanager Configurations
-Two `VMAlertmanagerConfig` resources are defined:
-1. **Generic Alerts**:
-   - Receiver: Discord
-   - Grouping by `alertgroup` and `alertname`
-   - Group interval: 5 minutes
-   - Repeat interval: 3 hours
-   - Route for specific alerts (e.g., `SomeRemoteWriteTargetsFailing`)
-
-2. **Systemd Alerts**:
-   - Receiver: Discord
-   - Grouping by `systemd_host` and `systemd_unit`
-   - Group interval: 15 minutes
-   - Repeat interval: 6 hours
-   - Routes for journald-related alerts
-
----
-
-### VMAlert
-
-#### Description
-VMAlert manages alert rules and notifications for VictoriaMetrics. It uses the `victoriametrics/vmalert` container image, with the version managed by FluxCD's ImagePolicy.
-
-#### Image Configuration
-- **Image Repository**: `victoriametrics/vmalert`
-- **Image Policy**: Semantic versioning (`vX.X.X`)
-
-#### HTTPRoutes
-Two HTTPRoutes expose VMAlert services:
-1. **vmalert-vlogs**:
-   - **Hostname**: `log-alerts.${domain_absolutist_it:=absolutist.it}`
-   - **Parent Gateway**: `internal-gw` in the `infrastructure` namespace
-   - **Backend Service**: `vmalert-vlogs-tpi-1` on port 8080
-
-2. **vmalert-vmetrics**:
-   - **Hostname**: `metrics-alerts.${domain_absolutist_it:=absolutist.it}`
-   - **Parent Gateway**: `internal-gw` in the `infrastructure` namespace
-   - **Backend Service**: `vmalert-vmetrics-tpi-1` on port 8080
-
-#### ConfigMap
-The `vmalert-templates` ConfigMap contains templates for Grafana URLs for logs and metrics exploration.
-
----
-
-### VM Rules
-
-Several `VMRule` resources are defined for alerting:
-
-1. **docker-mailserver**:
-   - Alerts for login failures, Postfix downtime, and deferred mail.
-   - Severity: Critical
-
-2. **kubernetes-apps**:
-   - Alerts for Kubernetes application issues such as pod crash loops, deployment mismatches, and stateful set issues.
-   - Severity: Warning
-
-3. **kubernetes-resources**:
-   - Alerts for resource overcommitment, quota usage, and resource limits.
-   - Severity: Warning/Info
-
----
-
-## Image Automation
-
-The `alerting` component uses FluxCD's Image Automation to manage container image versions for its sub-components:
-
-1. **vmalert**:
-   - **Image Repository**: `victoriametrics/vmalert`
-   - **Policy**: Semantic versioning (`vX.X.X`)
-
-2. **alertmanager**:
-   - **Image Repository**: `prom/alertmanager`
-   - **Policy**: Semantic versioning (`vX.X.X`)
-
----
-
-## External DNS Configuration
-
-The HTTPRoutes include annotations for external DNS configuration:
-- **Target**: `gw.nas.${domain_absolutist_it:=absolutist.it}`
-
----
+### ConfigMaps
+- **vmalert-templates:** Contains templates for Grafana URLs used in alerts.
 
 ## Summary
-
-The `alerting` component in the `tpi-1` cluster provides a robust alerting and monitoring solution using VictoriaMetrics and Prometheus Alertmanager. It is configured with multiple alert rules, routing configurations, and image automation policies to ensure efficient and scalable alert management.
+The `alerting` component is a comprehensive setup for monitoring and alerting within the `tpi-1` cluster, utilizing VictoriaMetrics and Alertmanager to provide robust alerting capabilities across various services and metrics.

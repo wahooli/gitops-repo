@@ -5,56 +5,55 @@ grand_parent: "tpi-1"
 ---
 
 ## Overview
-
-The `monitoring` infrastructure layer for cluster `tpi-1` is designed to manage and monitor metrics efficiently using VictoriaMetrics components. This setup includes resources for scraping metrics, storing data, and providing authentication and proxying capabilities for read and write operations. The components work together to ensure high availability, scalability, and optimized data retention for monitoring workloads.
+The monitoring infrastructure layer for the cluster `tpi-1` consists of several Kubernetes resources that work together to provide a robust monitoring solution using VictoriaMetrics. These resources include agents for scraping metrics, authentication services for secure access, and a clustered storage solution for managing metrics data. The architecture is designed to ensure high availability, efficient data handling, and easy access to monitoring data.
 
 ## Resource Glossary
 
-### VMAgent (`vmagent.yaml`)
-- **Kind**: `VMAgent`
-- **Name**: `tpi-1`
-- **Namespace**: `monitoring`
-- **Purpose**: The `VMAgent` is responsible for scraping metrics from various sources and forwarding them to multiple remote write endpoints for storage and processing.
-- **Details**:
-  - Scrapes metrics at a 30-second interval and forwards them to configured endpoints.
-  - Applies relabeling rules to filter and modify metrics before sending them.
-  - Configured with external labels to identify the cluster (`clustername: tpi-1`).
-  - Uses resource limits and requests to manage CPU and memory usage.
-  - Provides a service with `ClusterIP` type and annotations for Cilium service configuration.
-  - Includes affinity rules to avoid scheduling on control-plane nodes.
+### VMAgent
+- **Kind**: VMAgent
+- **Name**: tpi-1
+- **Namespace**: monitoring
+- **Purpose**: The VMAgent is responsible for scraping metrics from various sources and sending them to the configured storage endpoints.
+- **What it does**: It collects metrics at a specified interval (30 seconds) and writes them to multiple remote storage URLs, while applying relabeling rules to filter out unwanted data.
 
-### VMAuth (`vmauth.global-write.yaml`)
-- **Kind**: `VMAuth`
-- **Name**: `global-write`
-- **Namespace**: `monitoring`
-- **Purpose**: The `VMAuth` resource acts as an authentication and proxy layer for write operations to VictoriaMetrics components.
-- **Details**:
-  - Configured to listen on port `8427`.
-  - Provides a `ClusterIP` service with annotations for Cilium service configuration.
-  - Defines URL mappings for unauthenticated user access to write endpoints, with retry policies for specific HTTP status codes (`502`, `503`, `504`).
-  - Routes traffic to `vmagent-tpi-1` and `vmagent-nas` services.
+### VMAuth (global-write)
+- **Kind**: VMAuth
+- **Name**: global-write
+- **Namespace**: monitoring
+- **Purpose**: This resource provides authentication and access control for write operations to the monitoring system.
+- **What it does**: It allows unauthenticated users to write metrics to the VMAgent by mapping specific API paths to the agent's service, handling retries for certain error codes.
 
-### VMAuth (`vmauth.read-proxy.yaml`)
-- **Kind**: `VMAuth`
-- **Name**: `read-proxy`
-- **Namespace**: `monitoring`
-- **Purpose**: The `VMAuth` resource acts as an authentication and proxy layer for read operations from VictoriaMetrics components.
-- **Details**:
-  - Configured to listen on port `8427`.
-  - Defines URL mappings for unauthenticated user access to read endpoints, with retry policies for HTTP status code `503`.
-  - Routes traffic to `vmclusterlb-short-term-tpi-1`, `vmselect-short-term-nas-0`, and `vmselect-short-term-nas-1` services.
+### VMAuth (read-proxy)
+- **Kind**: VMAuth
+- **Name**: read-proxy
+- **Namespace**: monitoring
+- **Purpose**: This resource manages access control for read operations from the monitoring system.
+- **What it does**: It routes read requests to the appropriate backend services, allowing users to query metrics while managing load balancing and retry logic for failed requests.
 
-### VMCluster (`vmcluster.yaml`)
-- **Kind**: `VMCluster`
-- **Name**: `short-term-tpi-1`
-- **Namespace**: `monitoring`
-- **Purpose**: The `VMCluster` resource manages the VictoriaMetrics cluster for short-term data storage and retrieval.
-- **Details**:
-  - Configured with a retention period of 6 months and a replication factor of 2 for high availability.
-  - Includes components for data insertion (`vminsert`), storage (`vmstorage`), and querying (`vmselect`).
-  - Provides a load balancer for handling requests, with affinity rules to optimize scheduling.
-  - Each component (`vminsert`, `vmstorage`, `vmselect`) is configured with resource limits, affinity rules, and storage specifications:
-    - **VMInsert**: Handles data ingestion and forwards it to storage nodes.
-    - **VMStorage**: Stores metrics data with a `35Gi` persistent volume per replica.
-    - **VMSelect**: Handles query operations and connects to storage nodes.
-  - Uses `ClusterIP` services with annotations for Cilium service configuration.
+### VMCluster
+- **Kind**: VMCluster
+- **Name**: short-term-tpi-1
+- **Namespace**: monitoring
+- **Purpose**: The VMCluster resource defines a cluster of VictoriaMetrics components for storing and retrieving metrics data.
+- **What it does**: It configures the retention period for metrics, replication factor for high availability, and specifies the storage and compute resources for the cluster components, including vminsert, vmselect, and vmstorage.
+
+### VMStorage
+- **Kind**: VMStorage (part of VMCluster)
+- **Name**: short-term-tpi-1
+- **Namespace**: monitoring
+- **Purpose**: This component handles the storage of metrics data within the VMCluster.
+- **What it does**: It manages the actual storage backend, ensuring data is stored efficiently and is accessible for querying.
+
+### VMSelect
+- **Kind**: VMSelect (part of VMCluster)
+- **Name**: short-term-tpi-1
+- **Namespace**: monitoring
+- **Purpose**: This component is responsible for querying metrics data from the storage layer.
+- **What it does**: It processes read requests and retrieves metrics data from the VMStorage instances.
+
+### VMInsert
+- **Kind**: VMInsert (part of VMCluster)
+- **Name**: short-term-tpi-1
+- **Namespace**: monitoring
+- **Purpose**: This component is responsible for receiving incoming metrics data and writing it to the storage layer.
+- **What it does**: It accepts metrics from the VMAgent and ensures they are correctly stored in the VMStorage instances.
