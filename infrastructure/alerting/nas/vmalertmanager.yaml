@@ -54,6 +54,15 @@ spec:
       - alertname="RemoteWriteDroppingData"
       equal:
       - clustername
+    # Once a vmstorage is already over 80% full, the 3-day projection adds nothing
+    # and flaps as the ingestion rate varies.
+    - source_matchers:
+      - alertname="DiskRunsOutOfSpace"
+      target_matchers:
+      - alertname="DiskRunsOutOfSpaceIn3Days"
+      equal:
+      - job
+      - instance
     receivers:
     - name: 'blackhole'
   configNamespaceSelector:

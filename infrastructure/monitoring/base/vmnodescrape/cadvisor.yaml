@@ -79,6 +79,10 @@ spec:
     targetLabel: metrics_path
   - replacement: kubelet
     targetLabel: job
+  # "short" is dropped by the long-term (12m) target only, so this data lands in
+  # short-term storage on both clusters (nas 3m, tpi-1 6m) and never in long-term.
+  - replacement: short
+    targetLabel: retention_period
   scheme: https
   scrapeTimeout: 5s
   selector: {}

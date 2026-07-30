@@ -53,6 +53,9 @@ spec:
     extraArgs:
       loggerFormat: json
       dedup.minScrapeInterval: 30s
+      # Real buffer instead of the 100MB default, so overrun becomes a clean
+      # read-only stop with a distinct early warning rather than a full disk.
+      storage.minFreeDiskSpaceBytes: 2GB
     serviceSpec:
       useAsDefault: true
       spec:

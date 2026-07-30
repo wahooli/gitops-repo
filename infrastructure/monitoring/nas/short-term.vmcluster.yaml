@@ -25,12 +25,15 @@ spec:
     extraArgs:
       dedup.minScrapeInterval: 30s
       loggerFormat: json
+      # Real buffer instead of the 100MB default, so overrun becomes a clean
+      # read-only stop with a distinct early warning rather than a full disk.
+      storage.minFreeDiskSpaceBytes: 2GB
     storage:
       volumeClaimTemplate:
         spec:
           resources:
             requests:
-              storage: 20Gi
+              storage: 25Gi
               # resources:
               #   limits:
               #     cpu: "2"
