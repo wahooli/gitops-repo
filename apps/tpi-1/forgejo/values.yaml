@@ -9,7 +9,7 @@ service:
 image:
   registry: code.forgejo.org
   repository: forgejo/forgejo
-  tag: "16.0.1-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
+  tag: "16.0.2-rootless" # {"$imagepolicy": "flux-system:forgejo:tag"}
 extraContainers:
 - name: syncthing
   image: syncthing/syncthing:2.1.2 # {"$imagepolicy": "flux-system:syncthing"}
@@ -56,7 +56,7 @@ extraContainers:
       cpu: 500m
       memory: 256Mi
 - name: anubis
-  image: ghcr.io/techarohq/anubis:v1.26.0 # {"$imagepolicy": "flux-system:anubis"}
+  image: ghcr.io/techarohq/anubis:v1.26.2 # {"$imagepolicy": "flux-system:anubis"}
   env:
   - name: ED25519_PRIVATE_KEY_HEX
     valueFrom:
