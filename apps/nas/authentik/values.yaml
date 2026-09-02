@@ -1,3 +1,3 @@
 global:
   image:
-    tag: 2026.8.0 # {"$imagepolicy": "flux-system:authentik:tag"}
+    tag: 2026.8.1 # {"$imagepolicy": "flux-system:authentik:tag"}
