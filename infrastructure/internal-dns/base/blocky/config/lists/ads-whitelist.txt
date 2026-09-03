@@ -17,3 +17,4 @@
 www.googletagmanager.com
 clients1.google.com
 *.claspws.tv
+cdn.cookielaw.org
