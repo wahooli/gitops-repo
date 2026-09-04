@@ -6,7 +6,7 @@ resources:
 - tcproute.yaml
 images:
 - name: rhasspy/wyoming-piper
-  newTag: 2.4.2 # {"$imagepolicy": "flux-system:wyoming-piper:tag"}
+  newTag: 2.4.3 # {"$imagepolicy": "flux-system:wyoming-piper:tag"}
 patches:
 - path: inferenceservice.yaml
   target:
