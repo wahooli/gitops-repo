@@ -9,7 +9,7 @@ spec:
     tag: v1.24.0-victorialogs # {"$imagepolicy": "flux-system:victoria-logs:tag"}
     pullPolicy: IfNotPresent
   retentionPeriod: "100y" # overridden by extraArg retention.maxDiskSpaceUsageBytes
-  retentionMaxDiskSpaceUsageBytes: 14848MiB
+  retentionMaxDiskSpaceUsageBytes: 11264MiB
   logFormat: json
   serviceSpec:
     useAsDefault: true
