@@ -10,7 +10,7 @@ spec:
     - alert: VeleroBackupFailed
       annotations:
         summary: Velero backup {{ $labels.schedule }} failed.
-        description: Velero backup {{ $labels.schedule }} has status {{ $labels.status }}.
+        description: Velero backup schedule {{ $labels.schedule }} recorded a failed backup in the last hour.
       expr: |-
         increase(velero_backup_failure_total[1h]) > 0
       for: 0m
@@ -52,3 +52,35 @@ spec:
       for: 0m
       labels:
         severity: critical
+    # velero_backup_last_successful_timestamp is in-process state: a velero restart drops
+    # the series until the next successful backup, which silently blinds the
+    # VeleroBackupNotRunRecently rules above. The for: durations match each schedule's
+    # interval so a restart followed by a normal successful backup never alerts.
+    - alert: VeleroBackupMetricsMissing
+      annotations:
+        summary: Velero backup success metrics missing for {{ $labels.schedule }}.
+        description: >
+          velero is up but reports no successful backup timestamp for {{ $labels.schedule }}.
+          Velero likely restarted and has not completed a backup since, so backup age
+          alerting is blind until the next successful backup.
+      expr: |-
+        absent(velero_backup_last_successful_timestamp{schedule=~".*daily.*"}) == 1
+        and on() count(up{namespace="velero"} == 1) > 0
+      for: 26h
+      labels:
+        severity: critical
+        schedule: velero-daily
+    - alert: VeleroBackupMetricsMissing
+      annotations:
+        summary: Velero backup success metrics missing for {{ $labels.schedule }}.
+        description: >
+          velero is up but reports no successful backup timestamp for {{ $labels.schedule }}.
+          Velero likely restarted and has not completed a backup since, so backup age
+          alerting is blind until the next successful backup.
+      expr: |-
+        absent(velero_backup_last_successful_timestamp{schedule=~".*weekly.*"}) == 1
+        and on() count(up{namespace="velero"} == 1) > 0
+      for: 8d
+      labels:
+        severity: critical
+        schedule: velero-weekly
