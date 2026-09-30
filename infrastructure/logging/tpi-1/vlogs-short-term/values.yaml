@@ -7,7 +7,7 @@ server:
     enabled: true
   enabled: true
   extraArgs:
-    retention.maxDiskSpaceUsageBytes: 14336MiB
+    retention.maxDiskSpaceUsageBytes: 12288MiB
   image:
     repository: victoriametrics/victoria-logs
     tag: "v1.24.0-victorialogs" # {"$imagepolicy": "flux-system:victoria-logs:tag"}

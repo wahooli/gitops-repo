@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jdownloader-downloads
+  labels:
+    app.kubernetes.io/name: jdownloader
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: ${jdownloader_downloads_host_path}
+    type: DirectoryOrCreate
+  claimRef:
+    namespace: default
+    name: jdownloader-downloads
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jdownloader-downloads
+  namespace: default
+  labels:
+    app.kubernetes.io/name: jdownloader
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ""
+  volumeName: jdownloader-downloads
+  resources:
+    requests:
+      storage: 1Ti

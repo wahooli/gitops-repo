@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: jdownloader
+  namespace: flux-system
+spec:
+  image: docker.io/jlesage/jdownloader-2
+  interval: 24h
