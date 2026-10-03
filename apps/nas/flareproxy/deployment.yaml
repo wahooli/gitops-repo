@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flareproxy
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flareproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: flareproxy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: flareproxy
+    spec:
+      containers:
+      - name: flareproxy
+        image: ghcr.io/wahooli/docker/flareproxy:1.1.0 # {"$imagepolicy": "flux-system:flareproxy:tag"}
+        imagePullPolicy: IfNotPresent
+        env:
+        # FlareProxy forwards proxied requests to the FlareSolverr /v1 API
+        - name: FLARESOLVERR_URL
+          value: http://flaresolverr:8191/v1
+        - name: TZ
+          value: Europe/Helsinki
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          failureThreshold: 3

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaresolverr
+  namespace: default
+  labels:
+    app.kubernetes.io/name: flaresolverr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: flaresolverr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: flaresolverr
+    spec:
+      containers:
+      - name: flaresolverr
+        image: ghcr.io/flaresolverr/flaresolverr:v3.5.2 # {"$imagepolicy": "flux-system:flaresolverr:tag"}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: TZ
+          value: Europe/Helsinki
+        - name: LOG_LEVEL
+          value: info
+        - name: LOG_HTML
+          value: "false"
+        ports:
+        - name: http
+          containerPort: 8191
+          protocol: TCP
+        volumeMounts:
+        - name: dshm
+          mountPath: /dev/shm
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: "2"
+            memory: 2Gi
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+      volumes:
+      # Headless Chrome needs more than the default 64Mi of /dev/shm
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 256Mi
