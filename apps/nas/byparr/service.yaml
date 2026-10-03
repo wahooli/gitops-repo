@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: byparr
+  namespace: default
+  labels:
+    app.kubernetes.io/name: byparr
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8191
+    targetPort: http
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: byparr

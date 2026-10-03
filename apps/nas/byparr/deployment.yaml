@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: byparr
+  namespace: default
+  labels:
+    app.kubernetes.io/name: byparr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: byparr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: byparr
+    spec:
+      containers:
+      - name: byparr
+        image: ghcr.io/wahooli/docker/byparr:3.0.4 # {"$imagepolicy": "flux-system:byparr:tag"}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: TZ
+          value: Europe/Helsinki
+        ports:
+        - name: http
+          containerPort: 8191
+          protocol: TCP
+        volumeMounts:
+        # A stealth browser needs more than the default 64Mi of /dev/shm.
+        - name: dshm
+          mountPath: /dev/shm
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: "2"
+            memory: 2Gi
+        # Browser startup is slow; probe the socket (not /health, which solves).
+        startupProbe:
+          tcpSocket:
+            port: http
+          periodSeconds: 10
+          failureThreshold: 30
+        readinessProbe:
+          tcpSocket:
+            port: http
+          periodSeconds: 15
+          failureThreshold: 4
+        livenessProbe:
+          tcpSocket:
+            port: http
+          periodSeconds: 30
+          failureThreshold: 3
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 512Mi

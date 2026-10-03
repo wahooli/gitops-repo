@@ -1,8 +1,8 @@
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
-  name: vl-downloader
+  name: byparr
   namespace: flux-system
 spec:
-  image: ghcr.io/wahooli/docker/vimm-dl
+  image: ghcr.io/wahooli/docker/byparr
   interval: 24h

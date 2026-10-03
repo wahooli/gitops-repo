@@ -19,36 +19,46 @@ spec:
     spec:
       containers:
       - name: vl-downloader
-        image: docker.io/raiper34/vl-downloader:1.0.0 # {"$imagepolicy": "flux-system:vl-downloader:tag"}
+        image: ghcr.io/wahooli/docker/vimm-dl:1.0.0 # {"$imagepolicy": "flux-system:vl-downloader:tag"}
         imagePullPolicy: IfNotPresent
         env:
         - name: TZ
           value: Europe/Helsinki
+        - name: VIMM_SOLVER_URL
+          value: http://byparr:8191/v1
+        - name: VIMM_OUTPUT
+          value: /downloads
+        - name: VIMM_THROTTLE
+          value: "3"
+        - name: VIMM_LOG_LEVEL
+          value: info
         ports:
         - name: http
           containerPort: 3000
           protocol: TCP
         volumeMounts:
         - name: downloads
-          mountPath: /vl-downloader/backend/downloads
+          mountPath: /downloads
         resources:
+          # Headroom for 7z decompression + checksum hashing of multi-GB ROMs.
           requests:
-            cpu: 100m
-            memory: 256Mi
+            cpu: 250m
+            memory: 512Mi
           limits:
-            cpu: "1"
-            memory: 1Gi
+            cpu: "2"
+            memory: 2Gi
         readinessProbe:
           httpGet:
-            path: /
+            path: /healthz
             port: http
-          initialDelaySeconds: 10
+          initialDelaySeconds: 5
           periodSeconds: 15
           failureThreshold: 6
         livenessProbe:
-          tcpSocket:
+          httpGet:
+            path: /healthz
             port: http
-          initialDelaySeconds: 30
+          initialDelaySeconds: 15
           periodSeconds: 30
           failureThreshold: 3
       volumes:
