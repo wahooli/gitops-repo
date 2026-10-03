@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: vl-downloader
+  namespace: flux-system
+spec:
+  image: docker.io/raiper34/vl-downloader
+  interval: 24h
