@@ -189,6 +189,7 @@ service:
       service.cilium.io/global-sync-endpoint-slices: "true"
 gateway:
   enabled: true
+  progressDeadlineSeconds: 600
 persistence:
   data:
     enabled: true

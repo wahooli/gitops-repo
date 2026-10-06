@@ -14,8 +14,6 @@ data:
           cpu: 10m
           memory: 64Mi
       env:
-      - name: DISABLE_ONLINE_API
-        value: "true"
       - name: CROWDSEC_BYPASS_DB_VOLUME_CHECK
         value: "TRUE"
 

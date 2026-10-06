@@ -9,3 +9,5 @@ patches:
     kind: HelmRelease
   options:
     allowNameChange: true
+components:
+- ../../components/ai-workload

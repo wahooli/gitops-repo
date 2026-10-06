@@ -1,0 +1,71 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vpn-gateway
+  namespace: vpn-gateway
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vpn-gateway
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        homelab.wahoo.li/vpn-client: "true"
+      matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: Exists
+    toPorts:
+    - ports:
+      - port: "4789"
+        protocol: UDP
+  - fromEndpoints:
+    - matchLabels:
+        homelab.wahoo.li/vpn-client: "true"
+      matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: Exists
+    icmps:
+    - fields:
+      - type: EchoRequest
+        family: IPv4
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: envoy-gateway-system
+        gateway.envoyproxy.io/owning-gateway-name: envoy-gw-private
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+  - fromEntities:
+    - host
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        homelab.wahoo.li/vpn-client: "true"
+      matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: Exists
+    toPorts:
+    - ports:
+      - port: "4789"
+        protocol: UDP
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  - toEntities:
+    - world
+    toPorts:
+    - ports:
+      - port: "51820"
+        protocol: UDP

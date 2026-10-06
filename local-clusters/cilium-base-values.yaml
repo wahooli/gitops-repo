@@ -1,3 +1,9 @@
+k8sServiceHost: 127.0.0.1
+k8sServicePort: 6444
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
 cni:
   exclusive: false
 defaultLBServiceIPAM: none

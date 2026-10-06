@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7.0.1
       with:
         ref: ${{ inputs.source_ref || github.ref }}
         path: main
@@ -72,7 +72,7 @@ jobs:
 
     - name: Checkout gh-pages
       id: gh-pages
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7.0.1
       with:
         ref: gh-pages
         path: gh-pages
@@ -110,10 +110,10 @@ jobs:
       uses: mikefarah/yq@master
 
     - name: Setup Helm
-      uses: azure/setup-helm@v4
+      uses: azure/setup-helm@v5.0.1
 
     - name: Setup crane
-      uses: imjasonh/setup-crane@v0.4
+      uses: imjasonh/setup-crane@v0.7
 
     - name: Generate documentation
       id: generate

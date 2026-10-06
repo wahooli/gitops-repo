@@ -8,3 +8,5 @@ patches:
   target:
     kind: InferenceService
     name: speaches
+components:
+- ../../../components/ai-workload

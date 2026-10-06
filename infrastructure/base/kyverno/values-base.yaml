@@ -2,13 +2,6 @@ crds:
   install: true
 admissionController:
   replicas: 1
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 500m
-      memory: 384Mi
   container:
     resources:
       requests:
@@ -41,9 +34,9 @@ reportsController:
     limits:
       cpu: 200m
       memory: 256Mi
-# Start in Audit mode — policies log violations without blocking
-# Switch validationFailureAction to Enforce per-policy as ready
-config:
-  webhooks:
-  - failurePolicy: Ignore
-    timeoutSeconds: 10
+features:
+  # Every Kyverno webhook fails open, so an unavailable admission controller can't
+  # block pod creation on a single-node cluster. Whether a violation blocks is still
+  # set per policy (failureAction / validationActions).
+  forceFailurePolicyIgnore:
+    enabled: true

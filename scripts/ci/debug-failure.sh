@@ -38,7 +38,7 @@ group "Failure Summary: Unhealthy Pods" \
   bash -c "kubectl get pods -A --no-headers 2>/dev/null | awk '${unhealthy_pod_filter}' || echo 'All pods healthy'"
 
 group "Failure Summary: Recent Warning Events (last 30)" \
-  bash -c 'kubectl events -A --types=Warning --sort-by=lastTimestamp 2>/dev/null | tail -n 30'
+  bash -c 'kubectl events -A --types=Warning 2>/dev/null | tail -n 30'
 
 # ── 2. Unhealthy Pod Details ────────────────────────────────────────
 

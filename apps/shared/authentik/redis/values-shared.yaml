@@ -132,6 +132,7 @@ ciliumNetworkPolicies:
 
 haproxy:
   enabled: true
+  progressDeadlineSeconds: 600
   image:
     repository: ghcr.io/wahooli/docker/haproxy-redis
     tag: "3.2"

@@ -40,3 +40,5 @@ persistence:
       configMap:
         defaultMode: 0644
         name: bind9-zones
+
+progressDeadlineSeconds: 600

@@ -16,3 +16,5 @@ patches:
   target:
     kind: InferenceService
     name: wyoming-whisper
+components:
+- ../../../components/ai-workload

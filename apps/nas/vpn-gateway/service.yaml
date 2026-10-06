@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vpn-gateway
+  namespace: vpn-gateway
+  labels:
+    app.kubernetes.io/name: vpn-gateway
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/name: vpn-gateway
+  ports:
+  - name: vxlan
+    port: 4789
+    protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vpn-gateway-ui
+  namespace: vpn-gateway
+  labels:
+    app.kubernetes.io/name: vpn-gateway
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: vpn-gateway
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP

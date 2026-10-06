@@ -49,14 +49,14 @@ jobs:
       if: github.event_name != 'workflow_dispatch'
       uses: fluxcd/flux2/action@main
     - name: Checkout
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@v7.0.1
     - name: 🚀 Run yamllint
       run: |
         yamllint -s -c .yamllint .
     - name: Get changed directories
       id: changed-directories
       if: github.event_name != 'workflow_dispatch'
-      uses: tj-actions/changed-files@v46.0.5
+      uses: tj-actions/changed-files@v47.0.6
       with:
         dir_names_exclude_current_dir: true
         files: |
@@ -90,9 +90,9 @@ jobs:
     if: ${{ needs.lint.outputs.matrix != '[]' && needs.lint.outputs.matrix != '' }}
     steps:
     - name: Get more disk space
-      uses: jlumbroso/free-disk-space@v1.3.1
+      uses: jlumbroso/free-disk-space@v2.0.0
       with:
-        tool-cache: false
+        preinstalled-runtimes: false
         android: true
         dotnet: true
         haskell: true
@@ -100,7 +100,7 @@ jobs:
         swap-storage: false
         docker-images: false
     - name: Checkout
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@v7.0.1
       with:
         sparse-checkout: |
           scripts/ci/
@@ -142,6 +142,7 @@ jobs:
       env:
         K3D_SERVERS: "1"
         K3D_AGENTS: "0"
+        MINIMAL_REQUESTS: "true"
       run: scripts/create-cluster.sh ${{ matrix.test.tenant }}
     - name: Patch manifests for CI
       if: steps.create-cluster.outcome == 'success'
@@ -175,5 +176,6 @@ jobs:
       if: failure() && steps.create-cluster.outcome == 'success'
       env:
         DEBUG_LOGS: "true"
+        DEBUG_NODES: "true"
         HELM_RELEASES: "${{ steps.helmrelease-verify.outputs.failing_helmrelease || join(matrix.test.helmreleases, ',') }}"
       run: scripts/ci/debug-failure.sh

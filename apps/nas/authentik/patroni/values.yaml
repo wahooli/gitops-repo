@@ -1,2 +1,7 @@
 ordinals:
   start: 1
+
+haproxy:
+  progressDeadlineSeconds: 600
+
+progressDeadlineSeconds: 600

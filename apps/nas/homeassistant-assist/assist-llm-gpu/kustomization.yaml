@@ -13,3 +13,5 @@ patches:
     kind: InferenceService
   options:
     allowNameChange: true
+components:
+- ../../../components/ai-workload

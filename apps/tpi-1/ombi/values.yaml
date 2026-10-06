@@ -1,5 +1,7 @@
 image:
   tag: "4.53.10" # {"$imagepolicy": "flux-system:ombi:tag"}
+
+progressDeadlineSeconds: 600
 initContainers:
   copy-configuration:
     image: ghcr.io/wahooli/docker/envsubst:latest

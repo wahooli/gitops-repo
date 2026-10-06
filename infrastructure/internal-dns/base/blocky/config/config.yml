@@ -104,14 +104,9 @@ blocking:
       *.${purola_cidr_reverse}
     ads:
     - /app/manual-blocklist.txt
-    - https://raw.githubusercontent.com/AlexRabbit/ADios/master/PIHOLE/hosts
     - https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
-    - https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
-    - https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
+    - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt
     - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-    - http://sysctl.org/cameleon/hosts
-    - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
-    - https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Extension/GoodbyeAds-YouTube-AdBlock.txt
   # definition of whitelist groups. Attention: if the same group has black and whitelists, whitelists will be used to disable particular blacklist entries. If a group has only whitelist entries -> this means only domains from this list are allowed, all other domains will be blocked
   allowlists:
     homeassistant:
@@ -185,7 +180,7 @@ blocking:
     # Number of errors allowed in a list before it is considered invalid.
     # A value of -1 disables the limit.
     # default: 5
-    maxErrorsPerSource: 15
+    maxErrorsPerSource: -1
 
 # optional: configuration for caching of DNS responses
 caching:

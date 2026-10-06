@@ -16,6 +16,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: vl-downloader
+        homelab.wahoo.li/vpn-client: "true"
     spec:
       containers:
       - name: vl-downloader

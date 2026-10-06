@@ -327,6 +327,7 @@ ciliumNetworkPolicies:
           protocol: TCP
 
 haproxy:
+  progressDeadlineSeconds: 600
   enabled: true
   ciliumNetworkPolicies:
     main:
@@ -426,3 +427,5 @@ persistence:
         name: etcd-client
         optional: false
         defaultMode: 0400
+
+progressDeadlineSeconds: 600

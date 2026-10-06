@@ -1,0 +1,11 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: vpn-client-kill-switch
+spec:
+  endpointSelector:
+    matchLabels:
+      homelab.wahoo.li/vpn-client: "true"
+  egress:
+  - toEntities:
+    - cluster

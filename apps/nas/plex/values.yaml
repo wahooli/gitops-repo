@@ -1,5 +1,7 @@
 image:
   tag: "1.43.3" # {"$imagepolicy": "flux-system:plex:tag"}
+
+progressDeadlineSeconds: 600
 hostname: nasse
 runtimeClassName: nvidia
 strategy:

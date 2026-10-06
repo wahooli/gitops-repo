@@ -1,5 +1,7 @@
 image:
   tag: "2.5.2" # {"$imagepolicy": "flux-system:prowlarr:tag"}
+
+progressDeadlineSeconds: 600
 podAnnotations:
   backup.velero.io/backup-volumes: config
   vector.dev/exclude-containers: "prowlarr-exporter"

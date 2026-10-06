@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bind9-helmrelease-overrides
+  namespace: flux-system
+data:
+  values.yaml: |
+    image:
+      repository: ubuntu/bind9
+      tag: "9.20-24.10_edge"
