@@ -1,7 +1,7 @@
 ---
-title: "kserve"
+title: "vpn-client"
 parent: "Infrastructure / Platform"
-grand_parent: "tpi-1"
+grand_parent: "nas"
 ---
 
 
