@@ -13,3 +13,5 @@ patches:
   target:
     kind: InferenceService
     name: kokoro-tts
+components:
+- ../../../components/ai-workload

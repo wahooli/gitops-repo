@@ -1,5 +1,5 @@
 - name: nfs-share
-  image: nimbix/unfs3:20190318-1
+  image: ghcr.io/wahooli/docker/unfs3:0.10.0
   args: -it
   networkAliases:
   - nfs_share

@@ -16,3 +16,5 @@ patches:
   target:
     kind: InferenceService
     name: wyoming-piper
+components:
+- ../../../components/ai-workload

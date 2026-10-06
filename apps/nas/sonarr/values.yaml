@@ -1,5 +1,7 @@
 image:
   tag: "4.0.19" # {"$imagepolicy": "flux-system:sonarr:tag"}
+
+progressDeadlineSeconds: 600
 podAnnotations:
   backup.velero.io/backup-volumes: config
   vector.dev/exclude-containers: "sonarr-exporter"

@@ -5,6 +5,8 @@ image:
 env:
   TZ: Europe/Helsinki
 
+progressDeadlineSeconds: 600
+
 dnsConfig:
   options:
   - name: ndots

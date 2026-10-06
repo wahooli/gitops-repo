@@ -78,3 +78,5 @@ persistence:
 ingress:
   main:
     enabled: false
+
+progressDeadlineSeconds: 600

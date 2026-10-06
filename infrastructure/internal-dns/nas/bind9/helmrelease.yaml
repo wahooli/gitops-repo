@@ -17,6 +17,10 @@ spec:
   - kind: ConfigMap
     name: bind9-values
     valuesKey: values.yaml
+  - kind: ConfigMap
+    name: bind9-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml
   values:
     persistence:
       config:

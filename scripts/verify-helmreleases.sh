@@ -13,6 +13,8 @@ HELM_RELEASES="${HELM_RELEASES:-${2:-}}"
 HELMRELEASE_NAMESPACE="${HELMRELEASE_NAMESPACE:-flux-system}"
 HELMRELEASE_TIMEOUT="${HELMRELEASE_TIMEOUT:-4m}"
 RECONCILE_READY="${RECONCILE_READY:-true}"
+HELMRELEASE_MAX_FAILURES="${HELMRELEASE_MAX_FAILURES:-3}"
+FAIL_FAST_ERRORS='failed to create typed patch object|field not declared in schema|duplicate entries for key|execution error at|parse error|unable to build kubernetes objects|no matches for kind|no chart version found|invalid chart|chart pull error:.*: not found'
 
 # Optional context override (Makefile sets CONTEXT=k3d-<cluster>; CI uses default)
 CONTEXT_ARGS=()
@@ -84,19 +86,23 @@ fi
 declare -A hr_deps=() hr_source=() hr_ready=()
 all_hr_names=()
 
+if ! hr_list_json=$(kubectl "${CONTEXT_ARGS[@]}" get helmreleases.helm.toolkit.fluxcd.io -n "$HELMRELEASE_NAMESPACE" -o json); then
+  echo "Error: could not list HelmReleases in namespace $HELMRELEASE_NAMESPACE" >&2
+  exit 1
+fi
+
 while IFS='|' read -r name deps source ready; do
   [[ -z "$name" ]] && continue
   all_hr_names+=("$name")
   hr_deps[$name]="$deps"
   hr_source[$name]="$source"
   hr_ready[$name]="$ready"
-done < <(kubectl "${CONTEXT_ARGS[@]}" get helmrelease -n "$HELMRELEASE_NAMESPACE" -o json 2>/dev/null \
-  | jq -r '.items[] | [
+done < <(jq -r '.items[] | [
       .metadata.name,
       ([.spec.dependsOn[]?.name] | join(" ")),
       (.spec.chart.spec.sourceRef.name // ""),
       ((.status.conditions // []) | map(select(.type == "Ready")) | .[0].status // "Unknown")
-    ] | join("|")')
+    ] | join("|")' <<< "$hr_list_json")
 
 # --- Build processing set: targets + transitive unready deps ---
 declare -A to_process=()
@@ -157,69 +163,115 @@ if [[ $process_count -eq 0 ]]; then
 fi
 
 # --- Per-HelmRelease reconciliation (runs in subshell for parallel waves) ---
+
+duration_seconds() {
+  local d="$1" total=0 n unit
+  while [[ "$d" =~ ^([0-9]+)([hms])(.*)$ ]]; do
+    n="${BASH_REMATCH[1]}" unit="${BASH_REMATCH[2]}" d="${BASH_REMATCH[3]}"
+    case "$unit" in h) total=$((total + n * 3600)) ;; m) total=$((total + n * 60)) ;; s) total=$((total + n)) ;; esac
+  done
+  [[ -z "$d" ]] || { echo "Invalid duration: $1" >&2; return 1; }
+  echo "$total"
+}
+
+ready_status() {
+  kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" get "$1" "$2" -o json 2>/dev/null \
+    | jq -r 'if .kind == "HelmRepository" and .spec.type == "oci" then "True"
+             else (((.status.conditions // []) | map(select(.type == "Ready")) | .[0].status) // "Unknown") end' \
+    || echo "Unknown"
+}
+
+wait_helmrelease() {
+  local hr="$1" token="$2" budget="$3"
+  local deadline=$((SECONDS + budget)) start_failures="" sep=$'\x1f'
+  local handled gen observed ready reason stalled failures message
+  while true; do
+    if IFS="$sep" read -r handled gen observed ready reason stalled failures message < <(
+      kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" get helmreleases.helm.toolkit.fluxcd.io "$hr" -o json 2>/dev/null | jq -r --arg sep "$sep" '
+        def cond(t): (.status.conditions // []) | map(select(.type == t)) | .[0];
+        [ (.status.lastHandledReconcileAt // ""), (.metadata.generation | tostring),
+          ((.status.observedGeneration // -1) | tostring), (cond("Ready").status // "Unknown"),
+          (cond("Ready").reason // ""), (cond("Stalled").status // "False"),
+          (((.status.installFailures // 0) + (.status.upgradeFailures // 0)) | tostring),
+          ((cond("Ready").message // "") | gsub("[\n\t]"; " ")) ] | join($sep)'); then
+      [[ -z "$start_failures" ]] && start_failures="$failures"
+      if [[ ( -z "$token" || "$handled" == "$token" ) && "$ready" == "True" && "$observed" == "$gen" ]]; then
+        return 0
+      fi
+      if [[ "$stalled" == "True" ]]; then
+        echo "  $hr: stalled ($reason): $message" >&2
+        return 1
+      fi
+      if [[ "$ready" == "False" ]] && grep -qE "$FAIL_FAST_ERRORS" <<< "$message"; then
+        echo "  $hr: failed with an error retrying won't fix ($reason): $message" >&2
+        return 1
+      fi
+      if (( failures - start_failures >= HELMRELEASE_MAX_FAILURES )); then
+        echo "  $hr: failed $((failures - start_failures)) times since verification started ($reason): $message" >&2
+        return 1
+      fi
+    fi
+    if (( SECONDS >= deadline )); then
+      echo "  $hr: not ready after ${budget}s (${reason:-no status}): ${message:-}" >&2
+      return 1
+    fi
+    sleep 5
+  done
+}
+
 reconcile_helmrelease() {
   local hr="$1"
+  local budget
+  budget=$(( $(duration_seconds "$HELMRELEASE_TIMEOUT") * 2 ))
 
   # Resume if suspended
-  flux resume helmrelease "$hr" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true
+  if [[ "$(kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" get helmreleases.helm.toolkit.fluxcd.io "$hr" \
+      -o jsonpath='{.spec.suspend}' 2>/dev/null)" == "true" ]]; then
+    echo "  Resuming $hr"
+    kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" patch helmreleases.helm.toolkit.fluxcd.io "$hr" \
+      --type=merge -p '{"spec":{"suspend":false}}' >/dev/null
+  fi
 
   # Reconcile source if not ready
   local source="${hr_source[$hr]}"
-  if [[ -n "$source" && "$source" != "null" ]]; then
-    local source_ready
-    source_ready=$(flux get source helm "$source" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null | awk '{print tolower($4)}')
-    if [[ "$source_ready" != "true" ]]; then
-      echo "  Reconciling source: $source"
-      flux reconcile source helm "$source" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true
-    fi
+  if [[ -n "$source" && "$source" != "null" && "$(ready_status helmrepositories.source.toolkit.fluxcd.io "$source")" != "True" ]]; then
+    echo "  Reconciling source: $source"
+    kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" annotate --overwrite helmrepositories.source.toolkit.fluxcd.io "$source" \
+      "reconcile.fluxcd.io/requestedAt=$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)" >/dev/null 2>&1 || true
   fi
 
   # Reconcile chart if not ready
   local chart_name="${HELMRELEASE_NAMESPACE}-${hr}"
-  local chart_ready
-  chart_ready=$(flux get source chart "$chart_name" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null | awk '{print tolower($4)}')
-  if [[ "$chart_ready" != "true" ]]; then
+  if [[ "$(ready_status helmcharts.source.toolkit.fluxcd.io "$chart_name")" != "True" ]]; then
     echo "  Reconciling chart: $chart_name"
-    flux reconcile source chart "$chart_name" -n "$HELMRELEASE_NAMESPACE" "${CONTEXT_ARGS[@]}" 2>/dev/null || true
+    kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" annotate --overwrite helmcharts.source.toolkit.fluxcd.io "$chart_name" \
+      "reconcile.fluxcd.io/requestedAt=$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)" >/dev/null 2>&1 || true
   fi
 
   # Check current ready status
-  local ready_status
-  ready_status=$(flux get helmrelease "$hr" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null \
-    | awk '{print tolower($4)}')
+  local status
+  status=$(ready_status helmreleases.helm.toolkit.fluxcd.io "$hr")
 
-  if [[ "$ready_status" == "true" && "$RECONCILE_READY" != "true" ]]; then
+  if [[ "$status" == "True" && "$RECONCILE_READY" != "true" ]]; then
     echo "  $hr: already ready"
-  elif [[ "$ready_status" == "unknown" ]]; then
+    return 0
+  fi
+
+  local token=""
+  if [[ "$status" == "Unknown" ]]; then
     echo "  $hr: status unknown, waiting..."
-    kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" \
-      wait helmrelease/"$hr" \
-      --for=condition=ready \
-      --timeout="${HELMRELEASE_TIMEOUT}" || return 1
-    echo "  $hr: OK"
   else
     echo "  Reconciling $hr..."
-    if ! flux reconcile helmrelease "$hr" \
-      -n "$HELMRELEASE_NAMESPACE" \
-      --timeout="${HELMRELEASE_TIMEOUT}" \
-      "${CONTEXT_ARGS[@]}"; then
-      # Reconcile command failed — check if the release is actually ready
-      local post_ready
-      post_ready=$(flux get helmrelease "$hr" -n "$HELMRELEASE_NAMESPACE" --no-header "${CONTEXT_ARGS[@]}" 2>/dev/null \
-        | awk '{print tolower($4)}')
-      if [[ "$post_ready" != "true" ]]; then
-        echo "  Failed reconciling helmrelease: $hr" >&2
-        return 1
-      fi
-      echo "  $hr: reconcile command failed but release is ready"
-    fi
-
-    kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" \
-      wait helmrelease/"$hr" \
-      --for=condition=ready \
-      --timeout="${HELMRELEASE_TIMEOUT}" || return 1
-    echo "  $hr: OK"
+    token="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
+    kubectl "${CONTEXT_ARGS[@]}" -n "$HELMRELEASE_NAMESPACE" annotate --overwrite \
+      helmreleases.helm.toolkit.fluxcd.io/"$hr" "reconcile.fluxcd.io/requestedAt=$token" >/dev/null
   fi
+
+  if ! wait_helmrelease "$hr" "$token" "$budget"; then
+    echo "  Failed reconciling helmrelease: $hr" >&2
+    return 1
+  fi
+  echo "  $hr: OK"
 }
 
 # --- Process in dependency waves ---
@@ -267,7 +319,7 @@ while [[ $processed -lt $process_count ]]; do
   else
     # Parallel reconciliation with captured output
     tmpdir=$(mktemp -d)
-    wave_pids=()
+    declare -A wave_pid_hr=()
 
     for hr in "${wave[@]}"; do
       (
@@ -275,16 +327,27 @@ while [[ $processed -lt $process_count ]]; do
         reconcile_helmrelease "$hr"
         group_end
       ) > "$tmpdir/$hr.log" 2>&1 &
-      wave_pids+=($!)
+      wave_pid_hr[$!]="$hr"
     done
 
     # Wait for all and collect results
     wave_failed=""
-    for i in "${!wave_pids[@]}"; do
-      if ! wait "${wave_pids[$i]}"; then
-        [[ -z "$wave_failed" ]] && wave_failed="${wave[$i]}"
+    while [[ ${#wave_pid_hr[@]} -gt 0 ]]; do
+      done_pid=""
+      if wait -n -p done_pid "${!wave_pid_hr[@]}"; then rc=0; else rc=$?; fi
+      [[ -z "$done_pid" ]] && break
+      if [[ $rc -ne 0 && -z "$wave_failed" ]]; then
+        wave_failed="${wave_pid_hr[$done_pid]}"
+        for pid in "${!wave_pid_hr[@]}"; do
+          if [[ "$pid" != "$done_pid" ]]; then
+            kill "$pid" 2>/dev/null || true
+            echo "  ${wave_pid_hr[$pid]}: aborted, $wave_failed failed" >> "$tmpdir/${wave_pid_hr[$pid]}.log"
+          fi
+        done
       fi
+      unset "wave_pid_hr[$done_pid]"
     done
+    unset wave_pid_hr
 
     # Print captured output sequentially
     for hr in "${wave[@]}"; do

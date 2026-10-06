@@ -174,3 +174,5 @@ service:
       port: 9154
       protocol: TCP
       serviceOnly: true
+
+progressDeadlineSeconds: 600

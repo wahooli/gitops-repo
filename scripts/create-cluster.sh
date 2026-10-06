@@ -6,7 +6,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-CILIUM_VERSION="1.19.1"
+CILIUM_VERSION="1.19.8"
 REGISTRY_NAME="reg-docker"
 REGISTRY_PORT=5000
 USE_DEFAULT_REGISTRY=0
@@ -18,6 +18,8 @@ IN_DEVCONTAINER="${IN_DEVCONTAINER:-false}"
 # Optional overrides for k3d node counts (useful for CI with limited resources)
 K3D_SERVERS="${K3D_SERVERS:-}"
 K3D_AGENTS="${K3D_AGENTS:-}"
+FLUX_HELM_CONCURRENT="${FLUX_HELM_CONCURRENT:-8}"
+FLUX_REQUEUE_DEPENDENCY="${FLUX_REQUEUE_DEPENDENCY:-5s}"
 
 # --- Argument parsing & validation ---
 CLUSTER_NAME="${1:-}"
@@ -235,6 +237,11 @@ for node in $NODES; do
   '
 done
 
+echo "Enabling route_localnet in k3d containers"
+for node in $NODES; do
+  docker exec "$node" sh -c 'echo 1 > /proc/sys/net/ipv4/conf/all/route_localnet'
+done
+
 # Ensure /etc/machine-id, /run/log/journal and /run/topolvm exist in all nodes
 echo "Ensuring /etc/machine-id, /run/log/journal and /run/topolvm exist in k3d containers"
 for node in $NODES; do
@@ -308,7 +315,13 @@ cilium "${CILIUM_ARGS[@]}"
 
 echo "Cilium installed successfully in $CLUSTER_NAME"
 
-kubectl --context "$CONTEXT_NAME" create -f "$REPO_ROOT/clusters/$CLUSTER_NAME/flux-system/gotk-components.yaml"
+echo "Installing FluxCD (helm-controller concurrent=$FLUX_HELM_CONCURRENT, requeue-dependency=$FLUX_REQUEUE_DEPENDENCY)"
+yq "
+  (select(.kind == \"Deployment\" and .metadata.name == \"helm-controller\") | .spec.template.spec.containers[0].args) +=
+    [\"--concurrent=$FLUX_HELM_CONCURRENT\", \"--requeue-dependency=$FLUX_REQUEUE_DEPENDENCY\"] |
+  (select(.kind == \"Deployment\" and .metadata.name == \"kustomize-controller\") | .spec.template.spec.containers[0].args) +=
+    [\"--requeue-dependency=$FLUX_REQUEUE_DEPENDENCY\"]
+" "$REPO_ROOT/clusters/$CLUSTER_NAME/flux-system/gotk-components.yaml" | kubectl --context "$CONTEXT_NAME" create -f -
 
 echo "FluxCD installed successfully in $CLUSTER_NAME"
 

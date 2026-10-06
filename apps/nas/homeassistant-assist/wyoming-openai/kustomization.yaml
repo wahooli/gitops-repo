@@ -4,3 +4,5 @@ resources:
 - ../../../base/wyoming-openai
 - tcproute-tts.yaml
 - tcproute-stt.yaml
+components:
+- ../../../components/ai-workload

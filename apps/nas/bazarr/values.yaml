@@ -1,5 +1,7 @@
 image:
   tag: "1.6.0" # {"$imagepolicy": "flux-system:bazarr:tag"}
+
+progressDeadlineSeconds: 600
 podAnnotations:
   backup.velero.io/backup-volumes: config
   vector.dev/exclude-containers: "bazarr-exporter"

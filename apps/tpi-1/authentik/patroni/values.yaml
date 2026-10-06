@@ -5,3 +5,8 @@ patroni:
   config:
     tags:
       preferred_leader: true
+
+haproxy:
+  progressDeadlineSeconds: 600
+
+progressDeadlineSeconds: 600

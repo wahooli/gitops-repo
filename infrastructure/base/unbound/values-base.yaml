@@ -8,6 +8,8 @@ image:
 
 hostname: unbound
 
+progressDeadlineSeconds: 600
+
 resources:
   limits:
     memory: 640Mi

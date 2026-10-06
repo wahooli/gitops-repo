@@ -3,12 +3,6 @@ kind: Kustomization
 resources:
 - ../../../base/kserve
 patches:
-- path: helmrelease-crd.yaml
-  target:
-    kind: HelmRelease
-    name: base-kserve-crd
-  options:
-    allowNameChange: true
 - path: helmrelease.yaml
   target:
     kind: HelmRelease

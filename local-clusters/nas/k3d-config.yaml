@@ -37,6 +37,8 @@ options:
       nodeFilters: [server:*]
     - arg: "--flannel-backend=none"
       nodeFilters: [server:*]
+    - arg: "--disable-kube-proxy"
+      nodeFilters: [server:*]
     - arg: "--cluster-cidr=10.12.0.0/16"
       nodeFilters: [server:*]
     - arg: "--service-cidr=10.22.0.0/16"
