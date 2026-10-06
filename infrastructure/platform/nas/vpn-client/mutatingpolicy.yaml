@@ -1,0 +1,91 @@
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: vpn-gateway-client
+spec:
+  failurePolicy: Ignore
+  autogen:
+    podControllers:
+      controllers: []
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE"]
+      resources: ["pods"]
+    objectSelector:
+      matchLabels:
+        homelab.wahoo.li/vpn-client: "true"
+  matchConditions:
+  - name: not-injected-yet
+    expression: >-
+      !has(object.spec.initContainers) ||
+      !object.spec.initContainers.exists(c, c.name == 'gateway-init')
+  variables:
+  - name: image
+    expression: "'ghcr.io/angelnu/pod-gateway:v1.13.0'"
+  - name: dnsServer
+    expression: "'172.16.0.1'"
+  - name: securityContext
+    expression: >-
+      Object.spec.initContainers.securityContext{
+        runAsUser: 0,
+        runAsNonRoot: false,
+        capabilities: Object.spec.initContainers.securityContext.capabilities{
+          add: ["NET_ADMIN", "NET_RAW"]
+        }
+      }
+  - name: volumeMounts
+    expression: >-
+      [Object.spec.initContainers.volumeMounts{
+        name: "vpn-gateway-client",
+        mountPath: "/config",
+        readOnly: true
+      }]
+  mutations:
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: >-
+        (has(object.spec.initContainers) ? [] :
+          [JSONPatch{op: "add", path: "/spec/initContainers", value: []}]) +
+        (has(object.spec.volumes) ? [] :
+          [JSONPatch{op: "add", path: "/spec/volumes", value: []}]) +
+        [
+          JSONPatch{op: "add", path: "/spec/initContainers/0",
+            value: Object.spec.initContainers{
+              name: "gateway-init",
+              image: variables.image,
+              command: ["/bin/client_init.sh"],
+              securityContext: variables.securityContext,
+              volumeMounts: variables.volumeMounts
+            }},
+          JSONPatch{op: "add", path: "/spec/initContainers/1",
+            value: Object.spec.initContainers{
+              name: "gateway-sidecar",
+              image: variables.image,
+              command: ["/bin/client_sidecar.sh"],
+              restartPolicy: "Always",
+              securityContext: variables.securityContext,
+              volumeMounts: variables.volumeMounts
+            }},
+          JSONPatch{op: "add", path: "/spec/volumes/-",
+            value: Object.spec.volumes{
+              name: "vpn-gateway-client",
+              configMap: Object.spec.volumes.configMap{
+                name: "vpn-gateway-client",
+                defaultMode: 292
+              }
+            }},
+          JSONPatch{op: "add", path: "/spec/dnsPolicy", value: "None"},
+          JSONPatch{op: "add", path: "/spec/dnsConfig",
+            value: Object.spec.dnsConfig{
+              nameservers: [variables.dnsServer],
+              searches: [
+                request.namespace + ".svc.cluster.local",
+                "svc.cluster.local",
+                "cluster.local"
+              ],
+              options: has(object.spec.dnsConfig) && has(object.spec.dnsConfig.options) ?
+                object.spec.dnsConfig.options : []
+            }}
+        ]

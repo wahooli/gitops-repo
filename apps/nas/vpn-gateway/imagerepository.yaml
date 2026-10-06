@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: vpn-gateway
+  namespace: flux-system
+spec:
+  image: ghcr.io/wahooli/docker/vpn-gateway
+  interval: 24h

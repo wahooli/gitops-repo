@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: byparr
+        homelab.wahoo.li/vpn-client: "true"
     spec:
       containers:
       - name: byparr

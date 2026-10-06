@@ -12,6 +12,14 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./infrastructure/platform/nas
+  healthChecks:
+  - apiVersion: policies.kyverno.io/v1
+    kind: MutatingPolicy
+    name: vpn-gateway-client
+  healthCheckExprs:
+  - apiVersion: policies.kyverno.io/v1
+    kind: MutatingPolicy
+    current: has(status.conditionStatus) && status.conditionStatus.ready == true
   postBuild:
     substituteFrom:
     - kind: Secret

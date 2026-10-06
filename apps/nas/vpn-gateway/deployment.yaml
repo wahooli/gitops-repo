@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpn-gateway
+  namespace: vpn-gateway
+  labels:
+    app.kubernetes.io/name: vpn-gateway
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vpn-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vpn-gateway
+      annotations:
+        backup.velero.io/backup-volumes: state
+    spec:
+      containers:
+      - name: gluetun
+        image: qmcgaw/gluetun:latest@sha256:2733bb22b27e3efa7a9f2cef9057ec12791b8b225793fcd3dbfd0508404dfc25
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "(ip rule del table 51820; ip -6 rule del table 51820) || true"]
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        env:
+        - name: GLUETUN_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vpn-gateway-credentials
+              key: api-key
+        - name: WIREGUARD_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vpn-gateway-credentials
+              key: wireguard-private-key
+        - name: VPN_SERVICE_PROVIDER
+          value: protonvpn
+        - name: VPN_TYPE
+          value: wireguard
+        - name: WIREGUARD_IMPLEMENTATION
+          value: kernelspace
+        - name: WIREGUARD_ADDRESSES
+          value: 10.2.0.2/32
+        - name: SERVER_COUNTRIES
+          value: Finland
+        - name: VPN_PORT_FORWARDING
+          value: "on"
+        - name: FIREWALL_OUTBOUND_SUBNETS
+          value: ${vpn_gateway_cluster_cidrs:=10.12.0.0/15}
+        - name: HTTP_CONTROL_SERVER_ADDRESS
+          value: 127.0.0.1:8000
+        - name: HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE
+          value: '{"auth":"apikey","apikey":"$(GLUETUN_API_KEY)"}'
+        - name: UPDATER_PREFER_DIRECT_DOWNLOAD
+          value: "yes"
+        - name: UPDATER_PERIOD
+          value: 24h
+        - name: TZ
+          value: Europe/Helsinki
+        resources:
+          requests:
+            cpu: 20m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        volumeMounts:
+        - name: gluetun
+          mountPath: /gluetun
+      - name: gateway
+        image: ghcr.io/wahooli/docker/vpn-gateway:0.1.0 # {"$imagepolicy": "flux-system:vpn-gateway:tag"}
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+        env:
+        - name: GLUETUN_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vpn-gateway-credentials
+              key: api-key
+        - name: VPN_SERVICE_PROVIDER
+          value: protonvpn
+        - name: DISCONNECTED_TRAFFIC
+          value: block
+        - name: DIRECT_DNS_SERVER
+          value: ${cluster_dns_ip}
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http
+          periodSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        volumeMounts:
+        - name: gluetun
+          mountPath: /gluetun
+          readOnly: true
+        - name: state
+          mountPath: /data
+      volumes:
+      - name: gluetun
+        emptyDir: {}
+      - name: state
+        persistentVolumeClaim:
+          claimName: vpn-gateway-state
