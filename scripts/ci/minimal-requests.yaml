@@ -16,17 +16,13 @@ spec:
     jsonPatch:
       expression: >-
         object.spec.containers.filter(c, has(c.resources) && has(c.resources.requests) && "cpu" in c.resources.requests).map(c,
-          JSONPatch{op: "replace", path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/resources/requests/cpu", value: "1m"}) +
-        object.spec.containers.filter(c, has(c.resources) && has(c.resources.requests) && "memory" in c.resources.requests).map(c,
-          JSONPatch{op: "replace", path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/resources/requests/memory", value: "1Mi"})
+          JSONPatch{op: "replace", path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/resources/requests/cpu", value: "1m"})
   - patchType: JSONPatch
     jsonPatch:
       expression: >-
         has(object.spec.initContainers) ?
           object.spec.initContainers.filter(c, has(c.resources) && has(c.resources.requests) && "cpu" in c.resources.requests).map(c,
-            JSONPatch{op: "replace", path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/resources/requests/cpu", value: "1m"}) +
-          object.spec.initContainers.filter(c, has(c.resources) && has(c.resources.requests) && "memory" in c.resources.requests).map(c,
-            JSONPatch{op: "replace", path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/resources/requests/memory", value: "1Mi"})
+            JSONPatch{op: "replace", path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/resources/requests/cpu", value: "1m"})
         : []
 ---
 apiVersion: admissionregistration.k8s.io/v1

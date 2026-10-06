@@ -176,5 +176,6 @@ jobs:
       if: failure() && steps.create-cluster.outcome == 'success'
       env:
         DEBUG_LOGS: "true"
+        DEBUG_NODES: "true"
         HELM_RELEASES: "${{ steps.helmrelease-verify.outputs.failing_helmrelease || join(matrix.test.helmreleases, ',') }}"
       run: scripts/ci/debug-failure.sh
