@@ -324,8 +324,11 @@ while [[ $processed -lt $process_count ]]; do
     for hr in "${wave[@]}"; do
       (
         group_start "HelmRelease $hr"
-        reconcile_helmrelease "$hr"
+        rc=0
+        reconcile_helmrelease "$hr" || rc=$?
         group_end
+        echo "$rc" > "$tmpdir/$hr.rc"
+        exit "$rc"
       ) > "$tmpdir/$hr.log" 2>&1 &
       wave_pid_hr[$!]="$hr"
     done
@@ -333,20 +336,24 @@ while [[ $processed -lt $process_count ]]; do
     # Wait for all and collect results
     wave_failed=""
     while [[ ${#wave_pid_hr[@]} -gt 0 ]]; do
-      done_pid=""
-      if wait -n -p done_pid "${!wave_pid_hr[@]}"; then rc=0; else rc=$?; fi
-      [[ -z "$done_pid" ]] && break
-      if [[ $rc -ne 0 && -z "$wave_failed" ]]; then
-        wave_failed="${wave_pid_hr[$done_pid]}"
-        for pid in "${!wave_pid_hr[@]}"; do
-          if [[ "$pid" != "$done_pid" ]]; then
-            kill "$pid" 2>/dev/null || true
-            echo "  ${wave_pid_hr[$pid]}: aborted, $wave_failed failed" >> "$tmpdir/${wave_pid_hr[$pid]}.log"
-          fi
-        done
-      fi
-      unset "wave_pid_hr[$done_pid]"
+      for pid in "${!wave_pid_hr[@]}"; do
+        [[ -v "wave_pid_hr[$pid]" ]] || continue
+        kill -0 "$pid" 2>/dev/null && continue
+        hr="${wave_pid_hr[$pid]}"
+        unset "wave_pid_hr[$pid]"
+        rc=$(cat "$tmpdir/$hr.rc" 2>/dev/null || echo 1)
+        if [[ "$rc" != 0 && -z "$wave_failed" ]]; then
+          wave_failed="$hr"
+          for other in "${!wave_pid_hr[@]}"; do
+            [[ -f "$tmpdir/${wave_pid_hr[$other]}.rc" ]] && continue
+            kill "$other" 2>/dev/null || true
+            echo "  ${wave_pid_hr[$other]}: aborted, $wave_failed failed" >> "$tmpdir/${wave_pid_hr[$other]}.log"
+          done
+        fi
+      done
+      [[ ${#wave_pid_hr[@]} -gt 0 ]] && sleep 1
     done
+    wait || true
     unset wave_pid_hr
 
     # Print captured output sequentially
