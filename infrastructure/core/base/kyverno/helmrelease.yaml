@@ -1,0 +1,20 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kyverno--kyverno
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: kyverno
+  chart:
+    spec:
+      # 3.9.1 = Kyverno 1.19.1, what apps/nas/vpn-gateway's MutatingPolicy was tested against
+      version: ">=3.9.1 <4.0.0"
+  valuesFrom:
+  - kind: ConfigMap
+    name: kyverno-values
+    valuesKey: values-base.yaml
+  - kind: ConfigMap
+    name: kyverno-values
+    valuesKey: values-extra.yaml
+    optional: true

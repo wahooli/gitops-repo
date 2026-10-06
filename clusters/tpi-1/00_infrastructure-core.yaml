@@ -35,6 +35,10 @@ spec:
     kind: Deployment
     name: knative-operator
     namespace: knative-serving
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: kyverno-admission-controller
+    namespace: kyverno
   - apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     name: kserve--kserve-crd
