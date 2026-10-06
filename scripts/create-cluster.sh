@@ -20,6 +20,7 @@ K3D_SERVERS="${K3D_SERVERS:-}"
 K3D_AGENTS="${K3D_AGENTS:-}"
 FLUX_HELM_CONCURRENT="${FLUX_HELM_CONCURRENT:-8}"
 FLUX_REQUEUE_DEPENDENCY="${FLUX_REQUEUE_DEPENDENCY:-5s}"
+MINIMAL_REQUESTS="${MINIMAL_REQUESTS:-false}"
 
 # --- Argument parsing & validation ---
 CLUSTER_NAME="${1:-}"
@@ -223,6 +224,11 @@ if [[ "${IN_DEVCONTAINER,,}" == "true" ]]; then
   echo "Dev-container detected: patching kubeconfig server to use serverlb container name"
   kubectl config set-cluster "k3d-$CLUSTER_NAME" \
     --server="https://k3d-${CLUSTER_NAME}-serverlb:6443"
+fi
+
+if [[ "${MINIMAL_REQUESTS,,}" == "true" ]]; then
+  echo "Applying minimal resource requests policy"
+  kubectl --context "$CONTEXT_NAME" apply -f "$SCRIPT_DIR/ci/minimal-requests.yaml"
 fi
 
 # Mount BPF filesystem in all nodes

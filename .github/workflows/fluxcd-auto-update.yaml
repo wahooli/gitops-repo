@@ -37,7 +37,7 @@ jobs:
       with:
         version: 'latest'
 
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v7.0.1
       name: Try clone ${{ env.BRANCH_NAME }} branch
       continue-on-error: true
       id: flux-update-checkout
@@ -45,7 +45,7 @@ jobs:
         fetch-depth: 0
         ref: "${{ env.BRANCH_NAME }}"
 
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v7.0.1
       name: Clone ${{ github.event.repository.default_branch }} branch
       if: steps.flux-update-checkout.outcome == 'failure'
       with:

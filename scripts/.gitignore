@@ -6,5 +6,6 @@
 !ci/pages
 !ci/pages/**/*
 !ci/patch-manifests.yaml
+!ci/minimal-requests.yaml
 !bootstrap-flux.sh.d/
 !create-cluster.sh.d/

@@ -15,6 +15,38 @@ rules:
     del(.. | select(has("resources")).resources.limits | select(has("cpu") or has("memory")))
   error_tolerant: true
 
+- description: >-
+    Minimal Kyverno CPU requests: with ours stripped, the chart defaults (4 x 100m)
+    don't fit on the single CI node
+  expression: |
+    with(select(has("admissionController") and has("backgroundController") and has("cleanupController") and has("reportsController"));
+      .admissionController.container.resources.requests.cpu = "1m" |
+      .backgroundController.resources.requests.cpu = "1m" |
+      .cleanupController.resources.requests.cpu = "1m" |
+      .reportsController.resources.requests.cpu = "1m")
+  error_tolerant: true
+
+- description: >-
+    VictoriaMetrics operator: no default resources for the CRs stripped above
+    (operator defaults, e.g. vmstorage 250m CPU, don't fit on the single CI node)
+  expression: |
+    with(select(.kind == "HelmRelease" and .spec.chart.spec.chart == "victoria-metrics-operator");
+      .spec.values.env = ([
+        "VM_VLAGENTDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VLCLUSTERDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VLOGSDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VLSINGLEDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VMAGENTDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VMALERTDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VMALERTMANAGER_USEDEFAULTRESOURCES",
+        "VM_VMANOMALYDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VMAUTHDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VMBACKUP_USEDEFAULTRESOURCES",
+        "VM_VMCLUSTERDEFAULT_USEDEFAULTRESOURCES",
+        "VM_VMSINGLEDEFAULT_USEDEFAULTRESOURCES"
+      ] | map({"name": ., "value": "false"})))
+  error_tolerant: true
+
 - description: Disable blueprint-apply error sleep in CI
   expression: |
     with(select(.metadata.name == "authentik-apply-blueprints");

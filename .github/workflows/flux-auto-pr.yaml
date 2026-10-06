@@ -46,7 +46,7 @@ jobs:
       with:
         version: 'latest'
 
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v7.0.1
       name: Clone repository
       with:
         fetch-depth: 0
