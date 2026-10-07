@@ -66,6 +66,8 @@ jobs:
           fi
         done
 
+        flux migrate -f . --yes
+
         VERSION="$(flux -v)"
 
         if [ "${{ steps.flux-update-checkout.outcome }}" == "failure" ]; then
