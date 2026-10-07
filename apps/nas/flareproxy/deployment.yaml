@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: flareproxy
-        image: ghcr.io/wahooli/docker/flareproxy:1.1.0 # {"$imagepolicy": "flux-system:flareproxy:tag"}
+        image: 1.1.0 # {"$imagepolicy": "flux-system:flareproxy:tag"}
         imagePullPolicy: IfNotPresent
         env:
         # FlareProxy forwards proxied requests to the FlareSolverr /v1 API

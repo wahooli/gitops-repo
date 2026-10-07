@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: flaresolverr
-        image: ghcr.io/flaresolverr/flaresolverr:v3.5.2 # {"$imagepolicy": "flux-system:flaresolverr:tag"}
+        image: v3.5.2 # {"$imagepolicy": "flux-system:flaresolverr:tag"}
         imagePullPolicy: IfNotPresent
         env:
         - name: TZ
