@@ -31,8 +31,8 @@ primary:
     size: 4Gi
 auth:
   enablePostgresUser: true
-  # postgresPassword: ${paperless_postgres_password}
-  # password: ${paperless_database_password}
+  # postgresPassword: $${paperless_postgres_password}
+  # password: $${paperless_database_password}
   database: paperless
   username: ${paperless_database_user}
   existingSecret: "${paperless_app_secret_name}"

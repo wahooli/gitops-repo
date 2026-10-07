@@ -14,7 +14,7 @@ lvmd:
       name: "${nvme_lvm_thinpool_name}"
       overprovision-ratio: 5.0
 # node:
-#   kubeletWorkDirectory: ${kubelet_workdir}
+#   kubeletWorkDirectory: $${kubelet_workdir}
 #   nodeSelector:
 #     node_type: storage
 

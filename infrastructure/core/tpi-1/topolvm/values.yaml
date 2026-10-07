@@ -9,7 +9,7 @@ lvmd:
       overprovision-ratio: 5.0
 
 # node:
-#   kubeletWorkDirectory: ${kubelet_workdir}
+#   kubeletWorkDirectory: $${kubelet_workdir}
 #   nodeSelector:
 #     node_type: storage
 

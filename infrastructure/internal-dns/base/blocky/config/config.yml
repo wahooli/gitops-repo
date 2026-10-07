@@ -52,7 +52,7 @@ conditional:
     not: ${router_ip}
     mgmt: ${router_ip}
     # ${cluster_pod_cidr_reverse}: tcp+udp:${cluster_dns_ip}
-    # ${cluster_service_cidr_reverse}: tcp+udp:${cluster_dns_ip}
+    # $${cluster_service_cidr_reverse}: tcp+udp:${cluster_dns_ip}
     wahoo.li: tcp+udp:${bind9_cluster_ip}
     absolutist.it: tcp+udp:${bind9_cluster_ip}
     ${nas_ip_reverse}: tcp+udp:${bind9_cluster_ip}

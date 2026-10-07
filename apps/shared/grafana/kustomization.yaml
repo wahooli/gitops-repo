@@ -35,6 +35,8 @@ configMapGenerator:
   options:
     labels:
       grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
 - name: node-exporter-dashboard
   namespace: grafana
   files:
