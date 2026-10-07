@@ -1,5 +1,5 @@
 image:
-  tag: "15.1.0" # {"$imagepolicy": "flux-system:docker-mailserver:tag"}
+  tag: "16.0.1" # {"$imagepolicy": "flux-system:docker-mailserver:tag"}
 fullnameOverride: mail-relay
 strategy:
   type: RollingUpdate
@@ -174,5 +174,4 @@ service:
       port: 9154
       protocol: TCP
       serviceOnly: true
-
 progressDeadlineSeconds: 600
