@@ -76,7 +76,7 @@ spec:
         - name: gluetun
           mountPath: /gluetun
       - name: gateway
-        image: ghcr.io/wahooli/docker/vpn-gateway:0.1.0 # {"$imagepolicy": "flux-system:vpn-gateway:tag"}
+        image: ghcr.io/wahooli/docker/vpn-gateway:0.1.1 # {"$imagepolicy": "flux-system:vpn-gateway:tag"}
         imagePullPolicy: IfNotPresent
         securityContext:
           capabilities:
@@ -92,7 +92,7 @@ spec:
         - name: VPN_SERVICE_PROVIDER
           value: protonvpn
         - name: DISCONNECTED_TRAFFIC
-          value: block
+          value: direct
         - name: DIRECT_DNS_SERVER
           value: ${cluster_dns_ip}
         ports:

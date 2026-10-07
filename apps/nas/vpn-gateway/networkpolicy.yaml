@@ -65,7 +65,3 @@ spec:
         protocol: TCP
   - toEntities:
     - world
-    toPorts:
-    - ports:
-      - port: "51820"
-        protocol: UDP
