@@ -32,7 +32,7 @@ reportsController:
       cpu: "0"
       memory: 64Mi
     limits:
-      cpu: 200m
+      cpu: "1"
       memory: 256Mi
   rbac:
     clusterRole:
