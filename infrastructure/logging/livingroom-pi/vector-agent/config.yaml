@@ -270,6 +270,6 @@ sinks:
     type: vector
     inputs: [kube_log_parser, journald_parsed]
     address: http://vector-global-write-mesh.logging.svc.cluster.local.:6000
-    compression: true
+    compression: gzip
     healthcheck:
       enabled: true

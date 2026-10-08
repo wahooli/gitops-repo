@@ -38,14 +38,14 @@ sinks:
     type: vector
     inputs: [datadog_agent, fluent, logstash, splunk_hec, statsd, syslog, vector]
     address: http://vector-lb-tpi.logging.svc.cluster.local.:6000
-    compression: true
+    compression: gzip
     healthcheck:
       enabled: ${vector_healthcheck:=true}
   nas:
     type: vector
     inputs: [datadog_agent, fluent, logstash, splunk_hec, statsd, syslog, vector]
     address: http://vector-lb-nas.logging.svc.cluster.local.:6000
-    compression: true
+    compression: gzip
     healthcheck:
       enabled: ${vector_healthcheck:=true}
     buffer:
