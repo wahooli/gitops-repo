@@ -30,6 +30,7 @@ metrics:
       cpu: 200m
       memory: 60Mi
     requests:
+      cpu: "0"
       memory: 16Mi
 serviceMonitor:
   create: true

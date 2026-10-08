@@ -44,3 +44,9 @@ patches:
   target:
     kind: GitRepository
     name: flux-system
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "0"
+  target:
+    kind: Deployment

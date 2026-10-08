@@ -17,3 +17,9 @@ patches:
         - name: edns0
   target:
     kind: Deployment
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "0"
+  target:
+    kind: Deployment
