@@ -9,7 +9,25 @@ image:
   tag: "10.11.11" # {"$imagepolicy": "flux-system:jellyfin:tag"}
 podAnnotations:
   backup.velero.io/backup-volumes: data
+  secret.reloader.stakater.com/reload: "jellyfin-ldap-auth"
 runtimeClassName: nvidia
+initContainers:
+  ldap-auth-config:
+    image: busybox:1.37
+    imagePullPolicy: IfNotPresent
+    command: ["sh", "-c", "mkdir -p /config/plugins/configurations && cp /ldap-auth/LDAP-Auth.xml /config/plugins/configurations/LDAP-Auth.xml"]
+    volumeMounts:
+    - name: data
+      mountPath: /config
+      subPath: config
+    - name: ldap-auth
+      mountPath: /ldap-auth
+      readOnly: true
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 32Mi
 # hostNetwork: true
 dnsConfig:
   options:
@@ -51,6 +69,12 @@ persistence:
       useFromChart: false
       configMap:
         name: jellyfin-config
+  ldap-auth:
+    enabled: true
+    spec:
+      useFromChart: false
+      secret:
+        name: jellyfin-ldap-auth
   movies:
     enabled: true
     mount:
