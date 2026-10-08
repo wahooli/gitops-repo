@@ -12,6 +12,10 @@ spec:
   predictor:
     minReplicas: 1
     maxReplicas: 1
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
     containers:
     - name: wyoming-whisper
       image: rhasspy/wyoming-whisper:3.1.0

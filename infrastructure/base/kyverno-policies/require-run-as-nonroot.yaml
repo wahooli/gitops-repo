@@ -43,6 +43,7 @@ spec:
   - name: rootContainers
     expression: >-
       variables.allContainers.filter(c,
+        !(c.name in exceptions.allowedValues) &&
         !c.?securityContext.?runAsNonRoot.orValue(variables.podRunAsNonRoot))
   validations:
   - expression: size(variables.rootContainers) == 0

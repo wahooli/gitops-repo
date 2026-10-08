@@ -73,3 +73,7 @@ persistence:
         name: tls-mail-relay-openldap
 
 progressDeadlineSeconds: 600
+podSecurityContext:
+  runAsNonRoot: true
+securityContext:
+  runAsUser: 1001

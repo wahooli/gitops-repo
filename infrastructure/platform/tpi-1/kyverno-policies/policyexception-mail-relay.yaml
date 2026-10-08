@@ -1,0 +1,18 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: mail-relay-root
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  allowedValues:
+  - docker-mailserver
+  matchConditions:
+  - name: mail-relay
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      [object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))].exists(labels,
+        labels[?'app.kubernetes.io/name'].orValue('') == 'docker-mailserver' &&
+        labels[?'app.kubernetes.io/instance'].orValue('') == 'mail-relay')

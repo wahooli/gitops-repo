@@ -60,6 +60,9 @@ initContainers:
     - mountPath: /var/log/mail
       name: data
       subPath: logs
+    securityContext:
+      runAsUser: 65534
+      runAsGroup: 65534
   copy-configuration:
     image: ghcr.io/wahooli/docker/envsubst:1.0.0@sha256:baba8fbaa0b66a00b624f349b87bf621bcb65d485556c6d2b634bc9af66812d1 # {"$imagepolicy": "flux-system:envsubst"}
     imagePullPolicy: IfNotPresent
@@ -75,6 +78,9 @@ initContainers:
       subPath: config
     - mountPath: /src
       name: mail-relay-config
+    securityContext:
+      runAsUser: 65534
+      runAsGroup: 65534
 podAnnotations:
   vector.dev/exclude-containers: "postfix-exporter" # ignore logs for exporter sidecar
 sidecars:
@@ -123,6 +129,9 @@ sidecars:
       periodSeconds: 10
       successThreshold: 1
       timeoutSeconds: 1
+    securityContext:
+      runAsUser: 65534
+      runAsGroup: 106
 persistence:
   data:
     name: data
@@ -178,3 +187,7 @@ service:
       protocol: TCP
       serviceOnly: true
 progressDeadlineSeconds: 600
+podSecurityContext:
+  runAsNonRoot: true
+securityContext:
+  runAsNonRoot: false

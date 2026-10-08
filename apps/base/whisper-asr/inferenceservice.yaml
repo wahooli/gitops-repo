@@ -13,6 +13,10 @@ spec:
     scaleTarget: 1
     scaleMetric: concurrency
     timeout: 9000
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
     volumes:
     - name: model-cache
       persistentVolumeClaim:
@@ -30,6 +34,10 @@ spec:
         value: medium
       - name: HF_HOME
         value: /cache/hf
+      - name: ASR_MODEL_PATH
+        value: /cache/hf/whisper
+      - name: HOME
+        value: /tmp
       volumeMounts:
       - name: model-cache
         mountPath: /cache/hf

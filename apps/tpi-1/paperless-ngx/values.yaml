@@ -14,6 +14,19 @@ initContainers:
     - paperless-ngx-postgresql:5432
     - -t
     - "300" # wait for 5 minutes
+  tessdata-fin:
+    image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20  # {"$imagepolicy": "flux-system:wait-for-it"}
+    imagePullPolicy: IfNotPresent
+    command:
+    - /bin/sh
+    - -ec
+    args:
+    - |
+      wget -q -O /tessdata/fin.traineddata https://github.com/tesseract-ocr/tessdata_fast/raw/4.1.0/fin.traineddata
+      echo "61a04cd62b507c3d9ae0e1cda399e6715ebf49dea9df47897c8acdcd3bd3e13c  /tessdata/fin.traineddata" | sha256sum -c -
+    volumeMounts:
+    - name: tessdata
+      mountPath: /tessdata
 env:
   PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
   PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
@@ -59,6 +72,7 @@ env:
       secretKeyRef:
         name: ${paperless_app_secret_name}
         key: paperless_admin_password
+  PAPERLESS_OCR_LANGUAGES: ""
 dnsConfig:
   options:
   - name: ndots
@@ -112,6 +126,14 @@ persistence:
       nfs:
         path: ${paperless_nfs_export_path}
         server: ${paperless_nfs_server}
+  tessdata:
+    enabled: true
+    mount:
+    - path: /usr/share/tesseract-ocr/5/tessdata/fin.traineddata
+      subPath: fin.traineddata
+      readOnly: true
+    spec:
+      emptyDir: {}
 service:
   main:
     annotations:
@@ -123,3 +145,9 @@ ingress:
     enabled: false
 
 progressDeadlineSeconds: 600
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
