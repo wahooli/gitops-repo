@@ -40,7 +40,7 @@ metrics:
 
 initContainers:
   wait-for-etcdgw:
-    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
     imagePullPolicy: IfNotPresent
     args:
     - etcd-gateway.etcd.svc.cluster.local.:2379
@@ -285,7 +285,16 @@ ciliumNetworkPolicies:
         - port: "5432"
           protocol: TCP
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+
 haproxy:
+  podSecurityContext:
+    runAsNonRoot: true
   enabled: true
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-patroni-server"
@@ -353,6 +362,11 @@ haproxy:
           - port: "8404"
             protocol: TCP
 
+  resources:
+    requests:
+      memory: 32Mi
+    limits:
+      memory: 64Mi
 persistence:
   pgdata:
     enabled: true
@@ -386,3 +400,21 @@ persistence:
         name: etcd-client
         optional: false
         defaultMode: 0400
+resources:
+  requests:
+    memory: 1280Mi
+  limits:
+    memory: 2Gi
+containers:
+  postgres-log:
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 48Mi
+  pgbouncer:
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 48Mi

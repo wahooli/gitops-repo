@@ -5,6 +5,7 @@ metadata:
   namespace: homeassistant-assist
   labels:
     networking.knative.dev/visibility: cluster-local
+    app.kubernetes.io/name: kokoro-tts
   annotations:
     autoscaling.knative.dev/scale-down-delay: "5m"
     autoscaling.knative.dev/window: "60s"
@@ -16,9 +17,13 @@ spec:
     scaleMetric: concurrency
     timeout: 600
     runtimeClassName: nvidia
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
     containers:
     - name: kokoro-tts
-      image: ghcr.io/wahooli/docker/kokoro-fastapi-gpu:latest
+      image: ghcr.io/wahooli/docker/kokoro-fastapi-gpu:latest@sha256:8503affe8166e05364876d8ed008963f27fb3058df09fdb1a3257f1f8bdd6d98
       env:
       - name: USE_GPU
         value: "true"
@@ -43,7 +48,7 @@ spec:
         periodSeconds: 60
       resources:
         requests:
-          cpu: 500m
+          cpu: "0"
           memory: 1Gi
         limits:
           cpu: "2"

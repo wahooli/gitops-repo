@@ -5,11 +5,18 @@ metadata:
   namespace: homeassistant-assist
   labels:
     networking.knative.dev/visibility: cluster-local
+    app.kubernetes.io/name: assist-llm-gpu
   annotations:
     serving.kserve.io/deploymentMode: RawDeployment
     serving.kserve.io/autoscalerClass: "none"
 spec:
   predictor:
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 2000
+      runAsGroup: 0
+      fsGroup: 2000
+      fsGroupChangePolicy: OnRootMismatch
     deploymentStrategy:
       type: Recreate
     minReplicas: 1
@@ -74,7 +81,7 @@ spec:
       - qwen3
       resources:
         requests:
-          cpu: 500m
+          cpu: "0"
           memory: 4Gi
         limits:
           cpu: "4"

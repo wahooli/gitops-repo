@@ -15,6 +15,10 @@ spec:
       labels:
         app.kubernetes.io/name: flareproxy
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
       containers:
       - name: flareproxy
         image: ghcr.io/wahooli/docker/flareproxy:1.1.0 # {"$imagepolicy": "flux-system:flareproxy"}
@@ -31,7 +35,7 @@ spec:
           protocol: TCP
         resources:
           requests:
-            cpu: 50m
+            cpu: "0"
             memory: 64Mi
           limits:
             cpu: 500m

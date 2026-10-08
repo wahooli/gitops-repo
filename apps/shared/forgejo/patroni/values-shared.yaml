@@ -38,7 +38,7 @@ metrics:
 
 initContainers:
   wait-for-etcdgw:
-    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
     imagePullPolicy: IfNotPresent
     args:
     - etcd-gateway.etcd.svc.cluster.local.:2379
@@ -187,9 +187,23 @@ patroni:
         log_destination: stderr
         logging_collector: "off"
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+
 haproxy:
+  podSecurityContext:
+    runAsNonRoot: true
   enabled: true
 
+  resources:
+    requests:
+      memory: 24Mi
+    limits:
+      memory: 64Mi
 persistence:
   pgdata:
     enabled: true
@@ -223,3 +237,15 @@ persistence:
         name: etcd-client
         optional: false
         defaultMode: 0400
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 768Mi
+containers:
+  postgres-log:
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 48Mi

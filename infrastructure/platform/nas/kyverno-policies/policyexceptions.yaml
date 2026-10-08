@@ -1,0 +1,95 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: bigdata-host-paths
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: disallow-host-path
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: only-bigdata-host-paths
+    expression: >-
+      [object.?spec.?template.?spec.orValue(
+        object.?spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec))
+      ].exists(podSpec,
+        [podSpec.?volumes.orValue([]).filter(v, has(v.hostPath))].exists(hostPathVolumes,
+          size(hostPathVolumes) > 0 &&
+          hostPathVolumes.all(v, v.hostPath.path.startsWith('/mnt/bigdata/'))))
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: vpn-gateway
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: disallow-capabilities
+    kind: ValidatingPolicy
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: vpn-gateway
+    expression: >-
+      object.metadata.namespace == 'vpn-gateway' &&
+      object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))
+        [?'app.kubernetes.io/name'].orValue('') == 'vpn-gateway'
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: transmission
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  - name: disallow-privileged-containers
+    kind: ValidatingPolicy
+  - name: disallow-capabilities
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: transmission
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      [object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))].exists(labels,
+        labels[?'app.kubernetes.io/name'].orValue('') == 'transmission' &&
+        labels[?'app.kubernetes.io/instance'].orValue('') in ['transmission', 'transmission-old'])
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: plex
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  - name: disallow-host-namespaces
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: plex
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      [object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))].exists(labels,
+        labels[?'app.kubernetes.io/name'].orValue('') == 'plex' &&
+        labels[?'app.kubernetes.io/instance'].orValue('') == 'plex')
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: ps3netsrv
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  - name: disallow-host-namespaces
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: ps3netsrv
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      [object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))].exists(labels,
+        labels[?'app.kubernetes.io/name'].orValue('') == 'ps3netsrv' &&
+        labels[?'app.kubernetes.io/instance'].orValue('') == 'ps3netsrv')

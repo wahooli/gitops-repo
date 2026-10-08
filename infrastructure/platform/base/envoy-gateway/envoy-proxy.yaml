@@ -45,6 +45,27 @@ spec:
           type: RollingUpdate
           rollingUpdate:
             maxUnavailable: 1
+        container:
+          resources:
+            requests:
+              cpu: "0"
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+        patch:
+          type: StrategicMerge
+          value:
+            spec:
+              template:
+                spec:
+                  containers:
+                  - name: shutdown-manager
+                    resources:
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                      limits:
+                        memory: 128Mi
         pod:
           topologySpreadConstraints:
           - maxSkew: 1

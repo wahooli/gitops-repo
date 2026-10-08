@@ -55,6 +55,11 @@ primary:
   persistence:
     enabled: true
     size: 4Gi
+  resources:
+    requests:
+      memory: 1536Mi
+    limits:
+      memory: 2560Mi
 auth:
   database: Ombi
   existingSecret: ${ombi_app_secret_name}

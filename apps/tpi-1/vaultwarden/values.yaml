@@ -13,7 +13,7 @@ dnsConfig:
   - name: edns0
 initContainers:
   wait-for-psql:
-    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
     imagePullPolicy: IfNotPresent
     args:
     - vaultwarden-postgresql.default.svc.cluster.local.:5432
@@ -54,10 +54,19 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: vaultwarden
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
+  sysctls:
+  - name: net.ipv4.ip_unprivileged_port_start
+    value: "0"
 resources:
   requests:
     memory: "256Mi"
-    cpu: "600m"
+    cpu: "0"
   limits:
     memory: "3072Mi"
     # cpu: "1000m"

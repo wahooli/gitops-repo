@@ -22,6 +22,15 @@ ingress:
 httpRoute:
   enabled: false
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  sysctls:
+  - name: net.ipv4.ip_unprivileged_port_start
+    value: "0"
+
 replicaCount: 1
 
 serviceAccount:
@@ -61,7 +70,7 @@ initContainers:
   resources:
     limits: {}
     requests:
-      cpu: 100m
+      cpu: "0"
       memory: 128Mi
 
 gitea:
@@ -316,3 +325,8 @@ extraVolumes:
 - name: ssh-proxy-config
   configMap:
     name: forgejo-ssh-proxy-config
+resources:
+  requests:
+    memory: 320Mi
+  limits:
+    memory: 3Gi

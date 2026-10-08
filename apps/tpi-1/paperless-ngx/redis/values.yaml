@@ -22,5 +22,10 @@ master:
     pre.hook.backup.velero.io/container: redis
     post.hook.restore.velero.io/container: redis
     pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "rm -rf /dummy/*"]'
+  resources:
+    requests:
+      memory: 16Mi
+    limits:
+      memory: 48Mi
 auth:
   enabled: false

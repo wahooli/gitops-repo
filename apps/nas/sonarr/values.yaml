@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/home-operations/sonarr
   tag: "4.0.20" # {"$imagepolicy": "flux-system:sonarr:tag"}
 progressDeadlineSeconds: 600
 podAnnotations:
@@ -28,6 +29,9 @@ metrics:
     limits:
       cpu: 200m
       memory: 60Mi
+    requests:
+      cpu: "0"
+      memory: 16Mi
 serviceMonitor:
   create: true
   jobLabel: app.kubernetes.io/name
@@ -80,3 +84,12 @@ service:
 ingress:
   main:
     enabled: false
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 2001
+  runAsGroup: 2003
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 768Mi

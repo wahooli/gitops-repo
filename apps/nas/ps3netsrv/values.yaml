@@ -19,3 +19,8 @@ persistence:
       hostPath:
         path: ${ps3netsrv_games_host_path}
         type: Directory
+resources:
+  requests:
+    memory: 32Mi
+  limits:
+    memory: 256Mi

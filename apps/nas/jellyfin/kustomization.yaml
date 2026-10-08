@@ -4,6 +4,7 @@ resources:
 - ../../base/jellyfin
 - imagepolicy.yaml
 - httproute.yaml
+- ldap-auth-secret.yaml
 patches:
 - path: helmrelease.yaml
   target:

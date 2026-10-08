@@ -1,6 +1,10 @@
 role: Agent
 dataDir: /vector-data-dir
-resources: {}
+resources:
+  requests:
+    memory: 1Gi
+  limits:
+    memory: 1536Mi
 args:
 - -w
 - --config-dir

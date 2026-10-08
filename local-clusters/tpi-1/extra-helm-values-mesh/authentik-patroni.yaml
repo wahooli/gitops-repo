@@ -8,6 +8,10 @@ data:
     patroni:
       jsonLog: false
 
+    containers:
+      postgres-log:
+        enabled: false
+
     podMonitor:
       create: false
 

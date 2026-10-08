@@ -1,6 +1,10 @@
 role: Stateless-Aggregator
 dataDir: /vector-data-dir
-resources: {}
+resources:
+  requests:
+    memory: 96Mi
+  limits:
+    memory: 256Mi
 args:
 - -w
 - --config-dir
@@ -56,3 +60,7 @@ affinity:
             - vector
         topologyKey: kubernetes.io/hostname
       weight: 10
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532

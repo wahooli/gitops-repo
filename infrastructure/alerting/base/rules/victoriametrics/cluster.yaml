@@ -106,7 +106,7 @@ spec:
         (
             sum(rate(vm_new_timeseries_created_total[5m])) by(job)
             /
-            sum(rate(vm_rows_inserted_total[5m])) by(job)
+            sum(rate(vm_rows_added_to_storage_total[5m])) by(job)
           ) > 0.1
       for: 15m
       labels:
@@ -141,7 +141,7 @@ spec:
         (
             sum(rate(vm_slow_row_inserts_total[5m])) by(job)
             /
-            sum(rate(vm_rows_inserted_total[5m])) by(job)
+            sum(rate(vm_rows_added_to_storage_total[5m])) by(job)
           ) > 0.05
       for: 15m
       labels:

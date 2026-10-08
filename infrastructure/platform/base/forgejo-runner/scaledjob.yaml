@@ -63,7 +63,7 @@ spec:
             value: "1"
           resources:
             requests:
-              cpu: 50m
+              cpu: "0"
               memory: 64Mi
             limits:
               cpu: 500m
@@ -109,7 +109,7 @@ spec:
             runAsUser: 0
           resources:
             requests:
-              cpu: 500m
+              cpu: "0"
               memory: 1Gi
             limits:
               cpu: "2"

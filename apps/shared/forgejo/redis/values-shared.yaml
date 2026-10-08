@@ -17,6 +17,11 @@ redis:
   sentinel:
     enabled: true
 
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 48Mi
 certificates:
   server:
     secretTemplate:
@@ -47,7 +52,16 @@ service:
     annotations:
       service.cilium.io/global: "true"
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+
 haproxy:
+  podSecurityContext:
+    runAsNonRoot: true
   podAnnotations:
     secret.reloader.stakater.com/reload: "redis-server"
   enabled: false
@@ -67,3 +81,8 @@ persistence:
       resources:
         requests:
           storage: 1Gi
+resources:
+  requests:
+    memory: 16Mi
+  limits:
+    memory: 48Mi

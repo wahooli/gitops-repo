@@ -1,0 +1,41 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: k3s-certificates
+  namespace: alerting
+spec:
+  groups:
+  - name: k3s-certificates
+    params: {}
+    rules:
+    - alert: K3sCertificateExpiringSoon
+      annotations:
+        description: 'K3s certificate {{ $labels.subject }} on {{ $labels.clustername }}/{{ $labels.node }} expires
+          in {{ $value | humanizeDuration }}. K3s renews certificates close to expiry only when it starts: restart k3s
+          on the node, or run `k3s certificate rotate`, then refresh copied kubeconfigs.'
+        summary: K3s certificate expires in less than 30 days.
+      expr: min by (clustername, node, subject) (k3s_certificate_expiration_seconds) < 30 * 86400
+      for: 1h
+      labels:
+        severity: warning
+    - alert: K3sCertificateExpiryImminent
+      annotations:
+        description: 'K3s certificate {{ $labels.subject }} on {{ $labels.clustername }}/{{ $labels.node }} expires
+          in {{ $value | humanizeDuration }}. Restart k3s on the node, or run `k3s certificate rotate`.'
+        summary: K3s certificate expires in less than 7 days.
+      expr: min by (clustername, node, subject) (k3s_certificate_expiration_seconds) < 7 * 86400
+      for: 10m
+      labels:
+        severity: critical
+    - alert: K3sCertificateMetricsMissing
+      annotations:
+        description: '{{ $labels.clustername }} reported k3s certificate expiry a day ago but has not for the last
+          hour. Expired k3s certificates also break scraping, so check the cluster directly.'
+        summary: K3s certificate metrics stopped arriving.
+      expr: |-
+        count by (clustername) (k3s_certificate_expiration_seconds offset 1d)
+        unless
+        count by (clustername) (k3s_certificate_expiration_seconds)
+      for: 1h
+      labels:
+        severity: warning

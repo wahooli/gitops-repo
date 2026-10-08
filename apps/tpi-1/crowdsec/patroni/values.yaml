@@ -46,7 +46,7 @@ metrics:
 
 initContainers:
   wait-for-etcdgw:
-    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
     imagePullPolicy: IfNotPresent
     args:
     - etcd-gateway.etcd.svc.cluster.local.:2379
@@ -326,7 +326,16 @@ ciliumNetworkPolicies:
         - port: "5432"
           protocol: TCP
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+
 haproxy:
+  podSecurityContext:
+    runAsNonRoot: true
   progressDeadlineSeconds: 600
   enabled: true
   ciliumNetworkPolicies:
@@ -394,6 +403,11 @@ haproxy:
   #     annotations:
   #       service.cilium.io/global: "true"
 
+  resources:
+    requests:
+      memory: 24Mi
+    limits:
+      memory: 64Mi
 persistence:
   pgdata:
     enabled: true
@@ -429,3 +443,21 @@ persistence:
         defaultMode: 0400
 
 progressDeadlineSeconds: 600
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 768Mi
+containers:
+  pgbouncer:
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 48Mi
+  postgres-log:
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 48Mi

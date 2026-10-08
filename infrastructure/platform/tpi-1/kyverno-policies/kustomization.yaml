@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/kyverno-policies
+- policyexception-mail-relay.yaml
+patches:
+- target:
+    group: policies.kyverno.io
+    kind: ValidatingPolicy
+  patch: |
+    - op: replace
+      path: /spec/validationActions
+      value: [Deny, Audit]

@@ -19,6 +19,32 @@ spec:
   install:
     remediation:
       retries: -1
+  values:
+    env:
+    - name: VM_ENABLESTRICTSECURITY
+      value: "true"
+    - name: VM_CONFIG_RELOADER_LIMIT_MEMORY
+      value: 128Mi
+    - name: VM_VMCLUSTERDEFAULT_VMSTORAGEDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VMCLUSTERDEFAULT_VMSELECTDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VMCLUSTERDEFAULT_VMINSERTDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VMSINGLEDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VLSINGLEDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VLOGSDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VMAGENTDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VMALERTDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VMAUTHDEFAULT_RESOURCE_REQUEST_CPU
+      value: "0"
+    - name: VM_VMALERTMANAGER_RESOURCE_REQUEST_CPU
+      value: "0"
   valuesFrom:
   - kind: ConfigMap
     name: victoria-metrics-operator-values

@@ -23,3 +23,8 @@ spec:
     - '--no-collector.bonding'
     - '--no-collector.bcache'
     - '--log.format=json'
+    resources:
+      requests:
+        memory: 64Mi
+      limits:
+        memory: 96Mi

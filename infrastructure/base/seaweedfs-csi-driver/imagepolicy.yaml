@@ -11,4 +11,4 @@ spec:
     extract: '$major.$minor.$patch'
   policy:
     semver:
-      range: '>=1.4.0'
+      range: '>=1.4.0 <1.4.27'

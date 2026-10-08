@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/home-operations/bazarr
   tag: "1.6.2" # {"$imagepolicy": "flux-system:bazarr:tag"}
 progressDeadlineSeconds: 600
 podAnnotations:
@@ -24,7 +25,10 @@ metrics:
   resources:
     limits:
       cpu: 150m
-      memory: 60Mi
+      memory: 160Mi
+    requests:
+      cpu: "0"
+      memory: 96Mi
 serviceMonitor:
   create: true
   jobLabel: app.kubernetes.io/name
@@ -85,3 +89,47 @@ service:
 ingress:
   main:
     enabled: false
+resources:
+  requests:
+    memory: 640Mi
+  limits:
+    memory: 1Gi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 2003
+  runAsGroup: 2000
+  fsGroup: 2000
+  fsGroupChangePolicy: OnRootMismatch
+sidecars:
+  apikey-sync:
+    image:
+      repository: ghcr.io/home-operations/bazarr
+      tag: "1.6.2" # {"$imagepolicy": "flux-system:bazarr:tag"}
+    command:
+    - /bin/sh
+    - -c
+    - |
+      CFG=/src/config.yaml; OUT=/shared/apikey
+      while :; do
+        if [ -f "$CFG" ]; then
+          KEY=$(awk '/^auth:/{a=1;next} /^[^[:space:]#]/{a=0} a && $1=="apikey:"{v=$2; gsub(/["\047]/,"",v); print v; exit}' "$CFG")
+          if [ -n "$KEY" ] && [ "$KEY" != "$(cat "$OUT" 2>/dev/null)" ]; then
+            printf '%s' "$KEY" > "$OUT.tmp" && chmod 0644 "$OUT.tmp" && mv -f "$OUT.tmp" "$OUT" && echo "apikey file updated"
+          fi
+        fi
+        sleep 30
+      done
+    volumeMounts:
+    - name: config
+      mountPath: /src
+      subPath: config
+      readOnly: true
+    - name: config
+      mountPath: /shared
+      subPath: shared
+    resources:
+      requests:
+        cpu: "0"
+        memory: 8Mi
+      limits:
+        memory: 32Mi

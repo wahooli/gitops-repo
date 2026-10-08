@@ -1,0 +1,19 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: vpn-gateway-client
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  - name: require-requests-limits
+    kind: ValidatingPolicy
+  - name: disallow-capabilities
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: vpn-gateway-injected
+    expression: >-
+      object.kind == 'Pod' &&
+      object.metadata.?labels[?'homelab.wahoo.li/vpn-client'].orValue('') == 'true' &&
+      object.spec.?initContainers.orValue([]).exists(c, c.name == 'gateway-sidecar')

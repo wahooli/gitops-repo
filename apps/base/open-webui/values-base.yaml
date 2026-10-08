@@ -16,7 +16,16 @@ websocket:
   manager: redis
   redis:
     enabled: true
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 1000
 
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 48Mi
 enableOpenaiApi: true
 openaiBaseApiUrls:
 - http://assist-llm-gpu-predictor.homeassistant-assist.svc.cluster.local/v1
@@ -103,10 +112,22 @@ extraEnvVars:
 - name: AUDIO_TTS_VOICE
   value: af_bella
 
+- name: WEBUI_SECRET_KEY_FILE
+  value: /app/backend/data/.webui_secret_key
+- name: STATIC_DIR
+  value: /app/backend/data/static
+- name: HOME
+  value: /app/backend/data
 resources:
   requests:
-    cpu: 100m
+    cpu: "0"
     memory: 512Mi
   limits:
     cpu: "2"
     memory: 2Gi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch

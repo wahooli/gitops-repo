@@ -108,6 +108,11 @@ nodeAgent:
     - name: ndots
       value: "1"
     - name: edns0
+  resources:
+    requests:
+      memory: 96Mi
+    limits:
+      memory: 160Mi
 dnsConfig:
   options:
   - name: ndots
@@ -129,3 +134,25 @@ configuration:
       checksumAlgorithm: ""
       s3Url: http://seaweedfs-backup-filer-lb.seaweedfs-backup.svc.cluster.local:8333
       publicUrl: https://s3-backup.${domain_wahoo_li:=wahoo.li}
+  repositoryMaintenanceJob:
+    repositoryConfigData:
+      global:
+        keepLatestMaintenanceJobs: 3
+        podResources:
+          memoryRequest: 640Mi
+          memoryLimit: 1Gi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1002
+  runAsGroup: 1000
+  fsGroup: 1000
+resources:
+  requests:
+    memory: 640Mi
+  limits:
+    memory: 1Gi
+upgradeJobResources:
+  requests:
+    memory: 64Mi
+  limits:
+    memory: 256Mi

@@ -1,1 +1,11 @@
 # Base values - overridden by core and per-cluster layers
+resources:
+  operator:
+    requests:
+      cpu: "0"
+  metricServer:
+    requests:
+      cpu: "0"
+  webhooks:
+    requests:
+      cpu: "0"

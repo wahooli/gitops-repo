@@ -9,3 +9,8 @@ tolerations:
   operator: "Equal"
   value: "true"
   effect: "NoSchedule"
+resources:
+  requests:
+    memory: 96Mi
+  limits:
+    memory: 160Mi

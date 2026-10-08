@@ -196,6 +196,16 @@ service:
 gateway:
   enabled: true
   progressDeadlineSeconds: 600
+  resources:
+    requests:
+      memory: 16Mi
+    limits:
+      memory: 48Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+    fsGroup: 65532
 persistence:
   data:
     enabled: true
@@ -205,3 +215,14 @@ persistence:
         requests:
           # storage: 8Gi
           storage: 2Gi
+resources:
+  requests:
+    memory: 1Gi
+  limits:
+    memory: 2Gi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  fsGroupChangePolicy: OnRootMismatch

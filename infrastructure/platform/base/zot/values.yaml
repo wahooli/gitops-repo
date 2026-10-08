@@ -17,3 +17,14 @@ extraVolumeMounts:
 - name: zot-config
   mountPath: /etc/zot/config.json
   subPath: config.json
+resources:
+  requests:
+    memory: 96Mi
+  limits:
+    memory: 160Mi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  fsGroupChangePolicy: OnRootMismatch

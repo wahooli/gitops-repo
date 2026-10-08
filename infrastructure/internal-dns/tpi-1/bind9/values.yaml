@@ -40,3 +40,6 @@ persistence:
       configMap:
         defaultMode: 0644
         name: bind9-zones
+podSecurityContext:
+  runAsUser: 100
+  runAsGroup: 101

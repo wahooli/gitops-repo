@@ -8,3 +8,8 @@ crds:
   enabled: true
   cleanup:
     enabled: true
+resources:
+  requests:
+    memory: 192Mi
+  limits:
+    memory: 320Mi

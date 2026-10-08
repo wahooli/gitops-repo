@@ -4,5 +4,5 @@ metadata:
   name: tautulli
   namespace: flux-system
 spec:
-  image: ghcr.io/linuxserver/tautulli
+  image: ghcr.io/home-operations/tautulli
   interval: 24h

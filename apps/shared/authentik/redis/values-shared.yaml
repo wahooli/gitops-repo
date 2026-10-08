@@ -19,6 +19,11 @@ redis:
   sentinel:
     enabled: true
 
+    resources:
+      requests:
+        memory: 16Mi
+      limits:
+        memory: 48Mi
 certificates:
   server:
     secretTemplate:
@@ -130,12 +135,22 @@ ciliumNetworkPolicies:
         - port: "26379"
           protocol: TCP
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+
 haproxy:
+  podSecurityContext:
+    runAsNonRoot: true
   enabled: true
   progressDeadlineSeconds: 600
   image:
     repository: ghcr.io/wahooli/docker/haproxy-redis
-    tag: "3.2"
+    tag: "3.2.25" # {"$imagepolicy": "flux-system:haproxy-redis:tag"}
+    digest: sha256:8677dd3f9c82b5f28920dcb01b67d0292250f6b917ad30c38575d6d044070501 # {"$imagepolicy": "flux-system:haproxy-redis:digest"}
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server"
   ciliumNetworkPolicies:
@@ -198,6 +213,11 @@ haproxy:
           - port: "8404"
             protocol: TCP
 
+  resources:
+    requests:
+      memory: 32Mi
+    limits:
+      memory: 640Mi
 persistence:
   data:
     enabled: true
@@ -211,3 +231,8 @@ persistence:
       resources:
         requests:
           storage: 1Gi
+resources:
+  requests:
+    memory: 16Mi
+  limits:
+    memory: 48Mi

@@ -1,1 +1,9 @@
-{}
+knative_operator:
+  knative_operator:
+    resources:
+      requests:
+        cpu: "0"
+  operator_webhook:
+    resources:
+      requests:
+        cpu: "0"

@@ -12,6 +12,10 @@ spec:
   predictor:
     minReplicas: 1
     maxReplicas: 1
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
     containers:
     - name: wyoming-piper
       image: rhasspy/wyoming-piper:2.2.2
@@ -31,7 +35,7 @@ spec:
         protocol: TCP
       resources:
         requests:
-          cpu: 500m
+          cpu: "0"
           memory: 256Mi
         limits:
           cpu: "4"

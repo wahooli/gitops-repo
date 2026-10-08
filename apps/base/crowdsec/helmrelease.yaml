@@ -23,3 +23,25 @@ spec:
   upgrade:
     remediation:
       remediateLastFailure: true
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          kind: Deployment
+          labelSelector: type=lapi
+        patch: |
+          - op: add
+            path: /metadata/labels/app.kubernetes.io~1name
+            value: crowdsec
+          - op: add
+            path: /spec/template/spec/securityContext
+            value:
+              runAsNonRoot: true
+              runAsUser: 1000
+              runAsGroup: 1000
+              fsGroup: 1000
+              seccompProfile:
+                type: RuntimeDefault
+          - op: copy
+            from: /spec/template/spec/containers/0/image
+            path: /spec/template/spec/initContainers/0/image

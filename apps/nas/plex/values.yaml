@@ -25,6 +25,9 @@ metrics:
     limits:
       cpu: 100m
       memory: 100Mi
+    requests:
+      cpu: "0"
+      memory: 24Mi
 serviceMonitor:
   create: true
   jobLabel: app.kubernetes.io/name
@@ -183,6 +186,9 @@ containers:
       limits:
         cpu: 100m
         memory: 100Mi
+      requests:
+        cpu: "0"
+        memory: 64Mi
 initContainers:
   import-configuration:
     image: alpine:3.18.0
@@ -270,3 +276,8 @@ service:
 ingress:
   main:
     enabled: false
+resources:
+  requests:
+    memory: 2Gi
+  limits:
+    memory: 24Gi

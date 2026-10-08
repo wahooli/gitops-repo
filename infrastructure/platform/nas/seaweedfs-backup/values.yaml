@@ -4,6 +4,17 @@ image:
 fullNameOverride: seaweedfs-backup
 master:
   replicaCount: 1
+  resources:
+    requests:
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch
 volume:
   replicaCount: 1
   args:
@@ -22,6 +33,17 @@ volume:
         resources:
           requests:
             storage: 1Ti
+  resources:
+    requests:
+      memory: 160Mi
+    limits:
+      memory: 384Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch
 postUp:
   enabled: true
   collections:
@@ -29,6 +51,17 @@ postUp:
   - name: nas-backups
   - name: tpi-1-backups
   - name: livingroom-pi-backups
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+  resources:
+    requests:
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+  env:
+    HOME: /tmp
 filer:
   replicaCount: 1
   podAnnotations:
@@ -59,3 +92,14 @@ filer:
         resources:
           requests:
             storage: 1Ti
+  resources:
+    requests:
+      memory: 1Gi
+    limits:
+      memory: 5Gi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch

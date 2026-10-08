@@ -3,3 +3,13 @@ kind: Kustomization
 resources:
 - mutatingpolicy.yaml
 - networkpolicy.yaml
+- policyexception.yaml
+- validatingpolicy.yaml
+patches:
+- target:
+    group: policies.kyverno.io
+    kind: ValidatingPolicy
+  patch: |
+    - op: replace
+      path: /spec/validationActions
+      value: [Deny, Audit]

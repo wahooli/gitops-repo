@@ -29,6 +29,11 @@ primary:
   persistence:
     enabled: true
     size: 2Gi
+  resources:
+    requests:
+      memory: 48Mi
+    limits:
+      memory: 96Mi
 auth:
   enablePostgresUser: true
   database: vaultwarden

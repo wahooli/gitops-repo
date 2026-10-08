@@ -24,3 +24,20 @@ bind9:
   zoneCopy:
     enabled: true
     overwrite: false
+podSecurityContext:
+  runAsNonRoot: true
+  sysctls:
+  - name: net.ipv4.ip_unprivileged_port_start
+    value: '0'
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+persistence:
+  bind-etc:
+    enabled: true
+    mount:
+    - path: /etc/bind
+    spec:
+      emptyDir: {}

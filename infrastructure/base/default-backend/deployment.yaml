@@ -15,6 +15,10 @@ spec:
       labels:
         app.kubernetes.io/name: nginx
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
       initContainers:
       - name: webcontent-copy
         image: busybox:latest
@@ -33,7 +37,7 @@ spec:
         image: nginx:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 80
+        - containerPort: 8080
           name: http
           protocol: TCP
         resources:
@@ -42,7 +46,7 @@ spec:
             cpu: "250m"
           requests:
             memory: "32Mi"
-            cpu: "64m"
+            cpu: "0"
         volumeMounts:
         - name: html
           mountPath: /usr/share/nginx/html

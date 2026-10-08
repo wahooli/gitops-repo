@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: restrict-image-registries
   annotations:
@@ -11,26 +11,52 @@ metadata:
       vulnerabilities or malicious code. This policy audits container images
       to ensure they come from trusted registries.
 spec:
-  validationFailureAction: Audit
-  background: true
-  rules:
-  - name: validate-registries
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - kube-system
-          - kyverno
-    validate:
-      message: "Images must be from an allowed registry."
-      pattern:
-        spec:
-          containers:
-          - image: "docker.io/* | ghcr.io/* | quay.io/* | registry.k8s.io/* | lscr.io/*"
-          =(initContainers):
-          - image: "docker.io/* | ghcr.io/* | quay.io/* | registry.k8s.io/* | lscr.io/*"
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  autogen:
+    podControllers:
+      controllers:
+      - deployments
+      - statefulsets
+      - daemonsets
+      - jobs
+      - cronjobs
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kyverno]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+  variables:
+  - name: allContainers
+    expression: >-
+      object.spec.containers +
+      object.spec.?initContainers.orValue([]) +
+      object.spec.?ephemeralContainers.orValue([])
+  - name: allowedRegistries
+    expression: >-
+      [
+        'index.docker.io',
+        'ghcr.io',
+        'quay.io',
+        'gcr.io',
+        'registry.k8s.io',
+        'reg.kyverno.io',
+        'lscr.io',
+        'code.forgejo.org',
+        'registry.${domain_wahoo_li:=wahoo.li}',
+        'registry.${domain_absolutist_it:=absolutist.it}'
+      ]
+  - name: untrustedContainers
+    expression: >-
+      variables.allContainers.filter(c, !(image(c.image).registry() in variables.allowedRegistries))
+  validations:
+  - expression: size(variables.untrustedContainers) == 0
+    messageExpression: >-
+      'Images must be from an allowed registry: ' +
+      variables.untrustedContainers.map(c, c.name + ' (' + c.image + ')').join(', ')

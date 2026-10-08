@@ -13,6 +13,11 @@ sidecar:
     defaultFolderName: default
     enabled: true
     multicluster: false
+  resources:
+    requests:
+      memory: 128Mi
+    limits:
+      memory: 192Mi
 ingress:
   enabled: false
 dnsConfig:
@@ -61,3 +66,8 @@ grafana.ini:
 plugins:
 - https://github.com/VictoriaMetrics/victoriametrics-datasource/releases/download/v0.23.3/victoriametrics-metrics-datasource-v0.23.3.zip;victoriametrics-datasource
 - https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/v0.26.3/victoriametrics-logs-datasource-v0.26.3.zip;victoriametrics-logs-datasource
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 1Gi

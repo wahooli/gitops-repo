@@ -7,5 +7,6 @@
 !ci/pages/**/*
 !ci/patch-manifests.yaml
 !ci/minimal-requests.yaml
+!ci/kyverno-check.py
 !bootstrap-flux.sh.d/
 !create-cluster.sh.d/

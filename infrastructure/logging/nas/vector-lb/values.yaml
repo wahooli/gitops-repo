@@ -1,7 +1,11 @@
 fullnameOverride: vector-lb-nas
 role: Stateless-Aggregator
 dataDir: /vector-data-dir
-resources: {}
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 768Mi
 args:
 - -w
 - --config-dir
@@ -24,3 +28,7 @@ containerPorts:
   protocol: TCP
 serviceHeadless:
   enabled: false
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532

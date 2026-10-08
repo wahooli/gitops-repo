@@ -21,3 +21,4 @@
 !*/patches/*
 !*/patches/**/*.yaml
 !cilium-base-values.yaml
+!*/kyverno-check-vars.yaml

@@ -31,7 +31,7 @@ rules:
     (operator defaults, e.g. vmstorage 250m CPU, don't fit on the single CI node)
   expression: |
     with(select(.kind == "HelmRelease" and .spec.chart.spec.chart == "victoria-metrics-operator");
-      .spec.values.env = ([
+      .spec.values.env += ([
         "VM_VLAGENTDEFAULT_USEDEFAULTRESOURCES",
         "VM_VLCLUSTERDEFAULT_USEDEFAULTRESOURCES",
         "VM_VLOGSDEFAULT_USEDEFAULTRESOURCES",
@@ -52,6 +52,16 @@ rules:
     with(select(.metadata.name == "authentik-apply-blueprints");
       .spec.template.spec.initContainers[] |= with(select(.name == "apply-blueprints");
         .env += [{"name": "BLUEPRINT_ERROR_SLEEP", "value": "0"}]))
+  error_tolerant: true
+
+- description: >-
+    Keep Kyverno policies in Audit mode in CI: requests/limits are stripped above,
+    so a cluster overlay that enforces (Deny) would reject every pod. Drops overlay
+    patches targeting ValidatingPolicies, base policies are Audit. Matches on target,
+    since patch-manifests.sh hides block scalar contents (patch: |) from the rules
+  expression: |
+    with(select(.kind == "Kustomization" and has("patches"));
+      .patches |= map(select(.target.kind != "ValidatingPolicy")))
   error_tolerant: true
 
 # - description: Suspend HelmReleases in cluster-specific directories

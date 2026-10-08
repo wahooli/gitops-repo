@@ -45,6 +45,11 @@ global:
 #       successThreshold: 1
 #       timeoutSeconds: 1
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 100
+  runAsGroup: 101
+
 hostname: jellyplex-watched
 progressDeadlineSeconds: 600
 dnsConfig:
@@ -70,3 +75,8 @@ service:
     - name: metrics
       port: 9000
       protocol: TCP
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 768Mi

@@ -4,7 +4,7 @@ image:
 progressDeadlineSeconds: 600
 initContainers:
   copy-configuration:
-    image: ghcr.io/wahooli/docker/envsubst:latest
+    image: ghcr.io/wahooli/docker/envsubst:1.0.0@sha256:baba8fbaa0b66a00b624f349b87bf621bcb65d485556c6d2b634bc9af66812d1 # {"$imagepolicy": "flux-system:envsubst"}
     imagePullPolicy: IfNotPresent
     env:
     - name: database_user
@@ -50,3 +50,18 @@ service:
 ingress:
   main:
     enabled: false
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 768Mi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+command:
+- /bin/sh
+- -c
+- cd /app/ombi && exec /app/ombi/Ombi --storage /config --host 'http://*:3579'
+env:
+  TMPDIR: /tmp

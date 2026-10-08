@@ -23,7 +23,7 @@ env:
   LDAP_EXTRA_SCHEMAS: cosine,inetorgperson
 initContainers:
   copy-configuration:
-    image: ghcr.io/wahooli/docker/envsubst:latest
+    image: ghcr.io/wahooli/docker/envsubst:1.0.0@sha256:baba8fbaa0b66a00b624f349b87bf621bcb65d485556c6d2b634bc9af66812d1 # {"$imagepolicy": "flux-system:envsubst"}
     imagePullPolicy: IfNotPresent
     envFrom:
     - secretRef:
@@ -73,3 +73,7 @@ persistence:
         name: tls-mail-relay-openldap
 
 progressDeadlineSeconds: 600
+podSecurityContext:
+  runAsNonRoot: true
+securityContext:
+  runAsUser: 1001

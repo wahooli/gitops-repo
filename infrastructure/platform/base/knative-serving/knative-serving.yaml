@@ -19,6 +19,34 @@ spec:
       kubernetes.podspec-persistent-volume-write: enabled
       kubernetes.podspec-runtimeclassname: enabled
       kubernetes.podspec-init-containers: enabled
+      kubernetes.podspec-securitycontext: enabled
     defaults:
       revision-timeout-seconds: "9000"
       max-revision-timeout-seconds: "9000"
+    gc:
+      min-non-active-revisions: "0"
+      max-non-active-revisions: "0"
+    deployment:
+      queue-sidecar-memory-request: 32Mi
+      queue-sidecar-memory-limit: 128Mi
+  workloads:
+  - name: activator
+    resources:
+    - container: activator
+      requests:
+        cpu: "0"
+  - name: autoscaler
+    resources:
+    - container: autoscaler
+      requests:
+        cpu: "0"
+  - name: controller
+    resources:
+    - container: controller
+      requests:
+        cpu: "0"
+  - name: webhook
+    resources:
+    - container: webhook
+      requests:
+        cpu: "0"

@@ -17,15 +17,21 @@ spec:
       labels:
         app.kubernetes.io/name: whisper-asr-shim
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10002
+        runAsGroup: 10002
       containers:
       - name: whisper-asr-shim
         # Patched onerahmet/openai-whisper-asr-webservice with a "speaches"
         # ASR engine added — preserves Bazarr's /asr + /detect-language API
         # but forwards everything to Speaches over OpenAI HTTP.
         # Source: /home/wahooli/Code/whisper-asr-webservice
-        image: ghcr.io/wahooli/docker/whisper-asr-shim:latest
+        image: ghcr.io/wahooli/docker/whisper-asr-shim:latest@sha256:ead06fe0b8b5aac018b25471792b3882919375491a07362840118c33637a39e5
         imagePullPolicy: IfNotPresent
         env:
+        - name: HOME
+          value: /tmp
         - name: ASR_ENGINE
           value: speaches
         - name: SPEACHES_URL
@@ -42,7 +48,7 @@ spec:
           protocol: TCP
         resources:
           requests:
-            cpu: 50m
+            cpu: "0"
             memory: 256Mi
           limits:
             # Audio is loaded into memory as 16 kHz mono float32 before being

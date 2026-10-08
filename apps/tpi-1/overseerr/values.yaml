@@ -46,6 +46,12 @@ persistence:
         requests:
           storage: "2Gi"
 
+  next-cache:
+    enabled: true
+    mount:
+    - path: /app/.next/cache
+    spec:
+      emptyDir: {}
 service:
   main:
     annotations:
@@ -57,3 +63,14 @@ ingress:
     enabled: false
 
 progressDeadlineSeconds: 600
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 768Mi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch

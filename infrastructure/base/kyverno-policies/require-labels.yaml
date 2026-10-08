@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: require-labels
   annotations:
@@ -11,26 +11,19 @@ metadata:
       This policy audits that Deployments and StatefulSets carry the
       app.kubernetes.io/name label.
 spec:
-  validationFailureAction: Audit
-  background: true
-  rules:
-  - name: require-app-label
-    match:
-      any:
-      - resources:
-          kinds:
-          - Deployment
-          - StatefulSet
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - kube-system
-          - flux-system
-          - kyverno
-    validate:
-      message: "The label 'app.kubernetes.io/name' is required."
-      pattern:
-        metadata:
-          labels:
-            app.kubernetes.io/name: "?*"
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, flux-system, kyverno]
+    resourceRules:
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "statefulsets"]
+  validations:
+  - expression: object.metadata.?labels[?'app.kubernetes.io/name'].orValue('') != ''
+    message: "The label 'app.kubernetes.io/name' is required."

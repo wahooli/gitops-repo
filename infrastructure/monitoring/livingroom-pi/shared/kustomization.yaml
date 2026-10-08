@@ -75,3 +75,21 @@ patches:
     kind: VMPodScrape
     metadata:
       name: envoy-gateway-proxy
+- target:
+    kind: VMServiceScrape
+    name: kyverno
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMServiceScrape
+    metadata:
+      name: kyverno
+- target:
+    kind: VMServiceScrape
+    name: policy-reporter
+  patch: |-
+    $patch: delete
+    apiVersion: operator.victoriametrics.com/v1beta1
+    kind: VMServiceScrape
+    metadata:
+      name: policy-reporter

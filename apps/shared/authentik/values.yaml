@@ -2,6 +2,7 @@ global:
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server,authentik-patroni-server"
   securityContext:
+    runAsNonRoot: true
     fsGroup: 1000
     runAsUser: 1000
     runAsGroup: 1000
@@ -76,6 +77,11 @@ worker:
     - name: ndots
       value: "1"
     - name: edns0
+  resources:
+    requests:
+      memory: 384Mi
+    limits:
+      memory: 640Mi
 server:
   env:
   - name: POSTGRES_PASSWORD
@@ -100,6 +106,11 @@ server:
       service.cilium.io/affinity: "local"
   ingress:
     enabled: false
+  resources:
+    requests:
+      memory: 1Gi
+    limits:
+      memory: 1536Mi
 postgresql:
   enabled: false
   auth:

@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/home-operations/radarr
   tag: "6.4.4" # {"$imagepolicy": "flux-system:radarr:tag"}
 progressDeadlineSeconds: 600
 podAnnotations:
@@ -27,6 +28,9 @@ metrics:
     limits:
       cpu: 150m
       memory: 60Mi
+    requests:
+      cpu: "0"
+      memory: 24Mi
 serviceMonitor:
   create: true
   jobLabel: app.kubernetes.io/name
@@ -79,3 +83,12 @@ service:
 ingress:
   main:
     enabled: false
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 2002
+  runAsGroup: 2003
+resources:
+  requests:
+    memory: 384Mi
+  limits:
+    memory: 768Mi

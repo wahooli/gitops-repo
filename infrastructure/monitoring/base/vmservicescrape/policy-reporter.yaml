@@ -1,0 +1,16 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: policy-reporter
+  namespace: policy-reporter
+spec:
+  endpoints:
+  - port: http
+    honorLabels: true
+  namespaceSelector:
+    matchNames:
+    - policy-reporter
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: policy-reporter
+      app.kubernetes.io/name: policy-reporter

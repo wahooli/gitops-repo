@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: disallow-privileged-containers
   annotations:
@@ -10,31 +10,38 @@ metadata:
       Privileged mode disables most security mechanisms and must not be allowed.
       This policy ensures Pods do not use privileged mode.
 spec:
-  validationFailureAction: Audit
-  background: true
-  rules:
-  - name: privileged-containers
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - kube-system
-          - kyverno
-    validate:
-      message: "Privileged mode is disallowed."
-      pattern:
-        spec:
-          containers:
-          - =(securityContext):
-              =(privileged): false
-          =(initContainers):
-          - =(securityContext):
-              =(privileged): false
-          =(ephemeralContainers):
-          - =(securityContext):
-              =(privileged): false
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  autogen:
+    podControllers:
+      controllers:
+      - deployments
+      - statefulsets
+      - daemonsets
+      - jobs
+      - cronjobs
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kyverno]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+  variables:
+  - name: allContainers
+    expression: >-
+      object.spec.containers +
+      object.spec.?initContainers.orValue([]) +
+      object.spec.?ephemeralContainers.orValue([])
+  - name: privilegedContainers
+    expression: >-
+      variables.allContainers.filter(c, c.?securityContext.?privileged.orValue(false))
+  validations:
+  - expression: size(variables.privilegedContainers) == 0
+    messageExpression: >-
+      'Privileged mode is disallowed: ' +
+      variables.privilegedContainers.map(c, c.name).join(', ')

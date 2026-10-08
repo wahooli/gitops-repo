@@ -4,6 +4,7 @@ resources:
 - ../../shared/authentik
 - patroni
 - redis
+- ldap-outpost-probe-secret.yaml
 configMapGenerator:
 - name: authentik-values
   namespace: flux-system

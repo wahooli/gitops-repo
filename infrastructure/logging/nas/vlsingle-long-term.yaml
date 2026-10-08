@@ -15,7 +15,7 @@ spec:
     storageDataPath: /storage
   resources:
     requests:
-      cpu: 150m
+      cpu: "0"
       memory: 1Gi
     limits:
       cpu: 1200m

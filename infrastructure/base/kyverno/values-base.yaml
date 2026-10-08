@@ -5,7 +5,7 @@ admissionController:
   container:
     resources:
       requests:
-        cpu: 100m
+        cpu: "0"
         memory: 128Mi
       limits:
         cpu: 500m
@@ -13,7 +13,7 @@ admissionController:
 backgroundController:
   resources:
     requests:
-      cpu: 50m
+      cpu: "0"
       memory: 64Mi
     limits:
       cpu: 200m
@@ -21,7 +21,7 @@ backgroundController:
 cleanupController:
   resources:
     requests:
-      cpu: 50m
+      cpu: "0"
       memory: 64Mi
     limits:
       cpu: 200m
@@ -29,14 +29,22 @@ cleanupController:
 reportsController:
   resources:
     requests:
-      cpu: 50m
+      cpu: "0"
       memory: 64Mi
     limits:
-      cpu: 200m
+      cpu: "1"
       memory: 256Mi
+  rbac:
+    clusterRole:
+      extraResources:
+      - apiGroups: ["gateway.networking.k8s.io"]
+        resources: ["httproutes", "grpcroutes", "tlsroutes", "tcproutes", "udproutes"]
 features:
   # Every Kyverno webhook fails open, so an unavailable admission controller can't
   # block pod creation on a single-node cluster. Whether a violation blocks is still
   # set per policy (failureAction / validationActions).
   forceFailurePolicyIgnore:
     enabled: true
+  policyExceptions:
+    enabled: true
+    namespace: kyverno

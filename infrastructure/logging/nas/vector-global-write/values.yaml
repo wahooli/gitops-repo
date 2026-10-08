@@ -1,6 +1,10 @@
 role: Stateless-Aggregator
 dataDir: /vector-data-dir
-resources: {}
+resources:
+  requests:
+    memory: 384Mi
+  limits:
+    memory: 640Mi
 args:
 - -w
 - --config-dir
@@ -34,3 +38,7 @@ service:
     protocol: TCP
 serviceHeadless:
   enabled: false
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532

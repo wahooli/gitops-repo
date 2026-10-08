@@ -133,7 +133,8 @@ haproxy:
   enabled: false
   image:
     repository: ghcr.io/wahooli/docker/haproxy-redis
-    tag: "3.2"
+    tag: "3.2.25" # {"$imagepolicy": "flux-system:haproxy-redis:tag"}
+    digest: sha256:8677dd3f9c82b5f28920dcb01b67d0292250f6b917ad30c38575d6d044070501 # {"$imagepolicy": "flux-system:haproxy-redis:digest"}
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server"
   ciliumNetworkPolicies:

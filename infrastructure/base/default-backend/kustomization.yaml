@@ -25,6 +25,7 @@ labels:
     app.kubernetes.io/instance: default-backend
 images:
 - name: nginx
+  newName: nginxinc/nginx-unprivileged
   newTag: 1.27.3
 - name: busybox
   newTag: 1.37.0

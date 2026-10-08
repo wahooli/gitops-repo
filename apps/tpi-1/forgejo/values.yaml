@@ -50,7 +50,7 @@ extraContainers:
     mountPath: /syncthing
   resources:
     requests:
-      cpu: 50m
+      cpu: "0"
       memory: 64Mi
     limits:
       cpu: 500m
@@ -84,6 +84,11 @@ extraContainers:
   - name: anubis-config
     mountPath: /etc/anubis
     readOnly: true
+  resources:
+    requests:
+      memory: 32Mi
+    limits:
+      memory: 64Mi
 - name: ssh-proxy
   image: haproxy:lts-alpine
   ports:

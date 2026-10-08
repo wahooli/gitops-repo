@@ -1,0 +1,16 @@
+bazarr_movies_host_path: /mnt/bigdata/kyverno-check/bazarr-movies-host-path
+bazarr_tv_host_path: /mnt/bigdata/kyverno-check/bazarr-tv-host-path
+jellyfin_movies_host_path: /mnt/bigdata/kyverno-check/jellyfin-movies-host-path
+jellyfin_tv_host_path: /mnt/bigdata/kyverno-check/jellyfin-tv-host-path
+plex_movies_host_path: /mnt/bigdata/kyverno-check/plex-movies-host-path
+plex_tv_host_path: /mnt/bigdata/kyverno-check/plex-tv-host-path
+radarr_data_host_path: /mnt/bigdata/kyverno-check/radarr-data-host-path
+sonarr_data_host_path: /mnt/bigdata/kyverno-check/sonarr-data-host-path
+transmission_downloads_host_path: /mnt/bigdata/kyverno-check/transmission-downloads-host-path
+transmission_old_downloads_host_path: /mnt/bigdata/kyverno-check/transmission-old-downloads-host-path
+jdownloader_downloads_host_path: /mnt/bigdata/kyverno-check/jdownloader-downloads-host-path
+vl_downloader_downloads_host_path: /mnt/bigdata/kyverno-check/vl-downloader-downloads-host-path
+ps3netsrv_games_host_path: /mnt/bigdata/kyverno-check/ps3netsrv-games-host-path
+long_term_logs_cluster_directory_path: /mnt/bigdata/kyverno-check/long-term-logs-cluster-directory-path
+long_term_metrics_cluster_directory_path: /mnt/bigdata/kyverno-check/long-term-metrics-cluster-directory-path
+seaweedfs_hostpath_prefix: /mnt/bigdata/kyverno-check/seaweedfs-hostpath-prefix

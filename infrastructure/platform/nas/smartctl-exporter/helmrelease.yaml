@@ -43,3 +43,8 @@ spec:
     fullnameOverride: smartctl-exporter
     config:
       device_include: sd.*|nvme.*
+    resources:
+      requests:
+        memory: 48Mi
+      limits:
+        memory: 96Mi

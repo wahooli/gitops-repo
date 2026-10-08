@@ -98,7 +98,7 @@ spec:
         image: gcr.io/knative-releases/knative.dev/net-gateway-api/cmd/controller@sha256:dc6c099778b06152e25aa60d5de6b287948d40035bcb817e09705a6db545e21c
         resources:
           requests:
-            cpu: 100m
+            cpu: "0"
             memory: 100Mi
           limits:
             cpu: 1000m

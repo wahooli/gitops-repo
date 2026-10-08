@@ -184,6 +184,11 @@ service:
 gateway:
   enabled: true
   progressDeadlineSeconds: 600
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+    fsGroup: 65532
 extraArgs:
 - --snapshot-count=100000
 - --auto-compaction-mode=periodic

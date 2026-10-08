@@ -19,6 +19,17 @@ spec:
       for: 15m
       labels:
         severity: warning
+    - alert: KubeContainerOOMKilled
+      annotations:
+        description: Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }}
+          on {{ $labels.clustername }} was OOM-killed in the last 15 minutes.
+        summary: Container was OOM-killed.
+      expr: |-
+        increase(kube_pod_container_status_restarts_total{job="kube-state-metrics"}[15m]) >= 1
+        and on (clustername, namespace, pod, container)
+        kube_pod_container_status_last_terminated_reason{job="kube-state-metrics", reason="OOMKilled"} == 1
+      labels:
+        severity: warning
     - alert: KubePodNotReady
       annotations:
         description: Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in a non-ready

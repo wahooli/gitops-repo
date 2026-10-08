@@ -1,1 +1,9 @@
-{}
+kserve:
+  controller:
+    resources:
+      requests:
+        cpu: "0"
+    rbacProxy:
+      resources:
+        requests:
+          cpu: "0"

@@ -4,5 +4,5 @@ metadata:
   name: radarr
   namespace: flux-system
 spec:
-  image: ghcr.io/linuxserver/radarr
+  image: ghcr.io/home-operations/radarr
   interval: 24h

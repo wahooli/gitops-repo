@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/home-operations/prowlarr
   tag: "2.6.5" # {"$imagepolicy": "flux-system:prowlarr:tag"}
 progressDeadlineSeconds: 600
 podAnnotations:
@@ -29,6 +30,9 @@ metrics:
     limits:
       cpu: 100m
       memory: 60Mi
+    requests:
+      cpu: "0"
+      memory: 32Mi
 serviceMonitor:
   create: true
   jobLabel: app.kubernetes.io/name
@@ -59,3 +63,12 @@ service:
 ingress:
   main:
     enabled: false
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 911
+  runAsGroup: 911
+resources:
+  requests:
+    memory: 320Mi
+  limits:
+    memory: 512Mi
