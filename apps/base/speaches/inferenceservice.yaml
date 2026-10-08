@@ -17,6 +17,10 @@ spec:
     scaleMetric: concurrency
     timeout: 600
     runtimeClassName: nvidia
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
     model:
       modelFormat:
         name: whisper

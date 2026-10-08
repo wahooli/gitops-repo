@@ -17,6 +17,10 @@ spec:
     scaleMetric: concurrency
     timeout: 600
     runtimeClassName: nvidia
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
     containers:
     - name: kokoro-tts
       image: ghcr.io/wahooli/docker/kokoro-fastapi-gpu:latest@sha256:8503affe8166e05364876d8ed008963f27fb3058df09fdb1a3257f1f8bdd6d98

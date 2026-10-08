@@ -19,6 +19,7 @@ spec:
       kubernetes.podspec-persistent-volume-write: enabled
       kubernetes.podspec-runtimeclassname: enabled
       kubernetes.podspec-init-containers: enabled
+      kubernetes.podspec-securitycontext: enabled
     defaults:
       revision-timeout-seconds: "9000"
       max-revision-timeout-seconds: "9000"

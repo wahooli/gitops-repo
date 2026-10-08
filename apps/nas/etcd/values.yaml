@@ -195,6 +195,11 @@ gateway:
       memory: 24Mi
     limits:
       memory: 96Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+    fsGroup: 65532
 persistence:
   data:
     enabled: true
