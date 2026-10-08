@@ -1,14 +1,14 @@
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
-  name: haproxy-redis
+  name: immich-server
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: haproxy-redis
-  digestReflectionPolicy: IfNotPresent
+    name: immich-server
   filterTags:
-    pattern: '^\d+\.\d+\.\d+-\d+$'
+    pattern: '^v(?P<version>\d+\.\d+\.\d+)$'
+    extract: '$version'
   policy:
     semver:
-      range: "~3.2.0-0"
+      range: '^3.0.0'

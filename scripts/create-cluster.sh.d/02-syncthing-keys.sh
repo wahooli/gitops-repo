@@ -32,6 +32,12 @@ secretGenerator:
 EOF
 fi
 
+SYNCTHING_KEYS_IMMICH_DIR="$REPO_ROOT/local-clusters/$CLUSTER_NAME/bootstrap/syncthing-keys-immich"
+mkdir -p "$SYNCTHING_KEYS_IMMICH_DIR"
+cp "$SYNCTHING_KEYS_DIR/cert.pem" "$SYNCTHING_KEYS_DIR/key.pem" "$SYNCTHING_KEYS_IMMICH_DIR/"
+sed 's/^namespace: forgejo$/namespace: immich/' "$SYNCTHING_KEYS_DIR/kustomization.yaml" \
+  > "$SYNCTHING_KEYS_IMMICH_DIR/kustomization.yaml"
+
 # Copy device ID to shared directory for cross-cluster reference
 SYNCTHING_DEVICES_DIR="$REPO_ROOT/local-clusters/.syncthing-devices"
 mkdir -p "$SYNCTHING_DEVICES_DIR"

@@ -9,17 +9,20 @@ global:
   labels:
     backupWeekly: "true"
     backupDaily: "true"
-    app.kubernetes.io/part-of: forgejo
+    app.kubernetes.io/part-of: immich
 
 image:
-  repository: ghcr.io/wahooli/docker/patroni-17
-  tag: 4.0.6-1 # {"$imagepolicy": "flux-system:patroni-17:tag"}
+  repository: ghcr.io/wahooli/docker/patroni-17-vchord
+  tag: 4.0.6-1 # {"$imagepolicy": "flux-system:patroni-17-vchord:tag"}
 
 postgresql:
   bootstrap:
-    database: forgejo
-    username: forgejo
-    password: ${forgejo_database_password}
+    database: immich
+    username: immich
+    password: ${immich_database_password}
+    extraSql:
+      10_immich.sql: |
+        ALTER USER immich WITH SUPERUSER;
 
 secrets:
   etcd-client:
@@ -65,8 +68,7 @@ podAnnotations:
   pre.hook.backup.velero.io/container: patroni
   post.hook.restore.velero.io/container: patroni
   pre.hook.backup.velero.io/command: '["/bin/bash", "/backup-scripts/pre-backup.sh"]'
-  secret.reloader.stakater.com/reload: "forgejo-patroni-etcd-client,patroni-server"
-  configmap.reloader.stakater.com/reload: "pgbouncer-env"
+  secret.reloader.stakater.com/reload: "immich-patroni-etcd-client,patroni-server"
 
 ssl:
   enabled: true
@@ -119,28 +121,8 @@ podMonitor:
       action: drop
       regex: ^(go_.*|promhttp_.*)$
 
-pgbouncer:
-  envFrom:
-    poolMode:
-      type: configMap
-      useFromChart: false
-      name: forgejo-pgbouncer-env
-  env:
-    SERVER_RESET_QUERY: "DISCARD ALL"
-    IGNORE_STARTUP_PARAMETERS: extra_float_digits
-    MAX_CLIENT_CONN: 100
-    DEFAULT_POOL_SIZE: 20
-    SERVER_LOGIN_RETRY: 10
-    QUERY_WAIT_TIMEOUT: 0
-    RESERVE_POOL_SIZE: 5
-    RESERVE_POOL_TIMEOUT: 3
-    LOG_CONNECTIONS: 0
-    LOG_POOLER_ERRORS: 1
-    LOG_DISCONNECTIONS: 0
-    LOG_STATS: 0
-
 patroni:
-  scope: patroni
+  scope: immich
   allowLoginFrom:
   - 127.0.0.1/32
   - ::1/128
@@ -151,9 +133,9 @@ patroni:
   - 127.0.0.1/32
   - ::1/128
   - 10.0.0.0/8
-  superuserPassword: ${forgejo_postgres_superuser_password}
-  replicationPassword: ${forgejo_postgres_replication_password}
-  rewindPassword: ${forgejo_postgres_rewind_password}
+  superuserPassword: ${immich_postgres_superuser_password}
+  replicationPassword: ${immich_postgres_replication_password}
+  rewindPassword: ${immich_postgres_rewind_password}
   jsonLog: true
   config:
     bootstrap:
@@ -186,6 +168,7 @@ patroni:
         wal_compression: "on"
         log_destination: stderr
         logging_collector: "off"
+        shared_preload_libraries: vchord.so
 
 podSecurityContext:
   runAsNonRoot: true
@@ -212,7 +195,7 @@ persistence:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 1Gi
+          storage: 10Gi
   backup-scripts:
     enabled: true
     mount:
@@ -241,7 +224,7 @@ resources:
   requests:
     memory: 512Mi
   limits:
-    memory: 768Mi
+    memory: 1Gi
 containers:
   postgres-log:
     resources:

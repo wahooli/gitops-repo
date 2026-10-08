@@ -74,7 +74,6 @@ postUp:
   enabled: true
   collections:
   - name: forgejo-s3-data
-  - name: immich-data
   - name: zot-registry
 resticBackup:
   enabled: true

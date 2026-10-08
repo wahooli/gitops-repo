@@ -174,9 +174,9 @@ certificates:
         velero.io/exclude-from-backup: "true"
       annotations:
         reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik,crowdsec,forgejo"
+        reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,authentik,crowdsec,forgejo,immich"
         reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-        reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "crowdsec,forgejo"
+        reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "crowdsec,forgejo,immich"
 dnsConfig:
   options:
   - name: ndots

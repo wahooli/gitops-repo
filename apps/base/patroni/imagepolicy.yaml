@@ -6,6 +6,8 @@ metadata:
 spec:
   imageRepositoryRef:
     name: patroni-17
+  filterTags:
+    pattern: '^\d+\.\d+\.\d+-\d+$'
   policy:
     semver:
-      range: x.x.x
+      range: "~4.0.0-0"

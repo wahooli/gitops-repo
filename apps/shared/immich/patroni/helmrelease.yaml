@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich--immich-patroni
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: cert-manager--cert-manager
+    namespace: flux-system
+  - name: reflector--reflector
+    namespace: flux-system
+  - name: etcd--etcd
+    namespace: flux-system
+  releaseName: immich-patroni
+  interval: 5m
+  targetNamespace: immich
+  valuesFrom:
+  - kind: ConfigMap
+    name: immich-patroni-values
+    valuesKey: values-shared.yaml
+  - kind: ConfigMap
+    name: immich-patroni-values
+    optional: true
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: immich-patroni-helmrelease-overrides
+    optional: true
+    valuesKey: values.yaml

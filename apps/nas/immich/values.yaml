@@ -1,0 +1,24 @@
+server:
+  controllers:
+    main:
+      containers:
+        main:
+          resources:
+            requests:
+              memory: 1Gi
+            limits:
+              memory: 4Gi
+  service:
+    main:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "local"
+  persistence:
+    thumbs:
+      type: persistentVolumeClaim
+      storageClass: topolvm-fast
+      accessMode: ReadWriteOnce
+      size: 100Gi
+      retain: true
+      globalMounts:
+      - path: /data/thumbs

@@ -8,9 +8,6 @@ master:
           [master.maintenance]
           scripts = """
             lock
-            ec.encode -fullPercent=95 -quietFor=1h -collection=immich-data
-            ec.rebuild -force -collection=immich-data
-            ec.balance -force -collection=immich-data
             ec.encode -fullPercent=95 -quietFor=1h -collection=zot-registry
             ec.rebuild -force -collection=zot-registry
             ec.balance -force -collection=zot-registry
@@ -55,7 +52,6 @@ postUp:
   collections:
   - name: forgejo-s3-data
     replication: "001"
-  - name: immich-data
   - name: zot-registry
 
 filer:

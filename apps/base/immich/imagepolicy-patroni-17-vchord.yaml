@@ -1,14 +1,13 @@
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
-  name: haproxy-redis
+  name: patroni-17-vchord
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: haproxy-redis
-  digestReflectionPolicy: IfNotPresent
+    name: patroni-17-vchord
   filterTags:
     pattern: '^\d+\.\d+\.\d+-\d+$'
   policy:
     semver:
-      range: "~3.2.0-0"
+      range: '~4.0.0-0'
