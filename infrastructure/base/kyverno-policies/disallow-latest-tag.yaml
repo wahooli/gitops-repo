@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: disallow-latest-tag
   annotations:
@@ -10,24 +10,34 @@ metadata:
       The ':latest' tag is mutable and can lead to unexpected errors if the
       image changes. A best practice is to use an immutable tag that maps to
       a specific version of an application Pod. This policy validates that the
-      image specifies a tag and that it is not called 'latest'.
+      image specifies a tag or digest and that the tag is not 'latest'.
 spec:
-  validationFailureAction: Audit
-  background: true
-  rules:
-  - name: validate-image-tag
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    validate:
-      message: "An image tag is required and cannot be 'latest'."
-      pattern:
-        spec:
-          containers:
-          - image: "!*:latest"
-          =(initContainers):
-          - image: "!*:latest"
-          =(ephemeralContainers):
-          - image: "!*:latest"
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  matchConstraints:
+    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kyverno]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+  variables:
+  - name: allContainers
+    expression: >-
+      object.spec.containers +
+      object.spec.?initContainers.orValue([]) +
+      object.spec.?ephemeralContainers.orValue([])
+  # image() resolves an untagged reference to 'latest', and a digest-pinned one to its digest
+  - name: latestContainers
+    expression: >-
+      variables.allContainers.filter(c, image(c.image).identifier() == 'latest')
+  validations:
+  - expression: size(variables.latestContainers) == 0
+    messageExpression: >-
+      'An image tag is required and cannot be latest: ' +
+      variables.latestContainers.map(c, c.name + ' (' + c.image + ')').join(', ')

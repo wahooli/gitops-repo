@@ -1,0 +1,33 @@
+fullnameOverride: policy-reporter
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+metrics:
+  enabled: true
+  # Only non-passing results get a series, which keeps cardinality to what's worth alerting on
+  filter:
+    status:
+      exclude: ["pass", "skip"]
+ui:
+  enabled: true
+  resources:
+    requests:
+      cpu: 5m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+plugin:
+  kyverno:
+    enabled: true
+    resources:
+      requests:
+        cpu: 5m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi

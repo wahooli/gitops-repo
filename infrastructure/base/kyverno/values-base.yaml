@@ -34,9 +34,20 @@ reportsController:
     limits:
       cpu: 200m
       memory: 256Mi
+  rbac:
+    clusterRole:
+      # Background scans for require-public-route-label need to read Gateway API routes
+      extraResources:
+      - apiGroups: ["gateway.networking.k8s.io"]
+        resources: ["httproutes", "grpcroutes", "tlsroutes", "tcproutes", "udproutes"]
 features:
   # Every Kyverno webhook fails open, so an unavailable admission controller can't
   # block pod creation on a single-node cluster. Whether a violation blocks is still
   # set per policy (failureAction / validationActions).
   forceFailurePolicyIgnore:
     enabled: true
+  # PolicyExceptions are only honored in the kyverno namespace, so app namespaces
+  # can't exempt themselves
+  policyExceptions:
+    enabled: true
+    namespace: kyverno

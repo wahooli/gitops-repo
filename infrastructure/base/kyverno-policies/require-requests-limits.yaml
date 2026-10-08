@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: require-requests-limits
   annotations:
@@ -8,32 +8,38 @@ metadata:
     policies.kyverno.io/severity: medium
     policies.kyverno.io/description: >-
       Resource requests and limits are required to ensure workloads do not
-      consume unbounded resources. This policy validates that all containers
-      have resource requests and limits defined.
+      consume unbounded resources. This policy validates that all long-running
+      containers, including native sidecars, have CPU and memory requests and a
+      memory limit defined.
 spec:
-  validationFailureAction: Audit
-  background: true
-  rules:
-  - name: validate-resources
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - kube-system
-          - kyverno
-    validate:
-      message: "CPU and memory resource requests and limits are required."
-      pattern:
-        spec:
-          containers:
-          - resources:
-              requests:
-                memory: "?*"
-                cpu: "?*"
-              limits:
-                memory: "?*"
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  matchConstraints:
+    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kyverno]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+  variables:
+  # Native sidecars are initContainers with restartPolicy: Always
+  - name: longRunningContainers
+    expression: >-
+      object.spec.containers +
+      object.spec.?initContainers.orValue([]).filter(c, c.?restartPolicy.orValue('') == 'Always')
+  - name: missingResources
+    expression: >-
+      variables.longRunningContainers.filter(c, !(
+        c.?resources.?requests[?'cpu'].hasValue() &&
+        c.?resources.?requests[?'memory'].hasValue() &&
+        c.?resources.?limits[?'memory'].hasValue()))
+  validations:
+  - expression: size(variables.missingResources) == 0
+    messageExpression: >-
+      'CPU and memory requests and a memory limit are required: ' +
+      variables.missingResources.map(c, c.name).join(', ')

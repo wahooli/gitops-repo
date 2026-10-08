@@ -1,0 +1,39 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-vpn-gateway-injection
+  annotations:
+    policies.kyverno.io/title: Require VPN Gateway Injection
+    policies.kyverno.io/category: VPN
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Pods labelled homelab.wahoo.li/vpn-client=true get their gateway containers
+      from the vpn-gateway-client MutatingPolicy. Kyverno webhooks fail open, so a
+      pod created while Kyverno is unavailable starts without them and, behind the
+      kill switch, can only reach the cluster. This policy reports such pods.
+spec:
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  # The gateway containers only exist on Pods, never in their controllers' pod templates
+  autogen:
+    podControllers:
+      controllers: []
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+    objectSelector:
+      matchLabels:
+        homelab.wahoo.li/vpn-client: "true"
+  variables:
+  - name: initContainerNames
+    expression: object.spec.?initContainers.orValue([]).map(c, c.name)
+  validations:
+  - expression: >-
+      'gateway-init' in variables.initContainerNames &&
+      'gateway-sidecar' in variables.initContainerNames
+    message: >-
+      The VPN gateway containers were not injected, most likely because Kyverno
+      was unavailable when the pod was created. Delete the pod to recreate it.

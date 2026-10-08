@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: require-run-as-nonroot
   annotations:
@@ -8,33 +8,38 @@ metadata:
     policies.kyverno.io/severity: medium
     policies.kyverno.io/description: >-
       Containers must be required to run as non-root users. This policy ensures
-      runAsNonRoot is set to true either at the pod or container level.
+      runAsNonRoot resolves to true for every container, either set on the
+      container itself or inherited from the pod securityContext.
 spec:
-  validationFailureAction: Audit
-  background: true
-  rules:
-  - name: run-as-non-root
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - kube-system
-          - kyverno
-    validate:
-      message: "Running as root is not allowed. Either pod or container securityContext must set runAsNonRoot to true."
-      anyPattern:
-      - spec:
-          securityContext:
-            runAsNonRoot: true
-          containers:
-          - =(securityContext):
-              =(runAsNonRoot): true
-      - spec:
-          containers:
-          - securityContext:
-              runAsNonRoot: true
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  matchConstraints:
+    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kyverno]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+  variables:
+  - name: allContainers
+    expression: >-
+      object.spec.containers +
+      object.spec.?initContainers.orValue([]) +
+      object.spec.?ephemeralContainers.orValue([])
+  - name: podRunAsNonRoot
+    expression: object.spec.?securityContext.?runAsNonRoot.orValue(false)
+  # A container-level runAsNonRoot overrides the pod-level one
+  - name: rootContainers
+    expression: >-
+      variables.allContainers.filter(c,
+        !c.?securityContext.?runAsNonRoot.orValue(variables.podRunAsNonRoot))
+  validations:
+  - expression: size(variables.rootContainers) == 0
+    messageExpression: >-
+      'Running as root is not allowed. Set runAsNonRoot to true in the pod or container securityContext: ' +
+      variables.rootContainers.map(c, c.name).join(', ')

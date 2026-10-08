@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: disallow-host-namespaces
   annotations:
@@ -12,24 +12,27 @@ metadata:
       allowed access to host namespaces. This policy ensures fields
       spec.hostNetwork, spec.hostIPC, and spec.hostPID are unset or set to false.
 spec:
-  validationFailureAction: Audit
-  background: true
-  rules:
-  - name: host-namespaces
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - kube-system
-    validate:
-      message: "Sharing host namespaces is disallowed."
-      pattern:
-        spec:
-          =(hostPID): false
-          =(hostIPC): false
-          =(hostNetwork): false
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  matchConstraints:
+    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kyverno]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+  variables:
+  - name: hostNamespaces
+    expression: >-
+      (object.spec.?hostPID.orValue(false) ? ['hostPID'] : []) +
+      (object.spec.?hostIPC.orValue(false) ? ['hostIPC'] : []) +
+      (object.spec.?hostNetwork.orValue(false) ? ['hostNetwork'] : [])
+  validations:
+  - expression: size(variables.hostNamespaces) == 0
+    messageExpression: >-
+      'Sharing host namespaces is disallowed: ' + variables.hostNamespaces.join(', ')

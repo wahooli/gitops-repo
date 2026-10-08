@@ -4,7 +4,10 @@ resources:
 - disallow-latest-tag.yaml
 - disallow-privileged-containers.yaml
 - disallow-host-namespaces.yaml
+- disallow-host-path.yaml
+- disallow-capabilities.yaml
 - require-run-as-nonroot.yaml
 - require-requests-limits.yaml
 - require-labels.yaml
+- require-public-route-label.yaml
 - restrict-image-registries.yaml

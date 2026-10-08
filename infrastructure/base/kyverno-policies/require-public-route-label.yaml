@@ -1,0 +1,42 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-public-route-label
+  annotations:
+    policies.kyverno.io/title: Require Label on Public Routes
+    policies.kyverno.io/category: Exposure
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Routes attached to the public gateway envoy-gw are exposed outside the
+      home network. This policy audits that every such route is explicitly
+      labelled homelab.wahoo.li/exposure=public, so a route can't become public
+      by accident, for example by copying a parentRef from another route.
+spec:
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ["gateway.networking.k8s.io"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["httproutes", "grpcroutes"]
+    - apiGroups: ["gateway.networking.k8s.io"]
+      apiVersions: ["v1alpha2"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["tlsroutes", "tcproutes", "udproutes"]
+  variables:
+  # parentRef group, kind and namespace default to Gateway API group, Gateway and the route's namespace
+  - name: publicParentRefs
+    expression: >-
+      object.spec.?parentRefs.orValue([]).filter(p,
+        p.?group.orValue('gateway.networking.k8s.io') == 'gateway.networking.k8s.io' &&
+        p.?kind.orValue('Gateway') == 'Gateway' &&
+        p.?namespace.orValue(object.metadata.namespace) == 'envoy-gateway-system' &&
+        p.name == 'envoy-gw')
+  validations:
+  - expression: >-
+      size(variables.publicParentRefs) == 0 ||
+      object.metadata.?labels[?'homelab.wahoo.li/exposure'].orValue('') == 'public'
+    message: >-
+      This route is attached to the public gateway envoy-gw. Label it
+      homelab.wahoo.li/exposure=public to confirm it is meant to be public.

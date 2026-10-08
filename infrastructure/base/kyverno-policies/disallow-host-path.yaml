@@ -1,0 +1,37 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: disallow-host-path
+  annotations:
+    policies.kyverno.io/title: Disallow hostPath
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      HostPath volumes let Pods use host directories and volumes in containers.
+      Mounting host paths can be used to access shared data or escalate
+      privileges on the node and should not be allowed. This policy ensures no
+      hostPath volumes are in use.
+spec:
+  validationActions: [Audit]
+  failurePolicy: Ignore
+  matchConstraints:
+    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kyverno]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+  variables:
+  - name: hostPathVolumes
+    expression: >-
+      object.spec.?volumes.orValue([]).filter(v, has(v.hostPath))
+  validations:
+  - expression: size(variables.hostPathVolumes) == 0
+    messageExpression: >-
+      'hostPath volumes are disallowed: ' +
+      variables.hostPathVolumes.map(v, v.name + ' (' + v.hostPath.path + ')').join(', ')

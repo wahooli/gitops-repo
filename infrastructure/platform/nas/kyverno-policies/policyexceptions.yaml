@@ -1,0 +1,40 @@
+# Media and long-term metrics/logs storage live on the disk array under /mnt/bigdata.
+# Any workload may mount paths there; a hostPath anywhere else is still reported.
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: bigdata-host-paths
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: disallow-host-path
+    kind: ValidatingPolicy
+  matchConditions:
+  # Reads the pod spec from the pod template when the policy is applied to a controller.
+  # [x].exists(name, ...) binds x to a name: cel.bind isn't available here.
+  - name: only-bigdata-host-paths
+    expression: >-
+      [object.?spec.?template.?spec.orValue(
+        object.?spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec))
+      ].exists(podSpec,
+        [podSpec.?volumes.orValue([]).filter(v, has(v.hostPath))].exists(hostPathVolumes,
+          size(hostPathVolumes) > 0 &&
+          hostPathVolumes.all(v, v.hostPath.path.startsWith('/mnt/bigdata/'))))
+---
+# The VPN gateway itself (gluetun and pod-gateway) needs NET_ADMIN to manage
+# routing and the tunnel.
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: vpn-gateway
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: disallow-capabilities
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: vpn-gateway
+    expression: >-
+      object.metadata.namespace == 'vpn-gateway' &&
+      object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))
+        [?'app.kubernetes.io/name'].orValue('') == 'vpn-gateway'
