@@ -26,6 +26,8 @@ lapi:
   extraVolumes: *extraVolumes
   extraVolumeMounts: *extraVolumeMounts
   replicas: 1
+  strategy:
+    type: RollingUpdate
   storeCAPICredentialsInSecret: true
   persistentVolume:
     config:
