@@ -22,6 +22,15 @@ ingress:
 httpRoute:
   enabled: false
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  sysctls:
+  - name: net.ipv4.ip_unprivileged_port_start
+    value: "0"
+
 replicaCount: 1
 
 serviceAccount:

@@ -41,3 +41,10 @@ workload:
   annotations:
     secret.reloader.stakater.com/reload: "tls-blocky"
 resources: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 100
+  runAsGroup: 100
+  sysctls:
+  - name: net.ipv4.ip_unprivileged_port_start
+    value: "0"

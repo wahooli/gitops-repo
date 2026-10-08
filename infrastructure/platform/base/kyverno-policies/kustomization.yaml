@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - ../../../base/kyverno-policies
 - policyexception-infrastructure.yaml
+- policyexception-root-by-design.yaml

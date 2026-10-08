@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/home-operations/prowlarr
   tag: "2.6.5" # {"$imagepolicy": "flux-system:prowlarr:tag"}
 progressDeadlineSeconds: 600
 podAnnotations:
@@ -59,3 +60,7 @@ service:
 ingress:
   main:
     enabled: false
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 911
+  runAsGroup: 911

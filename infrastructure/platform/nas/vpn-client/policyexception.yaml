@@ -1,6 +1,3 @@
-# gateway-init and gateway-sidecar, injected by the vpn-gateway-client MutatingPolicy,
-# run as root with NET_ADMIN (iptables) and without resources. The app containers of
-# these pods are still checked on their Deployment through autogen.
 apiVersion: policies.kyverno.io/v1
 kind: PolicyException
 metadata:

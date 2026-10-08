@@ -47,7 +47,16 @@ service:
     annotations:
       service.cilium.io/global: "true"
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+  fsGroupChangePolicy: OnRootMismatch
+
 haproxy:
+  podSecurityContext:
+    runAsNonRoot: true
   podAnnotations:
     secret.reloader.stakater.com/reload: "redis-server"
   enabled: false

@@ -25,7 +25,6 @@ spec:
       operations: ["CREATE", "UPDATE"]
       resources: ["tlsroutes", "tcproutes", "udproutes"]
   variables:
-  # parentRef group, kind and namespace default to Gateway API group, Gateway and the route's namespace
   - name: publicParentRefs
     expression: >-
       object.spec.?parentRefs.orValue([]).filter(p,

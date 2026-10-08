@@ -15,7 +15,6 @@ spec:
   validationActions: [Audit]
   failurePolicy: Ignore
   matchConstraints:
-    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
     namespaceSelector:
       matchExpressions:
       - key: kubernetes.io/metadata.name
@@ -27,7 +26,6 @@ spec:
       operations: ["CREATE", "UPDATE"]
       resources: ["pods"]
   variables:
-  # Native sidecars are initContainers with restartPolicy: Always
   - name: longRunningContainers
     expression: >-
       object.spec.containers +

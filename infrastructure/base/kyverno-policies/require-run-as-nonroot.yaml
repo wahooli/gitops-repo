@@ -14,7 +14,6 @@ spec:
   validationActions: [Audit]
   failurePolicy: Ignore
   matchConstraints:
-    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
     namespaceSelector:
       matchExpressions:
       - key: kubernetes.io/metadata.name
@@ -33,7 +32,6 @@ spec:
       object.spec.?ephemeralContainers.orValue([])
   - name: podRunAsNonRoot
     expression: object.spec.?securityContext.?runAsNonRoot.orValue(false)
-  # A container-level runAsNonRoot overrides the pod-level one
   - name: rootContainers
     expression: >-
       variables.allContainers.filter(c,

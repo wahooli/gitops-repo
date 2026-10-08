@@ -2,6 +2,7 @@ global:
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server,authentik-patroni-server"
   securityContext:
+    runAsNonRoot: true
     fsGroup: 1000
     runAsUser: 1000
     runAsGroup: 1000

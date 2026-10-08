@@ -4,7 +4,6 @@ metadata:
   name: kyverno
   namespace: kyverno
 spec:
-  # One metrics service per controller; only those expose metrics-port
   endpoints:
   - port: metrics-port
   namespaceSelector:

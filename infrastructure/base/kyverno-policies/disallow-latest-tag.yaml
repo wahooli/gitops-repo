@@ -15,7 +15,6 @@ spec:
   validationActions: [Audit]
   failurePolicy: Ignore
   matchConstraints:
-    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
     namespaceSelector:
       matchExpressions:
       - key: kubernetes.io/metadata.name
@@ -32,7 +31,6 @@ spec:
       object.spec.containers +
       object.spec.?initContainers.orValue([]) +
       object.spec.?ephemeralContainers.orValue([])
-  # image() resolves an untagged reference to 'latest', and a digest-pinned one to its digest
   - name: latestContainers
     expression: >-
       variables.allContainers.filter(c, image(c.image).identifier() == 'latest')

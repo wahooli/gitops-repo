@@ -4,5 +4,5 @@ metadata:
   name: sonarr
   namespace: flux-system
 spec:
-  image: ghcr.io/linuxserver/sonarr
+  image: ghcr.io/home-operations/sonarr
   interval: 24h

@@ -11,6 +11,21 @@ unbound:
     existingConfigMap: unbound-config
 redis:
   enabled: true
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    fsGroupChangePolicy: OnRootMismatch
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  sysctls:
+  - name: net.ipv4.ip_unprivileged_port_start
+    value: "0"
+env:
+  DISABLE_SET_PERMS: "true"
 image:
   tag: "1.26.1-1" # {"$imagepolicy": "flux-system:unbound:tag"}
 service:

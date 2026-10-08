@@ -45,6 +45,11 @@ global:
 #       successThreshold: 1
 #       timeoutSeconds: 1
 
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 100
+  runAsGroup: 101
+
 hostname: jellyplex-watched
 dnsConfig:
   options:

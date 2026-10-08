@@ -12,14 +12,12 @@ tls:
     name: clustermesh-issuer
     kind: ClusterIssuer
 master:
-  # The chart's TLS healthcheck sidecar defaults to curlimages/curl:latest
   containers:
     healthcheck:
       image:
         tag: "8.22.0"
   replicaCount: 1
 volume:
-  # The chart's TLS healthcheck sidecar defaults to curlimages/curl:latest
   containers:
     healthcheck:
       image:
@@ -44,7 +42,6 @@ volume:
           requests:
             storage: "5Gi"
 filer:
-  # The chart's TLS healthcheck sidecar defaults to curlimages/curl:latest
   containers:
     healthcheck:
       image:

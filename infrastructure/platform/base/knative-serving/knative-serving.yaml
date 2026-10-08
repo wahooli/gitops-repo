@@ -22,8 +22,6 @@ spec:
     defaults:
       revision-timeout-seconds: "9000"
       max-revision-timeout-seconds: "9000"
-    # Keep one inactive revision for rollback instead of the default of up to 20
-    # (each one is a scaled-to-zero Deployment)
     gc:
       min-non-active-revisions: "1"
       max-non-active-revisions: "1"

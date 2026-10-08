@@ -1,5 +1,3 @@
-# Infrastructure that needs host access by design: CSI drivers, the LVM daemon,
-# log collectors, the backup node agent and the seaweedfs backup job (FUSE mount).
 apiVersion: policies.kyverno.io/v1
 kind: PolicyException
 metadata:
@@ -16,8 +14,6 @@ spec:
   - name: disallow-host-namespaces
     kind: ValidatingPolicy
   matchConditions:
-  # Matches on pod labels, read from the pod template when the policy is applied to a
-  # controller. [x].exists(name, ...) binds x to a name: cel.bind isn't available here.
   - name: infrastructure-workload
     expression: >-
       [object.?spec.?template.?metadata.?labels.orValue(

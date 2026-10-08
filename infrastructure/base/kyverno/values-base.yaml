@@ -36,7 +36,6 @@ reportsController:
       memory: 256Mi
   rbac:
     clusterRole:
-      # Background scans for require-public-route-label need to read Gateway API routes
       extraResources:
       - apiGroups: ["gateway.networking.k8s.io"]
         resources: ["httproutes", "grpcroutes", "tlsroutes", "tcproutes", "udproutes"]
@@ -46,8 +45,6 @@ features:
   # set per policy (failureAction / validationActions).
   forceFailurePolicyIgnore:
     enabled: true
-  # PolicyExceptions are only honored in the kyverno namespace, so app namespaces
-  # can't exempt themselves
   policyExceptions:
     enabled: true
     namespace: kyverno

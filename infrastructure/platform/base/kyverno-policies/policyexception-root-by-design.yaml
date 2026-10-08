@@ -1,0 +1,29 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: root-by-design
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: root-workload
+    expression: >-
+      [object.?spec.?template.?metadata.?labels.orValue(
+        object.?spec.?jobTemplate.?spec.?template.?metadata.?labels.orValue(
+          object.metadata.?labels.orValue({})))
+      ].exists(labels,
+        (object.metadata.namespace == 'crowdsec' &&
+          labels[?'type'].orValue('') == 'agent') ||
+        (object.metadata.namespace == 'logging' &&
+          labels[?'app.kubernetes.io/instance'].orValue('') == 'vector-agent') ||
+        (object.metadata.namespace == 'seaweedfs' &&
+          labels[?'app.kubernetes.io/name'].orValue('') in [
+            'seaweedfs-csi-driver-node', 'seaweedfs-csi-driver-mount', 'seaweedfs-csi-driver-node-gc']) ||
+        (object.metadata.namespace == 'seaweedfs' &&
+          labels[?'app.kubernetes.io/component'].orValue('') == 'backup') ||
+        (object.metadata.namespace == 'topolvm-system' &&
+          labels[?'app.kubernetes.io/component'].orValue('') in ['node', 'lvmd']) ||
+        (object.metadata.namespace == 'velero' &&
+          labels[?'role'].orValue('') == 'node-agent'))

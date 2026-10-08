@@ -8,7 +8,6 @@ resources:
     memory: 256Mi
 metrics:
   enabled: true
-  # Only non-passing results get a series, which keeps cardinality to what's worth alerting on
   filter:
     status:
       exclude: ["pass", "skip"]

@@ -27,3 +27,7 @@ priorityClass:
 
 snapshot:
   enabled: false
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10000
+  runAsGroup: 10000

@@ -6,7 +6,6 @@ metadata:
 spec:
   endpoints:
   - port: http
-    # Keep the namespace of the reported resource instead of policy-reporter's own
     honorLabels: true
   namespaceSelector:
     matchNames:

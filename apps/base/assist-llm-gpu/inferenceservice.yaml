@@ -11,6 +11,12 @@ metadata:
     serving.kserve.io/autoscalerClass: "none"
 spec:
   predictor:
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 2000
+      runAsGroup: 0
+      fsGroup: 2000
+      fsGroupChangePolicy: OnRootMismatch
     deploymentStrategy:
       type: Recreate
     minReplicas: 1

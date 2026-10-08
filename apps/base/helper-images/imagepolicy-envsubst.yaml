@@ -1,0 +1,12 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: envsubst
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: envsubst
+  digestReflectionPolicy: IfNotPresent
+  policy:
+    semver:
+      range: ">=1.0.0"

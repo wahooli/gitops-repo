@@ -45,7 +45,6 @@ spec:
           type: RollingUpdate
           rollingUpdate:
             maxUnavailable: 1
-        # 30-day peaks: envoy ~105Mi, shutdown-manager ~60Mi
         container:
           resources:
             requests:
@@ -53,7 +52,6 @@ spec:
               memory: 256Mi
             limits:
               memory: 1Gi
-        # shutdown-manager has no resources field of its own
         patch:
           type: StrategicMerge
           value:

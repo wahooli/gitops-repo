@@ -14,7 +14,6 @@ metadata:
 spec:
   validationActions: [Audit]
   failurePolicy: Ignore
-  # The gateway containers only exist on Pods, never in their controllers' pod templates
   autogen:
     podControllers:
       controllers: []

@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/home-operations/sonarr
   tag: "4.0.20" # {"$imagepolicy": "flux-system:sonarr:tag"}
 progressDeadlineSeconds: 600
 podAnnotations:
@@ -80,3 +81,7 @@ service:
 ingress:
   main:
     enabled: false
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 2001
+  runAsGroup: 2003

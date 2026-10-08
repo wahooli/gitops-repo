@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- imagerepository-wait-for-it.yaml
+- imagepolicy-wait-for-it.yaml
+- imagerepository-envsubst.yaml
+- imagepolicy-envsubst.yaml
+- imagerepository-haproxy-redis.yaml
+- imagepolicy-haproxy-redis.yaml

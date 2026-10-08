@@ -56,3 +56,7 @@ affinity:
             - vector
         topologyKey: kubernetes.io/hostname
       weight: 10
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532

@@ -1,4 +1,5 @@
 image:
+  repository: ghcr.io/home-operations/tautulli
   tag: "2.18.2" # {"$imagepolicy": "flux-system:tautulli:tag"}
 env:
   TZ: Europe/Helsinki
@@ -43,3 +44,7 @@ ingress:
   main:
     enabled: false
 progressDeadlineSeconds: 600
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000

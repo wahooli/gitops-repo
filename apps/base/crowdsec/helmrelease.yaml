@@ -23,7 +23,6 @@ spec:
   upgrade:
     remediation:
       remediateLastFailure: true
-  # The chart hardcodes the LAPI Deployment's labels
   postRenderers:
   - kustomize:
       patches:

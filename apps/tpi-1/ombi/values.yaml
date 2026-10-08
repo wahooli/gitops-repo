@@ -4,7 +4,7 @@ image:
 progressDeadlineSeconds: 600
 initContainers:
   copy-configuration:
-    image: ghcr.io/wahooli/docker/envsubst:latest@sha256:3ef7792a0461205dbb5fc5bbcbf84d321f1d86eb2b0637b58b229f33f39aa274
+    image: ghcr.io/wahooli/docker/envsubst:1.0.0@sha256:baba8fbaa0b66a00b624f349b87bf621bcb65d485556c6d2b634bc9af66812d1 # {"$imagepolicy": "flux-system:envsubst"}
     imagePullPolicy: IfNotPresent
     env:
     - name: database_user

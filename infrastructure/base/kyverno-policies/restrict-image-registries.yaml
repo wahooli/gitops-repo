@@ -14,7 +14,6 @@ spec:
   validationActions: [Audit]
   failurePolicy: Ignore
   matchConstraints:
-    # Kyverno's resourceFilters keep these out of admission checks, but not out of background scans
     namespaceSelector:
       matchExpressions:
       - key: kubernetes.io/metadata.name
@@ -31,7 +30,6 @@ spec:
       object.spec.containers +
       object.spec.?initContainers.orValue([]) +
       object.spec.?ephemeralContainers.orValue([])
-  # image() resolves Docker Hub short names (busybox, victoriametrics/vmagent) to index.docker.io
   - name: allowedRegistries
     expression: >-
       [

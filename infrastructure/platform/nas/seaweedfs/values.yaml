@@ -46,14 +46,14 @@ filerSync:
         memory: 256Mi
     initContainers:
       wait-for-nas:
-        image: ghcr.io/wahooli/docker/wait-for-it:latest@sha256:e1836a99f598856d6a1e843f8c5ce2e67572918d09650ad903d943a134e9fa72
+        image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
         imagePullPolicy: IfNotPresent
         args:
         - seaweedfs-filer-tpi-1.seaweedfs.svc.cluster.local:8888
         - -t
         - "300"
       wait-for-local:
-        image: ghcr.io/wahooli/docker/wait-for-it:latest@sha256:e1836a99f598856d6a1e843f8c5ce2e67572918d09650ad903d943a134e9fa72
+        image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
         imagePullPolicy: IfNotPresent
         args:
         - seaweedfs-filer-nas.seaweedfs.svc.cluster.local:8888
@@ -94,10 +94,10 @@ resticBackup:
   initContainers:
     wait-for-filer:
       enabled: true
-      image: ghcr.io/wahooli/docker/wait-for-it:latest@sha256:e1836a99f598856d6a1e843f8c5ce2e67572918d09650ad903d943a134e9fa72
+      image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
     wait-for-master:
       enabled: true
-      image: ghcr.io/wahooli/docker/wait-for-it:latest@sha256:e1836a99f598856d6a1e843f8c5ce2e67572918d09650ad903d943a134e9fa72
+      image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
   envFrom:
     backup-credentials:
       type: secret
