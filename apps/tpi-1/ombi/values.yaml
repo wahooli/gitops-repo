@@ -55,3 +55,13 @@ resources:
     memory: 512Mi
   limits:
     memory: 768Mi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+command:
+- /bin/sh
+- -c
+- cd /app/ombi && exec /app/ombi/Ombi --storage /config --host 'http://*:3579'
+env:
+  TMPDIR: /tmp
