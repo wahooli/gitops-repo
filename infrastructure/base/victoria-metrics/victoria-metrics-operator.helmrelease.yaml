@@ -19,6 +19,16 @@ spec:
   install:
     remediation:
       retries: -1
+  # Kept in spec.values (not values-base.yaml) so the CI patch can append to the list
+  values:
+    env:
+    # Non-root, read-only root filesystem, dropped capabilities and seccomp for every
+    # component the operator creates; CRs with their own securityContext keep it
+    - name: VM_ENABLESTRICTSECURITY
+      value: "true"
+    # The config-reloader sidecars peak at ~40Mi
+    - name: VM_CONFIG_RELOADER_LIMIT_MEMORY
+      value: 128Mi
   valuesFrom:
   - kind: ConfigMap
     name: victoria-metrics-operator-values

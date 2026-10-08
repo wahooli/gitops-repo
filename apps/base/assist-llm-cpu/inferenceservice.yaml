@@ -5,6 +5,7 @@ metadata:
   namespace: homeassistant-assist
   labels:
     networking.knative.dev/visibility: cluster-local
+    app.kubernetes.io/name: assist-llm-cpu
 spec:
   predictor:
     minReplicas: 1

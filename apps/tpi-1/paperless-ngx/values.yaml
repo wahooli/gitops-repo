@@ -1,14 +1,14 @@
 workloadType: Deployment
 initContainers:
   wait-for-redis:
-    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    image: ghcr.io/wahooli/docker/wait-for-it:latest@sha256:e1836a99f598856d6a1e843f8c5ce2e67572918d09650ad903d943a134e9fa72
     imagePullPolicy: IfNotPresent
     args:
     - paperless-ngx-redis-master:6379
     - -t
     - "300" # wait for 5 minutes
   wait-for-psql:
-    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    image: ghcr.io/wahooli/docker/wait-for-it:latest@sha256:e1836a99f598856d6a1e843f8c5ce2e67572918d09650ad903d943a134e9fa72
     imagePullPolicy: IfNotPresent
     args:
     - paperless-ngx-postgresql:5432

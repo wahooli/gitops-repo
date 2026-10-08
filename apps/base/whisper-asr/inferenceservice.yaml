@@ -5,6 +5,7 @@ metadata:
   namespace: default
   labels:
     networking.knative.dev/visibility: cluster-local
+    app.kubernetes.io/name: whisper-asr
 spec:
   predictor:
     minReplicas: 0

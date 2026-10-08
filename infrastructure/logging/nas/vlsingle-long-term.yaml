@@ -27,6 +27,12 @@ spec:
     metadata:
       annotations:
         service.cilium.io/global: "true"
+  # Stays root until the existing data in the hostPath is chowned to 65534 on the host;
+  # otherwise VM_ENABLESTRICTSECURITY would run it as 65534, which can't write there
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    runAsNonRoot: false
   volumeMounts:
   - name: vlogsstorage-volume
     mountPath: /storage

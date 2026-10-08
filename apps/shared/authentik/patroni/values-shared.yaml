@@ -40,7 +40,7 @@ metrics:
 
 initContainers:
   wait-for-etcdgw:
-    image: ghcr.io/wahooli/docker/wait-for-it:latest
+    image: ghcr.io/wahooli/docker/wait-for-it:latest@sha256:e1836a99f598856d6a1e843f8c5ce2e67572918d09650ad903d943a134e9fa72
     imagePullPolicy: IfNotPresent
     args:
     - etcd-gateway.etcd.svc.cluster.local.:2379

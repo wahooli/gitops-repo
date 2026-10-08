@@ -23,3 +23,14 @@ spec:
   upgrade:
     remediation:
       remediateLastFailure: true
+  # The chart hardcodes the LAPI Deployment's labels
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          kind: Deployment
+          labelSelector: type=lapi
+        patch: |
+          - op: add
+            path: /metadata/labels/app.kubernetes.io~1name
+            value: crowdsec

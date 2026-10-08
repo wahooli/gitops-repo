@@ -45,6 +45,29 @@ spec:
           type: RollingUpdate
           rollingUpdate:
             maxUnavailable: 1
+        # 30-day peaks: envoy ~105Mi, shutdown-manager ~60Mi
+        container:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+        # shutdown-manager has no resources field of its own
+        patch:
+          type: StrategicMerge
+          value:
+            spec:
+              template:
+                spec:
+                  containers:
+                  - name: shutdown-manager
+                    resources:
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                      limits:
+                        memory: 128Mi
         pod:
           topologySpreadConstraints:
           - maxSkew: 1

@@ -23,7 +23,7 @@ spec:
         # ASR engine added — preserves Bazarr's /asr + /detect-language API
         # but forwards everything to Speaches over OpenAI HTTP.
         # Source: /home/wahooli/Code/whisper-asr-webservice
-        image: ghcr.io/wahooli/docker/whisper-asr-shim:latest
+        image: ghcr.io/wahooli/docker/whisper-asr-shim:latest@sha256:ead06fe0b8b5aac018b25471792b3882919375491a07362840118c33637a39e5
         imagePullPolicy: IfNotPresent
         env:
         - name: ASR_ENGINE

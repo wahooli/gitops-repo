@@ -5,6 +5,7 @@ metadata:
   namespace: homeassistant-assist
   labels:
     networking.knative.dev/visibility: cluster-local
+    app.kubernetes.io/name: speaches
   annotations:
     autoscaling.knative.dev/scale-down-delay: "10m"
     autoscaling.knative.dev/window: "60s"
