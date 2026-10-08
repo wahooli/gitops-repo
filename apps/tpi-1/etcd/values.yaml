@@ -162,6 +162,10 @@ ciliumNetworkPolicies:
           app.kubernetes.io/instance: forgejo-patroni
           app.kubernetes.io/name: patroni
       - matchLabels:
+          io.kubernetes.pod.namespace: immich
+          app.kubernetes.io/instance: immich-patroni
+          app.kubernetes.io/name: patroni
+      - matchLabels:
           io.kubernetes.pod.namespace: etcd
           app.kubernetes.io/instance: etcd-gateway
           app.kubernetes.io/name: etcd-gateway
