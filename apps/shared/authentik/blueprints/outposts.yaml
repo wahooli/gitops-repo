@@ -334,6 +334,31 @@ entries:
               memory: 96Mi
             limits:
               memory: 160Mi
+        - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: LDAP_PROBE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: authentik-ldap-outpost-probe
+                key: password
+        # outpost has no probes by default; bind + search as the jellyfin bind user to catch "running but not serving"
+        - op: add
+          path: /spec/template/spec/containers/0/livenessProbe
+          value:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - >-
+                curl -sS --max-time 8
+                -u "cn=jellyfin-ldap-bind-user,ou=users,dc=ldap,dc=goauthentik,dc=io:$${LDAP_PROBE_PASSWORD}"
+                "ldap://127.0.0.1:3389/dc=ldap,dc=goauthentik,dc=io?cn?sub?(cn=jellyfin-ldap-bind-user)"
+                | grep -q '^DN: '
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 3
       kubernetes_service_type: ClusterIP
       kubernetes_image_pull_secrets: []
       kubernetes_ingress_class_name: null
