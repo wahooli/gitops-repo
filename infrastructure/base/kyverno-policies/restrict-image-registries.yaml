@@ -13,6 +13,14 @@ metadata:
 spec:
   validationActions: [Audit]
   failurePolicy: Ignore
+  autogen:
+    podControllers:
+      controllers:
+      - deployments
+      - statefulsets
+      - daemonsets
+      - jobs
+      - cronjobs
   matchConstraints:
     namespaceSelector:
       matchExpressions:
