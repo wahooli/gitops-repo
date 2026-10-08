@@ -1,8 +1,13 @@
 server:
   controllers:
     main:
+      pod:
+        runtimeClassName: nvidia
       containers:
         main:
+          env:
+            NVIDIA_VISIBLE_DEVICES: all
+            NVIDIA_DRIVER_CAPABILITIES: compute,video,utility
           resources:
             requests:
               memory: 2Gi
