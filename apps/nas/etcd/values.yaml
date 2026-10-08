@@ -190,6 +190,12 @@ service:
 gateway:
   enabled: true
   progressDeadlineSeconds: 600
+  resources:
+    requests:
+      cpu: 10m
+      memory: 24Mi
+    limits:
+      memory: 96Mi
 persistence:
   data:
     enabled: true
@@ -199,3 +205,9 @@ persistence:
         requests:
           # storage: 8Gi
           storage: 2Gi
+resources:
+  requests:
+    cpu: 30m
+    memory: 256Mi
+  limits:
+    memory: 2Gi

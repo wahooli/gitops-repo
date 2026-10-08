@@ -28,6 +28,9 @@ metrics:
     limits:
       cpu: 150m
       memory: 60Mi
+    requests:
+      cpu: 10m
+      memory: 24Mi
 serviceMonitor:
   create: true
   jobLabel: app.kubernetes.io/name
@@ -84,3 +87,9 @@ podSecurityContext:
   runAsNonRoot: true
   runAsUser: 2002
   runAsGroup: 2003
+resources:
+  requests:
+    cpu: 45m
+    memory: 384Mi
+  limits:
+    memory: 768Mi

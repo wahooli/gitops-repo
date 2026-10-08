@@ -19,6 +19,10 @@ data:
     patroni:
       jsonLog: false
 
+    containers:
+      postgres-log:
+        enabled: false
+
     ssl:
       issuerRef:
         name: selfsigned-ca

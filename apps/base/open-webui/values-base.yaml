@@ -21,6 +21,12 @@ websocket:
       runAsUser: 999
       runAsGroup: 1000
 
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        memory: 48Mi
 enableOpenaiApi: true
 openaiBaseApiUrls:
 - http://assist-llm-gpu-predictor.homeassistant-assist.svc.cluster.local/v1

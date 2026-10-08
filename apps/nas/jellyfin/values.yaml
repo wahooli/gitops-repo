@@ -80,3 +80,9 @@ ingress:
     enabled: false
 
 progressDeadlineSeconds: 600
+resources:
+  requests:
+    cpu: 125m
+    memory: 1536Mi
+  limits:
+    memory: 4Gi

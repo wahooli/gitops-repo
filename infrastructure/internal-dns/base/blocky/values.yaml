@@ -40,7 +40,12 @@ persistence:
 workload:
   annotations:
     secret.reloader.stakater.com/reload: "tls-blocky"
-resources: {}
+resources:
+  requests:
+    cpu: 10m
+    memory: 160Mi
+  limits:
+    memory: 256Mi
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 100

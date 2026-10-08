@@ -43,3 +43,9 @@ server:
       service.cilium.io/global: "true"
       service.cilium.io/global-sync-endpoint-slices: "true"
       service.cilium.io/affinity: "local"
+  resources:
+    requests:
+      cpu: 55m
+      memory: 4Gi
+    limits:
+      memory: 16Gi

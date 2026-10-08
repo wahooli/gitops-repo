@@ -59,3 +59,17 @@ persistence:
 ingress:
   main:
     enabled: false
+resources:
+  requests:
+    cpu: 40m
+    memory: 192Mi
+  limits:
+    memory: 1Gi
+sidecars:
+  wireguard:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        memory: 48Mi

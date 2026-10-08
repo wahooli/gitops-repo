@@ -396,6 +396,12 @@ haproxy:
   #     annotations:
   #       service.cilium.io/global: "true"
 
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
 persistence:
   pgdata:
     enabled: true
@@ -431,3 +437,24 @@ persistence:
         defaultMode: 0400
 
 progressDeadlineSeconds: 600
+resources:
+  requests:
+    cpu: 10m
+    memory: 256Mi
+  limits:
+    memory: 384Mi
+containers:
+  pgbouncer:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        memory: 48Mi
+  postgres-log:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        memory: 48Mi

@@ -362,6 +362,12 @@ haproxy:
           - port: "8404"
             protocol: TCP
 
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
 persistence:
   pgdata:
     enabled: true
@@ -395,3 +401,24 @@ persistence:
         name: etcd-client
         optional: false
         defaultMode: 0400
+resources:
+  requests:
+    cpu: 50m
+    memory: 1280Mi
+  limits:
+    memory: 2Gi
+containers:
+  postgres-log:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        memory: 48Mi
+  pgbouncer:
+    resources:
+      requests:
+        cpu: 30m
+        memory: 16Mi
+      limits:
+        memory: 48Mi

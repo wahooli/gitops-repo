@@ -1,6 +1,11 @@
 role: Stateless-Aggregator
 dataDir: /vector-data-dir
-resources: {}
+resources:
+  requests:
+    cpu: 25m
+    memory: 384Mi
+  limits:
+    memory: 640Mi
 args:
 - -w
 - --config-dir

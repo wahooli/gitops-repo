@@ -108,6 +108,12 @@ nodeAgent:
     - name: ndots
       value: "1"
     - name: edns0
+  resources:
+    requests:
+      cpu: 10m
+      memory: 96Mi
+    limits:
+      memory: 160Mi
 dnsConfig:
   options:
   - name: ndots
@@ -134,3 +140,9 @@ podSecurityContext:
   runAsUser: 1002
   runAsGroup: 1000
   fsGroup: 1000
+resources:
+  requests:
+    cpu: 625m
+    memory: 640Mi
+  limits:
+    memory: 1Gi

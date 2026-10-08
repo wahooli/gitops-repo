@@ -1,7 +1,12 @@
 fullnameOverride: vector-lb-nas
 role: Stateless-Aggregator
 dataDir: /vector-data-dir
-resources: {}
+resources:
+  requests:
+    cpu: 30m
+    memory: 512Mi
+  limits:
+    memory: 768Mi
 args:
 - -w
 - --config-dir

@@ -102,3 +102,9 @@ resticBackup:
     backup-credentials:
       type: secret
       name: restic-backup-credentials
+  resources:
+    requests:
+      cpu: 775m
+      memory: 1Gi
+    limits:
+      memory: 1536Mi

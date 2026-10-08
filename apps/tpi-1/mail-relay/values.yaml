@@ -108,6 +108,9 @@ sidecars:
       successThreshold: 1
       timeoutSeconds: 1
     resources:
+      requests:
+        cpu: 10m
+        memory: 24Mi
       limits:
         cpu: 100m
         memory: 50Mi

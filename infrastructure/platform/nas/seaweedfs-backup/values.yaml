@@ -4,6 +4,12 @@ image:
 fullNameOverride: seaweedfs-backup
 master:
   replicaCount: 1
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
 volume:
   replicaCount: 1
   args:
@@ -22,6 +28,12 @@ volume:
         resources:
           requests:
             storage: 1Ti
+  resources:
+    requests:
+      cpu: 10m
+      memory: 160Mi
+    limits:
+      memory: 384Mi
 postUp:
   enabled: true
   collections:
@@ -59,3 +71,9 @@ filer:
         resources:
           requests:
             storage: 1Ti
+  resources:
+    requests:
+      cpu: 30m
+      memory: 1Gi
+    limits:
+      memory: 5Gi

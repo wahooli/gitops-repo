@@ -29,6 +29,12 @@ primary:
   persistence:
     enabled: true
     size: 4Gi
+  resources:
+    requests:
+      cpu: 15m
+      memory: 48Mi
+    limits:
+      memory: 96Mi
 auth:
   enablePostgresUser: true
   # postgresPassword: $${paperless_postgres_password}

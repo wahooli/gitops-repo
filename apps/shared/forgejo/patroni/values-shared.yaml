@@ -199,6 +199,12 @@ haproxy:
     runAsNonRoot: true
   enabled: true
 
+  resources:
+    requests:
+      cpu: 10m
+      memory: 24Mi
+    limits:
+      memory: 64Mi
 persistence:
   pgdata:
     enabled: true
@@ -232,3 +238,17 @@ persistence:
         name: etcd-client
         optional: false
         defaultMode: 0400
+resources:
+  requests:
+    cpu: 10m
+    memory: 512Mi
+  limits:
+    memory: 768Mi
+containers:
+  postgres-log:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 16Mi
+      limits:
+        memory: 48Mi

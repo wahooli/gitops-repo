@@ -22,7 +22,8 @@ resources:
 cainjector:
   resources:
     limits:
-      memory: 175Mi
+      memory: 320Mi
       cpu: 800m
     requests:
       cpu: 300m
+      memory: 192Mi

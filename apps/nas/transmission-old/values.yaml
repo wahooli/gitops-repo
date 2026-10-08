@@ -21,9 +21,11 @@ wireguard:
 resources:
   requests:
     cpu: "300m"
+    memory: 96Mi
   limits:
     cpu: "1000m"
 
+    memory: 256Mi
 persistence:
   config:
     enabled: true

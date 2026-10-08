@@ -16,12 +16,30 @@ master:
     healthcheck:
       image:
         tag: "8.22.0"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          memory: 48Mi
   replicaCount: 1
+  resources:
+    requests:
+      cpu: 10m
+      memory: 48Mi
+    limits:
+      memory: 128Mi
 volume:
   containers:
     healthcheck:
       image:
         tag: "8.22.0"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          memory: 48Mi
   podManagementPolicy: Parallel
   cluster:
     ordinals:
@@ -41,11 +59,23 @@ volume:
         resources:
           requests:
             storage: "5Gi"
+  resources:
+    requests:
+      cpu: 10m
+      memory: 96Mi
+    limits:
+      memory: 1Gi
 filer:
   containers:
     healthcheck:
       image:
         tag: "8.22.0"
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          memory: 48Mi
   replicaCount: 1
   service:
     lb:
@@ -83,3 +113,9 @@ filer:
         resources:
           requests:
             storage: "6Gi"
+  resources:
+    requests:
+      cpu: 10m
+      memory: 320Mi
+    limits:
+      memory: 512Mi

@@ -171,6 +171,14 @@ entries:
         - op: add
           path: /spec/template/spec/dnsPolicy
           value: ClusterFirstWithHostNet
+        - op: add
+          path: /spec/template/spec/containers/0/resources
+          value:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 96Mi
       kubernetes_service_type: ClusterIP
       kubernetes_image_pull_secrets: []
       kubernetes_ingress_class_name: null
@@ -242,6 +250,14 @@ entries:
         - op: add
           path: /spec/template/spec/dnsPolicy
           value: ClusterFirstWithHostNet
+        - op: add
+          path: /spec/template/spec/containers/0/resources
+          value:
+            requests:
+              cpu: 10m
+              memory: 96Mi
+            limits:
+              memory: 160Mi
       kubernetes_service_type: ClusterIP
       kubernetes_image_pull_secrets: []
       kubernetes_ingress_class_name: null
@@ -313,6 +329,14 @@ entries:
         - op: add
           path: /spec/template/spec/dnsPolicy
           value: ClusterFirstWithHostNet
+        - op: add
+          path: /spec/template/spec/containers/0/resources
+          value:
+            requests:
+              cpu: 10m
+              memory: 96Mi
+            limits:
+              memory: 160Mi
       kubernetes_service_type: ClusterIP
       kubernetes_image_pull_secrets: []
       kubernetes_ingress_class_name: null

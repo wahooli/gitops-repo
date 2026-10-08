@@ -17,6 +17,12 @@ redis:
     runAsGroup: 999
     fsGroup: 999
     fsGroupChangePolicy: OnRootMismatch
+  resources:
+    requests:
+      cpu: 10m
+      memory: 24Mi
+    limits:
+      memory: 64Mi
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
@@ -32,3 +38,7 @@ service:
   main:
     type: ClusterIP
     clusterIP: ${unbound_cluster_ip}
+resources:
+  requests:
+    cpu: 10m
+    memory: 450Mi

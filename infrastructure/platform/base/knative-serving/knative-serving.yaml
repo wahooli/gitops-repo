@@ -25,3 +25,7 @@ spec:
     gc:
       min-non-active-revisions: "1"
       max-non-active-revisions: "1"
+    deployment:
+      queue-sidecar-cpu-request: 25m
+      queue-sidecar-memory-request: 32Mi
+      queue-sidecar-memory-limit: 128Mi

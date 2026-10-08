@@ -325,3 +325,9 @@ extraVolumes:
 - name: ssh-proxy-config
   configMap:
     name: forgejo-ssh-proxy-config
+resources:
+  requests:
+    cpu: 20m
+    memory: 320Mi
+  limits:
+    memory: 3Gi
