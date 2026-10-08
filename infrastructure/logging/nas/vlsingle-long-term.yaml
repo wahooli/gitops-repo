@@ -27,10 +27,6 @@ spec:
     metadata:
       annotations:
         service.cilium.io/global: "true"
-  securityContext:
-    runAsUser: 0
-    runAsGroup: 0
-    runAsNonRoot: false
   volumeMounts:
   - name: vlogsstorage-volume
     mountPath: /storage
