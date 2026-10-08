@@ -19,7 +19,6 @@ extraVolumeMounts:
   subPath: config.json
 resources:
   requests:
-    cpu: 10m
     memory: 96Mi
   limits:
     memory: 160Mi

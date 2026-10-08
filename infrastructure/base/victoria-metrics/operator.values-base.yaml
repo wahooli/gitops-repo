@@ -10,7 +10,6 @@ crds:
     enabled: true
 resources:
   requests:
-    cpu: 10m
     memory: 192Mi
   limits:
     memory: 320Mi

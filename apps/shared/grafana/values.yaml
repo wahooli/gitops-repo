@@ -15,7 +15,6 @@ sidecar:
     multicluster: false
   resources:
     requests:
-      cpu: 10m
       memory: 128Mi
     limits:
       memory: 192Mi
@@ -69,7 +68,6 @@ plugins:
 - https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/v0.26.3/victoriametrics-logs-datasource-v0.26.3.zip;victoriametrics-logs-datasource
 resources:
   requests:
-    cpu: 15m
     memory: 512Mi
   limits:
     memory: 1Gi

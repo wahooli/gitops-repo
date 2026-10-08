@@ -19,7 +19,6 @@ redis:
     fsGroupChangePolicy: OnRootMismatch
   resources:
     requests:
-      cpu: 10m
       memory: 24Mi
     limits:
       memory: 64Mi
@@ -40,5 +39,4 @@ service:
     clusterIP: ${unbound_cluster_ip}
 resources:
   requests:
-    cpu: 10m
     memory: 450Mi

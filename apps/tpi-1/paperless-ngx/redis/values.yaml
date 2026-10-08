@@ -24,7 +24,6 @@ master:
     pre.hook.backup.velero.io/command: '["/bin/bash", "-ec", "rm -rf /dummy/*"]'
   resources:
     requests:
-      cpu: 35m
       memory: 16Mi
     limits:
       memory: 48Mi

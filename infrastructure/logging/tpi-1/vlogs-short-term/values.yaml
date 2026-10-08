@@ -45,7 +45,6 @@ server:
       service.cilium.io/affinity: "local"
   resources:
     requests:
-      cpu: 55m
       memory: 4Gi
     limits:
       memory: 16Gi

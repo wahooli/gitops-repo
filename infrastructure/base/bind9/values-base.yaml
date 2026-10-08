@@ -18,7 +18,6 @@ resources:
   requests:
     memory: 300Mi
 
-    cpu: 10m
 bind9:
   namedConfGenerator:
     enabled: true

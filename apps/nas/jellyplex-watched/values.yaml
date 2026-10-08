@@ -77,7 +77,6 @@ service:
       protocol: TCP
 resources:
   requests:
-    cpu: 400m
     memory: 512Mi
   limits:
     memory: 768Mi

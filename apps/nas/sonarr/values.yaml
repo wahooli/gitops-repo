@@ -30,7 +30,6 @@ metrics:
       cpu: 200m
       memory: 60Mi
     requests:
-      cpu: 10m
       memory: 16Mi
 serviceMonitor:
   create: true
@@ -90,7 +89,6 @@ podSecurityContext:
   runAsGroup: 2003
 resources:
   requests:
-    cpu: 70m
     memory: 512Mi
   limits:
     memory: 768Mi

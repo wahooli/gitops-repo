@@ -109,7 +109,6 @@ sidecars:
       timeoutSeconds: 1
     resources:
       requests:
-        cpu: 10m
         memory: 24Mi
       limits:
         cpu: 100m

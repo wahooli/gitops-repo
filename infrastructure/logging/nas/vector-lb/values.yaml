@@ -3,7 +3,6 @@ role: Stateless-Aggregator
 dataDir: /vector-data-dir
 resources:
   requests:
-    cpu: 30m
     memory: 512Mi
   limits:
     memory: 768Mi

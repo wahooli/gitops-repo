@@ -26,7 +26,6 @@ metrics:
       cpu: 100m
       memory: 100Mi
     requests:
-      cpu: 10m
       memory: 24Mi
 serviceMonitor:
   create: true
@@ -187,7 +186,6 @@ containers:
         cpu: 100m
         memory: 100Mi
       requests:
-        cpu: 10m
         memory: 64Mi
 initContainers:
   import-configuration:
@@ -278,7 +276,6 @@ ingress:
     enabled: false
 resources:
   requests:
-    cpu: 1300m
     memory: 2Gi
   limits:
     memory: 24Gi

@@ -405,7 +405,6 @@ haproxy:
 
   resources:
     requests:
-      cpu: 10m
       memory: 24Mi
     limits:
       memory: 64Mi
@@ -446,7 +445,6 @@ persistence:
 progressDeadlineSeconds: 600
 resources:
   requests:
-    cpu: 20m
     memory: 512Mi
   limits:
     memory: 768Mi
@@ -454,14 +452,12 @@ containers:
   pgbouncer:
     resources:
       requests:
-        cpu: 10m
         memory: 16Mi
       limits:
         memory: 48Mi
   postgres-log:
     resources:
       requests:
-        cpu: 10m
         memory: 16Mi
       limits:
         memory: 48Mi

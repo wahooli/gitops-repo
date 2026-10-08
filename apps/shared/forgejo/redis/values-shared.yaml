@@ -19,7 +19,6 @@ redis:
 
     resources:
       requests:
-        cpu: 25m
         memory: 16Mi
       limits:
         memory: 48Mi
@@ -84,7 +83,6 @@ persistence:
           storage: 1Gi
 resources:
   requests:
-    cpu: 20m
     memory: 16Mi
   limits:
     memory: 48Mi

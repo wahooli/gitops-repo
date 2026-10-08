@@ -175,7 +175,6 @@ entries:
           path: /spec/template/spec/containers/0/resources
           value:
             requests:
-              cpu: 10m
               memory: 64Mi
             limits:
               memory: 96Mi
@@ -254,7 +253,6 @@ entries:
           path: /spec/template/spec/containers/0/resources
           value:
             requests:
-              cpu: 10m
               memory: 96Mi
             limits:
               memory: 160Mi
@@ -333,7 +331,6 @@ entries:
           path: /spec/template/spec/containers/0/resources
           value:
             requests:
-              cpu: 10m
               memory: 96Mi
             limits:
               memory: 160Mi

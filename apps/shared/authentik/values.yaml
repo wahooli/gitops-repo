@@ -79,7 +79,6 @@ worker:
     - name: edns0
   resources:
     requests:
-      cpu: 175m
       memory: 384Mi
     limits:
       memory: 640Mi
@@ -109,7 +108,6 @@ server:
     enabled: false
   resources:
     requests:
-      cpu: 125m
       memory: 1Gi
     limits:
       memory: 1536Mi

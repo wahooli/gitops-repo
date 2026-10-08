@@ -110,7 +110,6 @@ nodeAgent:
     - name: edns0
   resources:
     requests:
-      cpu: 10m
       memory: 96Mi
     limits:
       memory: 160Mi
@@ -142,7 +141,6 @@ podSecurityContext:
   fsGroup: 1000
 resources:
   requests:
-    cpu: 625m
     memory: 640Mi
   limits:
     memory: 1Gi

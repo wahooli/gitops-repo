@@ -2,7 +2,6 @@ role: Agent
 dataDir: /vector-data-dir
 resources:
   requests:
-    cpu: 80m
     memory: 1Gi
   limits:
     memory: 1536Mi

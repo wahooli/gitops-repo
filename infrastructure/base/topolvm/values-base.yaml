@@ -39,49 +39,41 @@ securityContext:
 resources:
   topolvm_controller:
     requests:
-      cpu: 10m
       memory: 64Mi
     limits:
       memory: 96Mi
   csi_provisioner:
     requests:
-      cpu: 10m
       memory: 64Mi
     limits:
       memory: 96Mi
   csi_resizer:
     requests:
-      cpu: 10m
       memory: 96Mi
     limits:
       memory: 160Mi
   lvmd:
     requests:
-      cpu: 100m
       memory: 96Mi
     limits:
       memory: 160Mi
   topolvm_node:
     requests:
-      cpu: 10m
       memory: 64Mi
     limits:
       memory: 96Mi
   csi_registrar:
     requests:
-      cpu: 10m
       memory: 32Mi
     limits:
       memory: 64Mi
   topolvm_scheduler:
     requests:
-      cpu: 10m
       memory: 48Mi
     limits:
       memory: 96Mi
   liveness_probe:
     requests:
-      cpu: 10m
       memory: 32Mi
     limits:
       memory: 64Mi

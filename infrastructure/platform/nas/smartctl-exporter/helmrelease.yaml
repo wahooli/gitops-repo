@@ -45,7 +45,6 @@ spec:
       device_include: sd.*|nvme.*
     resources:
       requests:
-        cpu: 15m
         memory: 48Mi
       limits:
         memory: 96Mi

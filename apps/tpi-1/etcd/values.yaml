@@ -198,7 +198,6 @@ gateway:
   progressDeadlineSeconds: 600
   resources:
     requests:
-      cpu: 15m
       memory: 16Mi
     limits:
       memory: 48Mi
@@ -213,7 +212,6 @@ persistence:
           storage: 2Gi
 resources:
   requests:
-    cpu: 50m
     memory: 1Gi
   limits:
     memory: 2Gi

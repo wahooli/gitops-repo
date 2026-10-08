@@ -26,7 +26,6 @@ metrics:
       cpu: 150m
       memory: 160Mi
     requests:
-      cpu: 10m
       memory: 96Mi
 serviceMonitor:
   create: true
@@ -90,7 +89,6 @@ ingress:
     enabled: false
 resources:
   requests:
-    cpu: 80m
     memory: 640Mi
   limits:
     memory: 1Gi

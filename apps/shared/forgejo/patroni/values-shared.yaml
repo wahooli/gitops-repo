@@ -201,7 +201,6 @@ haproxy:
 
   resources:
     requests:
-      cpu: 10m
       memory: 24Mi
     limits:
       memory: 64Mi
@@ -240,7 +239,6 @@ persistence:
         defaultMode: 0400
 resources:
   requests:
-    cpu: 10m
     memory: 512Mi
   limits:
     memory: 768Mi
@@ -248,7 +246,6 @@ containers:
   postgres-log:
     resources:
       requests:
-        cpu: 10m
         memory: 16Mi
       limits:
         memory: 48Mi
