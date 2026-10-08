@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: jdownloader
-        image: docker.io/jlesage/jdownloader-2:v26.09.1 # {"$imagepolicy": "flux-system:jdownloader:tag"}
+        image: v26.09.1 # {"$imagepolicy": "flux-system:jdownloader:tag"}
         imagePullPolicy: IfNotPresent
         env:
         - name: USER_ID

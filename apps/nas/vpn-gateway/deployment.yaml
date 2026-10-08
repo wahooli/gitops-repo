@@ -76,7 +76,7 @@ spec:
         - name: gluetun
           mountPath: /gluetun
       - name: gateway
-        image: ghcr.io/wahooli/docker/vpn-gateway:0.1.1 # {"$imagepolicy": "flux-system:vpn-gateway:tag"}
+        image: 0.1.1 # {"$imagepolicy": "flux-system:vpn-gateway:tag"}
         imagePullPolicy: IfNotPresent
         securityContext:
           capabilities:

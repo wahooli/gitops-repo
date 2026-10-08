@@ -16,6 +16,23 @@ mkdir -p "$SYNCTHING_DEVICES_DIR"
 # Copy all device ID files
 cp "$SYNCTHING_DEVICES_SRC"/*.txt "$SYNCTHING_DEVICES_DIR/"
 
+mapfile -t expected_devices < <(grep -oE 'forgejo_syncthing_device_[a-z0-9_]+' "$REPO_ROOT/apps/shared/forgejo/syncthing-config.xml" | sort -u)
+for var in "${expected_devices[@]}"; do
+  name="${var#forgejo_syncthing_device_}"
+  for dir in "$REPO_ROOT"/local-clusters/*/; do
+    if [[ "$(basename "$dir" | tr - _)" == "$name" ]]; then
+      name=$(basename "$dir")
+      break
+    fi
+  done
+  if [[ ! -f "$SYNCTHING_DEVICES_DIR/$name.txt" ]]; then
+    echo "No syncthing device ID for $name, generating a placeholder"
+    docker run --rm --entrypoint sh syncthing/syncthing:1.27 -c \
+      'syncthing generate --home=/tmp/st --skip-port-probing >/dev/null 2>&1 && syncthing --device-id --home=/tmp/st' \
+      > "$SYNCTHING_DEVICES_DIR/$name.txt"
+  fi
+done
+
 # Generate kustomization.yaml with secretGenerator referencing all device ID files
 # Keys are named syncthing_device_<cluster> (dashes converted to underscores)
 FILES_YAML=""

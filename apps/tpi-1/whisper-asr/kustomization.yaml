@@ -5,7 +5,7 @@ resources:
 - pvc.yaml
 images:
 - name: onerahmet/openai-whisper-asr-webservice
-  newTag: v1.9.1 # {"$imagepolicy": "flux-system:whisper-asr:tag"}
+  newTag: v1.10.0 # {"$imagepolicy": "flux-system:whisper-asr:tag"}
 patches:
 - target:
     kind: InferenceService

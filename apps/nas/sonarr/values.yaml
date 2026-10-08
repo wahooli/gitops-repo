@@ -1,6 +1,5 @@
 image:
-  tag: "4.0.19" # {"$imagepolicy": "flux-system:sonarr:tag"}
-
+  tag: "4.0.20" # {"$imagepolicy": "flux-system:sonarr:tag"}
 progressDeadlineSeconds: 600
 podAnnotations:
   backup.velero.io/backup-volumes: config

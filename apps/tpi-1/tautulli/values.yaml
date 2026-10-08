@@ -1,5 +1,5 @@
 image:
-  tag: "2.17.2" # {"$imagepolicy": "flux-system:tautulli:tag"}
+  tag: "2.18.2" # {"$imagepolicy": "flux-system:tautulli:tag"}
 env:
   TZ: Europe/Helsinki
 podAnnotations:
@@ -42,5 +42,4 @@ service:
 ingress:
   main:
     enabled: false
-
 progressDeadlineSeconds: 600

@@ -1,6 +1,5 @@
 image:
-  tag: "1.37.0" # {"$imagepolicy": "flux-system:vaultwarden:tag"}
-
+  tag: "1.37.4" # {"$imagepolicy": "flux-system:vaultwarden:tag"}
 progressDeadlineSeconds: 600
 envFrom:
   envs:
