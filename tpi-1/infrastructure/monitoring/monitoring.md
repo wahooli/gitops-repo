@@ -1,7 +1,7 @@
 ---
 title: "monitoring"
 parent: "Infrastructure / Monitoring"
-grand_parent: "nas"
+grand_parent: "tpi-1"
 ---
 
 

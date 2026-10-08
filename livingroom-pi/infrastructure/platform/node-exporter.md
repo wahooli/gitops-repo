@@ -4,36 +4,4 @@ parent: "Infrastructure / Platform"
 grand_parent: "livingroom-pi"
 ---
 
-# node-exporter
 
-## Overview
-The `node-exporter` component is responsible for exposing hardware and OS metrics from the nodes in the Kubernetes cluster. It runs as a DaemonSet, ensuring that an instance of the exporter runs on each node, collecting metrics that can be scraped by Prometheus for monitoring and alerting purposes.
-
-## Dependencies
-The `node-exporter` HelmRelease has a dependency on the `prometheus-operator--prometheus-operator-crds`, which provides the necessary Custom Resource Definitions (CRDs) for managing Prometheus instances and related components.
-
-## Helm Chart(s)
-- **Chart Name:** prometheus-node-exporter
-- **Repository:** prometheus-community (https://prometheus-community.github.io/helm-charts)
-- **Version:** 4.56.1
-
-## Resource Glossary
-### Security
-- **ServiceAccount:** A service account named `node-exporter` is created in the `kube-system` namespace to provide an identity for the node-exporter pods.
-
-### Networking
-- **Service:** A ClusterIP service named `node-exporter` is created to expose the metrics endpoint on port 9100, allowing Prometheus to scrape metrics from the node-exporter instances.
-
-### Workload
-- **DaemonSet:** A DaemonSet named `node-exporter` ensures that the node-exporter runs on every node in the cluster. It uses host networking and mounts host paths to access system metrics.
-
-## Configuration Highlights
-- **Extra Arguments:** The node-exporter is configured with several arguments to exclude certain filesystem mount points and network devices from being monitored, as well as to format logs in JSON.
-- **Security Context:** The container runs as a non-root user with a read-only root filesystem.
-- **Probes:** Liveness and readiness probes are configured to ensure the node-exporter is healthy and ready to serve metrics.
-
-## Deployment
-- **Target Namespace:** kube-system
-- **Release Name:** node-exporter
-- **Reconciliation Interval:** 10m
-- **Install Behavior:** The HelmRelease is set to retry indefinitely on failure.

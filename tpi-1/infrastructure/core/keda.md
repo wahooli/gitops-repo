@@ -1,5 +1,5 @@
 ---
-title: "prometheus-operator-crds"
+title: "keda"
 parent: "Infrastructure / Core"
 grand_parent: "tpi-1"
 ---
