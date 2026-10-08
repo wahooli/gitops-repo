@@ -24,8 +24,8 @@ spec:
       revision-timeout-seconds: "9000"
       max-revision-timeout-seconds: "9000"
     gc:
-      min-non-active-revisions: "1"
-      max-non-active-revisions: "1"
+      min-non-active-revisions: "0"
+      max-non-active-revisions: "0"
     deployment:
       queue-sidecar-memory-request: 32Mi
       queue-sidecar-memory-limit: 128Mi

@@ -112,6 +112,12 @@ extraEnvVars:
 - name: AUDIO_TTS_VOICE
   value: af_bella
 
+- name: WEBUI_SECRET_KEY_FILE
+  value: /app/backend/data/.webui_secret_key
+- name: STATIC_DIR
+  value: /app/backend/data/static
+- name: HOME
+  value: /app/backend/data
 resources:
   requests:
     cpu: "0"
@@ -119,3 +125,9 @@ resources:
   limits:
     cpu: "2"
     memory: 2Gi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch

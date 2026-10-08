@@ -113,3 +113,9 @@ filer:
       memory: 320Mi
     limits:
       memory: 512Mi
+filerSync:
+  __base__:
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
