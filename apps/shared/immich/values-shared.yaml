@@ -36,10 +36,12 @@ server:
       pod:
         securityContext:
           runAsNonRoot: true
-          runAsUser: 1000
-          runAsGroup: 1000
-          fsGroup: 1000
+          runAsUser: 2011
+          runAsGroup: 2001
+          fsGroup: 2001
           fsGroupChangePolicy: OnRootMismatch
+          supplementalGroups:
+          - 2002
       containers:
         main:
           image:
