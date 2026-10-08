@@ -6,3 +6,7 @@ metadata:
 data:
   values.yaml: |
     runtimeClassName: ""
+    podSecurityContext:
+      runAsNonRoot: false
+      runAsUser: 0
+      runAsGroup: 0
