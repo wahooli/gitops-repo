@@ -13,6 +13,8 @@ spec:
     namespace: flux-system
   releaseName: immich-patroni
   interval: 5m
+  install:
+    timeout: 15m
   targetNamespace: immich
   valuesFrom:
   - kind: ConfigMap
