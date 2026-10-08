@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: byparr
-        image: 3.0.6 # {"$imagepolicy": "flux-system:byparr:tag"}
+        image: ghcr.io/wahooli/docker/byparr:3.0.6 # {"$imagepolicy": "flux-system:byparr"}
         imagePullPolicy: IfNotPresent
         env:
         - name: TZ
