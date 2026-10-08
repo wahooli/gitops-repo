@@ -9,6 +9,12 @@ master:
       memory: 128Mi
     limits:
       memory: 256Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch
 volume:
   replicaCount: 1
   args:
@@ -32,6 +38,12 @@ volume:
       memory: 160Mi
     limits:
       memory: 384Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch
 postUp:
   enabled: true
   collections:
@@ -74,3 +86,9 @@ filer:
       memory: 1Gi
     limits:
       memory: 5Gi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch

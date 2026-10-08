@@ -26,4 +26,6 @@ spec:
         (object.metadata.namespace == 'topolvm-system' &&
           labels[?'app.kubernetes.io/component'].orValue('') in ['node', 'lvmd']) ||
         (object.metadata.namespace == 'velero' &&
-          labels[?'role'].orValue('') == 'node-agent'))
+          labels[?'role'].orValue('') == 'node-agent') ||
+        (object.metadata.namespace == 'default' &&
+          labels[?'app.kubernetes.io/name'].orValue('') == 'jdownloader'))

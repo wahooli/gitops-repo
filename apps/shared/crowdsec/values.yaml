@@ -26,8 +26,44 @@ lapi:
     annotations:
       service.cilium.io/global: "true"
       service.cilium.io/affinity: "local"
-  extraVolumes: *extraVolumes
-  extraVolumeMounts: *extraVolumeMounts
+  extraInitContainers:
+  - name: seed-config
+    image: crowdsecurity/crowdsec
+    imagePullPolicy: IfNotPresent
+    command:
+    - sh
+    - -c
+    - cp -R /staging/etc/crowdsec/. /seed/config/ 2>/dev/null || true; test -s /seed/config/config.yaml && mkdir -p /seed/data/trace
+    securityContext:
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    volumeMounts:
+    - name: lapi-config
+      mountPath: /seed/config
+    - name: lapi-data
+      mountPath: /seed/data
+  extraVolumes:
+  - name: postgres-tls
+    secret:
+      defaultMode: 0444
+      optional: false
+      secretName: crowdsec-patroni-server
+  - name: lapi-config
+    emptyDir:
+      sizeLimit: 64Mi
+  - name: lapi-data
+    emptyDir:
+      sizeLimit: 64Mi
+  extraVolumeMounts:
+  - mountPath: /certs/postgres
+    name: postgres-tls
+  - mountPath: /etc/crowdsec
+    name: lapi-config
+  - mountPath: /var/lib/crowdsec/data
+    name: lapi-data
   replicas: 1
   strategy:
     type: RollingUpdate
@@ -49,6 +85,8 @@ lapi:
     value: "true"
   - name: DB_PASSWORD
     value: ${crowdsec_database_password}
+  - name: NO_HUB_UPGRADE
+    value: "true"
 config:
   console.yaml: |
     share_manual_decisions: false

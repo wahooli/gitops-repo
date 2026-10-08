@@ -4,5 +4,5 @@ metadata:
   name: bazarr
   namespace: flux-system
 spec:
-  image: ghcr.io/linuxserver/bazarr
+  image: ghcr.io/home-operations/bazarr
   interval: 24h

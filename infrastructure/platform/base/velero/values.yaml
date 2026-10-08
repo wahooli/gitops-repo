@@ -134,6 +134,13 @@ configuration:
       checksumAlgorithm: ""
       s3Url: http://seaweedfs-backup-filer-lb.seaweedfs-backup.svc.cluster.local:8333
       publicUrl: https://s3-backup.${domain_wahoo_li:=wahoo.li}
+  repositoryMaintenanceJob:
+    repositoryConfigData:
+      global:
+        keepLatestMaintenanceJobs: 3
+        podResources:
+          memoryRequest: 640Mi
+          memoryLimit: 1Gi
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1002
