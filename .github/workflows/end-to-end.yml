@@ -32,9 +32,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  pr-check:
+    name: Check for open pull request
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      has_pr: ${{ steps.pr.outputs.has_pr }}
+    steps:
+    - name: Find open pull request for branch
+      id: pr
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        count=$(gh pr list --repo "${GITHUB_REPOSITORY}" --head "${GITHUB_REF_NAME}" --state open --json number --jq length)
+        if [ "${count}" -gt 0 ]; then
+          echo "Open pull request found for ${GITHUB_REF_NAME}, pull_request event will run the tests"
+          echo "has_pr=true" >> "${GITHUB_OUTPUT}"
+        else
+          echo "has_pr=false" >> "${GITHUB_OUTPUT}"
+        fi
+
   lint:
     name: Lint YAML and get modified helmreleases
     runs-on: ubuntu-latest
+    needs: pr-check
+    if: ${{ !cancelled() && needs.pr-check.outputs.has_pr != 'true' }}
     outputs:
       matrix: ${{ steps.helmreleases.outputs.test_matrix || steps.clusters.outputs.test_matrix }}
     steps:
@@ -87,7 +112,7 @@ jobs:
       fail-fast: false
       matrix:
         test: ${{ fromJSON(needs.lint.outputs.matrix ) }}
-    if: ${{ needs.lint.outputs.matrix != '[]' && needs.lint.outputs.matrix != '' }}
+    if: ${{ !cancelled() && needs.lint.result == 'success' && needs.lint.outputs.matrix != '[]' && needs.lint.outputs.matrix != '' }}
     steps:
     - name: Get more disk space
       uses: jlumbroso/free-disk-space@v2.0.0
@@ -136,6 +161,10 @@ jobs:
       uses: fluxcd/flux2/action@main
       with:
         version: '${{ matrix.test.flux_version }}'
+    - name: Kyverno policy check
+      env:
+        KYVERNO_VERSION: v1.19.1
+      run: scripts/ci/kyverno-check.sh ${{ matrix.test.tenant }}
     - name: Create k3d cluster
       id: create-cluster
       continue-on-error: true

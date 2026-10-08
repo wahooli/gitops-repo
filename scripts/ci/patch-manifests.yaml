@@ -56,10 +56,12 @@ rules:
 
 - description: >-
     Keep Kyverno policies in Audit mode in CI: requests/limits are stripped above,
-    so a cluster overlay that enforces (Deny) would reject every pod
+    so a cluster overlay that enforces (Deny) would reject every pod. Drops overlay
+    patches targeting ValidatingPolicies, base policies are Audit. Matches on target,
+    since patch-manifests.sh hides block scalar contents (patch: |) from the rules
   expression: |
     with(select(.kind == "Kustomization" and has("patches"));
-      .patches |= map(select((.patch // "") | test("validationActions") | not)))
+      .patches |= map(select(.target.kind != "ValidatingPolicy")))
   error_tolerant: true
 
 # - description: Suspend HelmReleases in cluster-specific directories
