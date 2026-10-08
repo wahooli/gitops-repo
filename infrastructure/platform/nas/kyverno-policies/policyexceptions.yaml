@@ -34,3 +34,43 @@ spec:
       object.metadata.namespace == 'vpn-gateway' &&
       object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))
         [?'app.kubernetes.io/name'].orValue('') == 'vpn-gateway'
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: transmission
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  - name: disallow-privileged-containers
+    kind: ValidatingPolicy
+  - name: disallow-capabilities
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: transmission
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      [object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))].exists(labels,
+        labels[?'app.kubernetes.io/name'].orValue('') == 'transmission' &&
+        labels[?'app.kubernetes.io/instance'].orValue('') in ['transmission', 'transmission-old'])
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: plex
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  - name: disallow-host-namespaces
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: plex
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      [object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))].exists(labels,
+        labels[?'app.kubernetes.io/name'].orValue('') == 'plex' &&
+        labels[?'app.kubernetes.io/instance'].orValue('') == 'plex')

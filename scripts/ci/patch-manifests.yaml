@@ -54,6 +54,14 @@ rules:
         .env += [{"name": "BLUEPRINT_ERROR_SLEEP", "value": "0"}]))
   error_tolerant: true
 
+- description: >-
+    Keep Kyverno policies in Audit mode in CI: requests/limits are stripped above,
+    so a cluster overlay that enforces (Deny) would reject every pod
+  expression: |
+    with(select(.kind == "Kustomization" and has("patches"));
+      .patches |= map(select((.patch // "") | test("validationActions") | not)))
+  error_tolerant: true
+
 # - description: Suspend HelmReleases in cluster-specific directories
 #   expression: |
 #     (select(.kind == "HelmRelease") | .spec.suspend) = true
