@@ -21,6 +21,7 @@ spec:
     remediation:
       retries: -1
   upgrade:
+    timeout: 10m
     remediation:
       remediateLastFailure: true
   valuesFrom:

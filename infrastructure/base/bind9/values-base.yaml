@@ -3,6 +3,8 @@ image:
 
 hostname: bind9
 
+progressDeadlineSeconds: 600
+
 args:
 - -g
 - '-4'

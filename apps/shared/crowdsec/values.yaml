@@ -26,6 +26,8 @@ lapi:
   extraVolumes: *extraVolumes
   extraVolumeMounts: *extraVolumeMounts
   replicas: 1
+  strategy:
+    type: RollingUpdate
   storeCAPICredentialsInSecret: true
   persistentVolume:
     config:
@@ -40,13 +42,8 @@ lapi:
       cpu: 500m
       memory: 500Mi
   env:
-  # To enroll the Security Engine to the console
-  - name: ENROLL_KEY
-    value: '${crowdsec_enroll_key}'
-  - name: ENROLL_INSTANCE_NAME
-    value: '${crowdsec_enroll_instance_name}'
-  - name: ENROLL_TAGS
-    value: 'k8s k3s linux'
+  - name: DISABLE_ONLINE_API
+    value: "true"
   - name: DB_PASSWORD
     value: ${crowdsec_database_password}
 config:

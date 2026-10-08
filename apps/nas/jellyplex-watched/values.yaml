@@ -51,6 +51,7 @@ podSecurityContext:
   runAsGroup: 101
 
 hostname: jellyplex-watched
+progressDeadlineSeconds: 600
 dnsConfig:
   options:
   - name: ndots
