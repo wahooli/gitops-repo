@@ -13,7 +13,7 @@ spec:
   - "policy-reporter-nas.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
-    - name: policy-reporter-ui-nas
+    - name: policy-reporter-nas
       port: 8080
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -31,5 +31,5 @@ spec:
   - "policy-reporter-tpi-1.${domain_absolutist_it:=absolutist.it}"
   rules:
   - backendRefs:
-    - name: policy-reporter-ui-tpi-1
+    - name: policy-reporter-tpi-1
       port: 8080

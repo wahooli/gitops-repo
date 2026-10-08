@@ -1,10 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: policy-reporter-ui-nas
+  name: policy-reporter-nas
   namespace: policy-reporter
   annotations:
     service.cilium.io/global: "true"
+    service.cilium.io/global-sync-endpoint-slices: "true"
     service.cilium.io/affinity: "local"
 spec:
   selector:
@@ -19,14 +20,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: policy-reporter-ui-tpi-1
+  name: policy-reporter-tpi-1
   namespace: policy-reporter
   annotations:
     service.cilium.io/global: "true"
-    service.cilium.io/affinity: "remote"
+    service.cilium.io/global-sync-endpoint-slices: "true"
 spec:
+  clusterIP: None
   ports:
   - name: http
     port: 8080
     protocol: TCP
-    targetPort: http
+    targetPort: 8080
