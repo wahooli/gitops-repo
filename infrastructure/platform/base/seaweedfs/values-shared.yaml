@@ -137,3 +137,15 @@ filerSync:
       runAsNonRoot: true
       runAsUser: 1000
       runAsGroup: 1000
+postUp:
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+  resources:
+    requests:
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+  env:
+    HOME: /tmp

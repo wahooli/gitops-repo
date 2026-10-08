@@ -27,3 +27,9 @@ cainjector:
     requests:
       cpu: "0"
       memory: 192Mi
+startupapicheck:
+  resources:
+    requests:
+      memory: 32Mi
+    limits:
+      memory: 64Mi

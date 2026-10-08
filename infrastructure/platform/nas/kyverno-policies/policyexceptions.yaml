@@ -74,3 +74,22 @@ spec:
       [object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))].exists(labels,
         labels[?'app.kubernetes.io/name'].orValue('') == 'plex' &&
         labels[?'app.kubernetes.io/instance'].orValue('') == 'plex')
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: ps3netsrv
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  - name: disallow-host-namespaces
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: ps3netsrv
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      [object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))].exists(labels,
+        labels[?'app.kubernetes.io/name'].orValue('') == 'ps3netsrv' &&
+        labels[?'app.kubernetes.io/instance'].orValue('') == 'ps3netsrv')

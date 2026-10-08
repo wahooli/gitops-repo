@@ -28,4 +28,7 @@ spec:
         (object.metadata.namespace == 'velero' &&
           labels[?'role'].orValue('') == 'node-agent') ||
         (object.metadata.namespace == 'default' &&
-          labels[?'app.kubernetes.io/name'].orValue('') == 'jdownloader'))
+          labels[?'app.kubernetes.io/name'].orValue('') == 'jdownloader') ||
+        (object.metadata.namespace == 'victoria-metrics' &&
+          ((object.kind == 'Job' && object.metadata.name.endsWith('-cleanup-hook')) ||
+           labels[?'batch.kubernetes.io/job-name'].orValue('').endsWith('-cleanup-hook'))))

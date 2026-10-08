@@ -151,3 +151,8 @@ resources:
     memory: 640Mi
   limits:
     memory: 1Gi
+upgradeJobResources:
+  requests:
+    memory: 64Mi
+  limits:
+    memory: 256Mi

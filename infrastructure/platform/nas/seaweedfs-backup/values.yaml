@@ -51,6 +51,17 @@ postUp:
   - name: nas-backups
   - name: tpi-1-backups
   - name: livingroom-pi-backups
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+  resources:
+    requests:
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+  env:
+    HOME: /tmp
 filer:
   replicaCount: 1
   podAnnotations:
