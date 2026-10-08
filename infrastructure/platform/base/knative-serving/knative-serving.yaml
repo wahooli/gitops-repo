@@ -28,3 +28,24 @@ spec:
     deployment:
       queue-sidecar-memory-request: 32Mi
       queue-sidecar-memory-limit: 128Mi
+  workloads:
+  - name: activator
+    resources:
+    - container: activator
+      requests:
+        cpu: "0"
+  - name: autoscaler
+    resources:
+    - container: autoscaler
+      requests:
+        cpu: "0"
+  - name: controller
+    resources:
+    - container: controller
+      requests:
+        cpu: "0"
+  - name: webhook
+    resources:
+    - container: webhook
+      requests:
+        cpu: "0"

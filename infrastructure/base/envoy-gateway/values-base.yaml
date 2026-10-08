@@ -7,3 +7,8 @@ config:
     logging:
       level:
         default: info
+deployment:
+  envoyGateway:
+    resources:
+      requests:
+        cpu: "0"

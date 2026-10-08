@@ -70,7 +70,7 @@ initContainers:
   resources:
     limits: {}
     requests:
-      cpu: 100m
+      cpu: "0"
       memory: 128Mi
 
 gitea:

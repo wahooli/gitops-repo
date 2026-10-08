@@ -1,6 +1,6 @@
 resources:
   requests:
-    cpu: 100m
+    cpu: "0"
     memory: 64Mi
 image:
   repository: ghcr.io/wahooli/docker/openldap

@@ -35,7 +35,7 @@ spec:
         mountPath: /cache/hf
       resources:
         requests:
-          cpu: "1"
+          cpu: "0"
           memory: "2Gi"
         limits:
           memory: "6Gi"

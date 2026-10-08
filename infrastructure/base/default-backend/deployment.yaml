@@ -46,7 +46,7 @@ spec:
             cpu: "250m"
           requests:
             memory: "32Mi"
-            cpu: "64m"
+            cpu: "0"
         volumeMounts:
         - name: html
           mountPath: /usr/share/nginx/html

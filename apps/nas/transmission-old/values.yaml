@@ -20,7 +20,7 @@ wireguard:
 
 resources:
   requests:
-    cpu: "300m"
+    cpu: "0"
     memory: 96Mi
   limits:
     cpu: "1000m"

@@ -6,7 +6,7 @@ resources:
   limits:
     memory: 128Mi
   requests:
-    cpu: 100m
+    cpu: "0"
     memory: 70Mi
 
 rollingUpdate:

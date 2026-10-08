@@ -114,7 +114,7 @@ extraEnvVars:
 
 resources:
   requests:
-    cpu: 100m
+    cpu: "0"
     memory: 512Mi
   limits:
     cpu: "2"

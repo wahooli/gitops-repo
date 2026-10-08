@@ -23,7 +23,7 @@ resources:
     ephemeral-storage: 2048Mi
     memory: 256Mi
   requests:
-    cpu: 160m
+    cpu: "0"
     ephemeral-storage: 200Mi
     memory: 128Mi
 dnsConfig:

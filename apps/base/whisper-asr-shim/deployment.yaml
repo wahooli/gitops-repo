@@ -42,7 +42,7 @@ spec:
           protocol: TCP
         resources:
           requests:
-            cpu: 50m
+            cpu: "0"
             memory: 256Mi
           limits:
             # Audio is loaded into memory as 16 kHz mono float32 before being

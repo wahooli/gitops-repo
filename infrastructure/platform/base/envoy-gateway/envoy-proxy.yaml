@@ -48,7 +48,7 @@ spec:
         container:
           resources:
             requests:
-              cpu: 100m
+              cpu: "0"
               memory: 256Mi
             limits:
               memory: 1Gi

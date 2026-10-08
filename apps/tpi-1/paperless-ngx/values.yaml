@@ -74,7 +74,7 @@ global:
 resources:
   requests:
     memory: "2048Mi"
-    cpu: "600m"
+    cpu: "0"
   limits:
     memory: "6144Mi"
     # cpu: "2000m"

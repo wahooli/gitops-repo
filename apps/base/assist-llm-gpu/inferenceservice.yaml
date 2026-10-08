@@ -81,7 +81,7 @@ spec:
       - qwen3
       resources:
         requests:
-          cpu: 500m
+          cpu: "0"
           memory: 4Gi
         limits:
           cpu: "4"

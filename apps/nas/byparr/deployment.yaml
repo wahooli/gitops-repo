@@ -33,7 +33,7 @@ spec:
           mountPath: /dev/shm
         resources:
           requests:
-            cpu: 250m
+            cpu: "0"
             memory: 512Mi
           limits:
             cpu: "2"

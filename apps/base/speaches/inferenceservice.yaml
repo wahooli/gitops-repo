@@ -28,7 +28,7 @@ spec:
         value: int8_float16
       resources:
         requests:
-          cpu: 500m
+          cpu: "0"
           memory: 2Gi
         limits:
           # Long-form transcription holds the full audio buffer + VAD +

@@ -5,7 +5,7 @@ admissionController:
   container:
     resources:
       requests:
-        cpu: 100m
+        cpu: "0"
         memory: 128Mi
       limits:
         cpu: 500m
@@ -13,7 +13,7 @@ admissionController:
 backgroundController:
   resources:
     requests:
-      cpu: 50m
+      cpu: "0"
       memory: 64Mi
     limits:
       cpu: 200m
@@ -21,7 +21,7 @@ backgroundController:
 cleanupController:
   resources:
     requests:
-      cpu: 50m
+      cpu: "0"
       memory: 64Mi
     limits:
       cpu: 200m
@@ -29,7 +29,7 @@ cleanupController:
 reportsController:
   resources:
     requests:
-      cpu: 50m
+      cpu: "0"
       memory: 64Mi
     limits:
       cpu: 200m

@@ -38,7 +38,7 @@ spec:
         value: /models/Qwen3-0.6B-Q4_K_M.gguf
       resources:
         requests:
-          cpu: 100m
+          cpu: "0"
           memory: 64Mi
         limits:
           cpu: "1"
@@ -57,7 +57,7 @@ spec:
       - "2048"
       resources:
         requests:
-          cpu: 1
+          cpu: "0"
           memory: 1Gi
         limits:
           cpu: 6

@@ -17,6 +17,9 @@ agent:
   extraVolumeMounts: &extraVolumeMounts
   - mountPath: /certs/postgres
     name: postgres-tls
+  resources:
+    requests:
+      cpu: "0"
 
 lapi:
   service:
@@ -39,7 +42,7 @@ lapi:
       memory: 500Mi
       cpu: 800m
     requests:
-      cpu: 500m
+      cpu: "0"
       memory: 500Mi
   env:
   - name: DISABLE_ONLINE_API

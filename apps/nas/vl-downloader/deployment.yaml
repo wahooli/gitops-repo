@@ -43,7 +43,7 @@ spec:
         resources:
           # Headroom for 7z decompression + checksum hashing of multi-GB ROMs.
           requests:
-            cpu: 250m
+            cpu: "0"
             memory: 512Mi
           limits:
             cpu: "2"

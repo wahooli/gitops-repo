@@ -9,8 +9,8 @@ metadata:
     policies.kyverno.io/description: >-
       Resource requests and limits are required to ensure workloads do not
       consume unbounded resources. This policy validates that all long-running
-      containers, including native sidecars, have CPU and memory requests and a
-      memory limit defined.
+      containers, including native sidecars, have a memory request and a memory
+      limit defined.
 spec:
   validationActions: [Audit]
   failurePolicy: Ignore
@@ -33,11 +33,10 @@ spec:
   - name: missingResources
     expression: >-
       variables.longRunningContainers.filter(c, !(
-        c.?resources.?requests[?'cpu'].hasValue() &&
         c.?resources.?requests[?'memory'].hasValue() &&
         c.?resources.?limits[?'memory'].hasValue()))
   validations:
   - expression: size(variables.missingResources) == 0
     messageExpression: >-
-      'CPU and memory requests and a memory limit are required: ' +
+      'A memory request and a memory limit are required: ' +
       variables.missingResources.map(c, c.name).join(', ')

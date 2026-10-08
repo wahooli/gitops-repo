@@ -11,11 +11,11 @@ webhook:
       cpu: 500m
     requests:
       memory: 64Mi
-      cpu: 175m
+      cpu: "0"
 resources:
   requests:
     memory: 128Mi
-    cpu: 300m
+    cpu: "0"
   limits:
     memory: 175Mi
     cpu: 400m
@@ -25,5 +25,5 @@ cainjector:
       memory: 320Mi
       cpu: 800m
     requests:
-      cpu: 300m
+      cpu: "0"
       memory: 192Mi
