@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: vl-downloader
-        image: ghcr.io/wahooli/docker/vimm-dl:1.0.3 # {"$imagepolicy": "flux-system:vl-downloader"}
+        image: ghcr.io/wahooli/docker/vimm-dl:1.0.5 # {"$imagepolicy": "flux-system:vl-downloader"}
         imagePullPolicy: IfNotPresent
         env:
         - name: TZ
