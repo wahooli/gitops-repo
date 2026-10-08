@@ -8,6 +8,8 @@ dnsConfig:
     value: "1"
   - name: edns0
 
+progressDeadlineSeconds: 600
+
 volume:
   ingress:
     main:

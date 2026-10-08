@@ -46,6 +46,7 @@ global:
 #       timeoutSeconds: 1
 
 hostname: jellyplex-watched
+progressDeadlineSeconds: 600
 dnsConfig:
   options:
   - name: ndots
