@@ -4,6 +4,8 @@ image:
 strategy:
   type: Recreate # needed for hostnetwork deployment
 
+progressDeadlineSeconds: 600
+
 global:
   labels:
     app.kubernetes.io/part-of: ps3netsrv
