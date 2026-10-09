@@ -12,7 +12,7 @@ global:
     app.kubernetes.io/part-of: forgejo
 image:
   repository: ghcr.io/wahooli/docker/patroni-17
-  tag: 4.0.6-1 # {"$imagepolicy": "flux-system:patroni-17:tag"}
+  tag: 4.0.11-1 # {"$imagepolicy": "flux-system:patroni-17:tag"}
 postgresql:
   bootstrap:
     database: forgejo
