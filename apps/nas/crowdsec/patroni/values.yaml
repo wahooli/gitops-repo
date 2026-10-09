@@ -15,7 +15,7 @@ ordinals:
   start: 1
 image:
   repository: ghcr.io/wahooli/docker/patroni-17
-  tag: 4.0.6 # {"$imagepolicy": "flux-system:patroni-17:tag"}
+  tag: 4.0.6-1 # {"$imagepolicy": "flux-system:patroni-17:tag"}
 postgresql:
   bootstrap:
     database: crowdsec # creates a database with this name
@@ -125,7 +125,7 @@ podMonitor:
       target_label: instance
     - action: labeldrop
       regex: (pod|container_id|image_id|container|service|namespace|prometheus)
-  # victoriaMetrics: false
+      # victoriaMetrics: false
 pgbouncer:
   envFrom:
     poolMode:
