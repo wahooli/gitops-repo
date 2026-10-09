@@ -8,6 +8,7 @@
     <device id="${immich_syncthing_device_nas}" introducedBy=""/>
     <device id="${immich_syncthing_device_tpi_1}" introducedBy=""/>
     <minDiskFree unit="%">1</minDiskFree>
+    <order>smallestFirst</order>
   </folder>
   <device id="${immich_syncthing_device_nas}" name="nas">
     <address>tcp://immich-syncthing-nas.immich.svc.cluster.local:22000</address>

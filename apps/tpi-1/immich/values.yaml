@@ -5,6 +5,7 @@ server:
         main:
           env:
             IMMICH_WORKERS_INCLUDE: api
+            IMMICH_IGNORE_MOUNT_CHECK_ERRORS: "true"
         syncthing:
           env:
             SYNC_CURRENT_YEAR_ONLY: "true"
