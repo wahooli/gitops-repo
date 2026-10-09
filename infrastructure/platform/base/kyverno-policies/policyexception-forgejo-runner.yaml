@@ -1,0 +1,17 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: forgejo-runner
+  namespace: kyverno
+spec:
+  policyRefs:
+  - name: disallow-privileged-containers
+    kind: ValidatingPolicy
+  - name: require-run-as-nonroot
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: forgejo-runner
+    expression: >-
+      object.metadata.namespace == 'forgejo-runners' &&
+      object.?spec.?template.?metadata.?labels.orValue(object.metadata.?labels.orValue({}))
+        [?'app'].orValue('') == 'forgejo-runner'

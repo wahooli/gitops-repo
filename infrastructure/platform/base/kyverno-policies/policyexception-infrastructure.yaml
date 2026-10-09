@@ -31,4 +31,6 @@ spec:
         (object.metadata.namespace == 'topolvm-system' &&
           labels[?'app.kubernetes.io/instance'].orValue('') == 'topolvm') ||
         (object.metadata.namespace == 'velero' &&
-          labels[?'role'].orValue('') == 'node-agent'))
+          (labels[?'role'].orValue('') == 'node-agent' ||
+           'velero.io/pod-volume-backup' in labels ||
+           'velero.io/pod-volume-restore' in labels)))

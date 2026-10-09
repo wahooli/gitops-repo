@@ -26,7 +26,9 @@ spec:
         (object.metadata.namespace == 'topolvm-system' &&
           labels[?'app.kubernetes.io/component'].orValue('') in ['node', 'lvmd']) ||
         (object.metadata.namespace == 'velero' &&
-          labels[?'role'].orValue('') == 'node-agent') ||
+          (labels[?'role'].orValue('') == 'node-agent' ||
+           'velero.io/pod-volume-backup' in labels ||
+           'velero.io/pod-volume-restore' in labels)) ||
         (object.metadata.namespace == 'default' &&
           labels[?'app.kubernetes.io/name'].orValue('') == 'jdownloader') ||
         (object.metadata.namespace == 'victoria-metrics' &&

@@ -144,6 +144,13 @@ def render_helmrelease(hr, objects, repos, workdir):
     return docs
 
 
+def scaledjob_to_job(sj):
+    return {"apiVersion": "batch/v1", "kind": "Job",
+            "metadata": {"name": sj["metadata"]["name"], "namespace": sj["metadata"].get("namespace", "default"),
+                         "labels": sj["metadata"].get("labels") or {}},
+            "spec": sj["spec"]["jobTargetRef"]}
+
+
 def main():
     tenant = sys.argv[1]
     cluster_dir = os.path.join(REPO, "clusters", tenant)
@@ -179,6 +186,7 @@ def main():
         if keep:
             print(f"working dir: {tmp}")
         resources = [d for d in built if d.get("kind") in WORKLOADS]
+        resources += [scaledjob_to_job(d) for d in built if d.get("kind") == "ScaledJob"]
         errors = []
         for hr in (d for d in built if d.get("kind") == "HelmRelease"):
             try:

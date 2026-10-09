@@ -103,6 +103,8 @@ schedules:
       excludedResources: *excludedResources
       excludedNamespaces: *excludedNamespaces
 nodeAgent:
+  extraArgs:
+  - --node-agent-configmap=velero-node-agent-config
   dnsConfig:
     options:
     - name: ndots
@@ -139,8 +141,15 @@ configuration:
       global:
         keepLatestMaintenanceJobs: 3
         podResources:
+          cpuRequest: "0"
+          cpuLimit: "0"
           memoryRequest: 640Mi
           memoryLimit: 1Gi
+configMaps:
+  node-agent-config:
+    data:
+      node-agent-config.json: |
+        {"podResources": {"cpuRequest": "0", "cpuLimit": "0", "memoryRequest": "32Mi", "memoryLimit": "1Gi"}}
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1002

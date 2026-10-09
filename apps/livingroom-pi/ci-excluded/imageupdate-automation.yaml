@@ -16,9 +16,12 @@ spec:
       author:
         email: fluxcdbot@users.noreply.github.com
         name: fluxcdbot
+      messageTemplateValues:
+        cluster: livingroom-pi
       messageTemplate: |
         Automated image update
 
+        Cluster: {{ .Values.cluster }}
         Automation name: {{ .AutomationObject }}
 
         Files:

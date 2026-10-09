@@ -4,3 +4,4 @@ resources:
 - ../../../base/kyverno-policies
 - policyexception-infrastructure.yaml
 - policyexception-root-by-design.yaml
+- policyexception-forgejo-runner.yaml
