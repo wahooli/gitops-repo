@@ -1,0 +1,10 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: immich-server
+  namespace: immich
+spec:
+  endpoints:
+  - fqdn:
+      hostname: immich-server.immich.svc.cluster.local
+      port: 2283

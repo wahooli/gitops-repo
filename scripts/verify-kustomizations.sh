@@ -62,7 +62,7 @@ ensure_dependencies_ready() {
   _dep_visited[$key]=1
 
   # Get dependsOn from the cluster
-  local dep_json
+  local dep_json dep_name dep_ns
   dep_json=$(kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" get kustomization "$name" \
     -o jsonpath='{range .spec.dependsOn[*]}{.name}{"|"}{.namespace}{"\n"}{end}' 2>/dev/null) || return 0
 

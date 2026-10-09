@@ -1,0 +1,15 @@
+server:
+  controllers:
+    main:
+      containers:
+        main:
+          env:
+            IMMICH_WORKERS_INCLUDE: api
+        syncthing:
+          env:
+            SYNC_CURRENT_YEAR_ONLY: "true"
+  service:
+    main:
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "remote"

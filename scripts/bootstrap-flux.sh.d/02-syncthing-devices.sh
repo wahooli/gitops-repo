@@ -38,8 +38,10 @@ done
 FILES_YAML=""
 for f in "$SYNCTHING_DEVICES_DIR"/*.txt; do
   name=$(basename "$f" .txt)
-  key="forgejo_syncthing_device_${name//-/_}"
-  FILES_YAML="${FILES_YAML}  - ${key}=$(basename "$f")"$'\n'
+  for app in forgejo immich; do
+    key="${app}_syncthing_device_${name//-/_}"
+    FILES_YAML="${FILES_YAML}  - ${key}=$(basename "$f")"$'\n'
+  done
 done
 
 # Remove trailing newline to prevent stray line in heredoc

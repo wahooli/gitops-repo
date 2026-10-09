@@ -1,0 +1,13 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: patroni-17-vchord
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: patroni-17-vchord
+  filterTags:
+    pattern: '^\d+\.\d+\.\d+-\d+$'
+  policy:
+    semver:
+      range: '~4.0.0-0'

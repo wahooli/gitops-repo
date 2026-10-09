@@ -7,6 +7,8 @@ spec:
   imageRepositoryRef:
     name: haproxy-redis
   digestReflectionPolicy: IfNotPresent
+  filterTags:
+    pattern: '^\d+\.\d+\.\d+-\d+$'
   policy:
     semver:
-      range: "~3.2.25"
+      range: "~3.2.0-0"
