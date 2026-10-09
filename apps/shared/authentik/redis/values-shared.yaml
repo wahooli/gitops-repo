@@ -10,15 +10,12 @@ global:
       ordinals:
         start: 0
       replicaCount: 3
-
 replicaCount: 1
-
 redis:
   initialMaster: 0
   enabled: true
   sentinel:
     enabled: true
-
     resources:
       requests:
         memory: 16Mi
@@ -29,22 +26,18 @@ certificates:
     secretTemplate:
       labels:
         velero.io/exclude-from-backup: "true"
-
 ssl:
   enabled: true
   issuerRef:
     name: clustermesh-issuer
     kind: ClusterIssuer
-
 podAnnotations:
   secret.reloader.stakater.com/reload: "authentik-redis-server"
-
 dnsConfig:
   options:
   - name: ndots
     value: "1"
   - name: edns0
-
 service:
   main:
     annotations:
@@ -134,14 +127,12 @@ ciliumNetworkPolicies:
           protocol: TCP
         - port: "26379"
           protocol: TCP
-
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 999
   runAsGroup: 999
   fsGroup: 999
   fsGroupChangePolicy: OnRootMismatch
-
 haproxy:
   podSecurityContext:
     runAsNonRoot: true
@@ -149,8 +140,8 @@ haproxy:
   progressDeadlineSeconds: 600
   image:
     repository: ghcr.io/wahooli/docker/haproxy-redis
-    tag: "3.2.25-1" # {"$imagepolicy": "flux-system:haproxy-redis:tag"}
-    digest: sha256:13a371b0d5d46e0e0e9d5824e52004436ac44605e033cc51f302d27d033ec10c # {"$imagepolicy": "flux-system:haproxy-redis:digest"}
+    tag: "3.2.25" # {"$imagepolicy": "flux-system:haproxy-redis:tag"}
+    digest: sha256:8677dd3f9c82b5f28920dcb01b67d0292250f6b917ad30c38575d6d044070501 # {"$imagepolicy": "flux-system:haproxy-redis:digest"}
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server"
   ciliumNetworkPolicies:
@@ -212,7 +203,6 @@ haproxy:
         - ports:
           - port: "8404"
             protocol: TCP
-
   resources:
     requests:
       memory: 32Mi

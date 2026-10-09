@@ -10,34 +10,27 @@ global:
     backupWeekly: "true"
     backupDaily: "true"
     app.kubernetes.io/part-of: authentik
-
 replicaCount: 1
-
 image:
   repository: ghcr.io/wahooli/docker/patroni-17
-  tag: 4.0.6-1 # {"$imagepolicy": "flux-system:patroni-17:tag"}
-
+  tag: 4.0.6 # {"$imagepolicy": "flux-system:patroni-17:tag"}
 postgresql:
   bootstrap:
     database: authentik # creates a database with this name
     username: authentik # creates a user with this name
     password: ${authentik_database_password} # sets the password for the user
-
 secrets:
   etcd-client:
     annotations:
       reflector.v1.k8s.emberstack.com/reflects: "etcd/etcd-client"
       reflector.v1.k8s.emberstack.com/reflected-version: ""
-
 certificates:
   server:
     secretTemplate:
       labels:
         velero.io/exclude-from-backup: "true"
-
 metrics:
   enabled: false
-
 initContainers:
   wait-for-etcdgw:
     image: ghcr.io/wahooli/docker/wait-for-it:1.0.0@sha256:08c0ea47bc72f3f9260f60ebcecb34f4c07542b40d97934b0af5b3ead9715c20 # {"$imagepolicy": "flux-system:wait-for-it"}
@@ -46,7 +39,6 @@ initContainers:
     - etcd-gateway.etcd.svc.cluster.local.:2379
     - -t
     - "300" # wait for 5 minutes
-
 configMaps:
   backup-scripts:
     data:
@@ -58,7 +50,6 @@ configMaps:
         export PATRONI_REPLICATION_PASSWORD="{{ (.Values.env).PATRONI_REPLICATION_PASSWORD | default .Values.patroni.replicationPassword }}"
         export PATRONI_REPLICATION_USERNAME="{{ (.Values.env).PATRONI_REPLICATION_USERNAME | default (((((.Values.patroni.config).postgresql).authentication).replication).username | default "replicator") }}"
         /db-backup.sh
-
 podAnnotations:
   backup.velero.io/backup-volumes: backup
   pre.hook.backup.velero.io/timeout: 10m
@@ -69,33 +60,27 @@ podAnnotations:
   pre.hook.backup.velero.io/command: '["/bin/bash", "/backup-scripts/pre-backup.sh"]'
   secret.reloader.stakater.com/reload: "authentik-patroni-etcd-client,authentik-patroni-server"
   configmap.reloader.stakater.com/reload: "pgbouncer-env"
-
 ssl:
   enabled: true
   # etcdClientCertSecret: authentik-patroni-etcd-client
   issuerRef:
     name: clustermesh-issuer
     kind: ClusterIssuer
-
 dnsConfig:
   options:
   - name: ndots
     value: "1"
   - name: edns0
-
 # env:
 #   LOG_MAX_SIZE: 2K
-
 service:
   main:
     annotations:
       service.cilium.io/global: "true"
       service.cilium.io/global-sync-endpoint-slices: "true"
-
 podMonitor:
   create: false
   jobLabel: app.kubernetes.io/instance
-
 pgbouncer:
   envFrom:
     poolMode:
@@ -115,7 +100,6 @@ pgbouncer:
     LOG_POOLER_ERRORS: 1
     LOG_DISCONNECTIONS: 0
     LOG_STATS: 0
-
 patroni:
   scope: authentik
   allowLoginFrom:
@@ -163,14 +147,12 @@ patroni:
         wal_compression: on # yamllint disable-line rule:truthy
         log_destination: stderr
         logging_collector: off # yamllint disable-line rule:truthy
-
     tags:
       nosync: false
       preferred: true
       noloadbalance: false
       clonefrom: true
       nostream: false
-
 ciliumNetworkPolicies:
   main:
     description: "Allow patroni to patroni and proxy communication. Allow access to etcd"
@@ -284,14 +266,12 @@ ciliumNetworkPolicies:
           protocol: TCP
         - port: "5432"
           protocol: TCP
-
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 999
   runAsGroup: 999
   fsGroup: 999
   fsGroupChangePolicy: OnRootMismatch
-
 haproxy:
   podSecurityContext:
     runAsNonRoot: true
@@ -361,7 +341,6 @@ haproxy:
         - ports:
           - port: "8404"
             protocol: TCP
-
   resources:
     requests:
       memory: 32Mi
