@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dav-feeds
+  namespace: webdav
+  labels:
+    app.kubernetes.io/name: dav-feeds
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: dav-feeds
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP

@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/dav-feeds
+- pvc.yaml
+- secret.yaml
+- httproute.yaml
+- networkpolicy.yaml
+- referencegrant.yaml
+- imagepolicy.yaml
+images:
+- name: ghcr.io/wahooli/docker/dav-feeds
+  newTag: 0.1.0 # {"$imagepolicy": "flux-system:dav-feeds:tag"}
+patches:
+- patch: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: dav-feeds
+      namespace: webdav
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "local"
+        service.cilium.io/global-sync-endpoint-slices: "true"

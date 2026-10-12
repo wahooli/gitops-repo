@@ -1,0 +1,29 @@
+[auth]
+type = ldap
+ldap_uri = ldap://ak-outpost-authentik-ldap-outpost.authentik.svc.cluster.local.:389
+ldap_base = dc=dav,dc=goauthentik,dc=io
+ldap_reader_dn = cn=dav-ldap-bind-user,ou=users,dc=dav,dc=goauthentik,dc=io
+ldap_secret_file = /run/secrets/radicale/password
+ldap_filter = (&(cn={0})(|(memberOf=cn=DAV Users,ou=groups,dc=dav,dc=goauthentik,dc=io)(cn=radicale-importer))(ak-active=TRUE))
+ldap_user_attribute = cn
+ldap_ignore_attribute_create_modify_timestamp = True
+cache_logins = True
+cache_successful_logins_expiry = 300
+
+[rights]
+type = from_file
+file = /etc/radicale/rights
+
+[storage]
+filesystem_folder = /var/lib/radicale/collections
+predefined_collections = {
+    "calendar": {"tag": "VCALENDAR", "D:displayname": "Calendar", "C:supported-calendar-component-set": "VEVENT,VTODO,VJOURNAL"},
+    "contacts": {"tag": "VADDRESSBOOK", "D:displayname": "Contacts"}
+  }
+
+[web]
+type = internal
+
+[logging]
+level = info
+mask_passwords = True

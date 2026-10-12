@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: dav-feeds-internet
+  namespace: webdav
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: dav-feeds
+  egress:
+  - toEntities:
+    - world
+    toPorts:
+    - ports:
+      - port: "80"
+        protocol: TCP
+      - port: "443"
+        protocol: TCP

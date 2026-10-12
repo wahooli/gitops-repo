@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webdav
+  namespace: webdav
+  labels:
+    app.kubernetes.io/name: webdav
+  annotations:
+    secret.reloader.stakater.com/reload: webdav-ldap-bind
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webdav
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: webdav
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 2012
+        runAsGroup: 2002
+        supplementalGroups:
+        - 2001
+      containers:
+      - name: httpd
+        image: httpd:2.4.69
+        imagePullPolicy: IfNotPresent
+        command: ["httpd", "-DFOREGROUND", "-f", "/etc/httpd/httpd.conf"]
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: http
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: "0"
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /etc/httpd
+          readOnly: true
+        - name: ldap-bind
+          mountPath: /run/secrets/webdav
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: webdav-data
+      - name: config
+        configMap:
+          name: webdav-config
+      - name: ldap-bind
+        secret:
+          secretName: webdav-ldap-bind
+      - name: tmp
+        emptyDir:
+          sizeLimit: 64Mi

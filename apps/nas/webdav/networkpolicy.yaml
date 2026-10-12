@@ -1,0 +1,55 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: webdav-namespace
+  namespace: webdav
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - {}
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: envoy-gateway-system
+        gateway.envoyproxy.io/owning-gateway-name: envoy-gw-private
+      matchExpressions:
+      - key: io.cilium.k8s.policy.cluster
+        operator: In
+        values:
+        - nas
+        - tpi-1
+    toPorts:
+    - ports:
+      - port: "5232"
+        protocol: TCP
+      - port: "8080"
+        protocol: TCP
+  - fromEntities:
+    - host
+    toPorts:
+    - ports:
+      - port: "5232"
+        protocol: TCP
+      - port: "8080"
+        protocol: TCP
+  egress:
+  - toEndpoints:
+    - {}
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: authentik
+        app.kubernetes.io/name: authentik-outpost-ldap
+    toPorts:
+    - ports:
+      - port: "3389"
+        protocol: TCP

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: radicale
+  namespace: webdav
+  labels:
+    app.kubernetes.io/name: radicale
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: radicale
+  ports:
+  - name: http
+    port: 5232
+    targetPort: http
+    protocol: TCP

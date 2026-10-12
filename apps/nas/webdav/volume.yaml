@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: webdav-data
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: ${webdav_data_host_path}
+    type: DirectoryOrCreate
+  claimRef:
+    name: webdav-data
+    namespace: webdav
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: webdav-data
+  namespace: webdav
+  labels:
+    app.kubernetes.io/name: webdav
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ""
+  volumeName: webdav-data
+  resources:
+    requests:
+      storage: 1Ti
