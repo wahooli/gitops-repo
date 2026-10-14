@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dav-feeds-data
+  namespace: webdav
+  labels:
+    app.kubernetes.io/name: dav-feeds
+    backupDaily: "true"
+    backupWeekly: "true"
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: topolvm-default
+  resources:
+    requests:
+      storage: 1Gi

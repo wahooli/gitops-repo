@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: httpd
+  namespace: flux-system
+spec:
+  image: httpd
+  interval: 24h

@@ -194,6 +194,7 @@ jobs:
         TENANT: "${{ matrix.test.tenant }}"
         CONTEXT: "k3d-${{ matrix.test.tenant }}"
         RECONCILE_READY: "false"
+        HELMRELEASE_TIMEOUT: "7m"
       run: scripts/verify-helmreleases.sh
     - name: Verify blueprint apply
       if: steps.create-cluster.outcome == 'success'

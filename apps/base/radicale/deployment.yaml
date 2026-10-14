@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radicale
+  namespace: webdav
+  labels:
+    app.kubernetes.io/name: radicale
+    backupDaily: "true"
+    backupWeekly: "true"
+  annotations:
+    secret.reloader.stakater.com/reload: radicale-ldap-bind
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: radicale
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: radicale
+        backupDaily: "true"
+        backupWeekly: "true"
+      annotations:
+        backup.velero.io/backup-volumes: data
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+      - name: radicale
+        image: ghcr.io/kozea/radicale:3.8.3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 5232
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: http
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: "0"
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/radicale
+        - name: config
+          mountPath: /etc/radicale
+          readOnly: true
+        - name: ldap-bind
+          mountPath: /run/secrets/radicale
+          readOnly: true
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: radicale-data
+      - name: config
+        configMap:
+          name: radicale-config
+      - name: ldap-bind
+        secret:
+          secretName: radicale-ldap-bind

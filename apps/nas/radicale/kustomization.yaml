@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/radicale
+- pvc.yaml
+- secrets.yaml
+- httproute.yaml
+- imagepolicy.yaml
+images:
+- name: ghcr.io/kozea/radicale
+  newTag: 3.8.3 # {"$imagepolicy": "flux-system:radicale:tag"}
+patches:
+- patch: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: radicale
+      namespace: webdav
+      annotations:
+        service.cilium.io/global: "true"
+        service.cilium.io/affinity: "local"
+        service.cilium.io/global-sync-endpoint-slices: "true"

@@ -1,0 +1,29 @@
+[feed-importer]
+user: radicale-importer
+collection: [^/]+/feed-[^/]+
+permissions: rw
+
+[feed-importer-deny]
+user: radicale-importer
+collection: .*
+permissions:
+
+[root]
+user: .+
+collection:
+permissions: R
+
+[principal]
+user: .+
+collection: {user}
+permissions: RW
+
+[feeds]
+user: .+
+collection: {user}/feed-[^/]+
+permissions: r
+
+[collections]
+user: .+
+collection: {user}/[^/]+
+permissions: rw

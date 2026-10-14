@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dav-feeds
+  namespace: webdav
+  labels:
+    app.kubernetes.io/name: dav-feeds
+    backupDaily: "true"
+    backupWeekly: "true"
+  annotations:
+    secret.reloader.stakater.com/reload: dav-feeds-radicale
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dav-feeds
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dav-feeds
+        backupDaily: "true"
+        backupWeekly: "true"
+      annotations:
+        backup.velero.io/backup-volumes: data
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+      - name: dav-feeds
+        image: ghcr.io/wahooli/docker/dav-feeds:0.1.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DAVFEEDS_RADICALE_URL
+          value: http://radicale.webdav.svc.cluster.local:5232
+        - name: DAVFEEDS_RADICALE_USER
+          value: radicale-importer
+        - name: DAVFEEDS_RADICALE_PASSWORD_FILE
+          value: /run/secrets/dav-feeds/password
+        - name: DAVFEEDS_REQUIRED_GROUP
+          value: DAV Users
+        - name: DAVFEEDS_DAV_URL
+          value: https://dav.${domain_wahoo_li:=wahoo.li}/
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: "0"
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: radicale
+          mountPath: /run/secrets/dav-feeds
+          readOnly: true
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: dav-feeds-data
+      - name: radicale
+        secret:
+          secretName: dav-feeds-radicale
