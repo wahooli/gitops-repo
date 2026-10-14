@@ -123,7 +123,7 @@ spec:
             mountPath: /tmp
   minReplicaCount: 0
   pollingInterval: 10
-  successfulJobsHistoryLimit: 0
+  successfulJobsHistoryLimit: 20
   failedJobsHistoryLimit: 1
   maxReplicaCount: 4
   triggers:

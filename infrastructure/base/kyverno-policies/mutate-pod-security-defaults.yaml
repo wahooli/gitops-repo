@@ -1,0 +1,88 @@
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: pod-security-defaults
+  annotations:
+    policies.kyverno.io/title: Pod security defaults
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/description: >-
+      Sets the RuntimeDefault seccomp profile on pods that set none, and
+      allowPrivilegeEscalation false and drop ALL capabilities on non-root,
+      non-privileged containers that add no capabilities and leave those
+      fields unset.
+spec:
+  failurePolicy: Ignore
+  autogen:
+    podControllers:
+      controllers: []
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values: [kube-system, kyverno]
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE"]
+      resources: ["pods"]
+  variables:
+  - name: podRunAsNonRoot
+    expression: object.spec.?securityContext.?runAsNonRoot.orValue(false)
+  - name: containers
+    expression: >-
+      object.spec.containers.filter(c,
+        c.?securityContext.?runAsNonRoot.orValue(variables.podRunAsNonRoot) &&
+        !c.?securityContext.?privileged.orValue(false) &&
+        size(c.?securityContext.?capabilities.?add.orValue([])) == 0 &&
+        (!c.?securityContext.?allowPrivilegeEscalation.hasValue() ||
+          size(c.?securityContext.?capabilities.?drop.orValue([])) == 0))
+  - name: initContainers
+    expression: >-
+      object.spec.?initContainers.orValue([]).filter(c,
+        c.?securityContext.?runAsNonRoot.orValue(variables.podRunAsNonRoot) &&
+        !c.?securityContext.?privileged.orValue(false) &&
+        size(c.?securityContext.?capabilities.?add.orValue([])) == 0 &&
+        (!c.?securityContext.?allowPrivilegeEscalation.hasValue() ||
+          size(c.?securityContext.?capabilities.?drop.orValue([])) == 0))
+  - name: containerNames
+    expression: object.spec.containers.map(c, c.name)
+  - name: initContainerNames
+    expression: object.spec.?initContainers.orValue([]).map(c, c.name)
+  mutations:
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: >-
+        (has(object.spec.securityContext) ? [] :
+          [JSONPatch{op: "add", path: "/spec/securityContext", value: Object.spec.securityContext{}}]) +
+        (object.spec.?securityContext.?seccompProfile.hasValue() ? [] :
+          [JSONPatch{op: "add", path: "/spec/securityContext/seccompProfile",
+            value: Object.spec.securityContext.seccompProfile{type: "RuntimeDefault"}}])
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: >-
+        variables.containers.filter(c, !has(c.securityContext)).map(c,
+          JSONPatch{op: "add", path: "/spec/containers/" + string(variables.containerNames.indexOf(c.name)) + "/securityContext",
+            value: Object.spec.containers.securityContext{}}) +
+        variables.containers.filter(c, !c.?securityContext.?allowPrivilegeEscalation.hasValue()).map(c,
+          JSONPatch{op: "add", path: "/spec/containers/" + string(variables.containerNames.indexOf(c.name)) + "/securityContext/allowPrivilegeEscalation", value: false}) +
+        variables.containers.filter(c, !c.?securityContext.?capabilities.hasValue()).map(c,
+          JSONPatch{op: "add", path: "/spec/containers/" + string(variables.containerNames.indexOf(c.name)) + "/securityContext/capabilities",
+            value: Object.spec.containers.securityContext.capabilities{drop: ["ALL"]}}) +
+        variables.containers.filter(c, c.?securityContext.?capabilities.hasValue() &&
+            size(c.?securityContext.?capabilities.?drop.orValue([])) == 0).map(c,
+          JSONPatch{op: "add", path: "/spec/containers/" + string(variables.containerNames.indexOf(c.name)) + "/securityContext/capabilities/drop", value: ["ALL"]})
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: >-
+        variables.initContainers.filter(c, !has(c.securityContext)).map(c,
+          JSONPatch{op: "add", path: "/spec/initContainers/" + string(variables.initContainerNames.indexOf(c.name)) + "/securityContext",
+            value: Object.spec.initContainers.securityContext{}}) +
+        variables.initContainers.filter(c, !c.?securityContext.?allowPrivilegeEscalation.hasValue()).map(c,
+          JSONPatch{op: "add", path: "/spec/initContainers/" + string(variables.initContainerNames.indexOf(c.name)) + "/securityContext/allowPrivilegeEscalation", value: false}) +
+        variables.initContainers.filter(c, !c.?securityContext.?capabilities.hasValue()).map(c,
+          JSONPatch{op: "add", path: "/spec/initContainers/" + string(variables.initContainerNames.indexOf(c.name)) + "/securityContext/capabilities",
+            value: Object.spec.initContainers.securityContext.capabilities{drop: ["ALL"]}}) +
+        variables.initContainers.filter(c, c.?securityContext.?capabilities.hasValue() &&
+            size(c.?securityContext.?capabilities.?drop.orValue([])) == 0).map(c,
+          JSONPatch{op: "add", path: "/spec/initContainers/" + string(variables.initContainerNames.indexOf(c.name)) + "/securityContext/capabilities/drop", value: ["ALL"]})

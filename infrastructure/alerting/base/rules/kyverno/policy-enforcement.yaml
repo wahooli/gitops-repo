@@ -1,0 +1,52 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: kyverno-policy-enforcement
+  namespace: alerting
+spec:
+  groups:
+  - name: kyverno-policy-enforcement
+    rules:
+    - alert: KyvernoAdmissionDenied
+      annotations:
+        summary: Kyverno denied {{ $labels.resource_kind }} in {{ $labels.resource_namespace }}.
+        description: >
+          Kyverno policy {{ $labels.policy_name }} denied {{ printf "%.0f" $value }} {{ $labels.resource_kind }}
+          request(s) in {{ $labels.resource_namespace }} on {{ $labels.clustername }} in the last 10 minutes.
+          Pods and Jobs created by controllers show the denial only in the controller's status
+          (e.g. ScaledJob conditions, PodVolumeBackup status), not in a HelmRelease.
+      expr: |-
+        sum by (clustername, policy_name, resource_kind, resource_namespace) (
+          increase(kyverno_validating_policy_results_total{execution_cause="admission_request", result="fail", policy_validation_mode="Deny"}[10m])
+        ) > 0
+      for: 0m
+      labels:
+        severity: warning
+    - alert: KyvernoPolicyViolation
+      annotations:
+        summary: '{{ $labels.resource_kind }} in {{ $labels.resource_namespace }} fails {{ $labels.policy_name }}.'
+        description: >
+          Background scans on {{ $labels.clustername }} find {{ $labels.resource_kind }} resources in
+          {{ $labels.resource_namespace }} that fail Kyverno policy {{ $labels.policy_name }}. They were admitted
+          while Kyverno was down (webhooks fail open), before the policy was enforced, or under a PolicyException
+          that has since changed. Details: kubectl get policyreport -n {{ $labels.resource_namespace }}
+      expr: |-
+        sum by (clustername, policy_name, resource_kind, resource_namespace) (
+          increase(kyverno_validating_policy_results_total{execution_cause="background_scan", result="fail"}[2h])
+        ) > 0
+      for: 0m
+      labels:
+        severity: warning
+    - alert: KyvernoControllerUnavailable
+      annotations:
+        summary: Kyverno {{ $labels.deployment }} is unavailable on {{ $labels.clustername }}.
+        description: >
+          {{ $labels.deployment }} on {{ $labels.clustername }} has had no available replicas for 10 minutes.
+          Kyverno's webhooks fail open: without the admission controller nothing is validated or mutated
+          (including the VPN gateway injection on nas), and without the reports controller
+          KyvernoPolicyViolation can't fire.
+      expr: |-
+        kube_deployment_status_replicas_available{job="kube-state-metrics", namespace="kyverno"} == 0
+      for: 10m
+      labels:
+        severity: warning
