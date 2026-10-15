@@ -280,5 +280,23 @@ configMapGenerator:
       grafana_dashboard: "1"
     annotations:
       kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: cilium-agent-dashboard
+  namespace: grafana
+  files:
+  - cilium-agent.json=dashboards/cilium/cilium-agent.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
+- name: cilium-bgp-dashboard
+  namespace: grafana
+  files:
+  - cilium-bgp.json=dashboards/cilium/cilium-bgp.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      kustomize.toolkit.fluxcd.io/substitute: disabled
 configurations:
 - ../../.config/valuesFrom.yaml

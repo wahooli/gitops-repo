@@ -1,0 +1,72 @@
+# Needs prometheus.enabled / operator.prometheus.enabled in the cilium Helm
+# release (ports named "prometheus", 9962 and 9963). k8s_app / io_cilium_app are
+# what the bundled Cilium dashboards filter on.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: cilium-agent
+  namespace: kube-system
+spec:
+  podMetricsEndpoints:
+  - port: prometheus
+    relabelConfigs:
+    - action: labelmap
+      regex: "__meta_kubernetes_pod_node_name"
+      replacement: "instance"
+    - action: replace
+      source_labels:
+      - __meta_kubernetes_pod_label_k8s_app
+      target_label: k8s_app
+    metricRelabelConfigs:
+    # Only what the Cilium dashboards and the cilium-bgp rules use: 761 of ~1865
+    # series per agent. Add a family here before building on it.
+    - action: keep
+      source_labels:
+      - __name__
+      regex: 'cilium_(agent_api_process_time_seconds|bgp_control_plane_(advertised_routes|received_routes|session_state)|bpf_(map_ops|map_pressure|maps_virtual_memory_max_bytes|progs_virtual_memory_max_bytes)|controllers_(failing|runs|runs_duration_seconds)|datapath_conntrack_(dump_resets|gc_entries)|drop_(bytes|count)|endpoint_(regeneration_time_stats_seconds|regenerations|state)|errors_warnings|forward_(bytes|count)|ip_addresses|k8s_client_api_(calls|latency_time_seconds)|kubernetes_events(_received)?|kvstore_(events_queue_seconds|operations_duration_seconds)|nodes_all_(events_received|num)|policy(_change|_endpoint_enforcement_status|_implementation_delay|_incremental_update_duration|_l7)?|process_(cpu_seconds|open_fds|resident_memory_bytes|virtual_memory_bytes)|unreachable_(health_endpoints|nodes)|version)(_bucket|_sum|_count|_total)?'
+    # BGP peers by router name: the address by default, the known routers by name.
+    - action: replace
+      source_labels:
+      - neighbor
+      regex: '(.+):\d+'
+      target_label: peer
+    - action: replace
+      source_labels:
+      - neighbor
+      regex: '10\.0\.0\.253:179'
+      target_label: peer
+      replacement: breakout
+    - action: replace
+      source_labels:
+      - neighbor
+      regex: '10\.0\.0\.254:179'
+      target_label: peer
+      replacement: quantum
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  selector:
+    matchLabels:
+      k8s-app: cilium
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: cilium-operator
+  namespace: kube-system
+spec:
+  podMetricsEndpoints:
+  - port: prometheus
+    relabelConfigs:
+    - action: replace
+      source_labels:
+      - __meta_kubernetes_pod_label_io_cilium_app
+      target_label: io_cilium_app
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  selector:
+    matchLabels:
+      io.cilium/app: operator
