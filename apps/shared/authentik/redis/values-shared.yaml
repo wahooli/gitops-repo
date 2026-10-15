@@ -10,15 +10,12 @@ global:
       ordinals:
         start: 0
       replicaCount: 3
-
 replicaCount: 1
-
 redis:
   initialMaster: 0
   enabled: true
   sentinel:
     enabled: true
-
     resources:
       requests:
         memory: 16Mi
@@ -29,22 +26,18 @@ certificates:
     secretTemplate:
       labels:
         velero.io/exclude-from-backup: "true"
-
 ssl:
   enabled: true
   issuerRef:
     name: clustermesh-issuer
     kind: ClusterIssuer
-
 podAnnotations:
   secret.reloader.stakater.com/reload: "authentik-redis-server"
-
 dnsConfig:
   options:
   - name: ndots
     value: "1"
   - name: edns0
-
 service:
   main:
     annotations:
@@ -134,14 +127,12 @@ ciliumNetworkPolicies:
           protocol: TCP
         - port: "26379"
           protocol: TCP
-
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 999
   runAsGroup: 999
   fsGroup: 999
   fsGroupChangePolicy: OnRootMismatch
-
 haproxy:
   podSecurityContext:
     runAsNonRoot: true
@@ -212,7 +203,6 @@ haproxy:
         - ports:
           - port: "8404"
             protocol: TCP
-
   resources:
     requests:
       memory: 32Mi
