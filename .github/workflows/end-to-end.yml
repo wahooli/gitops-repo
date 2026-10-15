@@ -207,5 +207,6 @@ jobs:
       env:
         DEBUG_LOGS: "true"
         DEBUG_NODES: "true"
+        DEBUG_DNS: "true"
         HELM_RELEASES: "${{ steps.helmrelease-verify.outputs.failing_helmrelease || join(matrix.test.helmreleases, ',') }}"
       run: scripts/ci/debug-failure.sh
