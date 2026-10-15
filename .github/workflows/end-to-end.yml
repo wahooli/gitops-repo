@@ -136,6 +136,7 @@ jobs:
           infrastructure
           local-clusters
           scripts
+          tenants
           .sourceignore
     - name: Install required self-hosted dependencies
       if: runner.environment == 'self-hosted'
