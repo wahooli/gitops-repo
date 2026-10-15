@@ -15,6 +15,9 @@ metadata:
 spec:
   validationActions: [Deny, Audit]
   failurePolicy: Fail
+  evaluation:
+    background:
+      enabled: false
   matchConstraints:
     namespaceSelector:
       matchExpressions:
@@ -22,9 +25,13 @@ spec:
         operator: Exists
     resourceRules:
     - apiGroups: ["gateway.networking.k8s.io"]
-      apiVersions: ["*"]
+      apiVersions: ["v1"]
       operations: ["CREATE", "UPDATE"]
-      resources: ["grpcroutes", "httproutes", "tcproutes", "tlsroutes", "udproutes"]
+      resources: ["grpcroutes", "httproutes"]
+    - apiGroups: ["gateway.networking.k8s.io"]
+      apiVersions: ["v1alpha2"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["tcproutes", "tlsroutes", "udproutes"]
   variables:
   - name: ns
     expression: object.metadata.namespace
