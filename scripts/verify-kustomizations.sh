@@ -14,6 +14,7 @@ KUSTOMIZATION_TIMEOUT="${KUSTOMIZATION_TIMEOUT:-5m}"
 KUSTOMIZATION_ATTEMPTS="${KUSTOMIZATION_ATTEMPTS:-3}"
 KUSTOMIZATION_RETRY_DELAY="${KUSTOMIZATION_RETRY_DELAY:-15}"
 RECONCILE_READY="${RECONCILE_READY:-true}"
+CI_UNSUSPENDED_KUSTOMIZATIONS="${CI_UNSUSPENDED_KUSTOMIZATIONS:-infrastructure-kube-dns}"
 
 # Optional context override (Makefile sets CONTEXT=k3d-<cluster>; CI uses default)
 CONTEXT_ARGS=()
@@ -315,10 +316,15 @@ echo "Waiting for CoreDNS rollout..."
 kubectl "${CONTEXT_ARGS[@]}" -n kube-system rollout status deployment/coredns --timeout="${KUSTOMIZATION_TIMEOUT}"
 
 # In CI, suspend all kustomizations to prevent the kustomization controller from
-# re-applying suspend: true to HelmReleases during helmrelease verification
+# re-applying suspend: true to HelmReleases during helmrelease verification.
+# CI_UNSUSPENDED_KUSTOMIZATIONS (no HelmReleases) keep reconciling.
 if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
-  echo "Suspending all kustomizations..."
-  flux suspend kustomization --all -n flux-system "${CONTEXT_ARGS[@]}"
+  echo "Suspending all kustomizations except: ${CI_UNSUSPENDED_KUSTOMIZATIONS:-none}"
+  for ks in $(kubectl "${CONTEXT_ARGS[@]}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io \
+      -o jsonpath='{.items[*].metadata.name}'); do
+    [[ " ${CI_UNSUSPENDED_KUSTOMIZATIONS} " == *" ${ks} "* ]] && continue
+    retry_transient flux suspend kustomization "$ks" -n flux-system "${CONTEXT_ARGS[@]}"
+  done
 fi
 
 exit 0

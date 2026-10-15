@@ -170,11 +170,30 @@ host_resources() {
 }
 
 k3s_server_logs() {
+  local node t action code
   for node in $(node_containers); do
-    echo "### ${node}"
+    echo "### ${node}: container die/oom/kill events"
+    timeout 20 docker events --since "$DEBUG_K3S_LOG_SINCE" --until "$(date +%s)" --filter "container=${node}" \
+        --filter event=die --filter event=oom --filter event=kill \
+        --format '{{.Time}} {{.Action}} {{index .Actor.Attributes "exitCode"}}{{index .Actor.Attributes "signal"}}' \
+      | while read -r t action code; do
+          echo "$(date -u -d "@${t}" +%Y-%m-%dT%H:%M:%SZ) ${action} ${code:+(exit code/signal ${code})}"
+        done
+    echo "### ${node}: last 80 log lines before each k3s restart"
+    docker logs --since "$DEBUG_K3S_LOG_SINCE" "$node" 2>&1 | awk '
+      /Starting k3s/ {
+        if (starts++) {
+          print "--- before start #" starts " ---"
+          for (i = (c > 80 ? c - 79 : 1); i <= c; i++) print buf[i % 80]
+        }
+        c = 0
+      }
+      { buf[++c % 80] = $0 }'
+    echo "### ${node}: fatal, leader election and startup lines"
     docker logs --since "$DEBUG_K3S_LOG_SINCE" "$node" 2>&1 \
-      | grep -E '^[EF][0-9]{4} |level=(error|fatal)|leaderelection|lost lease|apiserver not ready|Starting k3s|Running kube-apiserver|Shutting down' \
-      | tail -n 300
+      | grep -E '^F[0-9]{4} |level=fatal|leaderelection|lost lease|apiserver not ready|Starting k3s|Running kube-apiserver|Shutting down|signal'
+    echo "### ${node}: errors (last 150)"
+    docker logs --since "$DEBUG_K3S_LOG_SINCE" "$node" 2>&1 | grep -E '^E[0-9]{4} |level=error' | tail -n 150
   done
 }
 
@@ -304,6 +323,6 @@ fi
 if [ "$DEBUG_NODES" = true ]; then
   group "Describe all cluster nodes" kubectl describe nodes -A
   group "Node: host resources and node container state" host_resources
-  group "Node: k3s server errors, leader election and restarts" k3s_server_logs
+  group "Node: k3s restarts, fatal and error lines" k3s_server_logs
   group "Node: Cilium state" cilium_state
 fi
