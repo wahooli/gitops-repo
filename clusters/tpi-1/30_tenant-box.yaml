@@ -16,6 +16,7 @@ spec:
     substitute:
       tenant_name: box
       tenant_git_repo: the-backend/gitops.git
+      tenant_git_path: ./clusters/tpi-1
     substituteFrom:
     - kind: Secret
       name: cluster-vars
