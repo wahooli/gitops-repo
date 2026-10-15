@@ -1,10 +1,22 @@
 rack: tpi-1
 
 master:
+  # With -max=0 a volume server gets a volume slot for each volumeSizeLimitMB of free disk. The chart's 30000MB left the
+  # 100Gi volume disks only a few slots each, all used up by mostly empty volumes.
+  args:
+  - -mdir=/data
+  - -volumeSizeLimitMB=5000
   configMaps:
     config:
       data:
         master.toml: |-
+          # volumes created at a time for a collection that has none writable, by number of copies (default 7, 6, 3, 1)
+          [master.volume_growth]
+          copy_1 = 2
+          copy_2 = 2
+          copy_3 = 1
+          copy_other = 1
+
           [master.maintenance]
           scripts = """
             lock
@@ -38,6 +50,14 @@ volume:
   replicaCount: 4
   ordinals:
     start: 0
+  # the base args, with more free space kept: 1% of a 100Gi disk is 1GB
+  args:
+  - -dir=/data
+  - -max=0
+  - -compactionMBps=50
+  - -readMode=proxy
+  - -publicUrl=$(POD_FQDN)
+  - -minFreeSpacePercent=5
   persistence:
     data:
       spec:
