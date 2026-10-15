@@ -12,6 +12,7 @@ resources:
 - rules/kubernetes/kubernetes-resources.yaml
 - rules/kubernetes/kubernetes-storage.yaml
 - rules/kubernetes/kubernetes-sustained-load.yaml
+- rules/kyverno/policy-enforcement.yaml
 - rules/log-count.yaml
 - rules/envoy-gateway/envoy-logs.yaml
 - rules/nginx/nginx-logs.yaml

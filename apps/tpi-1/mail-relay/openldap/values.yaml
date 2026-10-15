@@ -77,3 +77,7 @@ podSecurityContext:
   runAsNonRoot: true
 securityContext:
   runAsUser: 1001
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+    add: ["NET_BIND_SERVICE"]

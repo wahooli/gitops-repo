@@ -11,3 +11,4 @@ resources:
 - require-labels.yaml
 - require-public-route-label.yaml
 - restrict-image-registries.yaml
+- mutate-pod-security-defaults.yaml
