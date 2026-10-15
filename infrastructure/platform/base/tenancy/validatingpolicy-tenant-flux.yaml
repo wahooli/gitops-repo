@@ -1,0 +1,82 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: tenant-flux-guardrails
+  annotations:
+    policies.kyverno.io/title: Tenant Flux Guardrails
+    policies.kyverno.io/category: Multi-Tenancy
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Flux objects in a tenant namespace may only reference that namespace and
+      may not reconcile against another cluster through kubeConfig. Sources may
+      not use cloud workload identity or proxies, and may not point at
+      cluster-internal or IP-literal URLs, because source-controller fetches
+      them from flux-system with the platform's network access.
+spec:
+  validationActions: [Deny, Audit]
+  failurePolicy: Fail
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: homelab.wahoo.li/tenant
+        operator: Exists
+    resourceRules:
+    - apiGroups: ["kustomize.toolkit.fluxcd.io"]
+      apiVersions: ["*"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["kustomizations"]
+    - apiGroups: ["helm.toolkit.fluxcd.io"]
+      apiVersions: ["*"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["helmreleases"]
+    - apiGroups: ["source.toolkit.fluxcd.io"]
+      apiVersions: ["*"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["buckets", "gitrepositories", "helmcharts", "helmrepositories", "ocirepositories"]
+  variables:
+  - name: ns
+    expression: object.metadata.namespace
+  - name: refs
+    expression: >-
+      [?object.spec.?sourceRef, ?object.spec.?chart.?spec.?sourceRef, ?object.spec.?chartRef] +
+      object.spec.?dependsOn.orValue([])
+  - name: url
+    expression: object.spec.?url.orValue('')
+  - name: host
+    expression: >-
+      variables.url != '' && isURL(variables.url) ?
+        url(variables.url).getHostname().lowerAscii() : ''
+  - name: hostname
+    expression: >-
+      variables.host.endsWith('.') ?
+        variables.host.substring(0, size(variables.host) - 1) : variables.host
+  validations:
+  - expression: object.kind != 'Bucket'
+    message: Bucket sources are not allowed in tenant namespaces.
+  - expression: >-
+      !(object.kind in ['Kustomization', 'HelmRelease']) ||
+      object.spec.?serviceAccountName.orValue('') != ''
+    message: Kustomizations and HelmReleases in tenant namespaces must set spec.serviceAccountName.
+  - expression: variables.refs.all(r, r.?namespace.orValue(variables.ns) == variables.ns)
+    message: Flux references in a tenant namespace must stay in that namespace.
+  - expression: >-
+      object.spec.?targetNamespace.orValue(variables.ns) == variables.ns &&
+      object.spec.?storageNamespace.orValue(variables.ns) == variables.ns
+    message: targetNamespace and storageNamespace must be the tenant namespace.
+  - expression: "!has(object.spec.kubeConfig)"
+    message: kubeConfig is not allowed in tenant namespaces.
+  - expression: "!(object.spec.?provider.orValue('generic') in ['aws', 'azure', 'gcp'])"
+    message: Cloud workload identity providers are not allowed in tenant namespaces.
+  - expression: "!has(object.spec.proxySecretRef)"
+    message: proxySecretRef is not allowed in tenant namespaces.
+  - expression: >-
+      variables.url == '' || (
+        isURL(variables.url) &&
+        variables.hostname.contains('.') &&
+        !isIP(variables.hostname) &&
+        !variables.hostname.endsWith('.svc') &&
+        !variables.hostname.contains('.svc.') &&
+        ['.local', '.localhost', '.internal', '.lan', '.home.arpa'].all(s, !variables.hostname.endsWith(s)))
+    messageExpression: >-
+      'Source URL host ' + variables.hostname + ' is not allowed: use a public DNS name, ' +
+      'not an IP address or a cluster-internal name.'

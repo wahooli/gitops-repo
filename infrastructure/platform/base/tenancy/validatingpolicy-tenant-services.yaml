@@ -1,0 +1,36 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: tenant-service-guardrails
+  annotations:
+    policies.kyverno.io/title: Tenant Service Guardrails
+    policies.kyverno.io/category: Multi-Tenancy
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Services in a tenant namespace must be ClusterIP without externalIPs, and
+      may not carry external-dns or Cilium annotations. Tenants get traffic
+      through their own gateway, so they don't need LoadBalancer IPs, DNS
+      records, or ClusterMesh global services of their own.
+spec:
+  validationActions: [Deny, Audit]
+  failurePolicy: Fail
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: homelab.wahoo.li/tenant
+        operator: Exists
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["services"]
+  validations:
+  - expression: object.spec.?type.orValue('ClusterIP') == 'ClusterIP'
+    message: Only ClusterIP Services are allowed in tenant namespaces.
+  - expression: size(object.spec.?externalIPs.orValue([])) == 0
+    message: externalIPs are not allowed in tenant namespaces.
+  - expression: >-
+      !object.metadata.?annotations.orValue({}).exists(k,
+        ['external-dns.alpha.kubernetes.io/', 'lbipam.cilium.io/', 'io.cilium/', 'service.cilium.io/']
+          .exists(p, k.startsWith(p)))
+    message: external-dns and Cilium annotations are not allowed on tenant Services.

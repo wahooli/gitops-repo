@@ -1,0 +1,22 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: tenant-box
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  prune: true
+  dependsOn:
+  - name: infrastructure-platform
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./tenants/tpi-1/box
+  postBuild:
+    substitute:
+      tenant_name: box
+      tenant_git_repo: the-backend/gitops.git
+    substituteFrom:
+    - kind: Secret
+      name: cluster-vars
+      optional: true

@@ -12,6 +12,7 @@
 !/.yamllint
 !/LICENSE
 !/scripts
+!/tenants
 !/local-clusters
 # allow globally these files
 !.gitignore
