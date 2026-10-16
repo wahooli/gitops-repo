@@ -317,13 +317,21 @@ kubectl "${CONTEXT_ARGS[@]}" -n kube-system rollout status deployment/coredns --
 
 # In CI, suspend all kustomizations to prevent the kustomization controller from
 # re-applying suspend: true to HelmReleases during helmrelease verification.
-# CI_UNSUSPENDED_KUSTOMIZATIONS (no HelmReleases) keep reconciling.
+# CI_UNSUSPENDED_KUSTOMIZATIONS (no HelmReleases) keep reconciling, without dependsOn.
 if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
   echo "Suspending all kustomizations except: ${CI_UNSUSPENDED_KUSTOMIZATIONS:-none}"
   for ks in $(kubectl "${CONTEXT_ARGS[@]}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io \
       -o jsonpath='{.items[*].metadata.name}'); do
     [[ " ${CI_UNSUSPENDED_KUSTOMIZATIONS} " == *" ${ks} "* ]] && continue
     retry_transient flux suspend kustomization "$ks" -n flux-system "${CONTEXT_ARGS[@]}"
+  done
+  for ks in ${CI_UNSUSPENDED_KUSTOMIZATIONS}; do
+    if [[ -n "$(kubectl "${CONTEXT_ARGS[@]}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io "$ks" \
+        -o jsonpath='{.spec.dependsOn}' 2>/dev/null)" ]]; then
+      echo "Removing dependsOn from $ks"
+      retry_transient kubectl "${CONTEXT_ARGS[@]}" -n flux-system patch kustomizations.kustomize.toolkit.fluxcd.io "$ks" \
+        --type=json -p '[{"op":"remove","path":"/spec/dependsOn"}]'
+    fi
   done
 fi
 

@@ -181,7 +181,7 @@ k3s_server_logs() {
         done
     echo "### ${node}: last 80 log lines before each k3s restart"
     docker logs --since "$DEBUG_K3S_LOG_SINCE" "$node" 2>&1 | awk '
-      /Starting k3s/ {
+      /msg="Starting k3s v/ {
         if (starts++) {
           print "--- before start #" starts " ---"
           for (i = (c > 80 ? c - 79 : 1); i <= c; i++) print buf[i % 80]
@@ -191,7 +191,7 @@ k3s_server_logs() {
       { buf[++c % 80] = $0 }'
     echo "### ${node}: fatal, leader election and startup lines"
     docker logs --since "$DEBUG_K3S_LOG_SINCE" "$node" 2>&1 \
-      | grep -E '^F[0-9]{4} |level=fatal|leaderelection|lost lease|apiserver not ready|Starting k3s|Running kube-apiserver|Shutting down|signal'
+      | grep -E '^F[0-9]{4} |level=fatal|leaderelection|lost lease|apiserver not ready|msg="Starting k3s v|Shutting down|signal'
     echo "### ${node}: errors (last 150)"
     docker logs --since "$DEBUG_K3S_LOG_SINCE" "$node" 2>&1 | grep -E '^E[0-9]{4} |level=error' | tail -n 150
   done
@@ -202,6 +202,25 @@ dns_conntrack() {
     echo "### ${node}: UDP/TCP port 53 flows"
     docker exec "$node" sh -c 'cat /proc/net/nf_conntrack 2>/dev/null || conntrack -L 2>/dev/null' \
       | grep -E 'dport=53 ' | head -n 120
+  done
+}
+
+# Top containers by memory working set, from the kubelet's CRI stats on each node
+container_usage() {
+  for node in $(node_containers); do
+    echo "### ${node}"
+    docker exec "$node" crictl stats -o json 2>/dev/null | jq -r '
+      [.stats[] | {
+        ns: (.attributes.labels["io.kubernetes.pod.namespace"] // "-"),
+        pod: (.attributes.labels["io.kubernetes.pod.name"] // "-"),
+        container: (.attributes.metadata.name // "-"),
+        mem: ((.memory.workingSetBytes.value // "0") | tonumber),
+        cpu: ((.cpu.usageNanoCores.value // "0") | tonumber)
+      }]
+      | "total: \(map(.mem) | add / 1048576 | floor) MiB in \(length) containers",
+        "MiB\tmCPU\tNAMESPACE\tPOD\tCONTAINER",
+        (sort_by(-.mem)[:30][] | "\(.mem / 1048576 | floor)\t\(.cpu / 1000000 | floor)\t\(.ns)\t\(.pod)\t\(.container)")' \
+      | { read -r total && echo "$total" && table; } || docker exec "$node" crictl stats 2>/dev/null
   done
 }
 
@@ -324,5 +343,6 @@ if [ "$DEBUG_NODES" = true ]; then
   group "Describe all cluster nodes" kubectl describe nodes -A
   group "Node: host resources and node container state" host_resources
   group "Node: k3s restarts, fatal and error lines" k3s_server_logs
+  group "Node: top containers by memory" container_usage
   group "Node: Cilium state" cilium_state
 fi
