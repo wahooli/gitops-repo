@@ -20,7 +20,11 @@ spec:
     port: 10300
     allowedRoutes:
       namespaces:
-        from: All
+        from: Selector
+        selector:
+          matchExpressions:
+          - key: homelab.wahoo.li/tenant
+            operator: DoesNotExist
       kinds:
       - kind: TCPRoute
   - name: wyoming-openai
@@ -28,6 +32,10 @@ spec:
     port: 10200
     allowedRoutes:
       namespaces:
-        from: All
+        from: Selector
+        selector:
+          matchExpressions:
+          - key: homelab.wahoo.li/tenant
+            operator: DoesNotExist
       kinds:
       - kind: TCPRoute

@@ -1,0 +1,65 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: tenant-route-guardrails
+  annotations:
+    policies.kyverno.io/title: Tenant Route Guardrails
+    policies.kyverno.io/category: Multi-Tenancy
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Routes in a tenant namespace may only attach to that tenant's gateway
+      (envoy-gw-<namespace>), may only use hostnames under
+      <namespace>.wahoo.li, and may only send traffic to Services in the same
+      namespace. The gateways' allowedRoutes enforce the attachment too; this
+      policy rejects the route up front with a readable message.
+spec:
+  validationActions: [Deny, Audit]
+  failurePolicy: Fail
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: homelab.wahoo.li/tenant
+        operator: Exists
+    resourceRules:
+    - apiGroups: ["gateway.networking.k8s.io"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["grpcroutes", "httproutes"]
+    - apiGroups: ["gateway.networking.k8s.io"]
+      apiVersions: ["v1alpha2"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["tcproutes", "tlsroutes", "udproutes"]
+  variables:
+  - name: ns
+    expression: object.metadata.namespace
+  - name: gateway
+    expression: "'envoy-gw-' + object.metadata.namespace"
+  - name: suffix
+    expression: "'.' + object.metadata.namespace + '.${domain_wahoo_li:=wahoo.li}'"
+  validations:
+  - expression: >-
+      object.spec.?parentRefs.orValue([]).all(p,
+        p.?group.orValue('gateway.networking.k8s.io') == 'gateway.networking.k8s.io' &&
+        p.?kind.orValue('Gateway') == 'Gateway' &&
+        p.?namespace.orValue(variables.ns) == 'envoy-gateway-system' &&
+        p.name == variables.gateway)
+    messageExpression: "'Tenant routes may only attach to envoy-gateway-system/' + variables.gateway + '.'"
+  - expression: object.spec.?hostnames.orValue([]).all(h, h.endsWith(variables.suffix))
+    messageExpression: "'Tenant route hostnames must end with ' + variables.suffix + '.'"
+  - expression: >-
+      object.spec.?rules.orValue([]).all(r,
+        r.?backendRefs.orValue([]).all(b,
+          b.?group.orValue('') == '' &&
+          b.?kind.orValue('Service') == 'Service' &&
+          b.?namespace.orValue(variables.ns) == variables.ns) &&
+        r.?filters.orValue([]).all(f,
+          !has(f.requestMirror) ||
+          (f.requestMirror.backendRef.?group.orValue('') == '' &&
+           f.requestMirror.backendRef.?kind.orValue('Service') == 'Service' &&
+           f.requestMirror.backendRef.?namespace.orValue(variables.ns) == variables.ns)))
+    message: Tenant routes may only send traffic to Services in the tenant namespace.
+  - expression: "!object.metadata.?annotations.orValue({}).exists(k, k.startsWith('external-dns.alpha.kubernetes.io/'))"
+    message: external-dns annotations are not allowed on tenant routes.

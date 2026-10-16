@@ -42,3 +42,15 @@ data:
 
     metrics:
       enabled: false
+
+    secrets:
+      etcd-client:
+        enabled: false
+
+    podAnnotations:
+      secret.reloader.stakater.com/reload: "etcd-client,authentik-patroni-server"
+
+    persistence:
+      etcd-tls:
+        spec:
+          useFromChart: false

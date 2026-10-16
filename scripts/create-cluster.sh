@@ -321,13 +321,17 @@ cilium "${CILIUM_ARGS[@]}"
 
 echo "Cilium installed successfully in $CLUSTER_NAME"
 
-echo "Installing FluxCD (helm-controller concurrent=$FLUX_HELM_CONCURRENT, requeue-dependency=$FLUX_REQUEUE_DEPENDENCY)"
-yq "
+echo "Installing FluxCD with clusters/$CLUSTER_NAME/flux-system patches, without gotk-sync (helm-controller concurrent=$FLUX_HELM_CONCURRENT, requeue-dependency=$FLUX_REQUEUE_DEPENDENCY)"
+FLUX_BUILD_DIR=$(mktemp -d)
+trap 'rm -rf "$FLUX_BUILD_DIR"' EXIT
+cp -R "$REPO_ROOT/clusters/$CLUSTER_NAME/flux-system/." "$FLUX_BUILD_DIR/"
+yq -i '.resources -= ["gotk-sync.yaml"]' "$FLUX_BUILD_DIR/kustomization.yaml"
+kubectl kustomize "$FLUX_BUILD_DIR" | yq "
   (select(.kind == \"Deployment\" and .metadata.name == \"helm-controller\") | .spec.template.spec.containers[0].args) +=
     [\"--concurrent=$FLUX_HELM_CONCURRENT\", \"--requeue-dependency=$FLUX_REQUEUE_DEPENDENCY\"] |
   (select(.kind == \"Deployment\" and .metadata.name == \"kustomize-controller\") | .spec.template.spec.containers[0].args) +=
     [\"--requeue-dependency=$FLUX_REQUEUE_DEPENDENCY\"]
-" "$REPO_ROOT/clusters/$CLUSTER_NAME/flux-system/gotk-components.yaml" | kubectl --context "$CONTEXT_NAME" create -f -
+" - | kubectl --context "$CONTEXT_NAME" create -f -
 
 echo "FluxCD installed successfully in $CLUSTER_NAME"
 

@@ -43,6 +43,9 @@ primary:
       - -ec
       - |
         MYSQL_PWD=$MARIADB_ROOT_PASSWORD mariadb-admin -u root status
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 30
   customReadinessProbe:
     exec:
       command:
@@ -50,6 +53,12 @@ primary:
       - -ec
       - |
         MYSQL_PWD=$MARIADB_ROOT_PASSWORD mariadb-admin -u root status
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  livenessProbe:
+    timeoutSeconds: 5
+    failureThreshold: 6
   readinessProbe:
     enabled: false
   persistence:

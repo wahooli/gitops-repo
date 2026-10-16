@@ -11,7 +11,10 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CLUSTER_NAME="${TENANT:-${1:-}}"
 KUSTOMIZATIONS="${KUSTOMIZATIONS:-${2:-}}"
 KUSTOMIZATION_TIMEOUT="${KUSTOMIZATION_TIMEOUT:-5m}"
+KUSTOMIZATION_ATTEMPTS="${KUSTOMIZATION_ATTEMPTS:-3}"
+KUSTOMIZATION_RETRY_DELAY="${KUSTOMIZATION_RETRY_DELAY:-15}"
 RECONCILE_READY="${RECONCILE_READY:-true}"
+CI_UNSUSPENDED_KUSTOMIZATIONS="${CI_UNSUSPENDED_KUSTOMIZATIONS:-infrastructure-kube-dns}"
 
 # Optional context override (Makefile sets CONTEXT=k3d-<cluster>; CI uses default)
 CONTEXT_ARGS=()
@@ -22,6 +25,29 @@ fi
 # GitHub Actions grouping
 group_start() { [[ -n "${GITHUB_ACTIONS:-}" ]] && echo "::group::$1" || echo "--- $1 ---"; }
 group_end() { [[ -n "${GITHUB_ACTIONS:-}" ]] && echo "::endgroup::" || true; }
+
+TRANSIENT_API_ERRORS='apiserver not ready|connection refused|connection reset by peer|unable to handle the request|service unavailable|i/o timeout|TLS handshake timeout|http2: client connection lost|unexpected EOF|etcdserver: request timed out|the object has been modified'
+
+# Run a command, retrying only when it fails with a transient API server error
+retry_transient() {
+  local attempt=1 rc out
+  out=$(mktemp)
+  while true; do
+    rc=0
+    "$@" 2>&1 | tee "$out" || rc=${PIPESTATUS[0]}
+    if [[ $rc -eq 0 ]]; then
+      rm -f "$out"
+      return 0
+    fi
+    if (( attempt >= KUSTOMIZATION_ATTEMPTS )) || ! grep -qiE "$TRANSIENT_API_ERRORS" "$out"; then
+      rm -f "$out"
+      return "$rc"
+    fi
+    echo "Transient API error (attempt $attempt/$KUSTOMIZATION_ATTEMPTS), retrying in ${KUSTOMIZATION_RETRY_DELAY}s..."
+    sleep "$KUSTOMIZATION_RETRY_DELAY"
+    attempt=$((attempt + 1))
+  done
+}
 
 # --- Validation ---
 if [[ -z "$CLUSTER_NAME" ]]; then
@@ -77,12 +103,12 @@ ensure_dependencies_ready() {
     echo "Dependency $dep_name (namespace: $dep_ns) is not ready, reconciling..."
     ensure_dependencies_ready "$dep_name" "$dep_ns" || return 1
 
-    flux reconcile kustomization "$dep_name" \
+    retry_transient flux reconcile kustomization "$dep_name" \
       -n "$dep_ns" \
       --timeout="${KUSTOMIZATION_TIMEOUT}" \
       "${CONTEXT_ARGS[@]}" || return 1
 
-    kubectl "${CONTEXT_ARGS[@]}" -n "$dep_ns" \
+    retry_transient kubectl "${CONTEXT_ARGS[@]}" -n "$dep_ns" \
       wait kustomization/"$dep_name" \
       --for=condition=ready \
       --timeout="${KUSTOMIZATION_TIMEOUT}" || return 1
@@ -122,13 +148,13 @@ reconcile_kustomization() {
     echo "kustomization $name is already ready, skipping reconcile"
   else
     echo "flux reconcile"
-    flux reconcile kustomization "$name" \
+    retry_transient flux reconcile kustomization "$name" \
       -n "$namespace" \
       --timeout="${KUSTOMIZATION_TIMEOUT}" \
       "${CONTEXT_ARGS[@]}" || return 1
 
     echo "kubectl wait"
-    kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" \
+    retry_transient kubectl "${CONTEXT_ARGS[@]}" -n "$namespace" \
       wait kustomization/"$name" \
       --for=condition=ready \
       --timeout="${KUSTOMIZATION_TIMEOUT}" || return 1
@@ -141,13 +167,13 @@ reconcile_kustomization() {
 
 group_start "Kustomization flux-system"
 echo "flux reconcile"
-flux reconcile kustomization flux-system \
+retry_transient flux reconcile kustomization flux-system \
   -n flux-system \
   --timeout="${KUSTOMIZATION_TIMEOUT}" \
   "${CONTEXT_ARGS[@]}" --with-source || exit 1
 
 echo "kubectl wait"
-kubectl "${CONTEXT_ARGS[@]}" -n flux-system \
+retry_transient kubectl "${CONTEXT_ARGS[@]}" -n flux-system \
   wait kustomization/flux-system \
   --for=condition=ready \
   --timeout="${KUSTOMIZATION_TIMEOUT}" || exit 1
@@ -157,13 +183,13 @@ group_end
 if flux get kustomization local-bootstrap -n flux-system "${CONTEXT_ARGS[@]}" >/dev/null 2>&1; then
   group_start "Kustomization local-bootstrap"
   echo "flux reconcile"
-  flux reconcile kustomization local-bootstrap \
+  retry_transient flux reconcile kustomization local-bootstrap \
     -n flux-system \
     --timeout="${KUSTOMIZATION_TIMEOUT}" \
     "${CONTEXT_ARGS[@]}" || exit 1
 
   echo "kubectl wait"
-  kubectl "${CONTEXT_ARGS[@]}" -n flux-system \
+  retry_transient kubectl "${CONTEXT_ARGS[@]}" -n flux-system \
     wait kustomization/local-bootstrap \
     --for=condition=ready \
     --timeout="${KUSTOMIZATION_TIMEOUT}" || exit 1
@@ -290,10 +316,23 @@ echo "Waiting for CoreDNS rollout..."
 kubectl "${CONTEXT_ARGS[@]}" -n kube-system rollout status deployment/coredns --timeout="${KUSTOMIZATION_TIMEOUT}"
 
 # In CI, suspend all kustomizations to prevent the kustomization controller from
-# re-applying suspend: true to HelmReleases during helmrelease verification
+# re-applying suspend: true to HelmReleases during helmrelease verification.
+# CI_UNSUSPENDED_KUSTOMIZATIONS (no HelmReleases) keep reconciling, without dependsOn.
 if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
-  echo "Suspending all kustomizations..."
-  flux suspend kustomization --all -n flux-system "${CONTEXT_ARGS[@]}"
+  echo "Suspending all kustomizations except: ${CI_UNSUSPENDED_KUSTOMIZATIONS:-none}"
+  for ks in $(kubectl "${CONTEXT_ARGS[@]}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io \
+      -o jsonpath='{.items[*].metadata.name}'); do
+    [[ " ${CI_UNSUSPENDED_KUSTOMIZATIONS} " == *" ${ks} "* ]] && continue
+    retry_transient flux suspend kustomization "$ks" -n flux-system "${CONTEXT_ARGS[@]}"
+  done
+  for ks in ${CI_UNSUSPENDED_KUSTOMIZATIONS}; do
+    if [[ -n "$(kubectl "${CONTEXT_ARGS[@]}" -n flux-system get kustomizations.kustomize.toolkit.fluxcd.io "$ks" \
+        -o jsonpath='{.spec.dependsOn}' 2>/dev/null)" ]]; then
+      echo "Removing dependsOn from $ks"
+      retry_transient kubectl "${CONTEXT_ARGS[@]}" -n flux-system patch kustomizations.kustomize.toolkit.fluxcd.io "$ks" \
+        --type=json -p '[{"op":"remove","path":"/spec/dependsOn"}]'
+    fi
+  done
 fi
 
 exit 0

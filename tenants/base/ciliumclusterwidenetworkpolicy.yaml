@@ -1,0 +1,70 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: tenant-${tenant_name}
+spec:
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: ${tenant_name}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: ${tenant_name}
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: envoy-gateway-system
+        k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-gw-${tenant_name}
+  ingressDeny:
+  - fromEndpoints:
+    - matchExpressions:
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: Exists
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: NotIn
+        values:
+        - ${tenant_name}
+        - envoy-gateway-system
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: ${tenant_name}
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: "6443"
+        protocol: TCP
+  - toEntities:
+    - world
+    toPorts:
+    - ports:
+      - port: "80"
+        protocol: TCP
+      - port: "443"
+        protocol: TCP
+  egressDeny:
+  - toEndpoints:
+    - matchExpressions:
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: Exists
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: NotIn
+        values:
+        - ${tenant_name}
+        - kube-system
+  - toCIDRSet:
+    - cidr: 10.0.0.0/8
+    - cidr: 100.64.0.0/10
+    - cidr: 169.254.0.0/16
+    - cidr: 172.16.0.0/12
+    - cidr: 192.168.0.0/16

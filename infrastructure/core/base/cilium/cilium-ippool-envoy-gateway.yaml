@@ -9,3 +9,9 @@ spec:
   serviceSelector:
     matchLabels:
       "io.kubernetes.service.namespace": "envoy-gateway-system"
+    matchExpressions:
+    - key: gateway.envoyproxy.io/owning-gateway-name
+      operator: In
+      values:
+      - envoy-gw
+      - envoy-gw-private

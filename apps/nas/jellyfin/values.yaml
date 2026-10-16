@@ -15,7 +15,7 @@ initContainers:
   ldap-auth-config:
     image: busybox:1.37
     imagePullPolicy: IfNotPresent
-    command: ["sh", "-c", "mkdir -p /config/plugins/configurations && cp /ldap-auth/LDAP-Auth.xml /config/plugins/configurations/LDAP-Auth.xml"]
+    command: ["sh", "-c", "mkdir -p /config/config /config/plugins/configurations && cp /ldap-auth/LDAP-Auth.xml /config/plugins/configurations/LDAP-Auth.xml"]
     volumeMounts:
     - name: data
       mountPath: /config
