@@ -53,7 +53,7 @@ volume:
   # the base args, with more free space kept: 1% of a 100Gi disk is 1GB
   args:
   - -dir=/data
-  - -max=0
+  - -max=60
   - -compactionMBps=50
   - -readMode=proxy
   - -publicUrl=$(POD_FQDN)
