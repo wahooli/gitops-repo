@@ -59,7 +59,7 @@ server:
         syncthing:
           image:
             repository: docker.io/syncthing/syncthing
-            tag: 2.1.6 # {"$imagepolicy": "flux-system:syncthing:tag"}
+            tag: 2.1.7 # {"$imagepolicy": "flux-system:syncthing:tag"}
           command:
           - /bin/sh
           - -c
