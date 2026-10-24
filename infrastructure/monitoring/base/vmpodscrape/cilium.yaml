@@ -63,6 +63,13 @@ spec:
       source_labels:
       - __meta_kubernetes_pod_label_io_cilium_app
       target_label: io_cilium_app
+    metricRelabelConfigs:
+    # ~130 of ~790 series: IP pools (LB-IPAM, pod IPAM), BGP and clustermesh; the
+    # rest is workqueue/kvstore histograms nothing uses.
+    - action: keep
+      source_labels:
+      - __name__
+      regex: 'cilium_operator_(bgp|clustermesh|ipam|lbipam)_.+'
   jobLabel: app.kubernetes.io/name
   namespaceSelector:
     matchNames:
