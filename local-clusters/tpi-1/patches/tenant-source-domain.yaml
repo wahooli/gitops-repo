@@ -1,0 +1,10 @@
+# domain_wahoo_li is "localhost" locally, which tenant-flux-guardrails rejects as a
+# source host. Give tenant sources a reserved, never-resolving public-style domain.
+target:
+  kind: Kustomization
+  group: kustomize.toolkit.fluxcd.io
+  name: tenant-.*
+patch: |
+  - op: add
+    path: /spec/postBuild/substitute/domain_wahoo_li
+    value: wahoo.invalid

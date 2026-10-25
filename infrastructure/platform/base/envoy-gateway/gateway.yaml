@@ -21,7 +21,11 @@ spec:
     hostname: "*.${domain_wahoo_li:=wahoo.li}"
     allowedRoutes:
       namespaces:
-        from: All
+        from: Selector
+        selector:
+          matchExpressions:
+          - key: homelab.wahoo.li/tenant
+            operator: DoesNotExist
   - name: wahooli-https
     protocol: HTTPS
     port: 443
@@ -33,4 +37,8 @@ spec:
         kind: Secret
     allowedRoutes:
       namespaces:
-        from: All
+        from: Selector
+        selector:
+          matchExpressions:
+          - key: homelab.wahoo.li/tenant
+            operator: DoesNotExist

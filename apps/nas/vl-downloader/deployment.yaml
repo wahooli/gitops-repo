@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: vl-downloader
-        image: ghcr.io/wahooli/docker/vimm-dl:1.0.6 # {"$imagepolicy": "flux-system:vl-downloader"}
+        image: ghcr.io/wahooli/docker/vimm-dl:1.0.8 # {"$imagepolicy": "flux-system:vl-downloader"}
         imagePullPolicy: IfNotPresent
         securityContext:
           runAsNonRoot: true
@@ -34,6 +34,12 @@ spec:
           value: Europe/Helsinki
         - name: VIMM_SOLVER_URL
           value: http://byparr:8191/v1
+        - name: VIMM_CHD
+          value: "true"
+        - name: VIMM_THREADS
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.cpu
         - name: VIMM_OUTPUT
           value: /downloads
         - name: VIMM_THROTTLE

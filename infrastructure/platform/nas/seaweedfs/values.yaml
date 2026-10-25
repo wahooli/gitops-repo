@@ -1,4 +1,32 @@
 rack: nas
+master:
+  configMaps:
+    config:
+      data:
+        master.toml: |-
+          [master.maintenance]
+          # one volume server, so there's nothing to balance or replicate
+          scripts = """
+            lock
+            volume.deleteEmpty -quietFor=72h -force
+            s3.clean.uploads -timeAgo=24h
+            unlock
+          """
+          sleep_minutes = 17
+
+          [master.sequencer]
+          type = "raft"
+          sequencer_snowflake_id = 0
+  persistence:
+    master-config:
+      mount:
+      - path: /etc/seaweedfs/master.toml
+        subPath: master.toml
+      spec:
+        useFromChart: true
+        configMap:
+          name: config
+          defaultMode: 0444
 volume:
   replicaCount: 1
   ordinals:

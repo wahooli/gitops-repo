@@ -1,0 +1,29 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: ${tenant_name}
+  namespace: ${tenant_name}
+spec:
+  interval: 5m0s
+  url: ssh://git@ssh.git.${domain_wahoo_li:=wahoo.li}/${tenant_git_repo}
+  ref:
+    branch: ${tenant_git_branch:=main}
+  secretRef:
+    name: ${tenant_name}-git-auth
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ${tenant_name}
+  namespace: ${tenant_name}
+spec:
+  interval: 10m0s
+  retryInterval: 2m0s
+  timeout: 5m0s
+  prune: true
+  serviceAccountName: flux-reconciler
+  targetNamespace: ${tenant_name}
+  sourceRef:
+    kind: GitRepository
+    name: ${tenant_name}
+  path: ${tenant_git_path:=./}

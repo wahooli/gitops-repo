@@ -1,0 +1,54 @@
+# BGP sessions between the clusters' Cilium and the routers (peer label from the
+# cilium-agent VMPodScrape: breakout = MikroTik, quantum = UDM). Both clusters
+# announce the anycast addresses; breakout and quantum prefer nas for 10.0.0.1,
+# 10.0.0.8, 10.0.0.9 and 10.0.0.80, and tpi-1 for 10.0.1.1.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: cilium-bgp
+  namespace: alerting
+spec:
+  groups:
+  - name: cilium-bgp
+    rules:
+    - alert: CiliumBGPAnycastFailover
+      expr: max by (clustername, peer) (cilium_bgp_control_plane_session_state{clustername=~"nas|tpi-1"}) == 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        dashboard: "https://grafana.${domain_wahoo_li:=wahoo.li}/d/cilium-bgp"
+        summary: "{{ $labels.clustername }} has no BGP session to {{ $labels.peer }}: its anycast addresses are failing over"
+        description: >-
+          No {{ $labels.clustername }} node has an established BGP session with
+          {{ $labels.peer }}, so {{ $labels.peer }} routes
+          {{ if eq $labels.clustername "nas" }}10.0.0.1, 10.0.0.8, 10.0.0.9 and 10.0.0.80{{ else }}10.0.1.1{{ end }}
+          to the other cluster.
+
+    - alert: CiliumBGPSessionDown
+      expr: cilium_bgp_control_plane_session_state == 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        dashboard: "https://grafana.${domain_wahoo_li:=wahoo.li}/d/cilium-bgp"
+        summary: "BGP session {{ $labels.clustername }}/{{ $labels.instance }} to {{ $labels.peer }} is down"
+        description: >-
+          Cilium on {{ $labels.instance }} ({{ $labels.clustername }}) has had no
+          established BGP session with {{ $labels.peer }} ({{ $labels.neighbor }})
+          for 5 minutes.
+
+    # Sampled every 30s, so drops shorter than that are only caught some of the
+    # time; repeated drops (e.g. a keepalive longer than the hold time) still show.
+    - alert: CiliumBGPSessionFlapping
+      expr: changes(cilium_bgp_control_plane_session_state[30m]) >= 2
+      labels:
+        severity: warning
+      annotations:
+        dashboard: "https://grafana.${domain_wahoo_li:=wahoo.li}/d/cilium-bgp"
+        summary: "BGP session {{ $labels.clustername }}/{{ $labels.instance }} to {{ $labels.peer }} is flapping"
+        description: >-
+          The BGP session between {{ $labels.instance }} ({{ $labels.clustername }})
+          and {{ $labels.peer }} changed state {{ $value }} times in 30 minutes.
+          Each drop briefly moves the cluster's anycast addresses to the other
+          cluster. Check hold and keepalive timers on both ends.

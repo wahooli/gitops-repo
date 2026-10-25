@@ -13,13 +13,16 @@ spec:
   scrapeInterval: 30s
   configReloaderExtraArgs:
     log-format: json
+  # vmauth-global-write sends every cluster's remote writes here first, so this
+  # one also relays the other agents' data: it sat at 265-336Mi under the old
+  # 350Mi limit and was OOM-killed on spikes.
   resources:
     limits:
       cpu: 650m
-      memory: 350Mi
+      memory: 512Mi
     requests:
       cpu: "0"
-      memory: 200Mi
+      memory: 300Mi
   remoteWrite:
   - url: http://vminsert-short-term-nas.monitoring.svc.cluster.local.:8480/insert/0/prometheus/api/v1/write
     inlineUrlRelabelConfig:

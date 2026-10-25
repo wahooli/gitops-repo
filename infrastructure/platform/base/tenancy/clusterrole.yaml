@@ -1,0 +1,78 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tenant
+rules:
+- apiGroups: [""]
+  resources:
+  - configmaps
+  - persistentvolumeclaims
+  - pods
+  - secrets
+  - serviceaccounts
+  - services
+  verbs: [get, list, watch, create, update, patch, delete, deletecollection]
+- apiGroups: [""]
+  resources:
+  - endpoints
+  - events
+  - limitranges
+  - pods/log
+  - resourcequotas
+  verbs: [get, list, watch]
+- apiGroups: [apps]
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs: [get, list, watch, create, update, patch, delete, deletecollection]
+- apiGroups: [batch]
+  resources:
+  - cronjobs
+  - jobs
+  verbs: [get, list, watch, create, update, patch, delete, deletecollection]
+- apiGroups: [autoscaling]
+  resources:
+  - horizontalpodautoscalers
+  verbs: [get, list, watch, create, update, patch, delete, deletecollection]
+- apiGroups: [coordination.k8s.io]
+  resources:
+  - leases
+  verbs: [get, list, watch, create, update, patch, delete]
+- apiGroups: [discovery.k8s.io]
+  resources:
+  - endpointslices
+  verbs: [get, list, watch]
+- apiGroups: [events.k8s.io]
+  resources:
+  - events
+  verbs: [get, list, watch]
+- apiGroups: [rbac.authorization.k8s.io]
+  resources:
+  - rolebindings
+  - roles
+  verbs: [get, list, watch, create, update, patch, delete]
+- apiGroups: [gateway.networking.k8s.io]
+  resources:
+  - grpcroutes
+  - httproutes
+  verbs: [get, list, watch, create, update, patch, delete]
+- apiGroups: [kustomize.toolkit.fluxcd.io]
+  resources:
+  - kustomizations
+  verbs: [get, list, watch, create, update, patch, delete]
+- apiGroups: [helm.toolkit.fluxcd.io]
+  resources:
+  - helmreleases
+  verbs: [get, list, watch, create, update, patch, delete]
+- apiGroups: [source.toolkit.fluxcd.io]
+  resources:
+  - gitrepositories
+  - helmrepositories
+  - ocirepositories
+  verbs: [get, list, watch, create, update, patch, delete]
+- apiGroups: [source.toolkit.fluxcd.io]
+  resources:
+  - helmcharts
+  verbs: [get, list, watch]

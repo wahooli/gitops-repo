@@ -2,6 +2,8 @@ gitea:
   config:
     storage:
       MINIO_ENDPOINT: seaweedfs-filer-tpi-1.seaweedfs.svc.cluster.local:8333
+    queue:
+      CONN_STR: redis+sentinel://forgejo-redis-0.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-1.forgejo-redis.forgejo.svc.cluster.local:26379,forgejo-redis-2.forgejo-redis.forgejo.svc.cluster.local:26379/3?mastername=forgejomaster
 service:
   http:
     annotations:

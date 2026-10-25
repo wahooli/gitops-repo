@@ -16,6 +16,10 @@ spec:
     port: 80
     allowedRoutes:
       namespaces:
-        from: All
+        from: Selector
+        selector:
+          matchExpressions:
+          - key: homelab.wahoo.li/tenant
+            operator: DoesNotExist
       kinds:
       - kind: HTTPRoute

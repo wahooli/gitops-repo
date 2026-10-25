@@ -22,3 +22,9 @@ data:
         enabled: false
       gateway:
         enabled: false
+
+    certificates:
+      client:
+        secretTemplate:
+          annotations:
+            reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "authentik,crowdsec,forgejo,immich"

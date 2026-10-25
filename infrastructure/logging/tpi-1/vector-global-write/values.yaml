@@ -5,6 +5,10 @@ resources:
     memory: 96Mi
   limits:
     memory: 256Mi
+# worker pool defaults to host CPU count, which overshoots the memory limit on large hosts
+env:
+- name: VECTOR_THREADS
+  value: "4"
 args:
 - -w
 - --config-dir

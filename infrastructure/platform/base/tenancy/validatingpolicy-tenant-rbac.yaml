@@ -1,0 +1,35 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: tenant-rbac-guardrails
+  annotations:
+    policies.kyverno.io/title: Tenant RBAC Guardrails
+    policies.kyverno.io/category: Multi-Tenancy
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      RoleBindings in a tenant namespace may only bind ServiceAccounts of that
+      namespace. RBAC escalation checks already stop tenants from granting
+      more than they hold; this stops them from handing that access to users,
+      groups (such as system:unauthenticated) or other namespaces' accounts.
+spec:
+  validationActions: [Deny, Audit]
+  failurePolicy: Fail
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+      - key: homelab.wahoo.li/tenant
+        operator: Exists
+    resourceRules:
+    - apiGroups: ["rbac.authorization.k8s.io"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["rolebindings"]
+  validations:
+  - expression: >-
+      object.?subjects.orValue([]).all(s,
+        s.kind == 'ServiceAccount' &&
+        s.?namespace.orValue(object.metadata.namespace) == object.metadata.namespace)
+    message: Tenant RoleBindings may only bind ServiceAccounts in the tenant namespace.

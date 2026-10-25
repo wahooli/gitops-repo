@@ -10,7 +10,3 @@ data:
         main:
           pod:
             runtimeClassName: ""
-            securityContext:
-              runAsNonRoot: false
-              runAsUser: 0
-              runAsGroup: 0
