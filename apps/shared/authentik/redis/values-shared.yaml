@@ -140,8 +140,8 @@ haproxy:
   progressDeadlineSeconds: 600
   image:
     repository: ghcr.io/wahooli/docker/haproxy-redis
-    tag: "3.2.26-1" # {"$imagepolicy": "flux-system:haproxy-redis:tag"}
-    digest: sha256:dccceddecb234de4da840d5077ba04563c736d9c2eaa424bfb84567c46eb7b3b # {"$imagepolicy": "flux-system:haproxy-redis:digest"}
+    tag: "3.2.26-2" # {"$imagepolicy": "flux-system:haproxy-redis:tag"}
+    digest: sha256:6ec8d7ccc075f19a3e47517a48cd46c90d365948687ee6611a8ec5821a6f99b8 # {"$imagepolicy": "flux-system:haproxy-redis:digest"}
   podAnnotations:
     secret.reloader.stakater.com/reload: "authentik-redis-server"
   ciliumNetworkPolicies:
