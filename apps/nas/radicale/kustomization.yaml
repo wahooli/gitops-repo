@@ -8,7 +8,7 @@ resources:
 - imagepolicy.yaml
 images:
 - name: ghcr.io/kozea/radicale
-  newTag: 3.8.3 # {"$imagepolicy": "flux-system:radicale:tag"}
+  newTag: 3.9.0 # {"$imagepolicy": "flux-system:radicale:tag"}
 patches:
 - patch: |
     apiVersion: v1
