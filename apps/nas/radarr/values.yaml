@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/home-operations/radarr
-  tag: "6.4.4" # {"$imagepolicy": "flux-system:radarr:tag"}
+  tag: "7.0.0" # {"$imagepolicy": "flux-system:radarr:tag"}
 progressDeadlineSeconds: 600
 podAnnotations:
   backup.velero.io/backup-volumes: config

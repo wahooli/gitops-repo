@@ -17,7 +17,7 @@ service:
   enabled: false
 image:
   base: debian
-  tag: 0.59.0-debian # {"$imagepolicy": "flux-system:vector-debian:tag"}
+  tag: 0.61.0-debian # {"$imagepolicy": "flux-system:vector-debian:tag"}
 extraVolumes:
 - name: machine-id
   hostPath:
