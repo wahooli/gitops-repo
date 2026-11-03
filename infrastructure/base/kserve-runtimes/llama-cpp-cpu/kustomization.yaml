@@ -4,4 +4,4 @@ resources:
 - llama-cpp-cpu.yaml
 images:
 - name: ghcr.io/ggml-org/llama.cpp
-  newTag: server-b12033 # {"$imagepolicy": "flux-system:llama-cpp-cpu:tag"}
+  newTag: server-b12063 # {"$imagepolicy": "flux-system:llama-cpp-cpu:tag"}
