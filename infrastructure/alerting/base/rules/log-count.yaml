@@ -16,12 +16,21 @@ spec:
       annotations:
         description: "unit {{$labels.systemd_unit}} at {{$labels.systemd_host}} generated {{$value}} logs in the last 1 minute"
     - alert: tooManySystemdLogs
-      expr: '_time: 1m systemd_unit:!~"(user@[0-9]+|archlinux-keyring.+-sync|asd-resync|asd|bluetooth|session-[0-9]+|rtkit-daemon).(service|scope)" {source_type="journald"} | stats by (systemd_unit, systemd_host, source_type) count () as total | filter total:>50'
-      for: 3m
+      expr: '_time: 1m systemd_unit:!~"(user@[0-9]+|archlinux-keyring.+-sync|asd-resync|asd|bluetooth|session-[0-9]+|rtkit-daemon).(service|scope)" {source_type="journald"} | stats by (systemd_unit, systemd_host, source_type) count () as total | filter total:>1000'
+      for: 10m
       annotations:
-        description: "unit {{$labels.systemd_unit}} at {{$labels.systemd_host}} generated more than 50 log entries in the last 1 minute: {{$value}}"
+        description: "unit {{$labels.systemd_unit}} at {{$labels.systemd_host}} generated more than 1000 log entries per minute for 10 minutes: {{$value}}"
         dashboard: https://grafana.${domain_wahoo_li:=wahoo.li}/d/ce9vopbczsc8wd/systemd-logs?orgId=1&timezone=browser&var-host={{$labels.systemd_host}}&var-unit={{$labels.systemd_unit}}&from={{($activeAt.Add (parseDurationTime "-15m")).UnixMilli}}&to={{($activeAt.Add (parseDurationTime "15m")).UnixMilli}}
       labels:
         explore_expression: '{source_type="journald", systemd_unit="{{$labels.systemd_unit}}", systemd_host="{{$labels.systemd_host}}"}'
         timespan: 15m
+        show_at: dashboard
+    - alert: repeatingSystemdLogs
+      expr: '_time: 2h systemd_unit:!~"(user@[0-9]+|archlinux-keyring.+-sync|asd-resync|asd|bluetooth|session-[0-9]+|rtkit-daemon).(service|scope)" {source_type="journald"} | collapse_nums prettify | stats by (systemd_unit, systemd_host, source_type, _msg, _time:10m) count() as n | filter n:>=30 | stats by (systemd_unit, systemd_host, source_type, _msg) count() as slices, sum(n) as total | filter slices:>=11 | stats by (systemd_unit, systemd_host, source_type, _msg) sum(total) as total'
+      annotations:
+        description: "unit {{$labels.systemd_unit}} at {{$labels.systemd_host}} repeated the same message at 3+ per minute for the last 2 hours ({{$value}} times): {{ index $labels \"_msg\" }}"
+        dashboard: https://grafana.${domain_wahoo_li:=wahoo.li}/d/ce9vopbczsc8wd/systemd-logs?orgId=1&timezone=browser&var-host={{$labels.systemd_host}}&var-unit={{$labels.systemd_unit}}&from={{($activeAt.Add (parseDurationTime "-2h")).UnixMilli}}&to={{($activeAt.Add (parseDurationTime "15m")).UnixMilli}}
+      labels:
+        explore_expression: '{source_type="journald", systemd_unit="{{$labels.systemd_unit}}", systemd_host="{{$labels.systemd_host}}"}'
+        timespan: 2h
         show_at: dashboard

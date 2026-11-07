@@ -34,7 +34,7 @@ spec:
     resources:
     - container: activator
       requests:
-        cpu: "0"
+        cpu: 50m
   - name: autoscaler
     resources:
     - container: autoscaler
@@ -49,4 +49,4 @@ spec:
     resources:
     - container: webhook
       requests:
-        cpu: "0"
+        cpu: 20m
