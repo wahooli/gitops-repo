@@ -107,6 +107,19 @@ blocking:
     - https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
     - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt
     - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+    lgtv:
+    - |
+      *.lgtvcommon.com
+      *.nextlgsdp.com
+      *.lgsmartad.com
+      *.lgtviot.com
+      *.lgthinq.com
+      *.lgtvsdp.com
+      *.lgappstv.com
+      *.lgsmartweb.com
+      *.lggalleryplus.com
+      tv.wiselg.com
+      /^([a-z0-9-]+-)?(ngfts|snu|su|su-ssl|nsu|snu-dev|su-dev)\.lge\.com$/
   # definition of whitelist groups. Attention: if the same group has black and whitelists, whitelists will be used to disable particular blacklist entries. If a group has only whitelist entries -> this means only domains from this list are allowed, all other domains will be blocked
   allowlists:
     homeassistant:
@@ -143,6 +156,7 @@ blocking:
     ${iot_cidr}:
     - ads
     - iot
+    - lgtv
     ${not_cidr}:
     - not
   # which response will be sent, if query is blocked:

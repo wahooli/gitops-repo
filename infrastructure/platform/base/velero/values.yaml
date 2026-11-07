@@ -140,6 +140,8 @@ configuration:
     repositoryConfigData:
       global:
         keepLatestMaintenanceJobs: 3
+        podLabels:
+          app: velero-repo-maintenance
         podResources:
           cpuRequest: "0"
           cpuLimit: "0"
