@@ -39,6 +39,11 @@ server:
           fsGroupChangePolicy: OnRootMismatch
           supplementalGroups:
           - 2002
+        dnsConfig:
+          options:
+          - name: ndots
+            value: "1"
+          - name: edns0
       containers:
         main:
           image:

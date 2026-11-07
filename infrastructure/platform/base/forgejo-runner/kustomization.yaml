@@ -5,6 +5,7 @@ resources:
 - serviceaccount.yaml
 - triggerauthentication.yaml
 - scaledjob.yaml
+- service.yaml
 - networkpolicy.yaml
 - imagerepository.yaml
 - imagepolicy.yaml

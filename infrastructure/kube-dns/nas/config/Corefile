@@ -18,6 +18,11 @@
     template ANY AAAA {
         rcode NOERROR
     }
+    template ANY ANY lan svc {
+        match ^.+\..+\.(lan|svc)\.$
+        rcode NXDOMAIN
+        fallthrough
+    }
     forward . ${blocky_cluster_ip:=/etc/resolv.conf}
     cache {
         success 9984 30
