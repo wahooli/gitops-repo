@@ -34,3 +34,12 @@ spec:
         explore_expression: '{source_type="journald", systemd_unit="{{$labels.systemd_unit}}", systemd_host="{{$labels.systemd_host}}"}'
         timespan: 2h
         show_at: dashboard
+    - alert: lvmThinPoolFillingUp
+      expr: '_time: 15m {source_type="journald"} (("Thin pool" "is now" "full") or "out-of-data-space") | stats by (systemd_unit, systemd_host, source_type, _msg) count() as total'
+      annotations:
+        description: "{{$labels.systemd_host}}: {{ index $labels \"_msg\" }}"
+        dashboard: https://grafana.${domain_wahoo_li:=wahoo.li}/d/ce9vopbczsc8wd/systemd-logs?orgId=1&timezone=browser&var-host={{$labels.systemd_host}}&var-unit={{$labels.systemd_unit}}&from={{($activeAt.Add (parseDurationTime "-15m")).UnixMilli}}&to={{($activeAt.Add (parseDurationTime "15m")).UnixMilli}}
+      labels:
+        explore_expression: '{source_type="journald", systemd_unit="{{$labels.systemd_unit}}", systemd_host="{{$labels.systemd_host}}"}'
+        timespan: 15m
+        show_at: dashboard

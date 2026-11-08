@@ -1,0 +1,59 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: node-filesystem
+  namespace: alerting
+spec:
+  groups:
+  - name: node-filesystem
+    rules:
+    - alert: NodeFilesystemSpaceFillingUp
+      annotations:
+        description: Filesystem {{ $labels.device }} on {{ $labels.instance }} {{ with $labels.clustername -}} ({{ . }}) {{- end }} has {{ $value | humanizePercentage }} space left and is predicted to run out within 24 hours.
+        summary: Filesystem is predicted to run out of space within 24 hours.
+      expr: |-
+        min by (clustername, instance, device, fstype) (
+          node_filesystem_avail_bytes{fstype!~"tmpfs|zfs|squashfs|overlay", source!="vps"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|zfs|squashfs|overlay", source!="vps"} < 0.20
+          and
+          predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|zfs|squashfs|overlay", source!="vps"}[6h], 24 * 3600) < 0
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: NodeFilesystemAlmostOutOfSpace
+      annotations:
+        description: Filesystem {{ $labels.device }} on {{ $labels.instance }} {{ with $labels.clustername -}} ({{ . }}) {{- end }} has only {{ $value | humanizePercentage }} space left.
+        summary: Filesystem has less than 10% space left.
+      expr: |-
+        min by (clustername, instance, device, fstype) (
+          node_filesystem_avail_bytes{fstype!~"tmpfs|zfs|squashfs|overlay", source!="vps"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|zfs|squashfs|overlay", source!="vps"}
+        ) < 0.10
+      for: 30m
+      labels:
+        severity: warning
+    - alert: NodeFilesystemAlmostOutOfSpace
+      annotations:
+        description: Filesystem {{ $labels.device }} on {{ $labels.instance }} {{ with $labels.clustername -}} ({{ . }}) {{- end }} has only {{ $value | humanizePercentage }} space left.
+        summary: Filesystem has less than 5% space left.
+      expr: |-
+        min by (clustername, instance, device, fstype) (
+          node_filesystem_avail_bytes{fstype!~"tmpfs|zfs|squashfs|overlay", source!="vps"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|zfs|squashfs|overlay", source!="vps"}
+        ) < 0.05
+      for: 15m
+      labels:
+        severity: critical
+    - alert: NodeFilesystemAlmostOutOfFiles
+      annotations:
+        description: Filesystem {{ $labels.device }} on {{ $labels.instance }} {{ with $labels.clustername -}} ({{ . }}) {{- end }} has only {{ $value | humanizePercentage }} inodes left.
+        summary: Filesystem has less than 5% inodes left.
+      expr: |-
+        min by (clustername, instance, device, fstype) (
+          node_filesystem_files_free{fstype!~"tmpfs|zfs|squashfs|overlay|vfat", source!="vps"}
+            / node_filesystem_files{fstype!~"tmpfs|zfs|squashfs|overlay|vfat", source!="vps"}
+        ) < 0.05
+      for: 1h
+      labels:
+        severity: warning

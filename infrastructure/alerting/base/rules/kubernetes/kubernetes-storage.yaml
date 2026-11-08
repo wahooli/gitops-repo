@@ -112,3 +112,12 @@ spec:
       for: 5m
       labels:
         severity: critical
+    - alert: TopolvmThinPoolFillingUp
+      annotations:
+        description: TopoLVM thin pool {{ $labels.device_class }} on {{ $labels.node }} ({{ $labels.clustername }}) is {{ $value | humanize }}% full (data or metadata).
+        summary: TopoLVM thin pool is filling up.
+      expr: |-
+        max by (clustername, node, device_class) (topolvm_thinpool_data_percent > 80 or topolvm_thinpool_metadata_percent > 80)
+      for: 15m
+      labels:
+        severity: warning
