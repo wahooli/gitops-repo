@@ -157,6 +157,10 @@ blocking:
     - ads
     - iot
     - lgtv
+    192.168.250.0/24:
+    - ads
+    - iot
+    - lgtv
     ${not_cidr}:
     - not
   # which response will be sent, if query is blocked:
