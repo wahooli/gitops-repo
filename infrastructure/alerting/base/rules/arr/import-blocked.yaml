@@ -1,0 +1,26 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: arr-import-blocked
+  namespace: alerting
+spec:
+  groups:
+  - name: arr-queue
+    rules:
+    - alert: ArrImportBlocked
+      annotations:
+        summary: New import-blocked downloads in {{ $labels.job }}.
+        description: >
+          {{ $labels.job }} has {{ $value }} import-blocked queue items, more than an hour ago.
+          Check Activity → Queue for downloads that need a manual import.
+      expr: |-
+        sum by (clustername, job) ({__name__=~"sonarr_queue_total|radarr_queue_total", download_state="importBlocked"})
+        >
+        (
+          sum by (clustername, job) ({__name__=~"sonarr_queue_total|radarr_queue_total", download_state="importBlocked"} offset 1h)
+          or
+          max by (clustername, job) (up{job=~"sonarr|radarr"} offset 1h == 1) * 0
+        )
+      for: 0m
+      labels:
+        severity: warning

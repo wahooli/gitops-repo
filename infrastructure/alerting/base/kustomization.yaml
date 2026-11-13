@@ -6,6 +6,7 @@ resources:
 - templates
 - vmalertmanagerconfig/generic-alerts.yaml
 - vmalertmanagerconfig/systemd-alerts.yaml
+- rules/arr/import-blocked.yaml
 - rules/authentik/outpost-health.yaml
 - rules/cilium/bgp.yaml
 - rules/kubernetes/k3s-certificates.yaml
