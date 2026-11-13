@@ -21,6 +21,12 @@ rbac:
     - imagepolicies
     - imageupdateautomations
     verbs: ["list", "watch"]
+  - apiGroups:
+    - velero.io
+    resources:
+    - backups
+    - schedules
+    verbs: ["list", "watch"]
 customResourceState:
   enabled: true
   config:
@@ -266,6 +272,38 @@ customResourceState:
             ready: [status, conditions, "[type=Ready]", status]
             suspended: [spec, suspend]
             source_name: [spec, sourceRef, name]
+      - groupVersionKind:
+          group: velero.io
+          version: v1
+          kind: Backup
+        metricNamePrefix: kube_velero
+        metrics:
+        - name: "backup_info"
+          help: "The current phase of a Velero backup."
+          each:
+            type: Info
+            info:
+              labelsFromPath:
+                name: [metadata, name]
+          labelsFromPath:
+            exported_namespace: [metadata, namespace]
+            phase: [status, phase]
+            schedule: [metadata, labels, velero.io/schedule-name]
+      - groupVersionKind:
+          group: velero.io
+          version: v1
+          kind: Schedule
+        metricNamePrefix: kube_velero
+        metrics:
+        - name: "schedule_last_backup_timestamp_seconds"
+          help: "Time the Velero schedule last started a backup."
+          each:
+            type: Gauge
+            gauge:
+              path: [status, lastBackup]
+          labelsFromPath:
+            exported_namespace: [metadata, namespace]
+            schedule: [metadata, name]
 resources:
   requests:
     memory: 256Mi

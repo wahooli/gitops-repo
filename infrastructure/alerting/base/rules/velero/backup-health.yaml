@@ -9,78 +9,37 @@ spec:
     rules:
     - alert: VeleroBackupFailed
       annotations:
-        summary: Velero backup {{ $labels.schedule }} failed.
-        description: Velero backup schedule {{ $labels.schedule }} recorded a failed backup in the last hour.
+        summary: Velero backup {{ $labels.name }} failed.
+        description: Velero backup {{ $labels.name }} (schedule {{ $labels.schedule }}) is in phase {{ $labels.phase }}. Delete the backup once handled to resolve this alert.
       expr: |-
-        increase(velero_backup_failure_total[1h]) > 0
+        kube_velero_backup_info{phase=~"Failed|FailedValidation"}
       for: 0m
       labels:
         severity: critical
     - alert: VeleroBackupPartialFailure
       annotations:
-        summary: Velero backup {{ $labels.schedule }} partially failed.
-        description: Velero backup {{ $labels.schedule }} completed with errors.
+        summary: Velero backup {{ $labels.name }} partially failed.
+        description: Velero backup {{ $labels.name }} (schedule {{ $labels.schedule }}) completed with errors. Delete the backup once handled to resolve this alert.
       expr: |-
-        increase(velero_backup_partial_failure_total[1h]) > 0
+        kube_velero_backup_info{phase="PartiallyFailed"}
       for: 0m
       labels:
         severity: warning
-    - alert: VeleroBackupValidationFailed
+    - alert: VeleroBackupNotRunRecently
       annotations:
-        summary: Velero backup {{ $labels.schedule }} failed validation.
-        description: Velero backup {{ $labels.schedule }} failed validation, check BackupStorageLocation availability.
+        summary: Velero backup schedule {{ $labels.schedule }} has not run recently.
+        description: Velero schedule {{ $labels.schedule }} has not started a backup in the last 26 hours.
       expr: |-
-        increase(velero_backup_validation_failure_total[1h]) > 0
+        time() - kube_velero_schedule_last_backup_timestamp_seconds{schedule=~".*daily.*"} > 93600
       for: 0m
       labels:
         severity: critical
     - alert: VeleroBackupNotRunRecently
       annotations:
-        summary: Velero backup schedule {{ $labels.schedule }} has not completed recently.
-        description: No successful backup for schedule {{ $labels.schedule }} in the last 26 hours.
+        summary: Velero backup schedule {{ $labels.schedule }} has not run recently.
+        description: Velero schedule {{ $labels.schedule }} has not started a backup in the last 8 days.
       expr: |-
-        time() - velero_backup_last_successful_timestamp{schedule=~".*daily.*"} > 93600
+        time() - kube_velero_schedule_last_backup_timestamp_seconds{schedule=~".*weekly.*"} > 691200
       for: 0m
       labels:
         severity: critical
-    - alert: VeleroBackupNotRunRecently
-      annotations:
-        summary: Velero backup schedule {{ $labels.schedule }} has not completed recently.
-        description: No successful backup for schedule {{ $labels.schedule }} in the last 8 days.
-      expr: |-
-        time() - velero_backup_last_successful_timestamp{schedule=~".*weekly.*"} > 691200
-      for: 0m
-      labels:
-        severity: critical
-    # velero_backup_last_successful_timestamp is in-process state: a velero restart drops
-    # the series until the next successful backup, which silently blinds the
-    # VeleroBackupNotRunRecently rules above. The for: durations match each schedule's
-    # interval so a restart followed by a normal successful backup never alerts.
-    - alert: VeleroBackupMetricsMissing
-      annotations:
-        summary: Velero backup success metrics missing for {{ $labels.schedule }}.
-        description: >
-          velero is up but reports no successful backup timestamp for {{ $labels.schedule }}.
-          Velero likely restarted and has not completed a backup since, so backup age
-          alerting is blind until the next successful backup.
-      expr: |-
-        absent(velero_backup_last_successful_timestamp{schedule=~".*daily.*"}) == 1
-        and on() count(up{namespace="velero"} == 1) > 0
-      for: 26h
-      labels:
-        severity: critical
-        schedule: velero-daily
-    - alert: VeleroBackupMetricsMissing
-      annotations:
-        summary: Velero backup success metrics missing for {{ $labels.schedule }}.
-        description: >
-          velero is up but reports no successful backup timestamp for {{ $labels.schedule }}.
-          Velero likely restarted and has not completed a backup since, so backup age
-          alerting is blind until the next successful backup.
-      expr: |-
-        absent(velero_backup_last_successful_timestamp{schedule=~".*weekly.*"}) == 1
-        and on() count(up{namespace="velero"} == 1) > 0
-      for: 8d
-      labels:
-        severity: critical
-        schedule: velero-weekly
