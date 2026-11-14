@@ -14,3 +14,4 @@ ps3netsrv_games_host_path: /mnt/bigdata/kyverno-check/ps3netsrv-games-host-path
 long_term_logs_cluster_directory_path: /mnt/bigdata/kyverno-check/long-term-logs-cluster-directory-path
 long_term_metrics_cluster_directory_path: /mnt/bigdata/kyverno-check/long-term-metrics-cluster-directory-path
 seaweedfs_hostpath_prefix: /mnt/bigdata/kyverno-check/seaweedfs-hostpath-prefix
+relapse_payloads_host_path: /mnt/bigdata/kyverno-check/relapse-payloads-host-path

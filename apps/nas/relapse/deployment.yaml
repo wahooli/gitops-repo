@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: relapse
+  namespace: relapse
+  labels:
+    app.kubernetes.io/name: relapse
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: relapse
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: relapse
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        supplementalGroups:
+        - 2001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: nginx
+        image: ghcr.io/wahooli/docker/relapse:0.1.0 # {"$imagepolicy": "flux-system:relapse"}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        resources:
+          requests:
+            cpu: "0"
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 2
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 20
+        volumeMounts:
+        - name: payloads
+          mountPath: /usr/share/nginx/html/payloads/optional
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+        - name: cache
+          mountPath: /var/cache/nginx
+      volumes:
+      - name: payloads
+        persistentVolumeClaim:
+          claimName: relapse-payloads
+      - name: tmp
+        emptyDir:
+          sizeLimit: 64Mi
+      - name: cache
+        emptyDir:
+          sizeLimit: 64Mi
