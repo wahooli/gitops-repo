@@ -7,3 +7,5 @@ resources:
 - imagepolicy-envsubst.yaml
 - imagerepository-haproxy-redis.yaml
 - imagepolicy-haproxy-redis.yaml
+- imagerepository-exportarr.yaml
+- imagepolicy-exportarr.yaml

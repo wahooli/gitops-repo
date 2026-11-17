@@ -1,0 +1,33 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: arr-queue
+  namespace: alerting
+spec:
+  groups:
+  - name: arr-queue
+    rules:
+    - alert: ArrImportBlocked
+      annotations:
+        summary: "{{ $labels.job }}: {{ $labels.title }} is import-blocked."
+        description: >
+          {{ $labels.title }} finished downloading but {{ $labels.job }} can't import it.
+          Import it manually or remove it in Activity → Queue.
+      expr: |-
+        count by (clustername, job, title) ({__name__=~"sonarr_queue_item_size_left_bytes|radarr_queue_item_size_left_bytes", download_state="importBlocked"})
+      for: 0m
+      labels:
+        severity: warning
+    - alert: ArrDownloadStalled
+      annotations:
+        summary: "{{ $labels.job }}: {{ $labels.title }} has stalled."
+        description: >
+          {{ $labels.title }} hasn't downloaded anything in the last hour ({{ $value | humanize1024 }}B left).
+          It may have no seeders. Remove and blocklist it in Activity → Queue to grab another release.
+      expr: |-
+        max by (clustername, job, title) ({__name__=~"sonarr_queue_item_size_left_bytes|radarr_queue_item_size_left_bytes", status=~"downloading|warning", download_state="downloading"})
+        ==
+        max by (clustername, job, title) ({__name__=~"sonarr_queue_item_size_left_bytes|radarr_queue_item_size_left_bytes", status=~"downloading|warning", download_state="downloading"} offset 1h)
+      for: 0m
+      labels:
+        severity: warning

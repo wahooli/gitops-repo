@@ -19,6 +19,10 @@ dnsConfig:
   - name: edns0
 metrics:
   enabled: true
+  image:
+    repository: ghcr.io/wahooli/docker/exportarr
+    tag: "2.3.0-2" # {"$imagepolicy": "flux-system:exportarr:tag"}
+    digest: sha256:c6dd0a4deb42217db8731dc6e80e52a96155a664abb71241de19153e335c9909 # {"$imagepolicy": "flux-system:exportarr:digest"}
   extraEnv:
     ENABLE_ADDITIONAL_METRICS: "true"
     GOMAXPROCS:

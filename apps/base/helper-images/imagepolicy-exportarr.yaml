@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: exportarr
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: exportarr
+  digestReflectionPolicy: IfNotPresent
+  filterTags:
+    pattern: '^\d+\.\d+\.\d+-\d+$'
+  policy:
+    semver:
+      range: "~2.3.0-0"
