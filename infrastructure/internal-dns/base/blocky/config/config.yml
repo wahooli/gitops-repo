@@ -120,6 +120,12 @@ blocking:
       *.lggalleryplus.com
       tv.wiselg.com
       /^([a-z0-9-]+-)?(ngfts|snu|su|su-ssl|nsu|snu-dev|su-dev)\.lge\.com$/
+    playstation:
+    - |
+      *.playstation.net
+      *.playstation.com
+      *.sonyentertainmentnetwork.com
+      *.sony.com
   # definition of whitelist groups. Attention: if the same group has black and whitelists, whitelists will be used to disable particular blacklist entries. If a group has only whitelist entries -> this means only domains from this list are allowed, all other domains will be blocked
   allowlists:
     homeassistant:
@@ -141,6 +147,9 @@ blocking:
       *.${not_cidr_reverse}
     ads:
     - /app/ads-whitelist.txt
+    playstation:
+    - |
+      *.dl.playstation.net
   # definition: which groups should be applied for which client
   clientGroupsBlock:
     # default will be used, if no special definition for a client name exists
@@ -163,6 +172,9 @@ blocking:
     - lgtv
     ${not_cidr}:
     - not
+    192.168.255.201:
+    - ads
+    - playstation
   # which response will be sent, if query is blocked:
   # zeroIp: 0.0.0.0 will be returned (default)
   # nxDomain: return NXDOMAIN as return code
