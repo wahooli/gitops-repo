@@ -160,6 +160,7 @@ blocking:
     nintendo:
     - |
       ctest.cdn.nintendo.net
+      *.ctest.srv.nintendo.net
   # definition: which groups should be applied for which client
   clientGroupsBlock:
     # default will be used, if no special definition for a client name exists
