@@ -166,7 +166,6 @@ blocking:
     # default will be used, if no special definition for a client name exists
     default:
     - ads
-    - nintendo
     homeassistant*:
     - ads
     - iot
@@ -187,6 +186,12 @@ blocking:
     192.168.255.201:
     - ads
     - playstation
+    192.168.255.202:
+    - ads
+    - nintendo
+    192.168.255.203:
+    - ads
+    - nintendo
   # which response will be sent, if query is blocked:
   # zeroIp: 0.0.0.0 will be returned (default)
   # nxDomain: return NXDOMAIN as return code
