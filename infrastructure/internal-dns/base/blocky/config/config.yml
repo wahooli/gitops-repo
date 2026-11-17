@@ -126,6 +126,7 @@ blocking:
       *.playstation.com
       *.sonyentertainmentnetwork.com
       *.sony.com
+      *.psndl.net
   # definition of whitelist groups. Attention: if the same group has black and whitelists, whitelists will be used to disable particular blacklist entries. If a group has only whitelist entries -> this means only domains from this list are allowed, all other domains will be blocked
   allowlists:
     homeassistant:
@@ -150,6 +151,9 @@ blocking:
     playstation:
     - |
       *.dl.playstation.net
+      ena.net.playstation.net
+      post.net.playstation.net
+      feature.api.playstation.com
   # definition: which groups should be applied for which client
   clientGroupsBlock:
     # default will be used, if no special definition for a client name exists
